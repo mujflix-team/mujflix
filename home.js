@@ -246,6 +246,12 @@
 
         _lastContinue = item || null;
 
+        var inFav = false;
+        try {
+          inFav = item.slug && typeof getWatchlist === 'function' &&
+            getWatchlist().some(function (w) { return w.slug === item.slug; });
+        } catch (e) {}
+
         card.innerHTML =
           '<div class="mfh-cont-info">' +
             '<div class="mfh-cont-eyebrow">Pokračovat ve sledování</div>' +
@@ -255,7 +261,10 @@
             '<div class="mfh-cont-bar"><div class="mfh-cont-fill" style="width:' + item.progress + '%"></div></div>' +
             '<div class="mfh-cont-actions">' +
               '<button class="mfh-btn-primary" onclick="mfhResume()">▶ Pokračovat</button>' +
-              '<button class="mfh-btn-secondary" onclick="mfhToggleList(this)">+ Oblíbené</button>' +
+              (item.slug ?
+                '<button class="mfh-btn-secondary" onclick="mfhToggleFav(\'' + esc(item.slug) + '\', this)">' +
+                  (inFav ? '✓ V oblíbených' : '+ Oblíbené') +
+                '</button>' : '') +
             '</div>' +
           '</div>' +
           '<div class="mfh-cont-image">' +
@@ -273,28 +282,25 @@
       }
 
       /* ═══════════ RENDER KARUSELU ═══════════ */
-      function renderCarousel(id, items) {
-        var el = document.getElementById(id);
-        if (!el) return;
+      function mfhCardHtml(it) {
+        var src = it.image ? esc(it.image) : '';
+        var tmdbId = it.tmdbId ? String(it.tmdbId) : '';
+        var mediaType = it.mediaType ? String(it.mediaType) : '';
+        return (
+          '<div class="mfh-card" onclick="mfhOpenCard(\'' + esc(it.title) + '\',\'' + esc(tmdbId) + '\',\'' + esc(mediaType) + '\')">' +
+            '<img class="mfh-card-img mfh-skeleton" ' +
+              'src="' + src + '" ' +
+              'alt="' + esc(it.title) + '" ' +
+              'loading="lazy">' +
+            '<div class="mfh-card-body">' +
+              '<p class="mfh-card-title">' + esc(it.title) + '</p>' +
+              (it.ep ? '<p class="mfh-card-ep">' + esc(it.ep) + '</p>' : '') +
+            '</div>' +
+          '</div>'
+        );
+      }
 
-        el.innerHTML = items.map(function (it) {
-          var src = it.image ? esc(it.image) : '';
-          var tmdbId = it.tmdbId ? String(it.tmdbId) : '';
-          var mediaType = it.mediaType ? String(it.mediaType) : '';
-          return (
-            '<div class="mfh-card" onclick="mfhOpenCard(\'' + esc(it.title) + '\',\'' + esc(tmdbId) + '\',\'' + esc(mediaType) + '\')">' +
-              '<img class="mfh-card-img mfh-skeleton" ' +
-                'src="' + src + '" ' +
-                'alt="' + esc(it.title) + '" ' +
-                'loading="lazy">' +
-              '<div class="mfh-card-body">' +
-                '<p class="mfh-card-title">' + esc(it.title) + '</p>' +
-                (it.ep ? '<p class="mfh-card-ep">' + esc(it.ep) + '</p>' : '') +
-              '</div>' +
-            '</div>'
-          );
-        }).join('');
-
+      function mfhBindCardImages(el) {
         el.querySelectorAll('.mfh-card-img').forEach(function (img) {
           img.addEventListener('load', function () {
             img.classList.remove('mfh-skeleton');
@@ -305,6 +311,48 @@
           });
         });
       }
+
+      function renderCarousel(id, items) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el._mfhItems = items || [];
+        el.innerHTML = items.map(mfhCardHtml).join('');
+        mfhBindCardImages(el);
+      }
+
+      /* ═══════════ "ZOBRAZIT VŠE" — homepage karusely ═══════════
+         Odkazy "Zobrazit vše" u řádků na homepage dřív jen dělaly
+         event.preventDefault() a nic víc. Teď otevřou modal s mřížkou
+         všech položek, které karusel naposledy vykreslil
+         (uložené v el._mfhItems). */
+      window.mfhSeeAll = function (carouselId) {
+        var carousel = document.getElementById(carouselId);
+        var items = (carousel && carousel._mfhItems) || [];
+        var section = carousel && carousel.closest('section');
+        var titleEl = section && section.querySelector('.mfh-h2');
+        var modal = document.getElementById('mfhSeeAllModal');
+        if (!modal) return;
+        var titleTarget = document.getElementById('mfhSeeAllTitle');
+        if (titleTarget) titleTarget.textContent = titleEl ? titleEl.textContent : 'Vše';
+        var grid = document.getElementById('mfhSeeAllGrid');
+        if (grid) {
+          grid.innerHTML = items.length
+            ? items.map(mfhCardHtml).join('')
+            : '<p class="mfh-seeall-empty">Zatím tu nic není.</p>';
+          mfhBindCardImages(grid);
+        }
+        modal.classList.add('open');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { modal.classList.add('visible'); });
+        });
+      };
+
+      window.mfhCloseSeeAll = function () {
+        var modal = document.getElementById('mfhSeeAllModal');
+        if (!modal) return;
+        modal.classList.remove('visible');
+        setTimeout(function () { modal.classList.remove('open'); }, 250);
+      };
 
       /* Přeuspořádá homepage sekce podle toho, jestli profil má historii
          sledování. Bez historie: "Pokračovat ve sledování" a "Nedávno
@@ -415,10 +463,17 @@
         }
         if (typeof openSeries === 'function') openSeries('the-simpsons');
       };
-      window.mfhToggleList = function (btn) {
-        var isIn = btn.textContent.indexOf('+') === -1;
-        btn.textContent = isIn ? '+ Oblíbené' : '✓ V seznamu';
-        btn.style.background = isIn ? '' : 'rgba(0,122,255,0.15)';
+      window.mfhToggleFav = function (slug, btn) {
+        if (typeof toggleWatchlistItem === 'function') toggleWatchlistItem(slug);
+        var inList = false;
+        try {
+          inList = typeof getWatchlist === 'function' &&
+            getWatchlist().some(function (w) { return w.slug === slug; });
+        } catch (e) {}
+        if (btn) {
+          btn.textContent = inList ? '✓ V oblíbených' : '+ Oblíbené';
+          btn.style.background = inList ? 'rgba(0,122,255,0.15)' : '';
+        }
       };
       /* ═══════════ CINEMA — napojení na MFCinemaPlayer ═══════════ */
       function mfhUnlockCinema() {
@@ -664,6 +719,51 @@
         return true;
       }
 
+      /* ═══════════ DOCK — VIDITELNÝ POUZE V SEKCI HOME ═══════════
+         Dřív se dock schovával jen přes CSS pravidla vázaná na
+         konkrétní stavy (body.modal-open, body.discover-open), ale
+         spousta overlayů (Oblíbené, Admin, Premiéry, Kolekce,
+         Nálada, Hlas, Trakt, …) žádnou z těch tříd nenastavuje —
+         dock tak zůstával viditelný i nad nimi. Tady je to obrácené:
+         dock se ukáže JEN když jsme v sekci Home a žádný overlay
+         není otevřený; jinak je vždy schovaný. Inline styl s
+         !important vyhraje nad všemi ostatními CSS pravidly bez
+         ohledu na to, který soubor se načte poslední. */
+      var DOCK_HIDE_OVERLAY_IDS = [
+        'cinemaModal', 'mfStandaloneCinema', 'universeOverlay',
+        'watchlistOverlay', 'seriesModal', 'premiereOverlay',
+        'collectionsOverlay', 'moodOverlay', 'genreEditorOverlay',
+        'traktOverlay', 'customizeOverlay', 'voiceCmdOverlay',
+        'wrappedOverlay', 'adminPanel', 'adminLoginModal',
+        'aiFullscreen', 'aiApikeyOverlay', 'dockMoreSheet', 'mfhSeeAllModal'
+      ];
+
+      function dockShouldShow() {
+        if (!document.documentElement.classList.contains('mfh-home-on')) return false;
+        if (document.body.classList.contains('modal-open') ||
+            document.body.classList.contains('discover-open') ||
+            document.body.classList.contains('disco-open') ||
+            document.body.classList.contains('edit-mode-active')) return false;
+        for (var i = 0; i < DOCK_HIDE_OVERLAY_IDS.length; i++) {
+          var el = document.getElementById(DOCK_HIDE_OVERLAY_IDS[i]);
+          if (el && (el.classList.contains('open') || el.classList.contains('visible') || el.classList.contains('show'))) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function updateDockVisibility() {
+        var dock = document.getElementById('mfDock');
+        if (!dock) return;
+        var show = dockShouldShow();
+        dock.style.setProperty('display', show ? 'flex' : 'none', 'important');
+        dock.style.setProperty('visibility', show ? 'visible' : 'hidden', 'important');
+        dock.style.setProperty('pointer-events', show ? 'auto' : 'none', 'important');
+        if (show) dock.style.setProperty('opacity', '1', 'important');
+      }
+      window.mfhUpdateDockVisibility = updateDockVisibility;
+
       /* ═══════════ HOOK NA DOCK ═══════════ */
       function hookDock() {
         var dockHome = document.getElementById('dockHome');
@@ -726,6 +826,7 @@
         injectHardCSS();
         hookDock();
         initHomeDockScrollFade();
+        updateDockVisibility();
 
         // Opakovaně wrapuj mfShowSection
         var attempts = 0;
@@ -738,6 +839,7 @@
 
         // 🔥 PERMANENTNÍ INTERVAL — nikdy nezastaví
         setInterval(function () {
+          updateDockVisibility();
           // Pokud máme home-on a ps-menu-scene je viditelný, schovej
           if (document.documentElement.classList.contains('mfh-home-on')) {
             var menu = document.querySelector('.ps-menu-scene');
@@ -773,6 +875,7 @@
             if (mfhDocMoRaf) return;
             mfhDocMoRaf = requestAnimationFrame(function () {
               mfhDocMoRaf = null;
+              updateDockVisibility();
               if (!document.documentElement.classList.contains('mfh-home-on')) return;
               document.querySelectorAll('.ps-menu-scene').forEach(function (m) {
                 if (getComputedStyle(m).display !== 'none') {
