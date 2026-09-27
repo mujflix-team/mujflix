@@ -1409,7 +1409,7 @@ async function showShPreview(e) {
   d.onclick = () => openShItem(e), d.textContent = "▶ Otevřít" + (r ? " na Bombuj" : " na SvetSerialu");
   const m = getWatchlist().some(e => e.name === o),
     u = document.getElementById("shPreviewWlBtn");
-  u.classList.toggle("in-wl", m), u.textContent = m ? "✓ V seznamu" : "❤️ Chci koukat", n.style.display = "none", t.style.display = "flex";
+  u.classList.toggle("in-wl", m), u.textContent = m ? "✓ V oblíbených" : "❤️ Chci koukat", n.style.display = "none", t.style.display = "flex";
   let p = document.getElementById("shJwAvail");
   if (!p) {
     p = document.createElement("div"), p.id = "shJwAvail", p.className = "jw-avail-slot";
@@ -1455,14 +1455,22 @@ function shAddToWatchlist() {
     n = "movie" === e.media_type || !!e.title,
     o = getWatchlist(),
     i = o.findIndex(e => e.name === t);
-  i >= 0 ? (o.splice(i, 1), saveWatchlistData(o), showToast("Odebráno ze seznamu")) : (o.push({
-    name: t,
-    type: n ? "movie" : "series",
-    poster: e.poster_path ? `https://image.tmdb.org/t/p/w185${e.poster_path}` : ""
-  }), saveWatchlistData(o), showToast("Přidáno do Oblíbených! ❤️"));
+  if (i >= 0) o.splice(i, 1), saveWatchlistData(o), showToast("Odebráno z oblíbených");
+  else {
+    o.push({
+      name: t,
+      type: n ? "movie" : "series",
+      poster: e.poster_path ? `https://image.tmdb.org/t/p/w185${e.poster_path}` : ""
+    }), saveWatchlistData(o), showToast("Přidáno do Oblíbených! ❤️");
+    try {
+      e.genre_ids?.length && aiBrain.boostGenreIds(e.genre_ids, .12)
+    } catch (e) {
+      console.warn("[Watchlist] aiBrain boost failed:", e)
+    }
+  }
   const a = document.getElementById("shPreviewWlBtn"),
     s = getWatchlist().some(e => e.name === t);
-  a && (a.classList.toggle("in-wl", s), a.textContent = s ? "✓ V seznamu" : "❤️ Chci koukat")
+  a && (a.classList.toggle("in-wl", s), a.textContent = s ? "✓ V oblíbených" : "❤️ Chci koukat")
 }
 
 function doSearch() {
@@ -1518,7 +1526,7 @@ function openSeries(e) {
     e && (e.style.opacity = "0", e.style.transform = "translateY(12px)", setTimeout(() => {
       e.style.transition = "opacity 0.4s ease, transform 0.45s cubic-bezier(0.34,1.2,0.64,1)", e.style.opacity = "1", e.style.transform = "translateY(0)"
     }, 120))
-  })), switchToSeasonView(), renderSeasons(), updatePanelProgress(), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
+  })), switchToSeasonView(), renderSeasons(), updatePanelProgress(), updateModalFavBtn(), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
   const a = document.getElementById("modalRateBtn");
   a && (a.style.display = calcProgress(e).seen > 0 ? "flex" : "none")
 }
@@ -1900,12 +1908,22 @@ function renderWatchlist() {
 function toggleWatchlistItem(e) {
   const t = getWatchlist(),
     n = t.findIndex(t => t.slug === e);
-  n >= 0 ? (t.splice(n, 1), showToast("Odebrano ze seznamu")) : (t.push({
-    slug: e,
-    name: db[e]?.name || e,
-    type: "series",
-    poster: db[e]?._poster || db[e]?.poster || ""
-  }), showToast("Pridano do Chci koukat! ❤️")), saveWatchlistData(t), updateWatchlistBtns()
+  if (n >= 0) t.splice(n, 1), showToast("Odebrano z oblibenych");
+  else {
+    t.push({
+      slug: e,
+      name: db[e]?.name || e,
+      type: "series",
+      poster: db[e]?._poster || db[e]?.poster || ""
+    }), showToast("Pridano do Oblibenych! ❤️");
+    try {
+      db[e]?._genres && aiBrain.boostGenresFromTmdb(db[e]._genres, .12),
+      db[e]?._genreIds && aiBrain.boostGenreIds(db[e]._genreIds, .12)
+    } catch (t) {
+      console.warn("[Watchlist] aiBrain boost failed:", t)
+    }
+  }
+  saveWatchlistData(t), updateWatchlistBtns()
 }
 
 function updateWatchlistBtns() {
@@ -1913,7 +1931,15 @@ function updateWatchlistBtns() {
   Object.keys(db).forEach(t => {
     const n = document.getElementById(`wlbtn-${t}`);
     n && n.classList.toggle("in-watchlist", e.some(e => e.slug === t))
-  })
+  });
+  updateModalFavBtn()
+}
+
+function updateModalFavBtn() {
+  const e = document.getElementById("modalFavBtn");
+  if (!e || !activeSeries) return;
+  const t = getWatchlist().some(e => e.slug === activeSeries);
+  e.classList.toggle("in-watchlist", t), e.innerHTML = t ? "✓ V oblíbených" : "❤️ Oblíbené"
 }
 
 function addToWatchlistByName(e, t = "movie") {
