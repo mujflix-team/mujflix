@@ -35,6 +35,17 @@ function escapeHTML(e) {
   return e || 0 === e ? String(e).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;") : ""
 }
 
+// OPRAVA — TOHLE byla skutečná příčina "prázdné" sekce Oblíbené:
+// renderWatchlist() (a pár dalších míst) volá funkci `_esc(...)`, která
+// ale nikde v kódu neexistovala (existuje jen `escapeHTML`). Jakmile bylo
+// v Oblíbených alespoň 1 položka, JS spadl na "_esc is not defined" ještě
+// PŘED vykreslením první karty — celá sekce tak zůstala prázdná (bez
+// karet i bez hlášky "nic tu není"), přestože se položka do localStorage
+// v pořádku uložila. `_esc` teď existuje jako alias pro `escapeHTML`.
+function _esc(e) {
+  return escapeHTML(e)
+}
+
 function safeSetItem(e, t) {
   try {
     return localStorage.setItem(e, t), !0
@@ -9340,10 +9351,18 @@ window.adminSavePerKey = function(e, t) {
       "#filmy" === e ? mfShowSection("filmy") : "#protebe" === e ? mfShowSection("protebe") : "#plex" === e ? mfShowSection("plex") : "#serialy" !== e && "" !== e || mfShowSection("serialy")
     }
     window.closeUniverse = function() {
-      t && t.apply(this, arguments), "filmy" === e && setTimeout(() => {
-        const t = document.querySelector(".ps-menu-scene"),
-          n = document.querySelector(".key-hint");
-        t && (t.style.display = ""), n && (n.style.display = ""), setDockActive("dockHome"), e = "serialy", location.hash = "#serialy"
+      t && t.apply(this, arguments), setTimeout(() => {
+        if ("filmy" === e) {
+          const q = document.querySelector(".ps-menu-scene"),
+            w = document.querySelector(".key-hint");
+          q && (q.style.display = ""), w && (w.style.display = ""), setDockActive("dockHome"), e = "serialy", location.hash = "#serialy"
+        } else {
+          // OPRAVA: dřív se dock resetoval jen když bylo "Objevovat"
+          // otevřené ze sekce "filmy". Pokud se otevřelo přímo tlačítkem
+          // v docku z jiné sekce (Domů/Pro tebe/Plex), aktivní ikonka
+          // v docku po zavření zůstala chybně na "Objevovat".
+          setDockActive({serialy:"dockHome",protebe:"dockProtebe",plex:"dockPlex"}[e] || "dockHome")
+        }
       }, 50)
     }, window.addEventListener("hashchange", n), document.addEventListener("DOMContentLoaded", () => setTimeout(n, 900));
     document.addEventListener("click", event => {
@@ -9387,8 +9406,8 @@ window.adminSavePerKey = function(e, t) {
     ["closeWatchlist", "closeModal", "closeUniverse", "closeSearch"].forEach(name => {
       const orig = window[name];
       if ("function" == typeof orig) window[name] = function(...args) {
-        const r = orig.apply(this, args);
-        setTimeout(mfSyncDockToView, 60);
+        let r;
+        try { r = orig.apply(this, args) } finally { setTimeout(mfSyncDockToView, 60) }
         return r
       }
     });
