@@ -18,6 +18,7 @@
 
   var modal, frame, titleNode, sourceLabelNode, sourceCounterNode;
   var tvBar, epGridPanel, epGridBody;
+  var favBtn;
   var current = null; // { tmdbId, title, type, season, episode, sourceIdx, localSlug, year, tried: Set }
 
   /* ── Helpery na slugy / dotazy ───────────────────────────── */
@@ -271,6 +272,7 @@
         "</div>" +
 
         '<button type="button" class="mf-cin-adtip-btn" id="mfCinAdTipBtn" aria-label="Zdroj může zobrazovat reklamy">⚠️</button>' +
+        '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených">🤍 Oblíbené</button>' +
         '<button type="button" class="mf-cin-switch-btn" id="mfCinSwitchSrc">🔄 Zkusit jiný zdroj</button>' +
         '<a class="mf-cin-external-btn" id="mfStandaloneCinemaExternal" target="_blank" rel="noopener">🔗 Otevřít v nové kartě</a>' +
         '<button type="button" id="mfStandaloneCinemaClose" aria-label="Zavřít">×</button>' +
@@ -305,6 +307,9 @@
     modal.querySelector("#mfCinNextEp").onclick = function () { stepEpisode(1); };
     modal.querySelector("#mfCinPickEp").onclick = toggleEpGrid;
     modal.querySelector("#mfCinNextSeries").onclick = goNextSeries;
+
+    favBtn = modal.querySelector("#mfCinFavBtn");
+    if (favBtn) favBtn.onclick = toggleCurrentFavorite;
 
     var adTip = modal.querySelector("#mfCinAdTip");
     var adTipBtn = modal.querySelector("#mfCinAdTipBtn");
@@ -484,6 +489,26 @@
     modal.querySelector("#mfStandaloneCinemaExternal").href = url;
   }
 
+  /* ── Oblíbené — srdíčko přímo v Cinema mode přehrávači ───────
+     Používá stejné úložiště jako zbytek appky (window.toggleTmdbFavorite
+     / window.isTmdbFavorite z app.js), takže se položka objeví ve
+     stejné sekci Oblíbené jako vše ostatní. */
+  function toggleCurrentFavorite() {
+    if (!current || !current.tmdbId) return;
+    if (typeof window.toggleTmdbFavorite !== "function") return;
+    window.toggleTmdbFavorite(current.tmdbId, current.type, current.title || "", "", favBtn);
+    updateFavBtn();
+  }
+
+  function updateFavBtn() {
+    if (!favBtn || !current) return;
+    var faved = current.tmdbId && typeof window.isTmdbFavorite === "function"
+      ? window.isTmdbFavorite(current.tmdbId, current.type)
+      : false;
+    favBtn.classList.toggle("faved", !!faved);
+    favBtn.innerHTML = faved ? "❤️ V oblíbených" : "🤍 Oblíbené";
+  }
+
   function renderCurrent() {
     var url = buildUrl();
     var sources = sourcesFor(current.type);
@@ -491,6 +516,7 @@
     modal.querySelector("#mfStandaloneCinemaSource").textContent = label;
     loadUrl(url, label);
     renderSourceBar();
+    updateFavBtn();
     if (current.type === "tv") {
       tvBar.style.display = "flex";
       updateEpCurrentLabel();
