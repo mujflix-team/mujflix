@@ -3606,6 +3606,20 @@
               </button>
               <button
                 class="btn-shuffle"
+                id="modalFavBtn"
+                onclick="toggleWatchlistItem(activeSeries)"
+                style="
+                  border-color: rgba(255, 55, 95, 0.3);
+                  color: rgba(255, 55, 95, 0.85);
+                  font-size: 0.72rem;
+                  gap: 5px;
+                "
+                title="Přidat do Oblíbených"
+              >
+                ❤️ Oblíbené
+              </button>
+              <button
+                class="btn-shuffle"
                 id="modalFindBtn"
                 onclick="
                   (function () {
@@ -3955,13 +3969,13 @@
     <div class="watchlist-overlay" id="watchlistOverlay" role="dialog" aria-modal="true" aria-labelledby="watchlistTitle">
       <div class="watchlist-box">
         <div class="wl-header">
-          <div class="wl-title" id="watchlistTitle">Můj <span>seznam</span></div>
+          <div class="wl-title" id="watchlistTitle">Oblíbené</div>
           <button class="wl-close" onclick="closeWatchlist()">&#x2715;</button>
         </div>
         <div class="wl-list" id="watchlistList">
           <div class="wl-empty" id="watchlistEmpty">
             <div class="wl-empty-icon">&#x1F3AC;</div>
-            <div>V seznamu zatím nic není. Přidej filmy nebo seriály a najdeš je tu na jednom místě.</div>
+            <div>V oblíbených zatím nic není. Přidej filmy nebo seriály a najdeš je tu na jednom místě.</div>
             <button type="button" onclick="closeWatchlist(); mfShowSection('filmy')" style="margin-top:12px;padding:9px 14px;border:1px solid rgba(0,122,255,.35);border-radius:10px;background:rgba(0,122,255,.12);color:#fff;cursor:pointer">Objevovat</button>
           </div>
         </div>
@@ -6942,7 +6956,7 @@
         <section class="mfh-row" id="mfhRecentSection">
           <div class="mfh-row-head">
             <h2 class="mfh-h2">Nedávno sledováno</h2>
-            <a class="mfh-see-all" href="#" onclick="event.preventDefault();">Zobrazit vše →</a>
+            <a class="mfh-see-all" href="#" onclick="event.preventDefault(); mfhSeeAll('mfhRecent');">Zobrazit vše →</a>
           </div>
           <div class="mfh-carousel" id="mfhRecent"></div>
         </section>
@@ -6951,7 +6965,7 @@
         <section class="mfh-row" id="mfhForYouSection">
           <div class="mfh-row-head">
             <h2 class="mfh-h2" id="mfhForYouTitle">✨ Vybráno pro tebe</h2>
-            <a class="mfh-see-all" href="#" onclick="event.preventDefault();">Zobrazit vše →</a>
+            <a class="mfh-see-all" href="#" onclick="event.preventDefault(); mfhSeeAll('mfhForYou');">Zobrazit vše →</a>
           </div>
           <p class="mfh-row-sub" id="mfhForYouSub">Podle toho, co poslední dobou sleduješ.</p>
           <div class="mfh-carousel" id="mfhForYou"></div>
@@ -6960,12 +6974,23 @@
         <!-- Z tvého seznamu -->
         <section class="mfh-row">
           <div class="mfh-row-head">
-            <h2 class="mfh-h2">❤ Z tvého seznamu</h2>
-            <a class="mfh-see-all" href="#" onclick="event.preventDefault();">Zobrazit vše →</a>
+            <h2 class="mfh-h2">❤ Oblíbené</h2>
+            <a class="mfh-see-all" href="#" onclick="event.preventDefault(); if (typeof openWatchlist === 'function') { openWatchlist(); } else { mfhSeeAll('mfhMyList'); }">Zobrazit vše →</a>
           </div>
           <div class="mfh-carousel" id="mfhMyList"></div>
         </section>
 
+      </div>
+    </div>
+
+    <!-- Modal "Zobrazit vše" pro homepage karusely -->
+    <div class="mfh-seeall-overlay" id="mfhSeeAllModal">
+      <div class="mfh-seeall-panel">
+        <div class="mfh-seeall-head">
+          <h2 class="mfh-h2" id="mfhSeeAllTitle">Vše</h2>
+          <button class="mfh-seeall-close" onclick="mfhCloseSeeAll()">&#x2715;</button>
+        </div>
+        <div class="mfh-seeall-grid" id="mfhSeeAllGrid"></div>
       </div>
     </div>
 
@@ -7257,6 +7282,43 @@
         border-radius: 8px;
         z-index: 100000;
         pointer-events: none;
+      }
+
+      /* ─── MODAL "Zobrazit vše" ─── */
+      .mfh-seeall-overlay {
+        display: none;
+        position: fixed; inset: 0; z-index: 20000;
+        background: rgba(6,6,8,0.72);
+        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        opacity: 0; transition: opacity 0.22s ease;
+        overflow-y: auto; padding: max(40px, env(safe-area-inset-top,0px)) 20px 40px;
+      }
+      .mfh-seeall-overlay.open { display: block; }
+      .mfh-seeall-overlay.visible { opacity: 1; }
+      .mfh-seeall-panel {
+        max-width: 1100px; margin: 0 auto;
+        background: #121216; border: 1px solid rgba(255,255,255,.08);
+        border-radius: 18px; padding: 22px clamp(16px,3vw,28px) 28px;
+        transform: translateY(14px); transition: transform 0.22s ease;
+      }
+      .mfh-seeall-overlay.visible .mfh-seeall-panel { transform: translateY(0); }
+      .mfh-seeall-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .mfh-seeall-close {
+        background: rgba(255,255,255,.08); border: none; color: #fff;
+        width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+        font-size: .9rem; display: flex; align-items: center; justify-content: center;
+      }
+      .mfh-seeall-close:hover { background: rgba(255,255,255,.16); }
+      .mfh-seeall-grid {
+        display: grid; gap: 14px;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .mfh-seeall-grid .mfh-card { width: 100%; }
+      .mfh-seeall-empty {
+        color: rgba(255,255,255,.4); font-size: .85rem; padding: 30px 0; text-align: center;
       }
     </style>
 
