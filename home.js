@@ -740,6 +740,7 @@
 
       function dockShouldShow() {
         if (!document.documentElement.classList.contains('mfh-home-on')) return false;
+        if (typeof window.mfDockTarget === 'function' && window.mfDockTarget() !== 'dockHome') return false;
         if (document.body.classList.contains('modal-open') ||
             document.body.classList.contains('discover-open') ||
             document.body.classList.contains('disco-open') ||
@@ -873,7 +874,7 @@
           var mfhDocMoRaf = null;
           var mo = new MutationObserver(function (muts) {
             if (mfhDocMoRaf) return;
-            mfhDocMoRaf = requestAnimationFrame(function () {
+            mfhDocMoRaf = setTimeout(function () {
               mfhDocMoRaf = null;
               updateDockVisibility();
               if (!document.documentElement.classList.contains('mfh-home-on')) return;
@@ -882,7 +883,7 @@
                   m.style.setProperty('display', 'none', 'important');
                 }
               });
-            });
+            }, 200);
           });
           mo.observe(document.documentElement, {
             childList: true,
