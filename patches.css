@@ -1056,8 +1056,7 @@ html body.discover-open #mfDock {
 .mf-dock-badge.visible { transform: scale(1); }
 
 /* Odebráno: AI chat (Gemini apod.) a Plex */
-#aiFab, #aiFullscreen, #aiApikeyOverlay, #aiVoiceOverlay, .ai-fab,
-[onclick*="openAi"], [onclick*="toggleAiPanel"], #dockPlex, #mfSectionPlex {
+#aiFab, #aiFullscreen, #aiApikeyOverlay, [onclick*="openAi"], [onclick*="toggleAiPanel"], #dockPlex, #mfSectionPlex {
   display: none !important;
 }
 /* dock nikdy nad Objevováním — okamžitě, bez čekání na JS */
