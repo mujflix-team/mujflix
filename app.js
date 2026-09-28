@@ -1,24 +1,3 @@
-function openAi() {
-  if ("function" == typeof openAiPanel) try {
-    return void openAiPanel()
-  } catch (e) {
-    console.warn("[AI]", e)
-  }
-  const e = document.getElementById("aiFullscreen");
-  if (e) {
-    e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => {
-      e.classList.add("visible");
-      const t = document.getElementById("aiInput");
-      t && t.focus()
-    })), void 0 !== aiPanelOpen && (window.aiPanelOpen = !0);
-    const t = document.getElementById("aiFab");
-    return t && t.classList.add("open"), "function" == typeof updateStatusBadge && updateStatusBadge(), "function" == typeof updateMsgCounter && updateMsgCounter(), "function" == typeof renderAiWatchList && renderAiWatchList(), void("function" == typeof pauseBgParticles && pauseBgParticles())
-  }
-  setTimeout(() => {
-    "function" == typeof openAiPanel && openAiPanel()
-  }, 200)
-}
-
 function safeLS(e, t) {
   try {
     return JSON.parse(localStorage.getItem(e) || String(t))
@@ -1004,7 +983,7 @@ function renderPersonalisedRow(e, t, n) {
   const r = document.createElement("div");
   r.className = "disco-row";
   const l = document.createElement("div");
-  l.className = "disco-row-header", l.innerHTML = `\n        <div class="disco-row-title">\n            ✦ Doporučení\n          <span class="drt-tag">AI VÝBĚR</span>\n        </div>\n        <div class="disco-row-nav" style="gap:8px;align-items:center;">\n          <button onclick="refreshPersonalisedRow()" style="font-size:0.52rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:${a};background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.2);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,122,255,0.15)'" onmouseout="this.style.background='rgba(0,122,255,0.07)'">\n            ↻ Nová doporučení\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,-1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>\n          </button>\n        </div>`;
+  l.className = "disco-row-header", l.innerHTML = `\n        <div class="disco-row-title">\n            ✦ Doporučení\n        </div>\n        <div class="disco-row-nav" style="gap:8px;align-items:center;">\n          <button onclick="refreshPersonalisedRow()" style="font-size:0.52rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:${a};background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.2);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,122,255,0.15)'" onmouseout="this.style.background='rgba(0,122,255,0.07)'">\n            ↻ Nová doporučení\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,-1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>\n          </button>\n        </div>`;
   const c = document.createElement("div");
   c.className = "disco-row-scroll", c.id = "personalisedRowScroll", o.slice(0, 24).forEach(({
     item: e,
@@ -2475,156 +2454,24 @@ async function loadPopular(e) {
     }), t?.classList.add("visible")
   } catch (e) {}
 }
-let wrappedIdx = 0;
 
-function openWrapped() {
-  const e = getWatched();
-  let t = 0,
-    n = 0,
-    o = {};
-  Object.keys(e).forEach(e => {
-    const i = e.match(/^(.+)-S\d+-E\d+$/);
-    if (!i) return;
-    const a = i[1];
-    db[a] && (t++, n += db[a].runtime || 22, o[a] = (o[a] || 0) + 1)
-  });
-  const i = Math.round(n / 60),
-    a = Math.round(n / 1440 * 10) / 10,
-    s = Object.entries(o).sort((e, t) => t[1] - e[1])[0],
-    r = s ? db[s[0]]?.name : "zatim nic",
-    l = s ? s[1] : 0,
-    c = safeLS(uKey("mf_ratings"), "{}"),
-    d = Object.values(c).filter(e => "loved" === e.rating).length,
-    m = aiBrain ? Object.entries(aiBrain.memory.genrePreferences || {}).sort((e, t) => t[1] - e[1]).slice(0, 5) : [],
-    u = m[0] ? m[0][0] : "Komedie",
-    p = [];
-  t >= 100 ? p.push("&#x1F3C6; Legenda") : t >= 50 ? p.push("&#x1F4FA; Maratonec") : t >= 10 && p.push("&#x1F3AC; Divak"), d >= 3 && p.push("&#x2764;&#xFE0F; Kritik"), l >= 10 && p.push("&#x1F31F; Verny fanousek");
-  const g = `Tvuj profil rika jasne: ${u} zanr${"zatim nic"!=r?`, nejvic te tahne ${r}`:""}. Za ${i} hodin sledovani sis budoval vlastni filmovy vkus. ${d>0?`Oba palce jsi udelil ${d}x – AI si to zapamatovala.`:"Zkus neco ohodnotit."} Priste budou doporuceni jeste presnejsi.`,
-    f = s && (db[s[0]]?._poster || db[s[0]]?.poster) || "",
-    y = [{
-      bg: "rgba(13,0,21,0.97)",
-      accent: "180,0,255",
-      content: `<div class="w-card"><div class="w-eyebrow">Tvůj MujFlix Wrapped</div><span class="w-emoji">&#x1F3AC;</span><div class="w-number" id="wNumEps">0</div><div class="w-label">epizod celkem</div><div class="w-sub">Kdyz to scitas – mas opravdu dobry vkus na cas.</div>${p.length?`<div class="w-badge-row">${p.map((e,t)=>`<div class="w-badge" style="animation-delay:${.12*t+.3}s">${e}</div>`).join("")}</div>`:""}</div>`,
-      counter: {
-        el: "wNumEps",
-        to: t
-      }
-    }, {
-      bg: "rgba(0,18,28,0.97)",
-      accent: "0,160,255",
-      content: `<div class="w-card"><div class="w-eyebrow">Cas na obrazovce</div><span class="w-emoji">&#x23F1;&#xFE0F;</span><div class="w-number" id="wNumH">0</div><div class="w-label">hodin (${a} dní)</div><div class="w-sub">${i>100?"Absolutni legenda. Kdyz nespis, koukáš.":i>30?"Solidni divak s dobrym vkusem.":"Jen zacinas. Ceka te hodne dobreho."}</div></div>`,
-      counter: {
-        el: "wNumH",
-        to: i
-      }
-    }, {
-      bg: "rgba(20,8,0,0.97)",
-      accent: "255,100,0",
-      content: `<div class="w-card"><div class="w-eyebrow">Tvůj #1 Favorit</div><span class="w-emoji">&#x1F4FA;</span><div class="w-number text">${r}</div><div class="w-label">${l} epizod</div><div class="w-sub">Tenhle serial te proste tahne. AI vím proc.</div></div>`,
-      counter: null
-    }, {
-      bg: "rgba(5,0,20,0.97)",
-      accent: "140,80,255",
-      content: `<div class="w-card"><div class="w-eyebrow">Tvůj filmovy DNA</div><span class="w-emoji">&#x1F9E0;</span><div class="w-number text" style="font-size:1.8rem">${u.charAt(0).toUpperCase()+u.slice(1)}</div><div class="w-label">dominantní žánr</div><div class="w-chart-wrap">${m.map(([e,t])=>`<div class="w-bar-row"><div class="w-bar-label">${e.slice(0,10)}</div><div class="w-bar-track"><div class="w-bar-fill" style="--target:${t.toFixed(2)}"></div></div><div class="w-bar-pct">${Math.round(100*t)}%</div></div>`).join("")}</div></div>`,
-      counter: null
-    }, {
-      bg: "rgba(10,8,0,0.97)",
-      accent: "0,122,255",
-      content: `<div class="w-card"><div class="w-eyebrow">AI si te precetla</div><span class="w-emoji">&#x2726;</span><div class="w-ai-text">${g}</div><div style="margin-top:16px;text-align:center;"><button onclick="event.stopPropagation();closeWrapped();openGenreEditor();" style="background:rgba(0,122,255,0.12);border:1px solid rgba(0,122,255,0.35);color:var(--accent);font-family:Outfit,sans-serif;font-size:0.73rem;font-weight:800;border-radius:50px;padding:10px 22px;cursor:pointer;transition:all 0.2s;">🎛 Vyladit moje preference</button></div><div style="margin-top:14px;text-align:center;font-size:0.58rem;color:rgba(255,255,255,0.18);letter-spacing:4px;text-transform:uppercase">MujFlix AI &middot; Osobni shrnut&iacute;</div></div>`,
-      counter: null
-    }],
-    h = document.getElementById("wrappedOverlay"),
-    v = h.querySelector(".wrapped-slides-wrap"),
-    b = h.querySelector(".wrapped-nav");
-  if (v.innerHTML = "", b.innerHTML = "", f) {
-    const e = document.getElementById("wrappedPosterBlur");
-    e && (e.style.backgroundImage = `url(${f})`, setTimeout(() => e.classList.add("vis"), 200))
-  }
-  y.forEach((e, t) => {
-    const n = document.createElement("div");
-    n.className = "wrapped-slide" + (0 === t ? " active" : ""), n.style.cssText = `background:${e.bg}`, n.innerHTML = e.content, v.appendChild(n);
-    const o = document.createElement("div");
-    o.className = "wrapped-dot" + (0 === t ? " active" : ""), o.onclick = e => {
-      e.stopPropagation(), goWrappedSlide(t)
-    }, b.appendChild(o)
-  }), _wrappedSlideConfigs = y, wrappedIdx = 0, h.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => {
-    h.classList.add("visible"), startWrappedCanvas(), setTimeout(() => {
-      animateWrappedBars(), animateWrappedCounter(y[0])
-    }, 400)
-  })), pauseBgParticles(), playOpen()
-}
-let _wrappedSlideConfigs = [],
-  _wrappedCanvasRaf = null;
 
-function startWrappedCanvas() {
-  const e = document.getElementById("wrappedCanvas");
-  if (!e) return;
-  e.width = window.innerWidth, e.height = window.innerHeight;
-  const t = e.getContext("2d"),
-    n = Array.from({
-      length: 80
-    }, () => ({
-      x: Math.random() * e.width,
-      y: Math.random() * e.height,
-      r: 2.2 * Math.random() + .4,
-      vx: .35 * (Math.random() - .5),
-      vy: .35 * (Math.random() - .5),
-      op: .5 * Math.random() + .05,
-      hue: Math.random() < .3 ? 60 : 80 * Math.random() + 200,
-      pulse: Math.random() * Math.PI * 2,
-      pspd: .015 * Math.random() + .004
-    }));
-  ! function o() {
-    t.clearRect(0, 0, e.width, e.height), n.forEach(n => {
-      n.x += n.vx, n.y += n.vy, n.pulse += n.pspd, n.x < 0 && (n.x = e.width), n.x > e.width && (n.x = 0), n.y < 0 && (n.y = e.height), n.y > e.height && (n.y = 0);
-      const o = n.op * (.5 + .5 * Math.sin(n.pulse)),
-        i = 60 === n.hue ? `rgba(0,122,255,${o})` : `hsla(${n.hue},80%,70%,${.5*o})`;
-      t.beginPath(), t.arc(n.x, n.y, n.r, 0, 2 * Math.PI), t.fillStyle = i, t.fill()
-    }), _wrappedCanvasRaf = requestAnimationFrame(o)
-  }()
-}
 
-function stopWrappedCanvas() {
-  _wrappedCanvasRaf && (cancelAnimationFrame(_wrappedCanvasRaf), _wrappedCanvasRaf = null)
-}
 
-function animateWrappedCounter(e) {
-  if (!e || !e.counter) return;
-  const t = document.getElementById(e.counter.el);
-  if (!t) return;
-  const n = e.counter.to;
-  let o = 0;
-  const i = Math.max(1, Math.ceil(n / 50)),
-    a = setInterval(() => {
-      o = Math.min(o + i, n), t.textContent = o, o >= n && clearInterval(a)
-    }, 28)
-}
 
-function animateWrappedBars() {
-  document.querySelectorAll(".w-bar-fill").forEach(e => {
-    const t = parseFloat(e.style.getPropertyValue("--target") || "1");
-    e.style.transform = `scaleX(${t})`, e.classList.add("animated")
-  })
-}
 
-function goWrappedSlide(e) {
-  const t = document.querySelectorAll(".wrapped-slide"),
-    n = document.querySelectorAll(".wrapped-dot");
-  e < 0 || e >= t.length || (t[wrappedIdx].classList.add("exit"), t[wrappedIdx].classList.remove("active"), n[wrappedIdx].classList.remove("active"), setTimeout(() => {
-    t[wrappedIdx] && t[wrappedIdx].classList.remove("exit")
-  }, 450), wrappedIdx = e, t[e].classList.add("active"), n[e].classList.add("active"), 3 === e && setTimeout(animateWrappedBars, 280), _wrappedSlideConfigs[e] && setTimeout(() => animateWrappedCounter(_wrappedSlideConfigs[e]), 200), playClick())
-}
 
-function nextWrappedSlide() {
-  wrappedIdx >= document.querySelectorAll(".wrapped-slide").length - 1 ? closeWrapped() : goWrappedSlide(wrappedIdx + 1)
-}
 
-function closeWrapped() {
-  const e = document.getElementById("wrappedOverlay");
-  e.classList.remove("visible"), stopWrappedCanvas();
-  const t = document.getElementById("wrappedPosterBlur");
-  t && t.classList.remove("vis"), setTimeout(() => e.classList.remove("open"), 600)
-}
+
+
+
+
+
+
+
+
+
+
 class AIBrain {
   constructor() {
     this._key = () => "mf_ai_brain_" + (getActiveProfileId() || "default"), this.memory = this._load()
@@ -2734,35 +2581,15 @@ class AIBrain {
   }
 }
 const aiBrain = new AIBrain;
-let aiHistory = [];
-try {
-  aiHistory = safeLS(uKey("mf_ai_history"), "[]")
-} catch {}
-let ttsEnabled = !1,
-  speechSynth = window.speechSynthesis,
-  aiMsgDay = 0,
-  AI_DAY_LIMIT = 999;
 
-function saveAiUsage() {
-  const e = (new Date).toDateString();
-  localStorage.setItem("mf_ai_usage", JSON.stringify({
-    date: e,
-    count: aiMsgDay
-  }))
-}
 
-function saveAiHistory() {
-  localStorage.setItem(uKey("mf_ai_history"), JSON.stringify(aiHistory.slice(-40)))
-}
 
-function updateMsgCounter() {
-  const e = document.getElementById("aiMsgCountNum"),
-    t = document.getElementById("aiMsgCountMax"),
-    n = AI_DAY_LIMIT - aiMsgDay;
-  e && (e.textContent = n, e.style.color = n <= 5 ? "rgba(255,80,80,0.95)" : n <= 10 ? "rgba(255,190,0,0.95)" : "var(--accent)"), t && (t.textContent = "zbývá dnes");
-  const o = document.getElementById("aiLimitBar");
-  o && (o.style.width = aiMsgDay / AI_DAY_LIMIT * 100 + "%", o.style.background = n <= 5 ? "rgba(255,80,80,0.7)" : n <= 10 ? "rgba(255,190,0,0.7)" : "rgba(0,122,255,0.5)")
-}
+
+
+
+
+
+
 
 function linkifyFilms(e) {
   return e.replace(/\b([A-ZÁÉÍÓÚŮŽŠŘČĎŤŇĚ][a-záéíóúůžšřčďťňěA-ZÁÉÍÓÚŮŽŠŘČĎŤŇĚ\s\-:]{3,40})\b/g, e => {
@@ -2772,20 +2599,7 @@ function linkifyFilms(e) {
   })
 }
 
-function updateStatusBadge() {
-  const e = document.getElementById("aiStatusDot"),
-    t = document.getElementById("aiStatusModel"),
-    n = document.getElementById("aiStatusSub"),
-    o = localStorage.getItem("mf_gemini_key"),
-    i = localStorage.getItem("mf_or_key"),
-    a = localStorage.getItem("mf_groq_key"),
-    s = localStorage.getItem("mf_jina_key"),
-    r = localStorage.getItem("mf_tavily_key"),
-    l = AI_DAY_LIMIT - aiMsgDay,
-    c = l <= 10 ? " · ⚠" + l + " zpráv" : "",
-    d = [void 0 !== _tfReady && _tfReady ? "🧠LocalAI" : "", a ? "⚡Groq" : "", s ? "👁Jina" : "", r ? "🌐Tavily" : ""].filter(Boolean).join(" · ");
-  o ? (e.className = "ai-status-dot", t.textContent = "Gemini 2.0 Flash", n.textContent = (d ? d + " · " : "") + "Nastavení" + c) : i ? (e.className = "ai-status-dot warn", t.textContent = "OpenRouter (záloha)", n.textContent = (d ? d + " · " : "") + "Nastavení" + c) : (e.className = "ai-status-dot error", t.textContent = "Žádný klíč", n.textContent = "Klikni pro nastavení AI"), updateMsgCounter()
-}
+
 
 function openApikeyOverlay() {
   const e = document.getElementById("aiApikeyOverlay");
@@ -2802,19 +2616,9 @@ function openApikeyOverlay() {
   a && (document.getElementById("aiTavilyKeyInput").value = a)
 }
 
-function openApikeyOverlayOnTrakt() {
-  openApikeyOverlay(), setTimeout(() => {
-    const e = [...document.querySelectorAll(".ai-key-tab")].find(e => e.textContent.includes("Trakt"));
-    e && switchKeyTab("trakt", e)
-  }, 50)
-}
 
-function updateTraktSidebarLabel() {
-  const e = localStorage.getItem("trakt_access_token"),
-    t = localStorage.getItem("trakt_username"),
-    n = document.getElementById("traktSidebarLbl");
-  n && (n.textContent = e ? `Trakt.tv — ${t||"Připojeno"} ✓` : "Trakt.tv — Nepřipojen")
-}
+
+
 
 function closeApikeyOverlay() {
   const e = document.getElementById("aiApikeyOverlay");
@@ -2830,47 +2634,30 @@ function switchKeyTab(e, t) {
     jina: "keyPanelJina",
     tavily: "keyPanelTavily",
     trakt: "keyPanelTrakt"
-  } [e] || "keyPanelGemini")?.classList.add("active"), "trakt" === e && aiTraktRefreshStatus()
+  } [e] || "keyPanelGemini")?.classList.add("active")
 }
 
-function aiTraktRefreshStatus() {
-  const e = localStorage.getItem("trakt_access_token"),
-    t = localStorage.getItem("trakt_username"),
-    n = document.getElementById("aiTraktDot"),
-    o = document.getElementById("aiTraktStatusLbl"),
-    i = document.getElementById("aiTraktUser"),
-    a = document.getElementById("aiTraktConnectBtn"),
-    s = document.getElementById("aiTraktDisconnectBtn");
-  e ? (n.style.background = "#2ecc71", n.style.boxShadow = "0 0 8px rgba(46,204,113,0.6)", o.textContent = "Připojeno", i.textContent = t || "", a.style.display = "none", s.style.display = "block") : (n.style.background = "#555", n.style.boxShadow = "none", o.textContent = "Nepřipojen", i.textContent = "", a.style.display = "block", s.style.display = "none")
-}
 
-function aiTraktConnect() {
-  const e = document.getElementById("aiTraktClientIdInput").value.trim();
-  e && localStorage.setItem("trakt_client_id_user", e), traktStartAuth(), document.getElementById("aiTraktPinWrap").style.display = "block"
-}
 
-function aiTraktVerifyPin() {
-  const e = document.getElementById("aiTraktPinInput").value.trim().toUpperCase();
-  document.getElementById("traktPinInput").value = e, traktSubmitPin(), setTimeout(aiTraktRefreshStatus, 1500)
-}
 
-function aiTraktDisconnect() {
-  ["trakt_access_token", "trakt_refresh_token", "trakt_username", "trakt_expires_at"].forEach(e => localStorage.removeItem(e)), document.getElementById("traktFab")?.classList.remove("connected"), aiTraktRefreshStatus(), showToast("Trakt odpojen")
-}
+
+
+
+
 
 function saveGeminiKey() {
   const e = document.getElementById("aiGeminiKeyInput").value.trim();
-  e && (localStorage.setItem("mf_gemini_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_gemini_key", e), closeApikeyOverlay(), updateStatusBadge(), showToast("✦ Gemini aktivován!"))
+  e && (localStorage.setItem("mf_gemini_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_gemini_key", e), closeApikeyOverlay(), showToast("✦ Gemini aktivován!"))
 }
 
 function saveOrKey() {
   const e = document.getElementById("aiOrKeyInput").value.trim();
-  e && (localStorage.setItem("mf_or_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_or_key", e), closeApikeyOverlay(), updateStatusBadge(), showToast("↻ OpenRouter přidán!"))
+  e && (localStorage.setItem("mf_or_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_or_key", e), closeApikeyOverlay(), showToast("↻ OpenRouter přidán!"))
 }
 
 function saveGroqKey() {
   const e = document.getElementById("aiGroqKeyInput").value.trim();
-  e && (localStorage.setItem("mf_groq_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_groq_key", e), showToast("⚡ Groq aktivován! Slugy se budou čistit AI."), document.getElementById("groqStatus").textContent = "✅ Groq aktivní — automatické čištění URL slugů", updateStatusBadge())
+  e && (localStorage.setItem("mf_groq_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_groq_key", e), showToast("⚡ Groq aktivován! Slugy se budou čistit AI."), document.getElementById("groqStatus").textContent = "✅ Groq aktivní — automatické čištění URL slugů")
 }
 
 function saveJinaKey() {
@@ -2883,282 +2670,38 @@ function saveTavilyKey() {
   e && (localStorage.setItem("mf_tavily_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_tavily_key", e), closeApikeyOverlay(), showToast("🌐 Tavily aktivován! Záložní vyhledávač odkazů."))
 }
 
-function toggleAiPanel() {
-  aiPanelOpen ? closeAiPanel() : openAiPanel()
-}
 
-function openAiPanel() {
-  const e = document.getElementById("aiFullscreen");
-  e.style.transform = "translateX(18px)", e.style.opacity = "0", e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => {
-    e.classList.add("visible"), e.style.transform = "", e.style.opacity = ""
-  }));
-  const t = document.getElementById("aiFab");
-  t && t.classList.add("open"), aiPanelOpen = !0, document.getElementById("aiInput").focus(), renderAiWatchList(), updateStatusBadge(), updateMsgCounter(), document.getElementById("aiProfileText").value = localStorage.getItem("mf_user_profile") || "", pauseBgParticles()
-}
 
-function closeAiPanel() {
-  const e = document.getElementById("aiFullscreen");
-  e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 340);
-  const t = document.getElementById("aiFab");
-  t && t.classList.remove("open"), aiPanelOpen = !1, resumeBgParticles()
-}
 
-function renderAiWatchList() {
-  const e = document.getElementById("aiWatchList");
-  e && (e.innerHTML = "", Object.keys(db).forEach(t => {
-    const n = db[t],
-      o = calcProgress(t),
-      i = (findNextEp(t), document.createElement("div"));
-    i.className = "ai-watch-item", i.onclick = () => {
-      closeAiPanel(), openSeries(t)
-    }, i.innerHTML = `<div class="ai-watch-poster"><img src="${n._poster||n.poster||""}" alt="" onerror="this.style.display='none'"></div><div class="ai-watch-info"><div class="ai-watch-name">${n.name}</div><div class="ai-watch-progress-wrap"><div class="ai-watch-bar"><div class="ai-watch-bar-fill" style="width:${o.pct}%"></div></div><span class="ai-watch-pct">${o.pct}%</span></div></div>`, e.appendChild(i)
-  }))
-}
 
-function saveUserProfile() {
-  const e = document.getElementById("aiProfileText").value;
-  localStorage.setItem("mf_user_profile", e), showToast("✓ Profil ulozen!"), showAutosave("saved")
-}
 
-function clearAiHistory() {
-  aiHistory = [], saveAiHistory();
-  document.getElementById("aiMessages").innerHTML = '<div class="ai-msg-wrap ai"><div class="ai-msg-avatar">✦</div><div class="ai-msg-bubble"><span class="ai-msg-label">MujFlix AI</span>Historia smazana. Cim mohu pomoct? 🎬</div></div>', showToast("Historie smazana")
-}
 
-function showAddSeriesForm() {
-  const e = document.getElementById("aiAddForm");
-  e.classList.toggle("visible"), e.classList.contains("visible") && document.getElementById("aiAddName").focus()
-}
 
-function aiConfirmAddSeries() {
-  const e = document.getElementById("aiAddName").value.trim(),
-    t = document.getElementById("aiAddSlug").value.trim() || e.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  e && (db[t] || (db[t] = {
-    name: e,
-    tmdbId: 0,
-    poster: "",
-    totalEps: 0,
-    runtime: 22
-  }, epsBySeason[t] = [12]), document.getElementById("aiAddForm").classList.remove("visible"), document.getElementById("aiAddName").value = "", document.getElementById("aiAddSlug").value = "", showToast(`✓ ${e} pridan!`), renderAiWatchList())
-}
 
-function toggleTts() {
-  ttsEnabled = !ttsEnabled, document.getElementById("aiTtsToggle").classList.toggle("tts-on", ttsEnabled), showToast(ttsEnabled ? "🔊 Hlas zapnut" : "🔇 Hlas vypnut")
-}
-async function aiSend() {
-  const e = document.getElementById("aiInput"),
-    t = e.value.trim();
-  if (!t || aiThinking) return;
-  if (aiMsgDay >= AI_DAY_LIMIT) return void showToast("Denni limit dosažen. Zítra zase!");
-  aiMsgDay++, saveAiUsage(), updateMsgCounter(), e.value = "", e.style.height = "";
-  const n = document.createElement("div");
-  n.className = "ai-msg-wrap user", n.innerHTML = `<div class="ai-msg-avatar">👤</div><div class="ai-msg-bubble">${escapeHTML(t)}</div>`, n.style.opacity = "0", n.style.transform = "translateY(10px)", document.getElementById("aiMessages").appendChild(n), requestAnimationFrame(() => {
-    n.style.transition = "opacity 0.3s ease, transform 0.38s cubic-bezier(0.34,1.2,0.64,1)", n.style.opacity = "1", n.style.transform = "translateY(0)"
-  });
-  const o = document.createElement("div");
-  o.className = "ai-thinking-wrap ai-msg-wrap ai", o.innerHTML = '<div class="ai-msg-avatar">✦</div><div class="ai-thinking-bubble"><span></span><span></span><span></span></div>', document.getElementById("aiMessages").appendChild(o), document.getElementById("aiMessages").scrollTop = 99999, aiThinking = !0, document.getElementById("aiSendBtn").disabled = !0, aiHistory.push({
-    role: "user",
-    content: t
-  });
-  let i = "";
-  try {
-    const e = await analyzeUserMood(t);
-    e && e.moodLabel ? (i = " Nálada: " + e.moodLabel + ".", showMoodBadge(e.moodLabel), aiBrain.boostGenres([e.mood || "light"], .05)) : showMoodBadge(null)
-  } catch (e) {}
-  const a = getWatched(),
-    s = Object.keys(a).length,
-    r = aiBrain.getTopGenres(3).join(", ") || "neznamy",
-    l = localStorage.getItem("mf_user_profile") || "",
-    c = (new Date).getHours(),
-    d = c < 5 ? "noc" : c < 12 ? "rano" : c < 18 ? "odpoledne" : c < 22 ? "vecer" : "pozde v noci",
-    m = safeLS(uKey("mf_ratings"), "{}"),
-    u = Object.values(m).filter(e => "loved" === e.rating).map(e => e.name).join(", ") || "zadne",
-    p = Object.values(m).filter(e => "meh" === e.rating).map(e => e.name).join(", ") || "zadne",
-    g = Object.entries(db).map(([e, t]) => {
-      const n = calcProgress(e);
-      return `${t.name} (${n.pct}% zhlédnuto${t._rating?", ★"+t._rating:""})`
-    }).join(", "),
-    f = (localStorage.getItem("mf_groq_key"), `Jsi MujFlix AI – osobní filmový průvodce. Odpovídáš VŽDY v češtině, jsi přátelský, konkrétní a osobní jako kamarád který miluje filmy.\n\nPROFIL UŽIVATELE:\n- Zhlédnuté epizody: ${s}\n- Oblíbené žánry: ${r||"zatím neznámé"}\n- Denní čas: ${d}\n- Miluje: ${u}\n- Nelíbilo se: ${p}\n${l?"- Osobní poznámky: "+l:""}${i?"\n- Nálada dnes: "+i:""}\n\nSLEDOVANÉ TITULY (z MujFlixu):\n${Object.entries(db).slice(0,8).map(([e,t])=>{const n=calcProgress(e);let o=`${t.name} (${n.pct}% zhlédnuto`;return t._rating&&(o+=`, ★${t._rating}`),t.tmdbRating&&(o+=`, TMDB:${t.tmdbRating}`),t.genres&&t.genres.length&&(o+=`, žánr:${t.genres.slice(0,2).join("/")}`),o+")"}).join(", ")||g}\n\nSTREAMOVACÍ WEBY (Czech/Slovak):\n- Filmy: bombuj.si, prima+, netflix.com\n- Seriály: svetserialu.to, hbogo.com, netflix.com, disney+\n- Zdarma: prehraj.to, webshare.cz (přes prohlížeč)\n- Uživatel může kliknout na ikonu 🎬 u titulu pro automatické nalezení zdroje\n\nPRAVIDLA:\n- Používej **tučný text** pro názvy, hodnocení a klíčové info\n- Vždy navrhuj KONKRÉTNÍ tituly s krátkým odůvodněním proč právě tento\n- Zmiňuj kde streamovat (platforma) ale NIKDY nekopíruj přímé URL — jen název platformy\n- Buď stručný — max 4-5 vět pokud není požadováno víc\n- Pokud se ptají na zdroj/kde sledovat → řekni jen platformu, pro přímý odkaz ať kliknou na 🔍 ikonu u titulu\n- Když nevíš přesně, raději řekni že nevíš než vymýšlíš\n- Občas použij emoji 🎬🍿✨ pro živost\n- NIKDY neříkej "jako AI" nebo "jako jazykový model" – jsi guru, ne robot\n- Pokud uživatel píše o konkrétním titulu ze své knihovny, komentuj jeho postup a náladu`);
-  try {
-    const e = localStorage.getItem("mf_gemini_key"),
-      t = localStorage.getItem("mf_or_key");
-    let n = "";
-    if (e) {
-      const o = aiHistory.slice(-10).map(e => ({
-          role: "assistant" === e.role ? "model" : "user",
-          parts: [{
-            text: e.content
-          }]
-        })),
-        i = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-8b"];
-      let a = "";
-      for (const t of i) {
-        const i = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${t}:generateContent?key=${e}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              system_instruction: {
-                parts: [{
-                  text: f
-                }]
-              },
-              contents: o,
-              generationConfig: {
-                maxOutputTokens: 600,
-                temperature: .85
-              }
-            })
-          }),
-          s = await i.json();
-        if (429 !== i.status) {
-          if (!i.ok) {
-            const e = s?.error?.message || "Chyba API";
-            n = 400 === i.status || 403 === i.status ? `❗ Chyba Gemini klíče: ${e}. Zkontroluj klic v nastaveni.` : `⚠ Gemini API chyba (${i.status}): ${e}`;
-            break
-          }
-          if (n = s?.candidates?.[0]?.content?.parts?.[0]?.text || "", !n) {
-            const e = s?.promptFeedback?.blockReason;
-            n = e ? `⚠ Zpráva zablokována: ${e}` : "⚠ Prázdná odpověď. Zkus to jinak."
-          }
-          break
-        }
-        a = `⚠ Gemini kvóta překročena (${t}). Zkouším záložní model...`
-      }
-      if (!n && a && t) try {
-        const e = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${t}`,
-              "HTTP-Referer": "https://mujflix.local"
-            },
-            body: JSON.stringify({
-              model: "mistralai/mistral-7b-instruct:free",
-              messages: [{
-                role: "system",
-                content: f
-              }, ...aiHistory.slice(-10)],
-              max_tokens: 500
-            })
-          }),
-          o = await e.json();
-        n = o?.choices?.[0]?.message?.content || "⚠ OpenRouter vrátil prázdnou odpověď.", n && !n.startsWith("⚠") && showToast("📡 Gemini kvóta – přepnuto na OpenRouter zálohu")
-      } catch {
-        n = "⚠ Gemini i OpenRouter jsou momentálně nedostupné. Zkus to za chvíli."
-      } else !n && a && (n = "⚠ **Gemini kvóta dosažena.** Free tier má denní limit.\n\n💡 Řešení:\n1. Počkej do zítřka\n2. Nastav **OpenRouter** jako zálohu (ikona robota → záložka OpenRouter)\n3. Nebo si poříď placený Gemini klic")
-    } else if (t) {
-      const e = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${t}`,
-            "HTTP-Referer": "https://mujflix.local"
-          },
-          body: JSON.stringify({
-            model: "mistralai/mistral-7b-instruct:free",
-            messages: [{
-              role: "system",
-              content: f
-            }, ...aiHistory.slice(-10)],
-            max_tokens: 500
-          })
-        }),
-        o = await e.json();
-      n = o?.choices?.[0]?.message?.content || "⚠ OpenRouter vrátil prázdnou odpověď. Zkus to znovu."
-    } else n = "❗ Nastav AI klic kliknutim na ikonu robota v AI panelu. Podporujeme **Gemini** (1000x/den zdarma) nebo **OpenRouter**.";
-    aiHistory.push({
-      role: "assistant",
-      content: n
-    }), saveAiHistory(), o.remove();
-    const i = n.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>"),
-      a = document.createElement("div");
-    if (a.className = "ai-msg-wrap ai", a.innerHTML = `<div class="ai-msg-avatar">✦</div><div class="ai-msg-bubble"><span class="ai-msg-label">MujFlix AI</span>${linkifyFilms(i)}<div class="ai-msg-feedback"><button class="ai-fb-btn" onclick="this.parentElement.style.display='none';showToast('Diky! 👍')">👍</button><button class="ai-fb-btn" onclick="this.parentElement.style.display='none';showToast('Priste lepe!')">👎</button></div></div>`, a.style.opacity = "0", a.style.transform = "translateY(12px)", document.getElementById("aiMessages").appendChild(a), requestAnimationFrame(() => {
-        a.style.transition = "opacity 0.32s ease, transform 0.42s cubic-bezier(0.34,1.18,0.64,1)", a.style.opacity = "1", a.style.transform = "translateY(0)"
-      }), document.getElementById("aiMessages").scrollTop = 99999, ttsEnabled && speechSynth) {
-      speechSynth.cancel();
-      const e = new SpeechSynthesisUtterance(n.replace(/<[^>]+>/g, "").substring(0, 200));
-      e.lang = "cs-CZ", e.rate = .95, "function" == typeof aiBubbleShow && aiBubbleShow(e), speechSynth.speak(e)
-    }
-  } catch (e) {
-    o.remove();
-    const t = document.createElement("div");
-    t.className = "ai-msg-wrap ai", t.innerHTML = '<div class="ai-msg-avatar">✦</div><div class="ai-msg-bubble"><span class="ai-msg-label">MujFlix AI</span>⚠ Chyba pripojeni. Zkontroluj API klic nebo internet.</div>', document.getElementById("aiMessages").appendChild(t)
-  }
-  aiThinking = !1, document.getElementById("aiSendBtn").disabled = !1
-}
 
-function aiQuick(e) {
-  document.getElementById("aiInput").value = e, setTimeout(aiSend, 80)
-}
 
-function handleAiInputKey(e) {
-  "Enter" !== e.key || e.shiftKey || (e.preventDefault(), aiSend())
-}
+
+
+
+
+
+
+
+
+
+
+
+
 
 function autoResizeInput(e) {
   e.style.height = "", e.style.height = Math.min(e.scrollHeight, 140) + "px"
-}(() => {
-  const e = (new Date).toDateString();
-  let t;
-  try {
-    t = safeLS("mf_ai_usage", '{"date":"","count":0}')
-  } catch {
-    t = {
-      date: "",
-      count: 0
-    }
-  }
-  t.date === e ? aiMsgDay = t.count : (localStorage.setItem("mf_ai_usage", JSON.stringify({
-    date: e,
-    count: 0
-  })), aiMsgDay = 0)
-})();
-let recog = null,
-  _voiceMode = "chat";
-const _SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-function startVoice(e) {
-  if (!_SR) {
-    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-    return void showToast(isFirefox ? "Firefox hlasové ovládání nepodporuje 😔 Zkus Chrome nebo Edge" : "Hlasové ovládání není podporováno v tomto prohlížeči", "error");
-  }
-  _voiceMode = e || "chat";
-  const t = document.getElementById("aiVoiceOverlay"),
-    n = document.getElementById("aiVoiceModeLbl");
-  if (n && (n.textContent = "dictate" === _voiceMode ? "🎙 Diktuji..." : "🎙 Mluv — pošlu to AI"), t.style.display = "flex", requestAnimationFrame(() => {
-      t.style.opacity = "1"
-    }), recog) try {
-    recog.stop()
-  } catch {}
-  recog = new _SR, recog.lang = "cs-CZ", recog.interimResults = !0, recog.continuous = "dictate" === _voiceMode, recog.onresult = e => {
-    const t = Array.from(e.results).filter(e => e.isFinal).map(e => e[0].transcript).join(""),
-      n = Array.from(e.results).filter(e => !e.isFinal).map(e => e[0].transcript).join(""),
-      o = document.getElementById("aiVoiceTranscript");
-    if (o && (o.innerHTML = (t ? "<strong>" + t + "</strong>" : "") + (n ? '<span style="opacity:0.5"> ' + n + "</span>" : "")), "chat" === _voiceMode) e.results[e.results.length - 1].isFinal && (document.getElementById("aiInput").value = Array.from(e.results).map(e => e[0].transcript).join(""), stopVoice(), aiPanelOpen || openAiPanel(), setTimeout(aiSend, 250));
-    else if (t) {
-      const e = document.getElementById("aiInput");
-      e && (e.value = (e.value ? e.value + " " : "") + t, autoResizeInput(e))
-    }
-  }, recog.onerror = e => {
-    "not-allowed" === e.error ? showToast("Povol mikrofon v nastavení prohlížeče", "error") : "no-speech" !== e.error && showToast("Chyba mikrofonu: " + e.error, "error"), stopVoice()
-  }, recog.onend = () => {
-    "dictate" !== _voiceMode && stopVoice()
-  }, recog.start()
 }
 
-function stopVoice() {
-  if (recog) try {
-    recog.stop()
-  } catch {}
-  const e = document.getElementById("aiVoiceOverlay");
-  e && (e.style.opacity = "0", setTimeout(() => {
-    e.style.display = "none";
-    const t = document.getElementById("aiVoiceTranscript");
-    t && (t.innerHTML = "")
-  }, 280))
-}
+
+
+
+
+
 let _tfPipeline = null,
   _tfLoading = !1,
   _tfReady = !1;
@@ -4028,9 +3571,8 @@ document.addEventListener("keydown", e => {
   if ("INPUT" !== e.target.tagName && "TEXTAREA" !== e.target.tagName) {
     if ("Escape" === e.key) {
       const e = document.getElementById("mfFinderModal");
-      return e && "none" !== e.style.pointerEvents && "none" !== e.style.display ? void closeFinderModal() : aiPanelOpen ? void closeAiPanel() : modalOpen ? void closeModal() : document.getElementById("watchlistOverlay").classList.contains("open") ? void closeWatchlist() : document.getElementById("wrappedOverlay").classList.contains("open") ? void closeWrapped() : document.getElementById("universeOverlay").classList.contains("open") ? void closeSearch() : document.getElementById("adminOverlay").classList.contains("open") ? void closeAdmin() : document.getElementById("customizeOverlay").classList.contains("open") ? void closeCustomize() : document.getElementById("collectionsOverlay").classList.contains("open") ? void closeCollections() : document.getElementById("editOverlay")?.classList.contains("open") ? void closeEditMode() : document.getElementById("ratingOverlay")?.classList.contains("open") ? void closeRating() : document.getElementById("traktOverlay")?.classList.contains("open") ? void closeTraktOverlay() : document.getElementById("voiceModeOverlay")?.classList.contains("open") ? void closeVoiceMode() : document.getElementById("genreEditorOverlay")?.classList.contains("open") ? void closeGenreEditor() : void 0
+      return e && "none" !== e.style.pointerEvents && "none" !== e.style.display ? void closeFinderModal() : modalOpen ? void closeModal() : document.getElementById("watchlistOverlay").classList.contains("open") ? void closeWatchlist() : document.getElementById("universeOverlay").classList.contains("open") ? void closeSearch() : document.getElementById("adminOverlay").classList.contains("open") ? void closeAdmin() : document.getElementById("customizeOverlay").classList.contains("open") ? void closeCustomize() : document.getElementById("collectionsOverlay").classList.contains("open") ? void closeCollections() : document.getElementById("editOverlay")?.classList.contains("open") ? void closeEditMode() : document.getElementById("ratingOverlay")?.classList.contains("open") ? void closeRating() : document.getElementById("genreEditorOverlay")?.classList.contains("open") ? void closeGenreEditor() : void 0
     }
-    if (!("a" !== e.key && "A" !== e.key || modalOpen || aiPanelOpen)) return e.preventDefault(), void toggleAiPanel();
     if (!("/" !== e.key && "." !== e.key || modalOpen || aiPanelOpen)) return e.preventDefault(), void openSearch();
     if ("menu" !== kbLayer || modalOpen || aiPanelOpen) {
       if ("modal-season" === kbLayer && modalOpen) {
@@ -4259,7 +3801,7 @@ function setSectionTab(e, t) {
 window.addEventListener("load", () => {
   if (Object.keys(db).forEach(e => {
       updateTileProgress(e), updateContinueBadge(e)
-    }), updateContinueWidget(), updateLogoProgress(), updateWatchlistBadge(), updateWatchlistBtns(), showAutosave("idle"), updateStatusBadge(), initTileEffects(), loadTmdbTileImages().then(() => initTileEffects()), document.querySelectorAll(".ps-tile-wrapper .tile-bg, .ps-tile-wrapper .tile-logo").forEach(e => {
+    }), updateContinueWidget(), updateLogoProgress(), updateWatchlistBadge(), updateWatchlistBtns(), showAutosave("idle"), initTileEffects(), loadTmdbTileImages().then(() => initTileEffects()), document.querySelectorAll(".ps-tile-wrapper .tile-bg, .ps-tile-wrapper .tile-logo").forEach(e => {
       const t = () => e.classList.add("loaded");
       e.complete && e.naturalWidth > 0 ? t() : (e.addEventListener("load", t, {
         once: !0
@@ -4284,18 +3826,7 @@ window.addEventListener("load", () => {
         }, 300)
       }
       o(), setInterval(o, 2800)
-    }(), setTimeout(checkNewEpisodes, 8e3), updateTraktSidebarLabel(), initPWA(), aiHistory.length > 0) {
-    const e = document.getElementById("aiMessages"),
-      t = document.createElement("div");
-    t.style.cssText = "text-align:center;font-size:0.57rem;color:var(--muted);padding:8px 0;opacity:0.45;", t.textContent = "── predchozi konverzace ──", e.appendChild(t), aiHistory.slice(-8).forEach(t => {
-      const n = document.createElement("div");
-      n.className = "ai-msg-wrap " + ("user" === t.role ? "user" : "ai");
-      const o = (t.content || "").replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
-      "user" === t.role ? n.innerHTML = `<div class="ai-msg-avatar">👤</div><div class="ai-msg-bubble">${o}</div>` : n.innerHTML = `<div class="ai-msg-avatar">✦</div><div class="ai-msg-bubble"><span class="ai-msg-label">MujFlix AI</span>${linkifyFilms(o)}</div>`, e.appendChild(n)
-    });
-    const n = document.createElement("div");
-    n.style.cssText = "text-align:center;font-size:0.57rem;color:var(--accent);padding:6px 0;opacity:0.6;", n.textContent = "── ted ──", e.appendChild(n), document.getElementById("aiMessages").scrollTop = 99999
-  }
+    }(), setTimeout(checkNewEpisodes, 8e3), initPWA(), !1) {}
   document.querySelectorAll(".tile-bg").forEach(e => {
     e.complete && e.naturalWidth > 0 && e.classList.add("loaded")
   });
@@ -4348,285 +3879,41 @@ window.addEventListener("load", () => {
     }, 60 + 55 * t)
   })
 });
-const TRAKT_DEFAULT_CLIENT_ID = "b4d4f6e7c4aadf32b56d3e5b5e69c59d7c5c14e6f34d9c11b2e64f7b2a1d5e8f",
-  TRAKT_API = "https://api.trakt.tv",
-  TRAKT_REDIRECT = "urn:ietf:wg:oauth:2.0:oob";
 
-function traktGetClientId() {
-  return localStorage.getItem("mf_trakt_client_id") || TRAKT_DEFAULT_CLIENT_ID
-}
 
-function traktSaveClientId(e) {
-  e.trim() ? localStorage.setItem("mf_trakt_client_id", e.trim()) : localStorage.removeItem("mf_trakt_client_id")
-}
 
-function getTraktTokenKey() {
-  try {
-    return "mf_trakt_" + (("function" == typeof getActiveProfileId ? getActiveProfileId() : null) || "default")
-  } catch (e) {
-    return "mf_trakt_default"
-  }
-}
 
-function traktGetToken() {
-  return localStorage.getItem(getTraktTokenKey())
-}
 
-function traktGetRefresh() {
-  return localStorage.getItem(getTraktTokenKey() + "_refresh")
-}
 
-function traktSaveSetting(e, t) {
-  localStorage.setItem("mf_trakt_" + e, t ? "1" : "0")
-}
 
-function traktGetSetting(e) {
-  return "0" !== localStorage.getItem("mf_trakt_" + e)
-}
 
-function openTraktOverlay() {
-  const e = document.getElementById("traktOverlay");
-  e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible"))), traktRefreshUI()
-}
 
-function closeTraktOverlay() {
-  const e = document.getElementById("traktOverlay");
-  e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 300)
-}
 
-function traktRefreshUI() {
-  const e = traktGetToken(),
-    t = document.getElementById("traktFab"),
-    n = document.getElementById("traktConnectSection"),
-    o = document.getElementById("traktDashSection"),
-    i = document.getElementById("traktStatus"),
-    a = document.getElementById("traktStatusText"),
-    s = document.getElementById("traktStatusUser"),
-    r = document.getElementById("traktClientIdInput");
-  r && (r.value = localStorage.getItem("mf_trakt_client_id") || "");
-  const l = document.getElementById("traktSyncAuto"),
-    c = document.getElementById("traktSyncWl");
-  if (l && (l.checked = traktGetSetting("autoSync")), c && (c.checked = traktGetSetting("syncWl")), e) {
-    t && t.classList.add("connected"), n && (n.style.display = "none"), o && (o.style.display = "block"), i && i.classList.add("ok"), a && (a.textContent = "Připojeno");
-    const e = localStorage.getItem(getTraktTokenKey() + "_username");
-    s && e && (s.textContent = "@" + e), traktLoadStats()
-  } else t && t.classList.remove("connected"), n && (n.style.display = "block"), o && (o.style.display = "none"), i && i.classList.remove("ok"), a && (a.textContent = "Nepřipojen — propoj svůj Trakt účet"), s && (s.textContent = "")
-}
-async function traktStartAuth() {
-  const e = `https://trakt.tv/oauth/authorize?response_type=code&client_id=${traktGetClientId()}&redirect_uri=${encodeURIComponent(TRAKT_REDIRECT)}`;
-  window.open(e, "_blank", "noopener,width=600,height=700");
-  const t = document.getElementById("traktPinWrap");
-  t && t.classList.add("visible");
-  const n = document.getElementById("traktPinInput");
-  n && setTimeout(() => n.focus(), 300), showToast("🔐 Přihlaste se na Trakt a zadejte PIN kód")
-}
-async function traktSubmitPin() {
-  const e = document.getElementById("traktPinInput")?.value?.trim();
-  if (!e || e.length < 4) return void showToast("⚠ Zadejte platný PIN kód");
-  const t = traktGetClientId();
-  showToast("⏳ Ověřuji PIN…");
-  try {
-    const n = await fetch(`${TRAKT_API}/oauth/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "trakt-api-version": "2",
-        "trakt-api-key": t
-      },
-      body: JSON.stringify({
-        code: e,
-        client_id: t,
-        client_secret: "",
-        redirect_uri: TRAKT_REDIRECT,
-        grant_type: "authorization_code"
-      })
-    });
-    if (!n.ok) throw new Error("PIN neplatný nebo vypršel");
-    const o = await n.json();
-    localStorage.setItem(getTraktTokenKey(), o.access_token), o.refresh_token && localStorage.setItem(getTraktTokenKey() + "_refresh", o.refresh_token), await traktFetchMe(o.access_token, t), showToast("✅ Trakt.tv připojen!"), traktRefreshUI(), updateTraktSidebarLabel(), aiTraktRefreshStatus(), traktGetSetting("syncWl") && traktImportWatchlist()
-  } catch (e) {
-    showToast("❌ Chyba: " + e.message)
-  }
-}
-async function traktFetchMe(e, t) {
-  try {
-    const n = await fetch(`${TRAKT_API}/users/me`, {
-      headers: {
-        Authorization: "Bearer " + e,
-        "trakt-api-key": t,
-        "trakt-api-version": "2",
-        "Content-Type": "application/json"
-      }
-    });
-    if (n.ok) {
-      const e = await n.json();
-      e.username && localStorage.setItem(getTraktTokenKey() + "_username", e.username)
-    }
-  } catch {}
-}
-async function traktAPI(e, t = "GET", n = null) {
-  const o = traktGetToken(),
-    i = traktGetClientId();
-  if (!o) return null;
-  const a = {
-    method: t,
-    headers: {
-      Authorization: "Bearer " + o,
-      "trakt-api-key": i,
-      "trakt-api-version": "2",
-      "Content-Type": "application/json"
-    }
-  };
-  n && (a.body = JSON.stringify(n));
-  try {
-    const t = await fetch(TRAKT_API + e, a);
-    return 401 === t.status ? (traktHandleExpired(), null) : 429 === t.status ? (console.warn("[Trakt] Rate limited - čekám 5s"), await new Promise(e => setTimeout(e, 5e3)), null) : t.ok ? 204 === t.status || await t.json() : null
-  } catch {
-    return null
-  }
-}
 
-function traktHandleExpired() {
-  localStorage.removeItem("mf_trakt_token"), showToast("⚠ Trakt relace vypršela — znovu se přihlaš"), traktRefreshUI()
-}
-async function traktLoadStats() {
-  const e = localStorage.getItem(getTraktTokenKey() + "_username");
-  if (!e) return;
-  const t = await traktAPI(`/users/${e}/stats`);
-  if (!t) return;
-  const n = (e, t) => {
-    const n = document.getElementById(e);
-    n && (n.textContent = t)
-  };
-  n("tstat-movies", t.movies?.watched || 0), n("tstat-shows", t.shows?.watched || 0), n("tstat-eps", t.episodes?.watched || 0);
-  const o = t.movies?.minutes || 0 + t.episodes?.minutes || 0;
-  n("tstat-hours", Math.round(o / 60))
-}
-async function traktScrobbleEpisode(e, t, n) {
-  if (!traktGetToken() || !traktGetSetting("autoSync")) return;
-  const o = db[e]?.tmdbId;
-  if (o) try {
-    await traktAPI("/sync/history", "POST", {
-      shows: [{
-        ids: {
-          tmdb: o
-        },
-        seasons: [{
-          number: t,
-          episodes: [{
-            number: n
-          }]
-        }]
-      }]
-    })
-  } catch {}
-}
-async function traktScrobbleMovie(e) {
-  if (traktGetToken() && traktGetSetting("autoSync")) try {
-    await traktAPI("/sync/history", "POST", {
-      movies: [{
-        ids: {
-          tmdb: e
-        }
-      }]
-    })
-  } catch {}
-}
-async function traktImportWatchlist() {
-  showToast("📋 Načítám Trakt Watchlist…");
-  const [e, t] = await Promise.all([traktAPI("/sync/watchlist/movies"), traktAPI("/sync/watchlist/shows")]);
-  if (!e && !t) return void showToast("⚠ Watchlist nepodařilo načíst");
-  const n = getWatchlist ? getWatchlist() : [];
-  let o = 0;
-  (e || []).forEach(e => {
-    const t = e.movie;
-    if (!t) return;
-    const i = t.title;
-    n.some(e => e.name === i) || (n.push({
-      name: i,
-      type: "movie",
-      poster: "",
-      trakt: !0,
-      tmdb: t.ids?.tmdb
-    }), o++)
-  }), (t || []).forEach(e => {
-    const t = e.show;
-    if (!t) return;
-    const i = t.title;
-    n.some(e => e.name === i) || (n.push({
-      name: i,
-      type: "series",
-      poster: "",
-      trakt: !0,
-      tmdb: t.ids?.tmdb
-    }), o++)
-  }), "function" == typeof saveWatchlistData && saveWatchlistData(n), showToast(`✅ Načteno ${o} položek z Trakt Watchlistu`)
-}
-async function traktImportHistory() {
-  showToast("📥 Načítám historii z Traktu…");
-  const e = await traktAPI("/sync/history/shows?limit=1000");
-  if (!e) return void showToast("⚠ Historii se nepodařilo načíst");
-  const t = getWatched();
-  let n = 0;
-  e.forEach(e => {
-    if ("episode" !== e.type) return;
-    const o = e.show,
-      i = e.episode,
-      a = Object.keys(db).find(e => db[e].tmdbId && db[e].tmdbId === o?.ids?.tmdb);
-    if (!a) return;
-    const s = `${a}-S${i.season}-E${i.number}`;
-    t[s] || (t[s] = !0, n++)
-  }), saveWatched(t), Object.keys(db).forEach(e => {
-    updateTileProgress(e), updateContinueBadge(e)
-  }), activeSeries && (renderEpisodes(), updatePanelProgress()), updateContinueWidget(), showToast(`✅ Importováno ${n} epizod z Traktu`)
-}
-async function traktFullSync() {
-  showToast("🔄 Synchronizuji s Traktem…");
-  const e = document.getElementById("traktStatus");
-  e && e.classList.add("pending");
-  const t = getWatched(),
-    n = [];
-  Object.keys(t).forEach(e => {
-    const t = e.match(/^(.+)-S(\d+)-E(\d+)$/);
-    if (!t) return;
-    const [, o, i, a] = t, s = db[o]?.tmdbId;
-    if (!s) return;
-    const r = n.find(e => e.ids.tmdb === s),
-      l = {
-        number: parseInt(a)
-      },
-      c = {
-        number: parseInt(i),
-        episodes: [l]
-      };
-    if (r) {
-      const e = r.seasons.find(e => e.number === parseInt(i));
-      e ? e.episodes.push(l) : r.seasons.push(c)
-    } else n.push({
-      ids: {
-        tmdb: s
-      },
-      seasons: [c]
-    })
-  }), n.length > 0 && await traktAPI("/sync/history", "POST", {
-    shows: n
-  }), traktGetSetting("syncWl") && await traktImportWatchlist(), await traktLoadStats(), e && e.classList.remove("pending"), showToast(`✅ Sync dokončen — odesláno ${n.length} seriálů`)
-}
 
-function traktDisconnect() {
-  clearTraktToken(), localStorage.removeItem(getTraktTokenKey() + "_refresh"), localStorage.removeItem(getTraktTokenKey() + "_username"), traktRefreshUI(), showToast("Trakt.tv odpojen"), closeTraktOverlay()
-}
-const _origMarkWatched = markWatched;
-markWatched = function(e) {
-    _origMarkWatched(e);
-    const t = e.match(/^(.+)-S(\d+)-E(\d+)$/);
-    t && traktScrobbleEpisode(t[1], parseInt(t[2]), parseInt(t[3]))
-  },
-  function() {
-    traktRefreshUI();
-    const e = document.getElementById("traktClientIdInput");
-    e && (e.value = localStorage.getItem("mf_trakt_client_id") || "")
-  }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const SW_CODE = "\nconst CACHE = 'mujflix-v1';\nconst PRECACHE = [];\n\nself.addEventListener('install', e => { self.skipWaiting(); });\nself.addEventListener('activate', e => { e.waitUntil(clients.claim()); });\n\n// Push notifikace\nself.addEventListener('push', e => {\n  const data = e.data ? e.data.json() : {};\n  const title = data.title || 'MůjFlix';\n  const options = {\n    body: data.body || 'Nová epizoda čeká!',\n    icon: data.icon || '',\n    badge: data.badge || '',\n    tag: data.tag || 'mujflix-notif',\n    data: { url: data.url || './' },\n    vibrate: [200, 100, 200],\n    requireInteraction: false,\n  };\n  e.waitUntil(self.registration.showNotification(title, options));\n});\n\n// Klik na notifikaci → otevři MůjFlix\nself.addEventListener('notificationclick', e => {\n  e.notification.close();\n  const target = e.notification.data?.url || './';\n  e.waitUntil(\n    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cls => {\n      for (const c of cls) {\n        if (c.url.includes(self.location.origin) && 'focus' in c) return c.focus();\n      }\n      if (clients.openWindow) return clients.openWindow(target);\n    })\n  );\n});\n";
 async function initPWA() {
   if ("serviceWorker" in navigator) try {
@@ -4713,9 +4000,6 @@ window.mfNotify = function(e, t, n) {
   window._swReg ? window._swReg.showNotification(e, o) : new Notification(e, o)
 };
 const _origCheckNewEps = "function" == typeof checkNewEpisodes ? checkNewEpisodes : null;
-document.addEventListener("keydown", e => {
-  "v" === e.key || "V" === e.key ? speechManager.startListening() : "m" !== e.key && "M" !== e.key || speechManager.stopListening();
-});
 const PROFILES_KEY = "mf_profiles_v2",
   ACTIVE_PID_KEY = "mf_active_pid",
   PROFILE_COLORS = ["#007AFF", "#ff6b6b", "#4ecdc4", "#a29bfe", "#fd79a8", "#fdcb6e", "#6c5ce7", "#00b894", "#e17055", "#74b9ff"],
@@ -5039,11 +4323,7 @@ function _saveContentPref(e, t) {
   }))
 }
 
-function clearTraktToken() {
-  try {
-    localStorage.removeItem(getTraktTokenKey())
-  } catch (e) {}
-}
+
 const ProfileGate = {
   _pinBuffer: "",
   _pinTargetId: null,
@@ -5464,50 +4744,8 @@ function refreshUserContent() {
     _showProfileGateOnLoad();
   }
 }();
-class SpeechManager {
-  constructor() {
-    const e = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new e, this.recognition.lang = "cs-CZ", this.recognition.continuous = !1, this.recognition.interimResults = !0, this.synth = window.speechSynthesis, this.isSpeaking = !1, this.isListening = !1, this.setupRecognitionListeners()
-  }
-  setupRecognitionListeners() {
-    this.recognition.onstart = () => {
-      window.MF_DEBUG && console.log("🎤 Poslechávám..."), this.isListening = !0, document.body.classList.add("listening");
-      const e = document.getElementById("speechMicBtn");
-      e && e.classList.add("listening")
-    }, this.recognition.onresult = e => {
-      let t = "";
-      for (let n = e.resultIndex; n < e.results.length; n++) t += e.results[n][0].transcript;
-      window.MF_DEBUG && console.log("📝 Text:", t), e.isFinal && this.handleSpeechResult(t)
-    }, this.recognition.onerror = e => {
-      console.error("❌ Chyba sluchačky:", e.error)
-    }, this.recognition.onend = () => {
-      window.MF_DEBUG && console.log("🔇 Přestaly jsem poslouchat"), this.isListening = !1, document.body.classList.remove("listening");
-      const e = document.getElementById("speechMicBtn");
-      e && e.classList.remove("listening")
-    }
-  }
-  startListening() {
-    this.isListening || this.recognition.start()
-  }
-  stopListening() {
-    this.recognition.stop()
-  }
-  speak(e, t = "cs-CZ", n = 1) {
-    this.isSpeaking && this.synth.cancel();
-    const o = new SpeechSynthesisUtterance(e);
-    "function" == typeof aiBubbleShow && aiBubbleShow(o), o.lang = t, o.rate = n, o.pitch = 1, o.volume = 1, o.onstart = () => {
-      window.MF_DEBUG && console.log("🔊 Mluvím:", e), this.isSpeaking = !0
-    }, o.onend = () => {
-      window.MF_DEBUG && console.log("✅ Skončil jsem mluvit"), this.isSpeaking = !1
-    }, o.onerror = e => {
-      console.error("❌ Chyba TTS:", e.error)
-    }, this.synth.speak(o)
-  }
-  handleSpeechResult(e) {
-    window.MF_DEBUG && console.log("🎯 Zpracovávám:", e), e.toLowerCase().includes("simpsons") || e.toLowerCase().includes("simpsonovi") ? (this.speak("Otevírám The Simpsons!"), "function" == typeof openSeries && openSeries("the-simpsons")) : e.toLowerCase().includes("south park") ? (this.speak("South Park se otevírá!"), "function" == typeof openSeries && openSeries("south-park")) : e.toLowerCase().includes("family guy") ? (this.speak("Family Guy, tady jsem!"), "function" == typeof openSeries && openSeries("family-guy")) : e.toLowerCase().includes("futurama") ? (this.speak("Futurama se otevírá!"), "function" == typeof openSeries && openSeries("futurama")) : e.toLowerCase().includes("náhodný") || e.toLowerCase().includes("nevím co koukat") ? (this.speak("Otevírám vyhledávání."), openSearch()) : this.speak("Pochopil jsem: " + e)
-  }
-}
-const speechManager = new SpeechManager;
+
+
 async function _checkAdminCredentials(e, t) {
   const n = (new TextEncoder).encode(e + ":" + t),
     o = await crypto.subtle.digest("SHA-256", n);
@@ -5917,11 +5155,7 @@ function adminTestConfetti() {
   }) : "function" == typeof showToast && showToast("❌ confetti není dostupné")
 }
 
-function adminForceWrapped() {
-  adminLogout(), setTimeout(() => {
-    "function" == typeof openWrapped && openWrapped()
-  }, 300)
-}
+
 
 function adminToggleDebugLegacy() {
   const e = "1" === localStorage.getItem("mf_admin_debug");
@@ -6574,101 +5808,18 @@ function collectionsPlayFilm(e, t) {
     "function" == typeof openWithCopy ? openWithCopy(e, t) : showToast(`▶ ${e}`)
   }, 400)
 }
-let _voiceRecognition = null,
-  _voiceListening = !1;
 
-function openVoiceCmd() {
-  const e = document.getElementById("voiceCmdOverlay");
-  e && (e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible"))), startVoiceRecognition())
-}
 
-function closeVoiceCmd() {
-  stopVoiceRecognition();
-  const e = document.getElementById("voiceCmdOverlay");
-  e && (e.classList.remove("visible", "listening"), setTimeout(() => e.classList.remove("open"), 300))
-}
 
-function startVoiceRecognition() {
-  const e = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-  if (!e) return document.getElementById("voiceCmdStatus").textContent = isFirefox ? "Firefox nepodporuje hlasové ovládání" : "Prohlížeč nepodporuje hlasové ovládání", void(document.getElementById("voiceCmdTranscript").textContent = "Zkus Chrome nebo Edge.");
-  if (_voiceRecognition) try {
-    _voiceRecognition.abort()
-  } catch {}
-  _voiceRecognition = new e, _voiceRecognition.lang = "cs-CZ", _voiceRecognition.continuous = !1, _voiceRecognition.interimResults = !0, _voiceListening = !0;
-  const t = document.getElementById("voiceCmdOverlay"),
-    n = document.getElementById("voiceCmdOrbCenter"),
-    o = document.getElementById("voiceCmdStatus"),
-    i = document.getElementById("voiceCmdTranscript");
-  t && t.classList.add("listening"), n && n.classList.add("listening"), o && (o.textContent = "Poslouchám…"), i && (i.textContent = ""), _voiceRecognition.onresult = e => {
-    const t = Array.from(e.results).map(e => e[0].transcript).join("");
-    i && (i.textContent = `"${t}"`), e.results[e.results.length - 1].isFinal && processVoiceCommand(t.toLowerCase().trim())
-  }, _voiceRecognition.onerror = e => {
-    o && (o.textContent = "Chyba: " + ("no-speech" === e.error ? "Nic jsem neslyšel" : e.error)), t && t.classList.remove("listening"), n && n.classList.remove("listening")
-  }, _voiceRecognition.onend = () => {
-    _voiceListening = !1, t && t.classList.remove("listening"), n && n.classList.remove("listening"), o && "Poslouchám…" === o.textContent && (o.textContent = "Hotovo")
-  }, _voiceRecognition.start()
-}
 
-function stopVoiceRecognition() {
-  if (_voiceListening = !1, _voiceRecognition) {
-    try {
-      _voiceRecognition.abort()
-    } catch {}
-    _voiceRecognition = null
-  }
-}
 
-function processVoiceCommand(e) {
-  const t = document.getElementById("voiceCmdStatus"),
-    n = document.getElementById("voiceCmdResult"),
-    o = document.getElementById("voiceCmdResultText");
-  t && (t.textContent = "Zpracovávám…");
-  let i = null,
-    a = "";
-  const s = e.match(/(?:pusť|přehraj|spusť|dej mi)\s+(?:další díl\s+)?(.+)/i),
-    r = e.match(/(?:najdi|hledej|ukaž)\s+(?:mi\s+)?(?:nějaký\s+|nějaké\s+|film\s+)?(.+)/i),
-    l = e.match(/náhodný|nevím co koukat|něco náhodného/i),
-    c = e.match(/premiéry|co vychází|what.s on/i);
-  e.match(/(?:pusť|otevři|dej)\s+(?:seriál\s+)?(.+)/i);
-  if (l) i = () => {
-    closeVoiceCmd(), setTimeout(() => openSearch?.(), 400)
-  }, a = "🔍 Otevírám vyhledávání…";
-  else if (c) i = () => {
-    closeVoiceCmd(), setTimeout(() => openPremiereCalendar(), 400)
-  }, a = "📅 Otevírám premiéry…";
-  else if (r) {
-    const e = r[1].trim();
-    i = () => {
-      closeVoiceCmd(), setTimeout(() => {
-        "function" == typeof openSearch && openSearch();
-        const t = document.getElementById("searchTitleInput");
-        t && (t.value = e, t.dispatchEvent(new Event("input")))
-      }, 400)
-    }, a = `🔍 Hledám: "${e}"`
-  } else if (s) {
-    const e = s[1].trim(),
-      t = void 0 !== db ? Object.keys(db).find(t => db[t]?.name?.toLowerCase().includes(e.split(" ")[0].toLowerCase())) : null;
-    t ? (i = () => {
-      closeVoiceCmd(), setTimeout(() => openSeries(t), 400)
-    }, a = `▶ Otvírám: ${db[t].name}`) : (i = () => {
-      closeVoiceCmd(), setTimeout(() => openWithCopy && openWithCopy(e, "tv"), 400)
-    }, a = `▶ Přehrávám: "${e}"`)
-  } else i = () => {
-    closeVoiceCmd(), setTimeout(() => {
-      "function" == typeof toggleAiPanel && (aiPanelOpen || toggleAiPanel()), setTimeout(() => {
-        const t = document.getElementById("aiInput");
-        t && (t.value = e), "function" == typeof sendAiMessage && sendAiMessage(e)
-      }, 500)
-    }, 400)
-  }, a = `🤖 Ptám se AI: "${e}"`;
-  n && n.classList.add("visible"), o && (o.textContent = a), t && (t.textContent = "Příkaz rozpoznán ✓"), setTimeout(() => {
-    i && i()
-  }, 1200)
-}
-document.addEventListener("keydown", e => {
-  "INPUT" !== e.target.tagName && "TEXTAREA" !== e.target.tagName && ("v" !== e.key && "V" !== e.key || e.ctrlKey || e.metaKey || (e.preventDefault(), openVoiceCmd()))
-}), document.addEventListener("DOMContentLoaded", () => {
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     const e = document.getElementById("premiereFabBadge");
     e && e.classList.remove("has-items")
@@ -6940,17 +6091,7 @@ function adminClearTimeline() {
   localStorage.removeItem(e), _momentumCache = null, adminRefreshAlgo(), showToast?.("🗑 Timeline smazána"), adminLog("Watch timeline vymazána", "warn")
 }
 
-function adminResetAiBrain() {
-  confirm("Opravdu resetovat celý AI Brain? Ztratíš všechna naučená doporučení!") && (void 0 !== aiBrain && (aiBrain.memory = {
-    genrePreferences: {},
-    genreIdPrefs: {},
-    ratedGenres: {},
-    watchedTmdbIds: {},
-    watchedSlugs: {},
-    sessionGenres: [],
-    totalWatched: 0
-  }, aiBrain.save?.()), _momentumCache = null, _ratingSignalCache = null, adminLog("AI Brain resetován", "warn"), showToast?.("⚠ AI Brain resetován"), adminRenderAlgo(), adminRenderStats())
-}
+
 
 function adminRenderUsers() {
   const e = "function" == typeof _getProfiles ? _getProfiles() : [],
@@ -7494,80 +6635,19 @@ _pulseStyle.textContent = "@keyframes fabPulse { 0%,100%{transform:scale(1)}50%{
       })
     } catch {}
   }();
-let _vmListening = !1,
-  _vmRecog = null;
 
-function openVoiceMode() {
-  const e = document.getElementById("voiceModeOverlay");
-  e.style.display = "flex", requestAnimationFrame(() => e.classList.add("visible")), document.getElementById("voiceModeFab").classList.add("active")
-}
 
-function closeVoiceMode() {
-  const e = document.getElementById("voiceModeOverlay");
-  e.classList.remove("visible"), setTimeout(() => {
-    e.style.display = "none"
-  }, 400), document.getElementById("voiceModeFab").classList.remove("active"), _vmListening && vmStopListen()
-}
 
-function vmToggleListen() {
-  _vmListening ? vmStopListen() : vmStartListen()
-}
 
-function vmStartListen() {
-  const e = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-  if (!e) return void(document.getElementById("vmTranscript").textContent = isFirefox ? "Firefox hlasové ovládání nepodporuje 😔 Zkus Chrome" : "Tvůj prohlížeč hlasové ovládání nepodporuje 😔");
-  _vmListening = !0;
-  document.getElementById("vmOrb").classList.add("listening"), document.getElementById("vmStatus").textContent = "Poslouchám…", document.getElementById("vmTranscript").textContent = "", _vmRecog = new e, _vmRecog.lang = "cs-CZ", _vmRecog.continuous = !1, _vmRecog.interimResults = !0, _vmRecog.onresult = e => {
-    let t = "";
-    for (let n = e.resultIndex; n < e.results.length; n++) t += e.results[n][0].transcript;
-    document.getElementById("vmTranscript").textContent = t, e.results[e.results.length - 1].isFinal && vmHandleCommand(t.toLowerCase().trim())
-  }, _vmRecog.onend = () => {
-    vmStopListen()
-  }, _vmRecog.onerror = e => {
-    document.getElementById("vmStatus").textContent = "Chyba: " + e.error, vmStopListen()
-  }, _vmRecog.start()
-}
 
-function vmStopListen() {
-  _vmListening = !1;
-  if (document.getElementById("vmOrb").classList.remove("listening"), document.getElementById("vmStatus").textContent = "Klikni pro poslech", _vmRecog) {
-    try {
-      _vmRecog.stop()
-    } catch (e) {}
-    _vmRecog = null
-  }
-}
 
-function vmHandleCommand(e) {
-  if (document.getElementById("vmStatus").textContent = "✓ Příkaz rozpoznán", e.includes("náhodn")) setTimeout(() => {
-    closeVoiceMode(), openUniverse?.()
-  }, 400);
-  else if (e.includes("premiér")) setTimeout(() => {
-    closeVoiceMode(), openPremiereCalendar?.()
-  }, 400);
-  else if (e.includes("kolekc") || e.includes("ságy")) setTimeout(() => {
-    closeVoiceMode(), openCollections?.()
-  }, 400);
-  else if (e.includes("watchlist") || e.includes("chci koukat")) setTimeout(() => {
-    closeVoiceMode(), openWatchlist?.()
-  }, 400);
-  else if (e.includes("ai") || e.includes("doporuč")) setTimeout(() => {
-    closeVoiceMode(), toggleAiPanel?.()
-  }, 400);
-  else if (e.includes("wrapped") || e.includes("statistik")) setTimeout(() => {
-    closeVoiceMode(), openWrapped?.()
-  }, 400);
-  else if (e.includes("hledej") || e.includes("najdi") || e.includes("hledat")) {
-    const t = e.replace(/hledej|najdi|hledat/g, "").trim();
-    setTimeout(() => {
-      closeVoiceMode(), openUniverse?.(), setTimeout(() => {
-        const e = document.getElementById("shSearchInput");
-        e && (e.value = t, e.dispatchEvent(new Event("input")))
-      }, 600)
-    }, 400)
-  } else e.includes("zavři") || e.includes("zavrit") || e.includes("zruš") ? closeVoiceMode() : (document.getElementById("vmTranscript").textContent = '"' + e + '"  — zkus jiný příkaz 🤔', document.getElementById("vmStatus").textContent = "Příkaz nebyl rozpoznán")
-}
+
+
+
+
+
+
+
 
 function _custStorageKey() {
   try {
@@ -7710,9 +6790,7 @@ function closeCustomize() {
   const e = document.getElementById("customizeOverlay");
   e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 300)
 }
-document.addEventListener("keydown", e => {
-    "Escape" === e.key && document.getElementById("voiceModeOverlay").classList.contains("visible") && closeVoiceMode()
-  }),
+!0,
   function() {
     try {
       const e = safeLS("mf_customize_default", "{}"),
@@ -8865,25 +7943,6 @@ window._tmdbSetTab = function(e) {
         attributeFilter: ["class", "style"]
       }), e()
     });
-    window.closeAiPanel, window.openAiPanel;
-    document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        if ("function" == typeof openAiPanel && !openAiPanel._patched) {
-          const e = openAiPanel;
-          window.openAiPanel = function() {
-            e.apply(this, arguments), document.body.classList.add("mf-panel-open")
-          }, window.openAiPanel._patched = !0
-        }
-        if ("function" == typeof closeAiPanel && !closeAiPanel._patched) {
-          const e = closeAiPanel;
-          window.closeAiPanel = function() {
-            e.apply(this, arguments), setTimeout(() => {
-              document.body.classList.remove("mf-panel-open")
-            }, 290)
-          }, window.closeAiPanel._patched = !0
-        }
-      }, 300)
-    })
   }();
 const _FB_LS = "mf_firebase_cfg";
 window.openFirebaseCfgModal = function() {
@@ -9018,9 +8077,6 @@ window.adminSavePerKey = function(e, t) {
       "#watchlist": () => {
         "function" == typeof openWatchlist && openWatchlist()
       },
-      "#ai": () => {
-        "function" == typeof openAi && openAi(), "function" == typeof setDockActive && setDockActive("dockAI")
-      },
       "#sync": () => {
         "function" == typeof openSyncModal && openSyncModal()
       },
@@ -9060,7 +8116,6 @@ window.adminSavePerKey = function(e, t) {
         return o[t] && e(o[t]), window._mfShowSection_orig.call(this, t, ...n)
       });
       if ([
-          ["openAi", "#ai"],
           ["openUniverse", "#discover"],
           ["openWatchlist", "#watchlist"],
           ["openSyncModal", "#sync"],
@@ -9170,167 +8225,15 @@ window.adminSavePerKey = function(e, t) {
     })
   }(),
   function() {
-    const e = "http://100.72.144.107:8080/plex",
-      t = "mf_plex_token",
-      n = "mf_plex_url";
-
-    function o() {
-      return localStorage.getItem(n) || e
-    }
-
-    function i() {
-      return localStorage.getItem(t) || "yzrL-FrFEgc85YobxCes"
-    }! function() {
-      const t = localStorage.getItem(n);
-      t && !t.includes(":32400") || localStorage.setItem(n, e)
-    }();
-    let a = null,
-      s = [];
-
-    function r() {
-      return o().replace(/\/plex\/?$/, "").replace(":8080", ":32400")
-    }
-    async function l(e) {
-      try {
-        const t = await fetch(e, {
-          method: "GET",
-          headers: {
-            Accept: "application/json"
-          },
-          credentials: "omit"
-        });
-        if (!t.ok) throw new Error("HTTP " + t.status);
-        return await t.json()
-      } catch (t) {
-        const n = await fetch(e, {
-          method: "GET",
-          credentials: "omit"
-        });
-        if (!n.ok) throw new Error("HTTP " + n.status);
-        const o = await n.text();
-        try {
-          return JSON.parse(o)
-        } catch (e) {
-          throw new Error("Síťová chyba — zkontroluj URL a token")
-        }
-      }
-    }
-
-    function c(e, t, n) {
-      const o = document.createElement("button");
-      return o.textContent = e, o.dataset.sectionKey = t || "", o.style.cssText = `padding:8px 16px;border-radius:20px;border:1px solid ${n?"rgba(229,160,13,0.5)":"rgba(255,255,255,0.08)"};background:${n?"rgba(229,160,13,0.14)":"rgba(255,255,255,0.04)"};color:${n?"#e5a00d":"rgba(255,255,255,0.6)"};font-size:0.78rem;font-weight:${n?"700":"500"};cursor:pointer;white-space:nowrap;transition:all 0.15s;`, o.onclick = () => {
-        document.querySelectorAll("#plexLibFilters button").forEach(e => {
-          e.style.background = "rgba(255,255,255,0.04)", e.style.borderColor = "rgba(255,255,255,0.08)", e.style.color = "rgba(255,255,255,0.6)", e.style.fontWeight = "500"
-        }), o.style.background = "rgba(229,160,13,0.14)", o.style.borderColor = "rgba(229,160,13,0.5)", o.style.color = "#e5a00d", o.style.fontWeight = "700", t ? plexLoadSection(t, null) : plexLoadAll(s)
-      }, o
-    }
-    window.plexInit = async function() {
-      const e = i(),
-        t = document.getElementById("plexOnboarding"),
-        n = document.getElementById("plexLoader"),
-        r = document.getElementById("plexConnError"),
-        d = document.getElementById("plexGrid"),
-        m = document.getElementById("plexLibFilters"),
-        u = document.getElementById("plexServerStatus");
-      if (t && (t.style.display = "none"), r && (r.style.display = "none"), d && (d.style.display = "none"), m && (m.style.display = "none"), !e) return t && (t.style.display = "block"), void(u && (u.textContent = "Token není nastaven"));
-      n && (n.style.display = "block"), u && (u.textContent = "Připojování k " + o() + "…");
-      try {
-        const t = await l(`${o()}/library/sections?X-Plex-Token=${e}&Accept=application/json`),
-          i = t.MediaContainer?.Directory || [];
-        if (s = i, n && (n.style.display = "none"), u && (u.textContent = `Připojeno · ${i.length} knihoven`), m) {
-          m.style.display = "flex", m.innerHTML = "";
-          const e = c("Vše", null, !0);
-          m.appendChild(e), i.forEach(e => {
-            const t = "movie" === e.type ? "🎬" : "show" === e.type ? "📺" : "🎵";
-            m.appendChild(c(t + " " + e.title, e.key, !1))
-          })
-        }
-        i.length > 0 ? (a = null, await plexLoadAll(i)) : d && (d.style.display = "block", d.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px;">Žádné knihovny nenalezeny.</p>')
-      } catch (e) {
-        n && (n.style.display = "none");
-        const t = document.getElementById("plexConnErrorMsg");
-        t && (t.innerHTML = `Chyba: <strong>${e.message}</strong><br><br>Zkontroluj URL a token, nebo zda Plex povoluje přístup z prohlížeče.`), r && (r.style.display = "block"), u && (u.textContent = "Chyba připojení")
-      }
-    }, window.plexLoadAll = async function(e) {
-      const t = document.getElementById("plexGrid");
-      if (t) {
-        t.style.display = "block", t.innerHTML = "";
-        for (const t of e) await plexLoadSection(t.key, t.title)
-      }
-    }, window.plexLoadSection = async function(e, t) {
-      const n = document.getElementById("plexGrid"),
-        a = i();
-      if (n) {
-        null === t && (n.innerHTML = "");
-        try {
-          const s = await l(`${o()}/library/sections/${e}/all?X-Plex-Token=${a}&X-Plex-Container-Start=0&X-Plex-Container-Size=200`),
-            c = s.MediaContainer?.Metadata || [];
-          if (0 === c.length) return;
-          const d = t || s.MediaContainer?.title1 || "Knihovna",
-            m = document.createElement("div");
-          m.style.cssText = "margin-bottom:32px;", m.innerHTML = `<div style="font-size:1rem;font-weight:700;letter-spacing:-0.3px;margin-bottom:14px;padding:0 2px;">${d} <span style="font-size:0.72rem;color:var(--muted);font-weight:400;">(${c.length})</span></div>`;
-          const u = document.createElement("div");
-          u.style.cssText = "display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;", c.forEach(e => {
-            const t = function(e) {
-              const t = i(),
-                n = e.thumb ? `${r()}${e.thumb}?X-Plex-Token=${t}&width=200` : null,
-                o = e.year ? ` (${e.year})` : "",
-                a = e.rating ? `⭐ ${parseFloat(e.rating).toFixed(1)}` : "",
-                s = e.viewCount > 0,
-                l = document.createElement("div");
-              l.style.cssText = "position:relative;cursor:pointer;border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);transition:transform 0.18s,box-shadow 0.18s;", l.title = e.title + o, l.onmouseenter = () => {
-                l.style.transform = "scale(1.04)", l.style.boxShadow = "0 8px 32px rgba(0,0,0,0.6)"
-              }, l.onmouseleave = () => {
-                l.style.transform = "", l.style.boxShadow = ""
-              };
-              const c = document.createElement("div");
-              c.style.cssText = `aspect-ratio:2/3;background:rgba(255,255,255,0.04) url('${n||""}') center/cover no-repeat;`, n || (c.style.display = "flex", c.style.alignItems = "center", c.style.justifyContent = "center", c.innerHTML = '<span style="font-size:2rem;">🎬</span>');
-              if (s) {
-                const e = document.createElement("div");
-                e.style.cssText = "position:absolute;top:6px;right:6px;background:rgba(229,160,13,0.9);border-radius:6px;padding:2px 6px;font-size:0.58rem;font-weight:700;color:#000;", e.textContent = "✓ Viděno", l.appendChild(e)
-              }
-              l.appendChild(c);
-              const d = document.createElement("div");
-              return d.style.cssText = "padding:8px 8px 10px;", d.innerHTML = `<div style="font-size:0.72rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${_esc(e.title)}</div><div style="font-size:0.62rem;color:var(--muted);margin-top:2px;">${o.replace("(","").replace(")","")||""}${a?" · "+a:""}</div>`, l.appendChild(d), l.onclick = () => {
-                const n = `${r()}/web/index.html#!/server/${e.librarySectionID}/details?key=${encodeURIComponent(e.key)}&X-Plex-Token=${t}`;
-                window.open(n, "_blank")
-              }, l
-            }(e);
-            u.appendChild(t)
-          }), m.appendChild(u), n.appendChild(m)
-        } catch (t) {
-          console.warn("[Plex] Chyba načítání sekce", e, t)
-        }
-      }
-    }, window.plexSaveSettings = function() {
-      const o = document.getElementById("plexTokenInput")?.value?.trim(),
-        i = document.getElementById("plexUrlInput")?.value?.trim() || e;
-      o ? (localStorage.setItem(t, o), localStorage.setItem(n, i), plexInit()) : alert("Vlož prosím Plex Token.")
-    }, window.openPlexSettings = function() {
-      const e = document.getElementById("plexSettingsModal");
-      e && (document.getElementById("plexUrlInputS").value = o(), document.getElementById("plexTokenInputS").value = i(), e.style.display = "flex")
-    }, window.closePlexSettings = function() {
-      const e = document.getElementById("plexSettingsModal");
-      e && (e.style.display = "none")
-    }, window.plexSaveSettingsModal = function() {
-      const o = document.getElementById("plexTokenInputS")?.value?.trim(),
-        i = document.getElementById("plexUrlInputS")?.value?.trim() || e;
-      o && localStorage.setItem(t, o), i && localStorage.setItem(n, i), closePlexSettings(), plexRefresh()
-    }, window.plexRefresh = function() {
-      plexInit()
-    }
-  }(),
-  function() {
     let e = "serialy";
     window.mfSectionBtn = function(e, t) {}, window.mfShowSection = function(t) {
-      "plex" === t && (t = "serialy"), e = t, window._mfCurrentSection = t;
+      e = t, window._mfCurrentSection = t;
       const n = document.querySelector(".ps-menu-scene"),
         o = document.querySelector(".key-hint"),
         i = document.getElementById("continueWidget"),
         a = document.getElementById("mfSectionProtebe");
       n && (n.style.display = ""), o && (o.style.display = ""), i && (i.style.display = ""), a && (a.style.display = "none");
-      const s = document.getElementById("mfSectionPlex");
-      if (s && (s.style.display = "none"), document.body.classList.remove("mf-section-protebe"), "serialy" === t) {
+      if (document.body.classList.remove("mf-section-protebe"), "serialy" === t) {
         "function" == typeof closeUniverse && closeUniverse();
         const e = document.getElementById("universeOverlay");
         e && (e.classList.remove("visible", "open"), document.body.classList.remove("discover-open"));
@@ -9344,17 +8247,12 @@ window.adminSavePerKey = function(e, t) {
         })
       }, 350));
       else if ("protebe" === t) n && (n.style.display = "none"), o && (o.style.display = "none"), i && (i.style.display = "none"), a && (a.style.display = "block"), document.body.classList.add("mf-section-protebe"), setDockActive("dockProtebe"), location.hash = "#protebe";
-      else if ("plex" === t) {
-        n && (n.style.display = "none"), o && (o.style.display = "none"), i && (i.style.display = "none"), a && (a.style.display = "none");
-        const e = document.getElementById("mfSectionPlex");
-        e && (e.style.display = "block"), setDockActive("dockPlex"), location.hash = "#plex", "function" == typeof plexInit && plexInit()
-      }
     };
     const t = window.closeUniverse;
 
     function n() {
       const e = (location.hash || "").toLowerCase();
-      "#filmy" === e ? mfShowSection("filmy") : "#protebe" === e ? mfShowSection("protebe") : "#plex" === e ? mfShowSection("plex") : "#serialy" !== e && "" !== e || mfShowSection("serialy")
+      "#filmy" === e ? mfShowSection("filmy") : "#protebe" === e ? mfShowSection("protebe") : "#serialy" !== e && "" !== e || mfShowSection("serialy")
     }
     window.closeUniverse = function() {
       t && t.apply(this, arguments), setTimeout(() => {
@@ -9365,9 +8263,9 @@ window.adminSavePerKey = function(e, t) {
         } else {
           // OPRAVA: dřív se dock resetoval jen když bylo "Objevovat"
           // otevřené ze sekce "filmy". Pokud se otevřelo přímo tlačítkem
-          // v docku z jiné sekce (Domů/Pro tebe/Plex), aktivní ikonka
+          // v docku z jiné sekce (Domů/Pro tebe), aktivní ikonka
           // v docku po zavření zůstala chybně na "Objevovat".
-          setDockActive({serialy:"dockHome",protebe:"dockProtebe",plex:"dockPlex"}[e] || "dockHome")
+          setDockActive({serialy:"dockHome",protebe:"dockProtebe"}[e] || "dockHome")
         }
       }, 50)
     }, window.addEventListener("hashchange", n), document.addEventListener("DOMContentLoaded", () => setTimeout(n, 900));
@@ -11252,213 +10150,4 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
     obs.observe(modal, { attributes: true, attributeFilter: ['class'] });
   });
 
-})();
-
-;/* ═══ DOCK SYNC v2 — dock ví, kde uživatel skutečně je ═══
-   Jediný zdroj pravdy je to, co je OPRAVDU vidět (overlaye, sekce), ne to,
-   co si kdo naposledy zapamatoval. Nejvýše položená vrstva vyhrává:
-   Profil → Objevovat → Oblíbené → sekce (Pro tebe / Plex) → Domů.
-   Přepočítává se: při změně tříd overlayů, po Esc / kliknutí, při každém
-   volání setDockActive (i ze starého kódu) a jako pojistka 2× za sekundu. */
-(function mfDockSync() {
-  try {
-    var IDS = ["dockHome", "dockFilmy", "dockProtebe", "dockPlex", "dockProfile"];
-    function shown(el) {
-      if (!el) return false;
-      var cs = getComputedStyle(el);
-      return cs.display !== "none" && cs.visibility !== "hidden";
-    }
-    function has(id, cls) {
-      var el = document.getElementById(id);
-      return !!(el && el.classList.contains(cls));
-    }
-    function target() {
-      var gate = document.getElementById("mfProfileGate");
-      if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none") return "dockProfile";
-      if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockFilmy";
-      if (has("watchlistOverlay", "visible")) return "dockProtebe";
-      var pr = document.getElementById("mfSectionProtebe");
-      if (document.body.classList.contains("mf-section-protebe") || (pr && pr.style.display === "block")) return "dockProtebe";
-      var px = document.getElementById("mfSectionPlex");
-      if (px && px.style.display === "block" && document.getElementById("dockPlex")) return "dockPlex";
-      return "dockHome";
-    }
-    function apply() {
-      try {
-        var id = target();
-        IDS.forEach(function (d) {
-          var b = document.getElementById(d);
-          if (!b) return;
-          var want = d === id;
-          if (b.classList.contains("active") !== want) b.classList.toggle("active", want);
-          if (want) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
-        });
-        if (typeof window.mfhUpdateDockVisibility === "function") window.mfhUpdateDockVisibility();
-        // ostatní tlačítka (např. dockAI/dockMore) nikdy nesmí zůstat "viset" jako aktivní
-        document.querySelectorAll(".dock-btn.active").forEach(function (b) {
-          if (IDS.indexOf(b.id) === -1) b.classList.remove("active");
-        });
-      } catch (e) {}
-    }
-    var timer = null;
-    function sync(delay) {
-      clearTimeout(timer);
-      timer = setTimeout(apply, typeof delay === "number" ? delay : 60);
-    }
-    window.mfSyncDockToView = sync;
-    window.mfDockTarget = target;
-    function init() {
-      ["universeOverlay", "watchlistOverlay", "mfProfileGate", "mfSectionProtebe", "mfSectionPlex"].forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el) new MutationObserver(function () { sync(); }).observe(el, { attributes: true, attributeFilter: ["class", "style"] });
-      });
-      new MutationObserver(function () { apply(); }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-      // jakékoliv volání setDockActive (i ze starého kódu) se po chvíli ověří proti realitě
-      var orig = window.setDockActive;
-      if (typeof orig === "function") window.setDockActive = function () {
-        var r = orig.apply(this, arguments);
-        sync(140);
-        return r;
-      };
-      document.addEventListener("keydown", function (e) { if (e.key === "Escape") { sync(60); sync(420); } }, true);
-      document.addEventListener("click", function () { sync(120); setTimeout(apply, 450); }, true);
-      window.addEventListener("hashchange", function () { sync(); });
-      window.addEventListener("popstate", function () { sync(); });
-      setInterval(apply, 500); // pojistka
-      apply();
-    }
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
-    else init();
-  } catch (err) { console.warn("[dock sync]", err); }
-})();
-
-;/* ═══ CHYTRÝ DOCK ═══
-   1) plynule klouzavá "pilulka" pod aktivní ikonou
-   2) počet položek v Oblíbených jako odznak na srdíčku
-   3) automatické schování při rolování dolů / vrácení při rolování nahoru
-   4) opakované klepnutí na aktivní ikonu: Domů → nahoru, Objevovat → do hledání
-   Samostatný blok v try/catch — nezávislý na zbytku appky. */
-(function mfSmartDock() {
-  try {
-    var dock, pill, badge, hidden = false, lastY = {}, ticking = false;
-
-    function movePill() {
-      if (!dock || !pill) return;
-      var act = dock.querySelector(".dock-btn.active");
-      if (!act || act.offsetWidth === 0) { pill.style.opacity = "0"; return; }
-      pill.style.opacity = "1";
-      pill.style.width = act.offsetWidth + "px";
-      pill.style.height = act.offsetHeight + "px";
-      pill.style.transform = "translate(" + act.offsetLeft + "px," + act.offsetTop + "px)";
-    }
-
-    function updateBadge() {
-      if (!badge) return;
-      var n = 0;
-      try { n = (typeof getWatchlist === "function" ? getWatchlist() : []).length; } catch (e) {}
-      badge.textContent = n > 99 ? "99+" : String(n);
-      badge.classList.toggle("visible", n > 0);
-    }
-
-    function setHidden(h) {
-      if (h === hidden || !dock) return;
-      hidden = h;
-      dock.classList.toggle("mf-dock-hidden", h);
-    }
-
-    function onScroll(e) {
-      var t = e.target === document ? document.scrollingElement : e.target;
-      if (!t || t.nodeType !== 1) return;
-      // ignoruj vodorovné karusely a malé kontejnery
-      if (t.scrollHeight - t.clientHeight < 120) return;
-      var key = t.id || t.className || "doc";
-      var y = t.scrollTop, prev = lastY[key];
-      lastY[key] = y;
-      if (prev === undefined) return;
-      var d = y - prev;
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        ticking = false;
-        if (y < 80) setHidden(false);
-        else if (d > 14) setHidden(true);
-        else if (d < -10) setHidden(false);
-      });
-    }
-
-    function onDockClick(e) {
-      var btn = e.target.closest && e.target.closest(".dock-btn");
-      if (!btn) return;
-      var wasActive = btn.classList.contains("active");
-      setHidden(false);
-      if (!wasActive) return;
-      setTimeout(function () {
-        if (btn.id === "dockFilmy") {
-          var inp = document.getElementById("searchTitleInput");
-          var body = document.getElementById("discoBody");
-          if (body) body.scrollTo({ top: 0, behavior: "smooth" });
-          if (inp) inp.focus();
-        } else if (btn.id === "dockHome") {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          document.querySelectorAll(".mfh-wrap, #mfHome, .mfh-scroll").forEach(function (el) {
-            if (el.scrollTo) el.scrollTo({ top: 0, behavior: "smooth" });
-          });
-        }
-      }, 60);
-    }
-
-    function init() {
-      dock = document.getElementById("mfDock");
-      if (!dock) return;
-      pill = document.createElement("div");
-      pill.className = "mf-dock-pill";
-      dock.insertBefore(pill, dock.firstChild);
-      dock.classList.add("has-pill");
-      var prot = document.getElementById("dockProtebe");
-      if (prot) {
-        badge = document.createElement("span");
-        badge.className = "mf-dock-badge";
-        prot.appendChild(badge);
-      }
-      new MutationObserver(function () { requestAnimationFrame(movePill); })
-        .observe(dock, { attributes: true, subtree: true, attributeFilter: ["class"] });
-      if (window.ResizeObserver) new ResizeObserver(function () { movePill(); }).observe(dock);
-      window.addEventListener("resize", movePill);
-      window.addEventListener("storage", updateBadge);
-      // badge se přepočítá po každém uložení Oblíbených
-      if (typeof window.saveWatchlistData === "function") {
-        var orig = window.saveWatchlistData;
-        window.saveWatchlistData = function () {
-          var r = orig.apply(this, arguments);
-          updateBadge();
-          return r;
-        };
-      }
-      document.addEventListener("scroll", onScroll, { capture: true, passive: true });
-      document.addEventListener("click", onDockClick, true);
-      // schovaný dock se vrátí při pohybu myši u spodní hrany
-      document.addEventListener("mousemove", function (e) {
-        if (hidden && e.clientY > window.innerHeight - 70) setHidden(false);
-      }, { passive: true });
-      // při otevření overlaye se dock vždy ukáže
-      setTimeout(movePill, 300); setTimeout(movePill, 1200);
-      updateBadge();
-      setInterval(updateBadge, 5000);
-    }
-
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-    else init();
-  } catch (err) { console.warn("[smart dock]", err); }
-})();
-
-
-;/* ═══ ODEBRÁNO: Plex a AI chat (Gemini apod.) ═══
-   Markup je pryč z index.html; tady jsou jen prázdné náhrady funkcí, aby
-   staré volání nikde nehodilo chybu. */
-(function () {
-  ["plexInit", "plexRefresh", "openPlexSettings", "closePlexSettings", "plexSaveSettings",
-   "plexSaveSettingsModal", "openAi", "toggleAiPanel", "aiSend"].forEach(function (n) {
-    window[n] = function () {};
-  });
-  window.closeAi = window.closeAi || function () {};
 })();
