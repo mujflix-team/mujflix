@@ -8436,7 +8436,7 @@ function triggerPwaInstall() {
 }
 "function" == typeof _origCloseWatchlist && (window.closeWatchlist = function(...e) {
     return setDockActive("dockHome"), _origCloseWatchlist.apply(this, e)
-  }), setInterval(_syncDockBadges, 2e3), setTimeout(_syncDockBadges, 500), window.addEventListener("beforeinstallprompt", e => {
+  }), setInterval(_syncDockBadges, 6e3), setTimeout(_syncDockBadges, 500), window.addEventListener("beforeinstallprompt", e => {
     e.preventDefault(), window._pwaInstallPrompt = e;
     const t = document.getElementById("pwaInstallBtn");
     t && (t.style.display = "flex", t.onclick = async () => {
@@ -8586,10 +8586,16 @@ function triggerPwaInstall() {
         "function" == typeof updateTileProgress && updateTileProgress(e), "function" == typeof updateContinueBadge && updateContinueBadge(e)
       }), "function" == typeof updateContinueWidget && updateContinueWidget(), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateWatchlistBadge && updateWatchlistBadge(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns()
     }, document.addEventListener("DOMContentLoaded", () => {
-      new MutationObserver(n).observe(document.body, {
+      // VÝKON: dřív se tenhle callback (15× querySelector) spouštěl při KAŽDÉ změně
+      // style/class kdekoli na stránce — tedy i při každém pohybu myši (tilt efekty
+      // mění style.transform). Teď jen class a max 1× za 150 ms.
+      let _moT = null;
+      new MutationObserver(() => {
+        _moT || (_moT = setTimeout(() => { _moT = null; n() }, 150))
+      }).observe(document.body, {
         subtree: !0,
         attributes: !0,
-        attributeFilter: ["class", "style"]
+        attributeFilter: ["class"]
       }), n()
     })
   }();
@@ -9317,7 +9323,7 @@ window.adminSavePerKey = function(e, t) {
   function() {
     let e = "serialy";
     window.mfSectionBtn = function(e, t) {}, window.mfShowSection = function(t) {
-      e = t, window._mfCurrentSection = t;
+      "plex" === t && (t = "serialy"), e = t, window._mfCurrentSection = t;
       const n = document.querySelector(".ps-menu-scene"),
         o = document.querySelector(".key-hint"),
         i = document.getElementById("continueWidget"),
@@ -9379,39 +9385,6 @@ window.adminSavePerKey = function(e, t) {
         n && (t === e ? n.classList.add("active") : n.classList.remove("active"))
       })
     }
-  }(),
-  // OPRAVA: dock (spodní lišta Domů/Objevovat/Profil/Oblíbené) se dřív
-  // aktivně přepínal jen v momentě kliknutí na jeho vlastní tlačítko —
-  // pokud se sekce změnila jinak (zavření overlaye, zpět v historii,
-  // hash routing), zvýrazněná ikonka v docku "zůstala viset" na staré
-  // sekci. Tahle funkce se místo dohadování na každém možném místě
-  // v kódu spustí po každé změně a sama zjistí, co je zrovna vidět,
-  // a podle toho nastaví správně aktivní ikonu v docku.
-  function() {
-    function mfSyncDockToView() {
-      if ("function" != typeof window.setDockActive) return;
-      let id = "dockHome";
-      try {
-        const hash = (location.hash || "").toLowerCase();
-        if (document.getElementById("watchlistOverlay")?.classList.contains("open")) id = "dockProtebe";
-        else if (document.body.classList.contains("mf-section-protebe") || "#protebe" === hash) id = "dockProtebe";
-        else if (document.body.classList.contains("discover-open") || document.getElementById("universeOverlay")?.classList.contains("open") || "#filmy" === hash) id = "dockFilmy";
-        else if (document.getElementById("profileGateOverlay")?.classList.contains("open") || "#profily" === hash) id = "dockProfile";
-        else id = "dockHome";
-      } catch (e) {}
-      window.setDockActive(id);
-    }
-    window.mfSyncDockToView = mfSyncDockToView;
-    window.addEventListener("hashchange", () => setTimeout(mfSyncDockToView, 30));
-    ["closeWatchlist", "closeModal", "closeUniverse", "closeSearch"].forEach(name => {
-      const orig = window[name];
-      if ("function" == typeof orig) window[name] = function(...args) {
-        let r;
-        try { r = orig.apply(this, args) } finally { setTimeout(mfSyncDockToView, 60) }
-        return r
-      }
-    });
-    document.addEventListener("DOMContentLoaded", () => setTimeout(mfSyncDockToView, 950));
   }(), console.info("[MůjFlix v4 sekce] ✓ Edit fix, Seriály/Filmy/Pro tebe sekce, dock redesign"),
   function() {
     function e() {
@@ -9551,9 +9524,13 @@ window.adminSavePerKey = function(e, t) {
       const t = o.apply(this, e);
       return n(), t
     });
+    let _tiltT = null;
     new MutationObserver(() => {
-      const e = document.querySelector(".universe-overlay.visible");
-      e && !e._tiltInited && (e._tiltInited = !0, n())
+      _tiltT || (_tiltT = setTimeout(() => {
+        _tiltT = null;
+        const e = document.querySelector(".universe-overlay.visible");
+        e && !e._tiltInited && (e._tiltInited = !0, n())
+      }, 200))
     }).observe(document.body, {
       attributes: !0,
       subtree: !0,
@@ -11275,4 +11252,213 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
     obs.observe(modal, { attributes: true, attributeFilter: ['class'] });
   });
 
+})();
+
+;/* ═══ DOCK SYNC v2 — dock ví, kde uživatel skutečně je ═══
+   Jediný zdroj pravdy je to, co je OPRAVDU vidět (overlaye, sekce), ne to,
+   co si kdo naposledy zapamatoval. Nejvýše položená vrstva vyhrává:
+   Profil → Objevovat → Oblíbené → sekce (Pro tebe / Plex) → Domů.
+   Přepočítává se: při změně tříd overlayů, po Esc / kliknutí, při každém
+   volání setDockActive (i ze starého kódu) a jako pojistka 2× za sekundu. */
+(function mfDockSync() {
+  try {
+    var IDS = ["dockHome", "dockFilmy", "dockProtebe", "dockPlex", "dockProfile"];
+    function shown(el) {
+      if (!el) return false;
+      var cs = getComputedStyle(el);
+      return cs.display !== "none" && cs.visibility !== "hidden";
+    }
+    function has(id, cls) {
+      var el = document.getElementById(id);
+      return !!(el && el.classList.contains(cls));
+    }
+    function target() {
+      var gate = document.getElementById("mfProfileGate");
+      if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none") return "dockProfile";
+      if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockFilmy";
+      if (has("watchlistOverlay", "visible")) return "dockProtebe";
+      var pr = document.getElementById("mfSectionProtebe");
+      if (document.body.classList.contains("mf-section-protebe") || (pr && pr.style.display === "block")) return "dockProtebe";
+      var px = document.getElementById("mfSectionPlex");
+      if (px && px.style.display === "block" && document.getElementById("dockPlex")) return "dockPlex";
+      return "dockHome";
+    }
+    function apply() {
+      try {
+        var id = target();
+        IDS.forEach(function (d) {
+          var b = document.getElementById(d);
+          if (!b) return;
+          var want = d === id;
+          if (b.classList.contains("active") !== want) b.classList.toggle("active", want);
+          if (want) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+        });
+        if (typeof window.mfhUpdateDockVisibility === "function") window.mfhUpdateDockVisibility();
+        // ostatní tlačítka (např. dockAI/dockMore) nikdy nesmí zůstat "viset" jako aktivní
+        document.querySelectorAll(".dock-btn.active").forEach(function (b) {
+          if (IDS.indexOf(b.id) === -1) b.classList.remove("active");
+        });
+      } catch (e) {}
+    }
+    var timer = null;
+    function sync(delay) {
+      clearTimeout(timer);
+      timer = setTimeout(apply, typeof delay === "number" ? delay : 60);
+    }
+    window.mfSyncDockToView = sync;
+    window.mfDockTarget = target;
+    function init() {
+      ["universeOverlay", "watchlistOverlay", "mfProfileGate", "mfSectionProtebe", "mfSectionPlex"].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) new MutationObserver(function () { sync(); }).observe(el, { attributes: true, attributeFilter: ["class", "style"] });
+      });
+      new MutationObserver(function () { apply(); }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+      // jakékoliv volání setDockActive (i ze starého kódu) se po chvíli ověří proti realitě
+      var orig = window.setDockActive;
+      if (typeof orig === "function") window.setDockActive = function () {
+        var r = orig.apply(this, arguments);
+        sync(140);
+        return r;
+      };
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") { sync(60); sync(420); } }, true);
+      document.addEventListener("click", function () { sync(120); setTimeout(apply, 450); }, true);
+      window.addEventListener("hashchange", function () { sync(); });
+      window.addEventListener("popstate", function () { sync(); });
+      setInterval(apply, 500); // pojistka
+      apply();
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
+    else init();
+  } catch (err) { console.warn("[dock sync]", err); }
+})();
+
+;/* ═══ CHYTRÝ DOCK ═══
+   1) plynule klouzavá "pilulka" pod aktivní ikonou
+   2) počet položek v Oblíbených jako odznak na srdíčku
+   3) automatické schování při rolování dolů / vrácení při rolování nahoru
+   4) opakované klepnutí na aktivní ikonu: Domů → nahoru, Objevovat → do hledání
+   Samostatný blok v try/catch — nezávislý na zbytku appky. */
+(function mfSmartDock() {
+  try {
+    var dock, pill, badge, hidden = false, lastY = {}, ticking = false;
+
+    function movePill() {
+      if (!dock || !pill) return;
+      var act = dock.querySelector(".dock-btn.active");
+      if (!act || act.offsetWidth === 0) { pill.style.opacity = "0"; return; }
+      pill.style.opacity = "1";
+      pill.style.width = act.offsetWidth + "px";
+      pill.style.height = act.offsetHeight + "px";
+      pill.style.transform = "translate(" + act.offsetLeft + "px," + act.offsetTop + "px)";
+    }
+
+    function updateBadge() {
+      if (!badge) return;
+      var n = 0;
+      try { n = (typeof getWatchlist === "function" ? getWatchlist() : []).length; } catch (e) {}
+      badge.textContent = n > 99 ? "99+" : String(n);
+      badge.classList.toggle("visible", n > 0);
+    }
+
+    function setHidden(h) {
+      if (h === hidden || !dock) return;
+      hidden = h;
+      dock.classList.toggle("mf-dock-hidden", h);
+    }
+
+    function onScroll(e) {
+      var t = e.target === document ? document.scrollingElement : e.target;
+      if (!t || t.nodeType !== 1) return;
+      // ignoruj vodorovné karusely a malé kontejnery
+      if (t.scrollHeight - t.clientHeight < 120) return;
+      var key = t.id || t.className || "doc";
+      var y = t.scrollTop, prev = lastY[key];
+      lastY[key] = y;
+      if (prev === undefined) return;
+      var d = y - prev;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        if (y < 80) setHidden(false);
+        else if (d > 14) setHidden(true);
+        else if (d < -10) setHidden(false);
+      });
+    }
+
+    function onDockClick(e) {
+      var btn = e.target.closest && e.target.closest(".dock-btn");
+      if (!btn) return;
+      var wasActive = btn.classList.contains("active");
+      setHidden(false);
+      if (!wasActive) return;
+      setTimeout(function () {
+        if (btn.id === "dockFilmy") {
+          var inp = document.getElementById("searchTitleInput");
+          var body = document.getElementById("discoBody");
+          if (body) body.scrollTo({ top: 0, behavior: "smooth" });
+          if (inp) inp.focus();
+        } else if (btn.id === "dockHome") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          document.querySelectorAll(".mfh-wrap, #mfHome, .mfh-scroll").forEach(function (el) {
+            if (el.scrollTo) el.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        }
+      }, 60);
+    }
+
+    function init() {
+      dock = document.getElementById("mfDock");
+      if (!dock) return;
+      pill = document.createElement("div");
+      pill.className = "mf-dock-pill";
+      dock.insertBefore(pill, dock.firstChild);
+      dock.classList.add("has-pill");
+      var prot = document.getElementById("dockProtebe");
+      if (prot) {
+        badge = document.createElement("span");
+        badge.className = "mf-dock-badge";
+        prot.appendChild(badge);
+      }
+      new MutationObserver(function () { requestAnimationFrame(movePill); })
+        .observe(dock, { attributes: true, subtree: true, attributeFilter: ["class"] });
+      if (window.ResizeObserver) new ResizeObserver(function () { movePill(); }).observe(dock);
+      window.addEventListener("resize", movePill);
+      window.addEventListener("storage", updateBadge);
+      // badge se přepočítá po každém uložení Oblíbených
+      if (typeof window.saveWatchlistData === "function") {
+        var orig = window.saveWatchlistData;
+        window.saveWatchlistData = function () {
+          var r = orig.apply(this, arguments);
+          updateBadge();
+          return r;
+        };
+      }
+      document.addEventListener("scroll", onScroll, { capture: true, passive: true });
+      document.addEventListener("click", onDockClick, true);
+      // schovaný dock se vrátí při pohybu myši u spodní hrany
+      document.addEventListener("mousemove", function (e) {
+        if (hidden && e.clientY > window.innerHeight - 70) setHidden(false);
+      }, { passive: true });
+      // při otevření overlaye se dock vždy ukáže
+      setTimeout(movePill, 300); setTimeout(movePill, 1200);
+      updateBadge();
+      setInterval(updateBadge, 5000);
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  } catch (err) { console.warn("[smart dock]", err); }
+})();
+
+
+;/* ═══ ODEBRÁNO: Plex a AI chat (Gemini apod.) ═══
+   Markup je pryč z index.html; tady jsou jen prázdné náhrady funkcí, aby
+   staré volání nikde nehodilo chybu. */
+(function () {
+  ["plexInit", "plexRefresh", "openPlexSettings", "closePlexSettings", "plexSaveSettings",
+   "plexSaveSettingsModal", "openAi", "toggleAiPanel", "aiSend"].forEach(function (n) {
+    window[n] = function () {};
+  });
+  window.closeAi = window.closeAi || function () {};
 })();
