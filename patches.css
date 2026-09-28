@@ -785,8 +785,6 @@ html body.discover-open #mfDock {
   height: 26px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.16);
   display: flex;
   align-items: center;
@@ -816,10 +814,251 @@ html body.discover-open #mfDock {
 
 /* Chipy žánrů/kategorií v horní liště Objevovat — jemně "skleněný"
    moderní vzhled místo ploché barvy. */
-.disco-nav-item {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
 .disco-nav-item.active {
   box-shadow: 0 4px 14px rgba(10, 132, 255, 0.3) !important;
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   VÝKON — blur za desítkami karet zabíjí GPU i na silném PC.
+   Na kartách a v řádcích ho vypínáme; vzhled zůstává tmavý/čistý.
+   ══════════════════════════════════════════════════════════════ */
+.disco-card, .disco-card *, .mfh-card, .mfh-card *, .ps-tile-wrapper *,
+.universe-overlay *, .mfd-body * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.disco-card, .mfh-card { contain: layout paint; }
+.disco-card-img { will-change: auto !important; }
+.mfd-body { contain: layout style; }
+
+/* ══════════════════════════════════════════════════════════════
+   OBJEVOVAT — kompletní vzhled (mfd-*)
+   Dřív měla nová struktura Objevování v CSS nulová pravidla,
+   proto vypadala jako nastylovaný HTML dokument bez designu.
+   ══════════════════════════════════════════════════════════════ */
+.universe-overlay {
+  background:
+    radial-gradient(1100px 500px at 15% -10%, rgba(10,132,255,0.14), transparent 60%),
+    radial-gradient(900px 420px at 95% 0%, rgba(191,90,242,0.10), transparent 60%),
+    #07070b !important;
+}
+
+/* Header: logo · vyhledávání · zavřít */
+.mfd-header {
+  display: flex; align-items: center; gap: 18px;
+  padding: 16px clamp(16px, 4vw, 48px);
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(7,7,11,0.94);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex: none;
+}
+.mfd-brand {
+  font-size: 1.25rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; flex: none;
+}
+.mfd-brand span { color: #0a84ff; }
+.mfd-search-wrap { position: relative; flex: 1; max-width: 720px; margin: 0 auto; }
+.mfd-search-wrap .uni-search-icon {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: rgba(255,255,255,0.45); pointer-events: none;
+}
+.mf-search-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.mfd-search-wrap .uni-input {
+  width: 100%; height: 48px; box-sizing: border-box;
+  padding: 0 46px 0 48px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  color: #fff !important; font-size: 0.98rem; outline: none;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.mfd-search-wrap .uni-input:hover { background: rgba(255,255,255,0.10) !important; }
+.mfd-search-wrap .uni-input:focus {
+  background: rgba(255,255,255,0.11) !important;
+  border-color: rgba(10,132,255,0.75) !important;
+  box-shadow: 0 0 0 4px rgba(10,132,255,0.18) !important;
+}
+.mfd-search-wrap .uni-clear-btn {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255,255,255,0.14); color: #fff; font-size: 0.72rem; line-height: 1;
+}
+.mfd-search-wrap .uni-clear-btn:hover { background: rgba(255,255,255,0.26); }
+.mf-search-history {
+  position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 30;
+  background: #14141b; border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+}
+.mf-search-history:empty { display: none; }
+.mfd-close {
+  flex: none; width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06);
+  color: #fff; font-size: 1rem; cursor: pointer;
+  transition: background .18s ease, transform .18s ease;
+}
+.mfd-close:hover { background: rgba(255,255,255,0.16); transform: rotate(90deg); }
+
+/* Tělo */
+.mfd-body {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 8px clamp(16px, 4vw, 48px) 90px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent;
+}
+.mfd-hero-title {
+  margin: 28px 0 4px; font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-weight: 800; letter-spacing: -0.04em; line-height: 1.05;
+  background: linear-gradient(90deg, #fff 30%, #7cb8ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.mfd-hero-sub { margin: 0 0 22px; color: rgba(255,255,255,0.5); font-size: 1rem; }
+
+/* Filtry */
+.mfd-filters-1 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+.mfd-f-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 18px; border-radius: 999px; cursor: pointer;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.78); font: inherit; font-size: 0.88rem; font-weight: 600;
+  transition: background .16s ease, color .16s ease, transform .16s ease, border-color .16s ease;
+}
+.mfd-f-btn svg { width: 16px; height: 16px; }
+.mfd-f-btn:hover { background: rgba(255,255,255,0.13); color: #fff; }
+.mfd-f-btn:active { transform: scale(0.96); }
+.mfd-f-btn.active {
+  background: #fff; color: #08080c; border-color: #fff;
+}
+.mfd-f-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.14); margin: 0 4px; }
+.mfd-select {
+  height: 40px; padding: 0 34px 0 16px; border-radius: 999px; cursor: pointer;
+  background-color: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09);
+  color: #fff; font: inherit; font-size: 0.86rem; font-weight: 600; outline: none;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.mfd-select:hover { background-color: rgba(255,255,255,0.12); }
+.mfd-select option { background: #14141b; color: #fff; }
+
+/* Žánrové chipy */
+.mfd-filters-2 {
+  display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 18px;
+  scrollbar-width: none;
+}
+.mfd-filters-2::-webkit-scrollbar { display: none; }
+.mfd-filters-2 .disco-nav-item {
+  flex: none; height: 34px; padding: 0 16px; border-radius: 999px;
+  background: transparent !important; border: 1px solid rgba(255,255,255,0.14) !important;
+  color: rgba(255,255,255,0.7) !important; font-size: 0.82rem; font-weight: 600;
+  transform: none !important; transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+.mfd-filters-2 .disco-nav-item:hover { background: rgba(255,255,255,0.09) !important; color: #fff !important; }
+.mfd-filters-2 .disco-nav-item.active {
+  background: linear-gradient(135deg, #0a84ff, #5e5ce6) !important;
+  border-color: transparent !important; color: #fff !important;
+  box-shadow: 0 6px 18px rgba(10,132,255,0.35) !important;
+}
+
+/* Nadpisy sekcí */
+.mfd-section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 14px; }
+.mfd-section-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+.mfd-em { color: #0a84ff; }
+
+/* Top 10 — vodorovná řada */
+.mfd-top10-row {
+  display: flex; gap: 16px; overflow-x: auto; padding: 6px 2px 18px;
+  scroll-snap-type: x proximity; scrollbar-width: none;
+}
+.mfd-top10-row::-webkit-scrollbar { display: none; }
+.mfd-top10-row > * { flex: none; scroll-snap-align: start; }
+.mfd-top10-row .disco-card { width: 170px; }
+
+/* Nálady */
+.mfd-mood-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.mfd-mood-card {
+  position: relative; overflow: hidden; cursor: pointer; border-radius: 22px;
+  min-height: 132px; padding: 22px; display: flex; align-items: flex-end;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease;
+}
+.mfd-mood-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,0.5); }
+.mfd-mood-card.m1 { background: linear-gradient(135deg, #2b1030, #6b1d3a 70%, #b23a48); }
+.mfd-mood-card.m2 { background: linear-gradient(135deg, #0e2a3b, #14607a 70%, #2fb7a3); }
+.mfd-mood-card.m3 { background: linear-gradient(135deg, #2a1607, #7a3a0e 70%, #f08a24); }
+.mfd-mood-emoji { position: absolute; right: 18px; top: 12px; font-size: 3rem; opacity: .9; }
+.mfd-mood-title { font-size: 1.08rem; font-weight: 800; color: #fff; }
+.mfd-mood-sub { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+/* Mřížka výsledků */
+.mfd-rec-grid {
+  display: grid; gap: 20px 16px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+.mfd-rec-grid .disco-card {
+  width: 100% !important; min-width: 0; height: auto !important;
+  aspect-ratio: 2 / 3; margin: 0 !important;
+}
+.mfd-rec-grid .disco-loading, .mfd-top10-row .disco-loading { grid-column: 1 / -1; }
+
+/* Načíst další */
+.mfd-loadmore-wrap { display: flex; justify-content: center; margin: 34px 0 10px; }
+.mfd-loadmore-btn {
+  height: 46px; padding: 0 34px; border-radius: 999px; cursor: pointer;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+  color: #fff; font: inherit; font-size: 0.92rem; font-weight: 700;
+  transition: background .18s ease, transform .18s ease;
+}
+.mfd-loadmore-btn:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); }
+
+@media (max-width: 640px) {
+  .mfd-header { gap: 10px; padding: 12px 14px; }
+  .mfd-brand { display: none; }
+  .mfd-search-wrap .uni-input { height: 44px; }
+  .mfd-rec-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px 10px; }
+  .mfd-top10-row .disco-card { width: 130px; }
+}
+
+/* ══════════ CHYTRÝ DOCK ══════════ */
+/* výkon: 70px blur + změna paddingu při hoveru přepočítávaly layout i GPU */
+.mf-dock {
+  backdrop-filter: blur(24px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.8) !important;
+  transition: transform .38s cubic-bezier(.2,.8,.2,1), opacity .3s ease !important;
+  position: fixed;
+}
+.mf-dock:hover { padding: 7px 14px !important; border-radius: 32px !important; }
+.mf-dock.mf-dock-hidden { transform: translate(-50%, 140%) !important; }
+
+/* klouzavá pilulka */
+.mf-dock-pill {
+  position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none;
+  border-radius: 16px; opacity: 0;
+  background: linear-gradient(135deg, rgba(10,132,255,0.30), rgba(94,92,230,0.22));
+  box-shadow: 0 0 0 1px rgba(10,132,255,0.35), 0 6px 18px rgba(10,132,255,0.25);
+  transition: transform .34s cubic-bezier(.34,1.3,.5,1), width .34s cubic-bezier(.34,1.3,.5,1),
+              height .34s ease, opacity .2s ease;
+}
+.mf-dock.has-pill .dock-btn { position: relative; z-index: 1; }
+.mf-dock.has-pill .dock-btn.active { background: transparent !important; }
+
+/* odznak s počtem Oblíbených */
+.mf-dock-badge {
+  position: absolute; top: 1px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 999px; box-sizing: border-box;
+  background: #ff375f; color: #fff; font-size: .58rem; font-weight: 800; line-height: 16px;
+  text-align: center; pointer-events: none;
+  transform: scale(0); transition: transform .28s cubic-bezier(.34,1.6,.5,1);
+  box-shadow: 0 0 0 2px rgba(12,12,18,0.9);
+}
+.mf-dock-badge.visible { transform: scale(1); }
+
+/* Odebráno: AI chat (Gemini apod.) a Plex */
+#aiFab, #aiFullscreen, #aiApikeyOverlay, #aiVoiceOverlay, .ai-fab,
+[onclick*="openAi"], [onclick*="toggleAiPanel"], #dockPlex, #mfSectionPlex {
+  display: none !important;
+}
+/* dock nikdy nad Objevováním — okamžitě, bez čekání na JS */
+body.discover-open #mfDock, body.disco-open #mfDock { display: none !important; }
