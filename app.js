@@ -1,3 +1,5 @@
+
+
 function safeLS(e, t) {
   try {
     return JSON.parse(localStorage.getItem(e) || String(t))
@@ -166,6 +168,18 @@ const TMDB_KEY = window.TMDB_KEY_DEFAULT || "",
     krimi: 80
   };
 
+// OPRAVA: admin panel volal saveDb()/autoSave() při každé úpravě (přejmenování,
+// smazání, přidání série), ale ani jedna z těch funkcí nikde v kódu neexistovala —
+// změny tedy zmizely hned po refreshi. Teď se katalog ukládá do localStorage a
+// při startu appky se uložené úpravy vrátí zpět do `db`.
+function saveDb() {
+  try { safeSetItem("mf_db_custom", JSON.stringify(db)) } catch (err) {}
+}
+try {
+  const _savedDb = JSON.parse(localStorage.getItem("mf_db_custom") || "{}");
+  Object.assign(db, _savedDb);
+} catch (err) {}
+
 function epsInSeason(e, t) {
   const n = epsBySeason[e];
   if (n && n[t - 1]) return n[t - 1];
@@ -248,8 +262,7 @@ window.MF_PROXY = {
   enabled: false,  // ← ZMĚŇ NA true PRO CLOUDFLARE
   baseUrl: '/api', // ← Cloudflare Pages: /api/tmdb
   // Pro externí server použij: baseUrl: 'https://tvuj-server.cz/api'
-  tmdbEndpoint: '/tmdb',
-  firebaseEndpoint: '/firebase'
+  tmdbEndpoint: '/tmdb'
 };
 
 // ══ PROXY INSTALACE (Cloudflare Pages) ══
@@ -1490,6 +1503,7 @@ function doSearch() {
 function openSearchPlatform(e) {
   doSearch()
 }
+function updateSearchFocus() {}
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("universeOverlay")?.addEventListener("click", e => {
     e.target === document.getElementById("universeOverlay") && closeUniverse()
@@ -1736,60 +1750,17 @@ function markWatched(e) {
     const e = n.querySelector(".ep-btn-mark");
     e && (e.textContent = "✓")
   }
-  updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateContinueWidget(), updateLogoProgress(), aiBrain && db[activeSeries] && db[activeSeries]._genres && aiBrain.boostGenresFromTmdb(db[activeSeries]._genres), setTimeout(() => showNextEpPrompt(e), 600)
+  updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateContinueWidget(), updateLogoProgress(), aiBrain && db[activeSeries] && db[activeSeries]._genres && aiBrain.boostGenresFromTmdb(db[activeSeries]._genres)
 }
 document.getElementById("seriesModal").addEventListener("click", e => {
   e.target === document.getElementById("seriesModal") && closeModal()
 });
-let _nextEpTimer = null,
-  _nextEpTarget = null;
-async function showNextEpPrompt(e) {
-  const t = findNextEp(activeSeries);
-  if (!t) return;
-  const n = db[activeSeries],
-    _nSlug = (activeSeries.startsWith('__dtv_') && db[activeSeries]?._svetSlug) ? db[activeSeries]._svetSlug : activeSeries,
-    o = `https://svetserialu.to/serial/${_nSlug}/s${String(t.se).padStart(2,"0")}e${String(t.ep).padStart(2,"0")}`;
-  _nextEpTarget = {
-    uid: t.uid,
-    se: t.se,
-    ep: t.ep,
-    url: o
-  }, document.getElementById("nextEpTitle").textContent = n.name || activeSeries, document.getElementById("nextEpSub").textContent = `Série ${t.se} · Epizoda ${t.ep}`;
-  const i = document.getElementById("nextEpThumbImg");
-  if (i.src = n.poster || "", TMDB_KEY) {
-    const e = await getTmdbStill(activeSeries, t.se, t.ep);
-    e && (i.src = e)
-  }
-  document.getElementById("nextEpOverlay").classList.add("open");
-  let a = 10;
-  const s = document.getElementById("nextEpCountdown");
-  s.textContent = `${a}s`, _nextEpTimer = setInterval(() => {
-    a--, s.textContent = `${a}s`, a <= 0 && nextEpPlay()
-  }, 1e3)
-}
 
-function nextEpPlay() {
-  if (nextEpDismiss(), !_nextEpTarget) return;
-  const e = _nextEpTarget;
-  markWatched(e.uid);
-  const t = db[activeSeries]?.tmdbId;
-  if (t) {
-    const n = `${db[activeSeries]?.name||activeSeries} — S${String(e.se).padStart(2,"0")}E${String(e.ep||e.epNum||"?").padStart(2,"0")}`;
-    window._cinSiteSlug = (activeSeries.startsWith('__dtv_') && db[activeSeries]?._svetSlug) ? db[activeSeries]._svetSlug : activeSeries, _showCinemaOrFinderChoice(t + "/" + e.se + "/" + (e.ep || e.epNum), n, "tv_ep", e.url)
-  } else window.open(e.url, "_blank", "noopener,noreferrer");
-  activeSeason = e.se, showAllSeasons = !1, renderSeasons(), renderEpisodes(), setTimeout(() => {
-    const t = document.getElementById(`card-${e.uid}`);
-    t && t.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    })
-  }, 200)
-}
 
-function nextEpDismiss() {
-  clearInterval(_nextEpTimer), _nextEpTimer = null, _nextEpTarget = null;
-  document.getElementById("nextEpOverlay").classList.remove("open")
-}
+
+
+
+
 
 function toggleWatch(e) {
   const t = getWatched(),
@@ -1946,11 +1917,38 @@ function renderWatchlist() {
     n = document.getElementById("watchlistEmpty");
   t.querySelectorAll(".wl-item").forEach(e => e.remove()), e.length ? (n.style.display = "none", e.forEach((e, n) => {
     const o = document.createElement("div");
-    o.className = "wl-item", o.innerHTML = `<div class="wl-item-thumb"><img src="${e.poster||""}" alt="" onerror="this.style.display='none'"></div><div class="wl-item-info"><div class="wl-item-name">${_esc(e.name)}</div><div class="wl-item-meta">${"series"===e.type?"Serial":"Film"}</div></div><div class="wl-item-actions"><button class="wl-search-btn">Hledat</button><button class="wl-remove-btn">✕</button></div>`, o.querySelector(".wl-search-btn").onclick = () => openWithCopy(e.name, "series" === e.type ? "tv" : "movie"), o.querySelector(".wl-remove-btn").onclick = () => {
+    o.className = "wl-item", o.innerHTML = `<div class="wl-item-thumb"><img src="${e.poster||""}" alt="" onerror="this.style.display='none'"></div><div class="wl-item-info"><div class="wl-item-name">${_esc(e.name)}</div><div class="wl-item-meta">${"series"===e.type?"Serial":"Film"}</div></div><div class="wl-item-actions"><button class="wl-search-btn">Otevřít</button><button class="wl-remove-btn">✕</button></div>`, o.querySelector(".wl-search-btn").onclick = () => openFavoriteItem(e), o.querySelector(".wl-remove-btn").onclick = () => {
       const e = getWatchlist();
       e.splice(n, 1), saveWatchlistData(e), renderWatchlist()
     }, t.appendChild(o)
   })) : n.style.display = "block"
+}
+
+// Tlačítko "Otevřít" v Oblíbených — dřív jen hledalo název na externím webu.
+// Teď otevře rovnou přehrávač (film) nebo výběr série/epizody (seriál).
+function openFavoriteItem(e) {
+  try { closeWatchlist() } catch (err) {}
+  setTimeout(() => {
+    try {
+      if (e.tmdbId && "series" === e.type) {
+        if (typeof openDiscoverTv === "function") return void openDiscoverTv(e.tmdbId, e.name);
+      } else if (e.tmdbId) {
+        if (typeof _showCinemaOrFinderChoice === "function") return void _showCinemaOrFinderChoice(e.tmdbId, e.name, "movie");
+      }
+      if (e.slug && e.slug.startsWith("__dtv_") && typeof openDiscoverTv === "function") {
+        return void openDiscoverTv(e.slug.slice(6), e.name);
+      }
+      if (e.slug && typeof openSeries === "function" && db[e.slug]) {
+        return void openSeries(e.slug);
+      }
+      if (e.slug && typeof openSeries === "function") {
+        return void openSeries(e.slug);
+      }
+      openWithCopy(e.name, "series" === e.type ? "tv" : "movie");
+    } catch (err) {
+      openWithCopy(e.name, "series" === e.type ? "tv" : "movie");
+    }
+  }, 300);
 }
 
 function toggleWatchlistItem(e) {
@@ -3510,6 +3508,9 @@ function _fallbackCopy(e, t) {
   const n = document.getElementById("mfFinderSub");
   n && (n.textContent = "Přímé vyhledávání (bez AI)")
 }
+async function _getEnglishTitle(e, t) {
+  return e
+}
 async function openWithCopy(e, t, n) {
   window._mfFinderTmdbId = window._mfFinderTmdbId || null;
   let o = e;
@@ -3536,7 +3537,7 @@ function setKbMenuFocus(e) {
   if (i && "__search__" !== i && setAdaptiveColor(i), i && "__search__" !== i && "__foryou__" !== i) {
     const e = db[i]?.tmdbId,
       t = HARDCODED_TRAILERS[i];
-    e && "function" == typeof preFetchTrailer && preFetchTrailer(i), (e || t) && (o._trailerTimer = setTimeout(() => {
+    (e || t) && (o._trailerTimer = setTimeout(() => {
       o.classList.contains("kb-focus") && loadTileTrailer(o, e || null, "tv", i)
     }, 1400))
   }
@@ -4244,12 +4245,6 @@ function _applyProfileAccent() {
   }
 }
 
-function _applyUserPreferences() {
-  const e = getActiveProfile();
-  if (!e) return;
-  const t = e.prefs?.features || {};
-  "function" == typeof _setSoundEnabled && _setSoundEnabled(!1 !== t.soundEnabled)
-}
 async function _userAwareFetch(e) {
   const t = getActiveProfile(),
     n = t?.likedGenres || [],
@@ -4415,7 +4410,7 @@ const ProfileGate = {
     }
   },
   activateProfile(e) {
-    localStorage.setItem(ACTIVE_PID_KEY, e), this.renderBadge(), _applyProfileAccent(), _applyUserPreferences(), this.hide(), this.closePin(), setTimeout(() => {
+    localStorage.setItem(ACTIVE_PID_KEY, e), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
       void 0 !== aiBrain && (aiBrain.reloadForProfile(), aiBrain.applyDecay()), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof updateWatchlistBadge && updateWatchlistBadge(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateContinueWidget && updateContinueWidget()
     }, 100);
     const t = _getProfiles().find(t => t.id === e);
@@ -6031,10 +6026,6 @@ function adminImportDBPrompt() {
   }, e.click()
 }
 
-function adminRefetchAllPosters() {
-  showToast?.("🖼 Stahuju postery..."), adminLog("Bulk poster refetch zahájen", "info"), "function" == typeof enrichAllSeriesWithTmdb ? enrichAllSeriesWithTmdb() : showToast?.("ℹ️ Funkce enrichAllSeriesWithTmdb není dostupná")
-}
-
 function adminResetWatched() {
   confirm("Opravdu smazat celou sledovanost? Toto nelze vrátit!") && (localStorage.removeItem("function" == typeof uKey ? uKey("mf_watched") : "mf_watched"), "function" == typeof refreshUserContent && refreshUserContent(), adminLog("Sledovanost smazána", "warn"), showToast?.("🗑 Sledovanost smazána"), adminRenderStats())
 }
@@ -7357,61 +7348,17 @@ function timerFinished() {
   }, 10))
 }
 
-function openSyncModal() {
-  const e = document.getElementById("syncModal");
-  if (!e) return;
-  e.classList.add("open"), _updateSyncModalStatus();
-  const t = localStorage.getItem("mf_sync_group") || "",
-    n = document.getElementById("syncGroupInput");
-  n && (n.value = t);
-  const o = document.getElementById("syncFirebaseWarn"),
-    i = document.getElementById("syncFbSetupBtn");
-  if (o || i) {
-    const e = window.MFSync && window.MFSync._db;
-    o && (o.style.display = e ? "none" : "block"), i && (i.style.display = e ? "none" : "block")
-  }
-}
 
-function closeSyncModal() {
-  const e = document.getElementById("syncModal");
-  e && e.classList.remove("open")
-}
 
-function _updateSyncModalStatus() {
-  const e = window._mfSyncStatus || "offline",
-    t = document.getElementById("syncModalDot"),
-    n = document.getElementById("syncModalText"),
-    o = document.getElementById("syncDisconnectBtn"),
-    i = localStorage.getItem("mf_sync_group");
-  t && (t.className = "sync-status-dot", "online" === e ? t.classList.add("online") : "syncing" === e ? t.classList.add("syncing") : "error" === e && t.classList.add("error"));
-  const a = {
-    online: i ? `✓ Připojeno ke skupině: ${i}` : "Připojeno (bez skupiny)",
-    syncing: "Synchronizuji…",
-    offline: "Offline — Firebase není nastaven",
-    error: "Chyba připojení — zkontroluj Firebase config",
-    "no-group": "Firebase OK — zadej kód skupiny pro sync"
-  };
-  n && (n.textContent = a[e] || e), o && (o.style.display = i ? "block" : "none")
-}
 
-function syncGenerateCode() {
-  const e = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let t = "";
-  for (let n = 0; n < 8; n++) t += e[Math.floor(32 * Math.random())];
-  const n = document.getElementById("syncGroupInput");
-  n && (n.value = t)
-}
 
-function syncConnect() {
-  const e = document.getElementById("syncGroupInput"),
-    t = (e?.value || "").trim().replace(/\s/g, "").toUpperCase();
-  if (!t || t.length < 4) return e && (e.style.borderColor = "rgba(255,80,80,0.5)", e.focus()), void showToast?.("⚠️ Zadej platný kód skupiny (min. 4 znaky)", "error");
-  window.MFSync && "function" == typeof window.MFSync.connectGroup ? (window.MFSync.connectGroup(t), setTimeout(() => window.MFSync.pushData(), 500), closeSyncModal(), showToast?.("☁️ Připojeno ke skupině " + t + "!", "success")) : showToast?.("⚠️ Firebase není nastaven v kódu — vyplň FIREBASE_CONFIG", "error")
-}
 
-function syncDisconnect() {
-  window.MFSync && "function" == typeof window.MFSync.disconnect && window.MFSync.disconnect(), _updateSyncModalStatus(), showToast?.("☁️ Sync odpojen", "success")
-}
+
+
+
+
+
+
 
 function setDockActive(e) {
   document.querySelectorAll(".dock-btn").forEach(e => e.classList.remove("active"));
@@ -7488,13 +7435,9 @@ setTimerPreset(45), document.addEventListener("keydown", function(e) {
     });
     const t = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(e, n) {
-      t(e, n), e && e.includes("watched") && setTimeout(updateStreak, 100), e && (e.startsWith("mf_") || e.startsWith("watched_") || e.startsWith("watchlist") || e.startsWith("streak")) && (clearTimeout(window._mfSyncDebounce), window._mfSyncDebounce = setTimeout(() => {
-        window.MFSync && "function" == typeof window.MFSync.pushData && window.MFSync.pushData()
-      }, 2500))
+      t(e, n), e && e.includes("watched") && setTimeout(updateStreak, 100), e && (e.startsWith("mf_") || e.startsWith("watched_") || e.startsWith("watchlist") || e.startsWith("streak")) && (void 0)
     }
-  }(), document.getElementById("syncModal")?.addEventListener("click", function(e) {
-    e.target === this && closeSyncModal()
-  });
+  }();
 const _origOpenWatchlist = window.openWatchlist;
 "function" == typeof _origOpenWatchlist && (window.openWatchlist = function(...e) {
   return setDockActive("dockProtebe"), _origOpenWatchlist.apply(this, e)
@@ -7652,13 +7595,11 @@ function triggerPwaInstall() {
     let t = null;
 
     function n() {
-      const e = [".wrapped-overlay.open", "#ai-voice-bubble-overlay.open", ".premiere-overlay.open", ".collections-overlay.open", ".trakt-overlay.open", ".voice-cmd-overlay.open", ".mood-overlay.open", ".universe-overlay.open", ".genre-editor-overlay.open", "#epRatingOverlay.open", "#syncOverlay.open", "#voiceCmdOverlay.open", "#syncModal.open", ".pm-overlay.open", ".watchlist-overlay.open"].some(e => !!document.querySelector(e));
+      const e = [".wrapped-overlay.open", "#ai-voice-bubble-overlay.open", ".premiere-overlay.open", ".collections-overlay.open", ".trakt-overlay.open", ".voice-cmd-overlay.open", ".mood-overlay.open", ".universe-overlay.open", ".genre-editor-overlay.open", "#epRatingOverlay.open", "#voiceCmdOverlay.open", "#syncModal.open", ".pm-overlay.open", ".watchlist-overlay.open"].some(e => !!document.querySelector(e));
       document.body.classList.toggle("modal-open", e)
     }
     localStorage.setItem = function(n, o) {
-      e(n, o), (n.startsWith("mf_") || n.startsWith("watched_") || n.startsWith("watchlist") || n.startsWith("streak") || n.startsWith("aiMem")) && (clearTimeout(t), t = setTimeout(() => {
-        window.MFSync && window.MFSync._db && window.MFSync._syncRef && window.MFSync.pushData()
-      }, 1500))
+      e(n, o), (n.startsWith("mf_") || n.startsWith("watched_") || n.startsWith("watchlist") || n.startsWith("streak") || n.startsWith("aiMem")) && void 0
     }, window.refreshUserContent = window.refreshUserContent || function() {
       void 0 !== db && Object.keys(db).forEach(e => {
         "function" == typeof updateTileProgress && updateTileProgress(e), "function" == typeof updateContinueBadge && updateContinueBadge(e)
@@ -7910,7 +7851,7 @@ window._tmdbSetTab = function(e) {
       const n = e ? document.getElementById(e) : document.querySelector(t);
       return !!n && (n.classList.contains("open") || n.classList.contains("visible") || n.style.display && "none" !== n.style.display)
     }
-    "Escape" === e.key && (t("adminProfileApiModal") ? _apkClose() : t("tmdbAvatarModal") ? _tmdbAvClose() : t("epRatingOverlay") ? "function" == typeof closeEpRating && closeEpRating(!1) : (t("syncModal") || t("syncOverlay")) && "function" == typeof closeSyncModal && closeSyncModal())
+    "Escape" === e.key && (t("adminProfileApiModal") ? _apkClose() : t("tmdbAvatarModal") ? _tmdbAvClose() : t("epRatingOverlay") ? "function" == typeof closeEpRating && closeEpRating(!1) : void 0)
   }, {
     capture: !0
   }), document.getElementById("tmdbAvatarModal").addEventListener("click", function(e) {
@@ -7944,53 +7885,6 @@ window._tmdbSetTab = function(e) {
       }), e()
     });
   }();
-const _FB_LS = "mf_firebase_cfg";
-window.openFirebaseCfgModal = function() {
-  const e = document.getElementById("mfFbModal");
-  if (!e) return;
-  const t = function() {
-    try {
-      return safeLS(_FB_LS, "{}")
-    } catch (e) {
-      return {}
-    }
-  }();
-  ["apiKey", "authDomain", "databaseURL", "projectId", "appId"].forEach(e => {
-    const n = document.getElementById("fbI_" + e);
-    n && t[e] && (n.value = t[e])
-  });
-  const n = document.getElementById("fbI_groupKey");
-  n && (n.value = localStorage.getItem("mf_sync_group") || ""), document.getElementById("mfFbStatus").textContent = "", e.classList.add("open")
-}, window.mfFbClose = function() {
-  document.getElementById("mfFbModal")?.classList.remove("open")
-}, window.mfFbGenKey = function() {
-  const e = "mf-" + Math.random().toString(36).slice(2, 7) + "-" + Math.random().toString(36).slice(2, 5),
-    t = document.getElementById("fbI_groupKey");
-  t && (t.value = e)
-}, window.mfFbSave = function() {
-  const e = e => document.getElementById("fbI_" + e)?.value?.trim() || "",
-    t = {
-      apiKey: e("apiKey"),
-      authDomain: e("authDomain"),
-      databaseURL: e("databaseURL"),
-      projectId: e("projectId"),
-      appId: e("appId"),
-      storageBucket: "",
-      messagingSenderId: ""
-    },
-    n = e("groupKey"),
-    o = document.getElementById("mfFbStatus");
-  if (!t.apiKey || !t.databaseURL) return o.textContent = "⚠ Vyplň alespoň API Key a Database URL", void(o.style.color = "#e17055");
-  localStorage.setItem(_FB_LS, JSON.stringify(t)), n && localStorage.setItem("mf_sync_group", n), o.textContent = "✓ Uloženo — stránka se obnoví pro aktivaci sync…", o.style.color = "#30d158", "function" == typeof showToast && showToast("🔥 Firebase nastaven! Obnovuji…", "success"), setTimeout(() => location.reload(), 1500)
-}, document.getElementById("mfFbModal").addEventListener("click", function(e) {
-  e.target === this && mfFbClose()
-}), document.addEventListener("keydown", function(e) {
-  if ("Escape" !== e.key) return;
-  const t = document.getElementById("mfFbModal");
-  t && t.classList.contains("open") && (e.stopImmediatePropagation(), mfFbClose())
-}, {
-  capture: !0
-});
 const _PP_KEYS = [{
   key: "mf_gemini_key",
   label: "Gemini",
@@ -8077,12 +7971,6 @@ window.adminSavePerKey = function(e, t) {
       "#watchlist": () => {
         "function" == typeof openWatchlist && openWatchlist()
       },
-      "#sync": () => {
-        "function" == typeof openSyncModal && openSyncModal()
-      },
-      "#firebase": () => {
-        "function" == typeof openFirebaseCfgModal && openFirebaseCfgModal()
-      },
       "#admin": () => {
         "function" == typeof openAdmin && openAdmin()
       },
@@ -8118,11 +8006,9 @@ window.adminSavePerKey = function(e, t) {
       if ([
           ["openUniverse", "#discover"],
           ["openWatchlist", "#watchlist"],
-          ["openSyncModal", "#sync"],
           ["openAdmin", "#admin"],
           ["openSettings", "#settings"],
-          ["openApikeyOverlay", "#settings"],
-          ["openFirebaseCfgModal", "#firebase"]
+          ["openApikeyOverlay", "#settings"]
         ].forEach(([t, n]) => {
           if ("function" == typeof window[t]) {
             const o = window[t];
@@ -8160,8 +8046,6 @@ window.adminSavePerKey = function(e, t) {
     })
   }(), document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
-      const e = document.getElementById("hdrSyncBtn");
-      e && (e.style.display = "");
       const t = document.getElementById("aiFab");
       t && !t.classList.contains("dock-btn") && (t.style.display = "none")
     }, 500)
@@ -8733,55 +8617,30 @@ window.adminSavePerKey = function(e, t) {
     return {
       open: function() {
         document.getElementById("mfBeautifulSettings") || function() {
-          let o = {};
-          try {
-            o = safeLS("mf_firebase_cfg", "{}")
-          } catch (e) {}
-          const i = localStorage.getItem("mf_sync_group") || "",
-            a = void 0 !== window.TMDB_KEY ? window.TMDB_KEY : localStorage.getItem("mf_tmdb_key") || "",
+          const a = void 0 !== window.TMDB_KEY ? window.TMDB_KEY : localStorage.getItem("mf_tmdb_key") || "",
             s = document.createElement("div");
           s.id = "mfBeautifulSettings", s.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.75);backdrop-filter:blur(24px);display:flex;align-items:flex-end;justify-content:center;font-family:-apple-system,Inter,sans-serif;animation:mfSettFade 0.22s ease;";
           const r = document.createElement("div");
-          r.style.cssText = "background:rgba(18,18,26,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -20px 60px rgba(0,0,0,0.6);animation:mfSettUp 0.38s cubic-bezier(0.34,1.1,0.64,1);", r.innerHTML = `\n      \x3c!-- Handle --\x3e\n      <div style="display:flex;justify-content:center;padding:12px 0 4px;">\n        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);"></div>\n      </div>\n\n      \x3c!-- Header --\x3e\n      <div style="padding:16px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">\n        <div style="display:flex;align-items:center;justify-content:space-between;">\n          <div>\n            <div style="font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-0.3px;">Nastavení</div>\n            <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-top:2px;">MůjFlix konfigurace</div>\n          </div>\n          <button id="mfSetClose" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>\n        </div>\n      </div>\n\n      \x3c!-- Section: TMDB --\x3e\n      <div style="padding:20px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🎬 Film databáze</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">TMDB API klíč</label>\n          <input id="mfSetTmdb" type="password" placeholder="Vložte váš TMDB API klíč…" value="${t(a)}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:inherit;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;line-height:1.5;">\n            Získej zdarma na <a href="https://www.themoviedb.org/settings/api" target="_blank" style="color:rgba(0,122,255,0.7);">themoviedb.org</a> → API → Klíč v3\n          </div>\n        </div>\n      </div>\n\n      \x3c!-- Section: Sync --\x3e\n      <div style="padding:16px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">☁️ Sync mezi zařízeními</div>\n\n        \x3c!-- Sync group key --\x3e\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">Sync kód skupiny</label>\n          <div style="display:flex;gap:8px;">\n            <input id="mfSetSyncGrp" type="text" placeholder="Sdílený kód (stejný na všech zařízeních)" value="${t(i)}"\n              style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;font-family:monospace;box-sizing:border-box;">\n            <button id="mfSetSyncGen" style="padding:10px 14px;border-radius:10px;background:rgba(0,122,255,0.12);border:1px solid rgba(0,122,255,0.25);color:rgba(0,122,255,0.9);font-size:0.72rem;cursor:pointer;white-space:nowrap;">🎲 Vygenerovat</button>\n          </div>\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;">Zadej stejný kód na všech svých zařízeních pro synchronizaci sledovanosti.</div>\n        </div>\n\n        \x3c!-- Firebase accordion --\x3e\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;margin-bottom:8px;">\n          <button id="mfFbToggle" style="width:100%;padding:14px 16px;background:transparent;border:none;color:rgba(255,255,255,0.65);font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:inherit;">\n            <span>🔥 Firebase konfigurace <span style="font-size:0.6rem;font-weight:400;opacity:0.5;">(pokročilé)</span></span>\n            <span id="mfFbChevron" style="transition:transform 0.2s;">▾</span>\n          </button>\n          <div id="mfFbFields" style="display:none;padding:0 16px 16px;border-top:1px solid rgba(255,255,255,0.06);">\n            <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin:10px 0 12px;line-height:1.5;">\n              Firebase potřebuješ pro sync. Vytvořit zdarma na <a href="https://console.firebase.google.com" target="_blank" style="color:rgba(0,122,255,0.7);">console.firebase.google.com</a>\n            </div>\n            ${e("mfFbApi","API klíč","apiKey",o,"text","AIzaSy…")}\n            ${e("mfFbAuth","Auth doména","authDomain",o,"text","mujflix.firebaseapp.com")}\n            ${e("mfFbDb","Database URL","databaseURL",o,"url","https://mujflix-default-rtdb.firebaseio.com")}\n            ${e("mfFbProj","Project ID","projectId",o,"text","mujflix-xxxxx")}\n            ${e("mfFbApp","App ID","appId",o,"text","1:123:web:abc")}\n            <div id="mfFbStatus" style="font-size:0.65rem;margin-top:8px;color:rgba(255,255,255,0.3);"></div>\n          </div>\n        </div>\n      </div>\n\n      \x3c!-- Section: AI --\x3e\n      <div style="padding:16px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🤖 AI asistent</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">Anthropic API klíč</label>\n          <input id="mfSetAnthro" type="password" placeholder="sk-ant-…" value="${t(localStorage.getItem("mf_anthropic_key")||"")}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:monospace;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;">Potřeba pro AI doporučení. Získej na <a href="https://console.anthropic.com" target="_blank" style="color:rgba(0,122,255,0.7);">console.anthropic.com</a></div>\n        </div>\n\n        \x3c!-- AI Source stats --\x3e\n        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 14px;">\n          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\n            <span style="font-size:0.68rem;font-weight:600;color:rgba(255,255,255,0.5);">✦ AI Source statistiky</span>\n            <button id="mfResetAiStats" style="font-size:0.6rem;background:transparent;border:none;color:rgba(255,100,100,0.6);cursor:pointer;padding:2px 6px;">Reset</button>\n          </div>\n          <div id="mfAiStatsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>\n        </div>\n      </div>\n\n      \x3c!-- Save button --\x3e\n      <div style="padding:24px 24px 0;">\n        <button id="mfSetSave" style="width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:-0.2px;">Uložit nastavení</button>\n      </div>\n    `, s.appendChild(r), document.body.appendChild(s),
+          r.style.cssText = "background:rgba(18,18,26,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -20px 60px rgba(0,0,0,0.6);animation:mfSettUp 0.38s cubic-bezier(0.34,1.1,0.64,1);", r.innerHTML = `\n      \x3c!-- Handle --\x3e\n      <div style="display:flex;justify-content:center;padding:12px 0 4px;">\n        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);"></div>\n      </div>\n\n      \x3c!-- Header --\x3e\n      <div style="padding:16px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">\n        <div style="display:flex;align-items:center;justify-content:space-between;">\n          <div>\n            <div style="font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-0.3px;">Nastavení</div>\n            <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-top:2px;">MůjFlix konfigurace</div>\n          </div>\n          <button id="mfSetClose" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>\n        </div>\n      </div>\n\n      \x3c!-- Section: TMDB --\x3e\n      <div style="padding:20px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🎬 Film databáze</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">TMDB API klíč</label>\n          <input id="mfSetTmdb" type="password" placeholder="Vložte váš TMDB API klíč…" value="${t(a)}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:inherit;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;line-height:1.5;">\n            Získej zdarma na <a href="https://www.themoviedb.org/settings/api" target="_blank" style="color:rgba(0,122,255,0.7);">themoviedb.org</a> → API → Klíč v3\n          </div>\n        </div>\n      </div>\n\n      \x3c!-- Section: AI --\x3e\n      <div style="padding:16px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🤖 AI asistent</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">Anthropic API klíč</label>\n          <input id="mfSetAnthro" type="password" placeholder="sk-ant-…" value="${t(localStorage.getItem("mf_anthropic_key")||"")}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:monospace;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;">Potřeba pro AI doporučení. Získej na <a href="https://console.anthropic.com" target="_blank" style="color:rgba(0,122,255,0.7);">console.anthropic.com</a></div>\n        </div>\n\n        \x3c!-- AI Source stats --\x3e\n        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 14px;">\n          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\n            <span style="font-size:0.68rem;font-weight:600;color:rgba(255,255,255,0.5);">✦ AI Source statistiky</span>\n            <button id="mfResetAiStats" style="font-size:0.6rem;background:transparent;border:none;color:rgba(255,100,100,0.6);cursor:pointer;padding:2px 6px;">Reset</button>\n          </div>\n          <div id="mfAiStatsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>\n        </div>\n      </div>\n\n      \x3c!-- Save button --\x3e\n      <div style="padding:24px 24px 0;">\n        <button id="mfSetSave" style="width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:-0.2px;">Uložit nastavení</button>\n      </div>\n    `, s.appendChild(r), document.body.appendChild(s),
             function() {
               if (document.getElementById("mfSettStyle")) return;
               const e = document.createElement("style");
               e.id = "mfSettStyle", e.textContent = "\n      @keyframes mfSettFade { from{opacity:0} to{opacity:1} }\n      @keyframes mfSettUp { from{transform:translateY(40px);opacity:0} to{transform:none;opacity:1} }\n      #mfBeautifulSettings input::placeholder { color:rgba(255,255,255,0.2); }\n      #mfBeautifulSettings *::-webkit-scrollbar { width:3px; }\n      #mfBeautifulSettings *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12);border-radius:3px; }\n    ", document.head.appendChild(e)
             }(),
-            function(e, t) {
+            function(e) {
               e.querySelector("#mfSetClose").onclick = () => e.remove(), e.addEventListener("click", t => {
                 t.target === e && e.remove()
-              }), e.querySelector("#mfFbToggle").onclick = () => {
-                const t = e.querySelector("#mfFbFields"),
-                  n = e.querySelector("#mfFbChevron"),
-                  o = "none" === t.style.display;
-                t.style.display = o ? "block" : "none", n.style.transform = o ? "rotate(180deg)" : ""
-              }, e.querySelector("#mfSetSyncGen").onclick = () => {
-                const t = Math.random().toString(36).slice(2, 8).toUpperCase() + "-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-                e.querySelector("#mfSetSyncGrp").value = t
-              }, e.querySelector("#mfResetAiStats").onclick = () => {
+              }),  e.querySelector("#mfResetAiStats").onclick = () => {
                 window.CinAI && (CinAI.resetStats(), n(), "function" == typeof showToast && showToast("AI statistiky vynulovány"))
               }, e.querySelectorAll("input").forEach(e => {
                 e.addEventListener("focus", () => e.style.borderColor = "rgba(0,122,255,0.45)"), e.addEventListener("blur", () => e.style.borderColor = "rgba(255,255,255,0.09)")
               }), e.querySelector("#mfSetSave").onclick = () => {
                 const n = e.querySelector("#mfSetTmdb").value.trim();
                 n && localStorage.setItem("mf_tmdb_key", n);
-                const o = e.querySelector("#mfSetSyncGrp").value.trim();
-                o && (localStorage.setItem("mf_sync_group", o), window.MFSync && MFSync._db && MFSync.connectGroup(o));
-                const i = {
-                  apiKey: e.querySelector("#mfFbApi")?.value.trim() || t.apiKey || "",
-                  authDomain: e.querySelector("#mfFbAuth")?.value.trim() || t.authDomain || "",
-                  databaseURL: e.querySelector("#mfFbDb")?.value.trim() || t.databaseURL || "",
-                  projectId: e.querySelector("#mfFbProj")?.value.trim() || t.projectId || "",
-                  appId: e.querySelector("#mfFbApp")?.value.trim() || t.appId || "",
-                  storageBucket: t.storageBucket || "",
-                  messagingSenderId: t.messagingSenderId || ""
-                };
-                i.apiKey && i.databaseURL && localStorage.setItem("mf_firebase_cfg", JSON.stringify(i));
                 const a = e.querySelector("#mfSetAnthro").value.trim();
                 a && localStorage.setItem("mf_anthropic_key", a), e.remove(), "function" == typeof showToast && showToast("✅ Nastavení uloženo!", "success")
               }
-            }(s, o), n()
+            }(s), n()
         }()
       }
     }
@@ -9935,10 +9794,15 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
       background: rgba(255,255,255,0.04) !important;
       transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1), border-color 0.2s, box-shadow 0.3s !important;
     }
-    .ssv-card:hover {
-      transform: translateY(-8px) scale(1.02) !important;
-      border-color: rgba(255,255,255,0.2) !important;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.9) !important;
+    /* OPRAVA: na dotyku (mobil/tablet) zůstává :hover "přilepený" po ťuknutí
+       a dřív ho scroll náhodou smazal — teď hover funguje jen na zařízeních
+       s opravdovou myší, na dotyku se karta nezvětšuje a nepřekáží. */
+    @media (hover: hover) and (pointer: fine) {
+      .ssv-card:hover {
+        transform: translateY(-4px) !important;
+        border-color: rgba(255,255,255,0.2) !important;
+        box-shadow: 0 14px 32px rgba(0,0,0,0.55) !important;
+      }
     }
     .ssv-card.ssv-active {
       border-color: var(--accent,#007aff) !important;
@@ -10047,9 +9911,13 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
       overflow: hidden !important;
       text-overflow: ellipsis !important;
     }
-    .episode-card:hover .ep-title {
-      color: #fff !important;
-      white-space: normal !important;
+    .episode-card:hover .ep-title { color: #fff !important; }
+    /* OPRAVA: rozbalení popisku a tlačítek na hover dělalo řádek epizody
+       vyšší, takže "přerůstal" přes sousední řádky. Na dotyku navíc hover
+       zůstává "přilepený" po ťuknutí (scroll ho dřív náhodou smazal, teď
+       ne) — proto se to celé zapíná jen na zařízeních se skutečnou myší. */
+    @media (hover: hover) and (pointer: fine) {
+      .episode-card:hover .ep-title { white-space: normal !important; }
     }
     .ep-desc {
       font-size: 0.68rem !important;
@@ -10061,17 +9929,31 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
       -webkit-box-orient: vertical !important;
       overflow: hidden !important;
     }
-    .episode-card:hover .ep-desc {
-      max-height: 55px !important; opacity: 1 !important; margin-top: 4px !important;
+    @media (hover: hover) and (pointer: fine) {
+      .episode-card:hover .ep-desc {
+        max-height: 55px !important; opacity: 1 !important; margin-top: 4px !important;
+      }
     }
     .ep-actions {
       max-height: 0 !important; opacity: 0 !important; margin-top: 0 !important;
       overflow: hidden !important;
       transition: max-height 0.28s ease, opacity 0.22s ease, margin-top 0.22s ease !important;
     }
-    .episode-card:hover .ep-actions {
-      max-height: 36px !important; opacity: 1 !important;
-      overflow: visible !important; margin-top: 8px !important;
+    @media (hover: hover) and (pointer: fine) {
+      .episode-card:hover .ep-actions {
+        max-height: 36px !important; opacity: 1 !important;
+        overflow: visible !important; margin-top: 8px !important;
+      }
+    }
+    /* Na dotyku jsou tlačítka (přehrát / označit) vidět rovnou, bez hoveru */
+    @media (hover: none), (pointer: coarse) {
+      .ep-actions {
+        max-height: 36px !important; opacity: 1 !important;
+        overflow: visible !important; margin-top: 8px !important;
+      }
+      .ep-desc {
+        max-height: 55px !important; opacity: 1 !important; margin-top: 4px !important;
+      }
     }
     .ep-btn-play-hbo {
       border-radius: 20px !important;
