@@ -1,16 +1,9 @@
-/* ══════════════════════════════════════════════════════════════
-   MůjFlix — home.js
-   Přesunuto z inline <script id="mfh-script"> v index.html.
-   Používá document.addEventListener("DOMContentLoaded", ...) —
-   s "defer" se chová stejně (spustí se před DOMContentLoaded).
-   ══════════════════════════════════════════════════════════════ */
     (function () {
       'use strict';
       if (window._mfhInstalled) return;
       window._mfhInstalled = true;
       console.log('[mfh] Script START');
 
-      /* ═══════════ DATA ═══════════ */
       var DATA = {
         continueWatching: {
           title: 'Simpsonovi',
@@ -52,8 +45,6 @@
       }
 
       function getRawUserName() {
-        // Zkusí nejdřív skutečný profilový systém appky (mf_active_pid + mf_profiles_v2),
-        // pak historicky používané klíče pro zpětnou kompatibilitu.
         try {
           if (typeof getActiveProfile === 'function') {
             var active = getActiveProfile();
@@ -98,7 +89,6 @@
         return name;
       }
 
-      /* ═══════════ TMDB API NASTAVENÍ ═══════════ */
       var TMDB_BASE = 'https://api.themoviedb.org/3';
       var TMDB_IMG = 'https://image.tmdb.org/t/p';
       var _tmdbPromise = null;
@@ -109,7 +99,6 @@
           window.TMDB_KEY || '';
       }
 
-      /* ═══════════ NAČTENÍ DAT Z TMDB ═══════════ */
       function fetchTmdbData() {
         if (_tmdbPromise) return _tmdbPromise;
         var TMDB_API_KEY = getTmdbKey();
@@ -151,13 +140,6 @@
         return TMDB_IMG + '/' + (size || 'w780') + path;
       }
 
-      /* ═══════════ SKUTEČNÁ HISTORIE SLEDOVÁNÍ (per profil) ═══════════
-         Homepage dřív vždy ukazovala "Pokračovat ve sledování" se stejným
-         trendujícím titulem z TMDB (nebo natvrdo se Simpsonovými) úplně
-         nezávisle na tom, jestli daný profil vůbec něco sledoval — proto
-         to bylo pro každý nový profil stejné (stejný film, stejný čas).
-         Tyhle funkce čtou reálná data konkrétního profilu (stejné klíče,
-         jaké používá zbytek appky přes uKey() v app.js). */
       function mfhProfileScopedKey(base) {
         try {
           if (typeof uKey === 'function') return uKey(base);
@@ -203,8 +185,6 @@
         return false;
       }
 
-      /* Sestaví reálnou kartu "Pokračovat ve sledování" z poslední rozečtené
-         položky konkrétního profilu — ne z globálního TMDB trendu. */
       function mfhGetRealContinueItem() {
         try {
           var timeline = mfhGetWatchTimeline();
@@ -218,7 +198,7 @@
             if (typeof db === 'undefined' || !db[slug]) continue;
             var show = db[slug];
             var next = (typeof findNextEp === 'function') ? findNextEp(slug) : null;
-            if (!next) continue; // odkoukáno celé — zkus další seriál v historii
+            if (!next) continue;
             var prog = (typeof calcProgress === 'function') ? calcProgress(slug) : { pct: 0 };
             var runtime = show.runtime || 22;
             var pct = prog.pct || 0;
@@ -239,7 +219,6 @@
         return null;
       }
 
-      /* ═══════════ RENDER KARTY "POKRAČOVAT VE SLEDOVÁNÍ" ═══════════ */
       function renderContinue(item) {
         var card = document.getElementById('mfhContinueCard');
         if (!card) return;
@@ -281,7 +260,6 @@
         }
       }
 
-      /* ═══════════ RENDER KARUSELU ═══════════ */
       function mfhCardHtml(it) {
         var src = it.image ? esc(it.image) : '';
         var tmdbId = it.tmdbId ? String(it.tmdbId) : '';
@@ -320,11 +298,6 @@
         mfhBindCardImages(el);
       }
 
-      /* ═══════════ "ZOBRAZIT VŠE" — homepage karusely ═══════════
-         Odkazy "Zobrazit vše" u řádků na homepage dřív jen dělaly
-         event.preventDefault() a nic víc. Teď otevřou modal s mřížkou
-         všech položek, které karusel naposledy vykreslil
-         (uložené v el._mfhItems). */
       window.mfhSeeAll = function (carouselId) {
         var carousel = document.getElementById(carouselId);
         var items = (carousel && carousel._mfhItems) || [];
@@ -354,12 +327,6 @@
         setTimeout(function () { modal.classList.remove('open'); }, 250);
       };
 
-      /* Přeuspořádá homepage sekce podle toho, jestli profil má historii
-         sledování. Bez historie: "Pokračovat ve sledování" a "Nedávno
-         sledováno" zmizí (nemá smysl je ukazovat) a "Vybráno pro tebe" /
-         "Mohlo by se ti líbit" se přesune úplně nahoru, hned pod uvítání.
-         Jakmile profil něco sleduje, sekce se vrátí do původního pořadí
-         a "Pokračovat ve sledování" se naplní reálnými daty. */
       function mfhApplyHomeLayout(hasContinueItem) {
         var continueSection = document.getElementById('mfhContinue');
         var recentSection = document.getElementById('mfhRecentSection');
@@ -378,13 +345,11 @@
 
         if (wrap && forYouSection) {
           if (!hasContinueItem) {
-            // Nový profil bez historie → "Pro tebe" jde jako první obsahová sekce.
             var welcome = wrap.querySelector('.mfh-welcome');
             if (welcome && welcome.nextSibling !== forYouSection) {
               wrap.insertBefore(forYouSection, welcome.nextSibling);
             }
           } else {
-            // Profil s historií → původní pořadí (Pokračovat, Nedávno, Pro tebe, Seznam).
             var myListSection = document.getElementById('mfhMyList') && document.getElementById('mfhMyList').closest('section');
             if (myListSection && forYouSection.nextSibling !== myListSection) {
               wrap.insertBefore(forYouSection, myListSection);
@@ -393,7 +358,6 @@
         }
       }
 
-      /* ═══════════ RENDER HOME PAGE S REÁLNÝMI DATY Z TMDB ═══════════ */
       function renderHomepage() {
         try {
           var nameEl = document.getElementById('mfhUserName');
@@ -402,9 +366,6 @@
           console.warn('[mfh] renderHomepage error:', e);
         }
 
-        // Continue-watching se teď počítá ze skutečné historie profilu,
-        // ne z globálního TMDB trendu — jinak by měl každý profil pořád
-        // to samé (stejný titul, stejný zbývající čas).
         var hasHistory = mfhHasWatchHistory();
         var realContinueItem = hasHistory ? mfhGetRealContinueItem() : null;
         mfhApplyHomeLayout(!!realContinueItem);
@@ -475,7 +436,6 @@
           btn.style.background = inList ? 'rgba(0,122,255,0.15)' : '';
         }
       };
-      /* ═══════════ CINEMA — napojení na MFCinemaPlayer ═══════════ */
       function mfhUnlockCinema() {
         var cinema = document.getElementById('cinemaModal') ||
                      document.getElementById('mfStandaloneCinema');
@@ -503,18 +463,11 @@
 
         var cinType = (mediaType === 'tv' || mediaType === 'tv_ep') ? 'tv_ep' : 'movie';
 
-        // OPRAVA: seriály z homepage skákaly rovnou do cinema módu s napevno
-        // nastavenou S1E1 (bez ohledu na to, kolik sérií/epizod seriál má) a
-        // bez načtení dat o seriálu — proto 404 na zdroji. Přes "Objevovat"
-        // to funguje správně, protože tam se volá openDiscoverTv(), která
-        // nejdřív stáhne sezóny/epizody a otevře pořádný výběr. Homepage teď
-        // pro seriály dělá přesně to samé; u filmů se nic nemění.
         if (cinType === 'tv_ep' && tmdbId && typeof openDiscoverTv === 'function') {
           openDiscoverTv(tmdbId, title);
           return;
         }
 
-        // ── Použij MFCinemaPlayer (Bombuj, SvetSerialu, Prehrajto, Uzi.la) ──
         if (window.MFCinemaPlayer && typeof window.MFCinemaPlayer.open === 'function') {
           try {
             window.MFCinemaPlayer.open(
@@ -529,20 +482,17 @@
           }
         }
 
-        // ── Fallback: app.js openMovieInCinema ──
         if (typeof openMovieInCinema === 'function' && tmdbId) {
           openMovieInCinema(tmdbId, title, cinType === 'tv_ep' ? 'tv' : 'movie');
           mfhUnlockCinema();
           return;
         }
 
-        // ── Poslední záchrana ──
         if (typeof showToast === 'function') {
           showToast('⚠ ' + title, 'info');
         }
       };
 
-      /* ═══════════ INJECT CSS DO <head> — nepřepsatelné ═══════════ */
       function injectHardCSS() {
         if (document.getElementById('mfh-hard-css')) return;
         var css = document.createElement('style');
@@ -568,33 +518,13 @@
         console.log('[mfh] Hard CSS injected');
       }
 
-      /* ═══════════ FORCE HOMEPAGE ═══════════ */
       function forceHome(opts) {
-        // VÝKON: forceHome() se volá automaticky ~12× během prvních pár
-        // vteřin po startu appky (boot schedule + window.load + reakce na
-        // zmizení profile gate + storage event) a pokaždé dělá netriviální
-        // práci (zavírá 18 elementů, přestavuje homepage, stahuje z TMDB).
-        // Naměřeno: 14 volání za 6,5 s. Reálná potřeba je spustit to jen
-        // tehdy, když se od posledního běhu něco skutečně mohlo změnit —
-        // ne pokaždé znovu během pár desítek ms. Throttle na 400 ms kolo
-        // (kromě force:true, tam se má spustit vždy hned – používá ho jen
-        // klik na "Domů").
         var now = Date.now();
         if (!(opts && opts.force) && now - (forceHome._lastRun || 0) < 400) {
           return;
         }
         forceHome._lastRun = now;
         try {
-          // OPRAVA: forceHome() se volá i automaticky několikrát po startu
-          // appky (50 ms až 5 s po načtení) a dřív bezpodmínečně zavírala
-          // VŠECHNY overlaye (Objevování, Oblíbené, detail seriálu, …) —
-          // i ten, co uživatel zrovna sám otevřel klikem během té doby.
-          // Efekt: klik na "Objevovat"/"Oblíbené" krátce po startu appky
-          // vypadal, že "nic neudělá", protože se okno hned zase zabouchlo.
-          // Teď kontrolujeme, jestli je otevřený JAKÝKOLI overlay (ne jen
-          // cinema) a pokud ano, forceHome (bez explicitního force:true)
-          // ho nechá být — automatické volání po startu nemá přebíjet
-          // reálnou akci uživatele.
           var OPEN_OVERLAY_IDS = [
             'cinemaModal', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
             'premiereOverlay', 'collectionsOverlay', 'moodOverlay',
@@ -611,11 +541,9 @@
             return;
           }
 
-          // Klasický na <html> i <body>
           document.documentElement.classList.add('mfh-home-on');
           document.body.classList.add('mfh-home-on');
 
-          // 🔥 ZAVŘI VŠECHNY OVERLAYE (včetně cinema, které jinak žere kliky)
           var overlaysToClose = [
             'universeOverlay',
             'watchlistOverlay',
@@ -638,18 +566,6 @@
           overlaysToClose.forEach(function(id) {
             var el = document.getElementById(id);
             if (el) {
-              // OPRAVA: dřív se tu navíc dávalo
-              //   el.style.setProperty('display', 'none', 'important')
-              // — inline !important, který zůstane na elementu navždy
-              // (dokud ho něco explicitně nesmaže). Funkce pro otevření
-              // overlaye (openUniverse, openWatchlist, …) ale jen přidávají
-              // CSS třídy "open"/"visible" a inline styl nikdy nemažou —
-              // takže jakmile forceHome() proběhne jednou (a běží
-              // automaticky hned po startu appky), overlay zůstane
-              // "otrávený" a NEJDE HO UŽ NIKDY OTEVŘÍT, i když se třídy
-              // správně přidají. Odebrání tříd samo o sobě stačí — bez
-              // třídy "open" element skryje základní (ne-!important)
-              // "display:none" ve stylesheetu.
               el.style.removeProperty('pointer-events');
               el.classList.remove('active', 'open', 'visible', 'show');
             }
@@ -658,18 +574,15 @@
           document.documentElement.classList.remove('modal-open');
           document.body.style.overflow = '';
 
-          // Inline !important backup na tile menu
           document.querySelectorAll('.ps-menu-scene, #mainMenu').forEach(function (m) {
             m.style.setProperty('display', 'none', 'important');
           });
 
-          // Skryj ostatní sekce
           ['mfSectionProtebe', 'mfSectionFilmy', 'mfSectionPlex'].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) el.style.display = 'none';
           });
 
-          // Ukaž homepage + dock (klikatelné)
           var home = document.getElementById('mfSectionHome');
           if (home) {
             home.style.setProperty('display', 'block', 'important');
@@ -685,7 +598,6 @@
             dock.style.setProperty('pointer-events', 'auto', 'important');
           }
 
-          // Naplň daty
           renderHomepage();
         } catch (e) {
           console.warn('[mfh] forceHome error:', e);
@@ -700,7 +612,6 @@
       window.mfShowHomeSection = forceHome;
       window.mfhShowHome = forceHome;
 
-      /* ═══════════ OVERRIDE mfShowSection ═══════════ */
       function wrapShowSection() {
         if (typeof window.mfShowSection !== 'function') return false;
         if (window.mfShowSection._mfhWrapped) return true;
@@ -719,16 +630,6 @@
         return true;
       }
 
-      /* ═══════════ DOCK — VIDITELNÝ POUZE V SEKCI HOME ═══════════
-         Dřív se dock schovával jen přes CSS pravidla vázaná na
-         konkrétní stavy (body.modal-open, body.discover-open), ale
-         spousta overlayů (Oblíbené, Admin, Premiéry, Kolekce,
-         Nálada, Hlas, Trakt, …) žádnou z těch tříd nenastavuje —
-         dock tak zůstával viditelný i nad nimi. Tady je to obrácené:
-         dock se ukáže JEN když jsme v sekci Home a žádný overlay
-         není otevřený; jinak je vždy schovaný. Inline styl s
-         !important vyhraje nad všemi ostatními CSS pravidly bez
-         ohledu na to, který soubor se načte poslední. */
       var DOCK_HIDE_OVERLAY_IDS = [
         'cinemaModal', 'mfStandaloneCinema', 'universeOverlay',
         'watchlistOverlay', 'seriesModal', 'premiereOverlay',
@@ -765,7 +666,6 @@
       }
       window.mfhUpdateDockVisibility = updateDockVisibility;
 
-      /* ═══════════ HOOK NA DOCK ═══════════ */
       function hookDock() {
         var dockHome = document.getElementById('dockHome');
         if (!dockHome || dockHome._mfhHooked) return;
@@ -780,24 +680,14 @@
         };
       }
 
-      /* ═══════════ DOCK — plynulé prosvítání podle scrollu na homepage ═══════════
-         Dřív měl dock na homepage vždy pevnou neprůhlednost (CSS pravidlo
-         "#mfDock, .mf-dock { opacity: 1 !important }"). Teď se při
-         scrollování dolů dock postupně zprůhlední (méně ruší nad
-         obsahem) a při scrollu zpět nahoru se plynule vrátí do plné
-         neprůhlednosti. Přechod je rychlý (~160 ms), aby to nepůsobilo
-         líně/zaseknutě. Dock nikdy úplně nezmizí (zůstává klikatelný). */
       function initHomeDockScrollFade() {
         var home = document.getElementById('mfSectionHome');
         var dock = document.getElementById('mfDock');
         if (!home || !dock || home._mfhDockFadeBound) return;
         home._mfhDockFadeBound = true;
 
-        var MAX_SCROLL = 200; // px, po kolika pixelech scrollu dock úplně zmizí
+        var MAX_SCROLL = 200;
 
-        // Inline !important, protože CSS pravidlo "opacity: 1 !important"
-        // by jinak transition u opacity ignorovalo (jiné !important
-        // pravidlo v styles.css navíc nastavuje "transition: none !important").
         dock.style.setProperty('transition', 'opacity 0.16s ease-out', 'important');
 
         var ticking = false;
@@ -806,11 +696,8 @@
           if (!document.body.classList.contains('mfh-home-on')) return;
           var y = home.scrollTop;
           var ratio = Math.min(1, Math.max(0, y / MAX_SCROLL));
-          var opacity = 1 - ratio; // dole úplně zmizí (0), nahoře plně viditelný (1)
+          var opacity = 1 - ratio;
           dock.style.setProperty('opacity', opacity.toFixed(2), 'important');
-          // Skoro neviditelný dock nesmí blokovat kliky na obsah pod ním —
-          // jakmile zprůhlední skoro na 0, přestane brát kliky, a při
-          // scrollu zpátky nahoru se klikatelnost hned vrátí.
           dock.style.setProperty('pointer-events', ratio > 0.92 ? 'none' : 'auto', 'important');
         }
 
@@ -821,7 +708,6 @@
         }, { passive: true });
       }
 
-      /* ═══════════ INIT ═══════════ */
       function init() {
         console.log('[mfh] init START');
         injectHardCSS();
@@ -829,19 +715,16 @@
         initHomeDockScrollFade();
         updateDockVisibility();
 
-        // Opakovaně wrapuj mfShowSection
         var attempts = 0;
         var wid = setInterval(function () {
           wrapShowSection();
           hookDock();
           initHomeDockScrollFade();
-          if (++attempts > 600) clearInterval(wid); // 30 sekund
+          if (++attempts > 600) clearInterval(wid);
         }, 50);
 
-        // 🔥 PERMANENTNÍ INTERVAL — nikdy nezastaví
         setInterval(function () {
           updateDockVisibility();
-          // Pokud máme home-on a ps-menu-scene je viditelný, schovej
           if (document.documentElement.classList.contains('mfh-home-on')) {
             var menu = document.querySelector('.ps-menu-scene');
             if (menu) {
@@ -855,21 +738,12 @@
               home.style.setProperty('display', 'block', 'important');
             }
           }
-        }, 500); // VÝKON: 2× za sekundu místo 5× — pořád dost rychlé na "safety net", ale běží to navždy, tak ať to neškube CPU zbytečně
+        }, 500);
 
-        // Po startu několikrát forceHome
         [50, 150, 300, 600, 1000, 1500, 2000, 3000, 5000].forEach(function (t) {
           setTimeout(forceHome, t);
         });
 
-        // MutationObserver na celý document
-        // VÝKON: tenhle observer sleduje ÚPLNĚ CELÝ dokument (childList +
-        // subtree + attributes), takže ho spustí i drobné věci jako hover
-        // efekt nebo GSAP animace kdekoli v appce — naměřeno 267 spuštění
-        // za 6,5 s, z toho hodně dělalo querySelectorAll + getComputedStyle
-        // (vynucený přepočet stylů). Teď se skutečná kontrola provede
-        // nejvýš jednou za animační snímek (requestAnimationFrame), i když
-        // MutationObserver nahlásí mutace vícekrát v rychlém sledu.
         if (document.documentElement) {
           var mfhDocMoRaf = null;
           var mo = new MutationObserver(function (muts) {
@@ -893,12 +767,10 @@
           });
         }
 
-        // Reaguj na změnu localStorage
         window.addEventListener('storage', function (e) {
           if (e.key && e.key.indexOf('mf_') === 0) setTimeout(forceHome, 300);
         });
 
-        // Když zmizí profile gate → force home
         var gateEl = document.getElementById('mfProfileGate');
         if (gateEl) {
           var go = new MutationObserver(function () {
@@ -918,13 +790,11 @@
         init();
       }
 
-      // Ještě jeden pokus po window.load
       window.addEventListener('load', function () {
         setTimeout(forceHome, 300);
         setTimeout(forceHome, 1500);
       });
 
-      /* ═══════════ ZÁCHRANA – pokud cinema zůstane prázdný ═══════════ */
       (function setupCinemaRescue() {
         var warned = false;
         function attach() {
