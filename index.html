@@ -47,7 +47,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Firebase SDK pro cross-device sync -->
 
     <!-- PWA Manifest -->
     <link
@@ -69,7 +68,6 @@
 ══════════════════════════════════════════════════════════════════ -->
 
     <link rel="stylesheet" href="styles.css?v=5" />
-    <link rel="stylesheet" href="discover.css" />
     <link rel="stylesheet" href="patches.css" />
     <script>
       (function () {
@@ -85,170 +83,6 @@
     <!-- ⚡ HIDE KEY HINTS — klávesové zkratky skryty -->
     <style>
       .key-hint, #mf-disco-kb-hint { display: none !important; }
-
-      /* ══ SYNC MODAL REDESIGN ══ */
-      #syncModal {
-        background: rgba(0,0,0,0.75) !important;
-        backdrop-filter: blur(32px) saturate(1.6) !important;
-        -webkit-backdrop-filter: blur(32px) saturate(1.6) !important;
-      }
-      #syncModal .sync-box {
-        background: rgba(10,10,16,0.98) !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        border-top-color: rgba(255,255,255,0.13) !important;
-        border-radius: 22px !important;
-        padding: 24px 24px 20px !important;
-        width: min(440px, 93vw) !important;
-        box-shadow:
-          0 0 0 1px rgba(0,0,0,0.5),
-          0 40px 100px rgba(0,0,0,0.9),
-          inset 0 1px 0 rgba(255,255,255,0.07) !important;
-      }
-      /* Status row */
-      #syncModal .sync-status-row {
-        background: rgba(255,255,255,0.03) !important;
-        border: 1px solid rgba(255,255,255,0.06) !important;
-        border-radius: 14px !important;
-        padding: 13px 15px !important;
-        margin-bottom: 20px !important;
-        gap: 10px !important;
-      }
-      #syncModal .sync-status-dot {
-        width: 9px !important; height: 9px !important;
-      }
-      #syncModal .sync-status-dot.online {
-        background: #30d158 !important;
-        box-shadow: 0 0 8px rgba(48,209,88,0.5) !important;
-      }
-      #syncModal .sync-status-text {
-        font-size: 0.75rem !important;
-        font-weight: 500 !important;
-        color: rgba(255,255,255,0.65) !important;
-      }
-      #syncModal .sync-now-btn {
-        font-size: 0.62rem !important;
-        font-weight: 700 !important;
-        color: #007aff !important;
-        background: rgba(0,122,255,0.1) !important;
-        border: 1px solid rgba(0,122,255,0.22) !important;
-        border-radius: 9px !important;
-        padding: 6px 11px !important;
-        transition: all 0.18s !important;
-        display: flex !important; align-items: center !important;
-      }
-      #syncModal .sync-now-btn:hover {
-        background: rgba(0,122,255,0.18) !important;
-      }
-      /* Code row */
-      #syncModal .sync-code-row {
-        gap: 7px !important;
-        margin-bottom: 16px !important;
-        align-items: stretch !important;
-      }
-      #syncModal .sync-code-input {
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-        background: rgba(255,255,255,0.04) !important;
-        border: 1px solid rgba(255,255,255,0.09) !important;
-        border-radius: 12px !important;
-        padding: 11px 14px !important;
-        font-size: 0.9rem !important;
-        font-weight: 700 !important;
-        letter-spacing: 1px !important;
-        color: #fff !important;
-        transition: border-color 0.18s, box-shadow 0.18s !important;
-      }
-      #syncModal .sync-code-input:focus {
-        border-color: rgba(0,122,255,0.4) !important;
-        box-shadow: 0 0 0 3px rgba(0,122,255,0.08) !important;
-      }
-      #syncModal .sync-gen-btn {
-        background: transparent !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        border-radius: 12px !important;
-        padding: 11px 13px !important;
-        font-size: 0.68rem !important;
-        font-weight: 700 !important;
-        color: rgba(255,255,255,0.45) !important;
-        flex-shrink: 0 !important;
-        transition: all 0.2s ease !important;
-        display: flex !important; align-items: center !important; gap: 5px !important;
-        white-space: nowrap !important;
-      }
-      #syncModal .sync-gen-btn:hover {
-        background: rgba(255,255,255,0.06) !important;
-        color: rgba(255,255,255,0.8) !important;
-        border-color: rgba(255,255,255,0.18) !important;
-      }
-      #syncModal .sync-btn {
-        background: #007aff !important;
-        border-radius: 12px !important;
-        padding: 11px 16px !important;
-        font-size: 0.76rem !important;
-        font-weight: 800 !important;
-        color: #fff !important;
-        flex-shrink: 0 !important;
-        display: flex !important; align-items: center !important; gap: 6px !important;
-        white-space: nowrap !important;
-        box-shadow: 0 2px 12px rgba(0,122,255,0.35) !important;
-        transition: all 0.2s ease !important;
-      }
-      #syncModal .sync-btn:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 20px rgba(0,122,255,0.5) !important;
-      }
-      #syncModal .sync-btn:active {
-        transform: scale(0.97) !important;
-      }
-      /* Info box */
-      #syncModal .sync-info-box {
-        background: rgba(255,255,255,0.025) !important;
-        border: 1px solid rgba(255,255,255,0.06) !important;
-        border-radius: 13px !important;
-        padding: 13px 15px !important;
-        font-size: 0.67rem !important;
-        color: rgba(255,255,255,0.38) !important;
-        line-height: 1.65 !important;
-        margin-bottom: 18px !important;
-      }
-      #syncModal .sync-info-box strong {
-        color: rgba(255,255,255,0.65) !important;
-        font-weight: 700 !important;
-      }
-      /* Footer */
-      #syncModal .sync-footer-row {
-        gap: 8px !important;
-        justify-content: flex-end !important;
-      }
-      #syncModal .sync-disconnect-btn {
-        background: transparent !important;
-        border: 1px solid rgba(255,80,80,0.2) !important;
-        border-radius: 11px !important;
-        padding: 9px 15px !important;
-        font-size: 0.72rem !important;
-        font-weight: 700 !important;
-        color: rgba(255,100,100,0.55) !important;
-        transition: all 0.18s !important;
-      }
-      #syncModal .sync-disconnect-btn:hover {
-        background: rgba(255,80,80,0.1) !important;
-        color: #ff6060 !important;
-        border-color: rgba(255,80,80,0.35) !important;
-      }
-      #syncModal .sync-btn-sec {
-        background: rgba(255,255,255,0.05) !important;
-        border: 1px solid rgba(255,255,255,0.09) !important;
-        border-radius: 11px !important;
-        padding: 9px 18px !important;
-        font-size: 0.72rem !important;
-        font-weight: 600 !important;
-        color: rgba(255,255,255,0.45) !important;
-        transition: all 0.18s !important;
-      }
-      #syncModal .sync-btn-sec:hover {
-        background: rgba(255,255,255,0.1) !important;
-        color: rgba(255,255,255,0.8) !important;
-      }
     </style>
 
     <!-- ⚡ PERFORMANCE PATCH -->
@@ -2656,18 +2490,7 @@
         <span class="dock-badge" id="hdrNotifBadge"></span>
       </button>
 
-      <!-- Sync status -->
-      <button
-        class="mf-header-btn"
-        onclick="openSyncModal()"
-        title="Synchronizace zařízení"
-        id="hdrSyncBtn"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
-        </svg>
-        <span class="mf-sync-dot" id="hdrSyncDot"></span>
-      </button>
+      
 
       <div id="mfWelcomeNote" aria-live="polite"></div>
       <!-- Profile badge (will be rendered by JS) -->
@@ -2816,52 +2639,7 @@
           overflow: hidden;
         "
       >
-        <button
-          onclick="
-            openSyncModal();
-            closeDockMore();
-          "
-          style="
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            font-family: -apple-system, sans-serif;
-            color: rgba(255, 255, 255, 0.92);
-          "
-          onmouseover="this.style.background = 'rgba(255,255,255,0.05)'"
-          onmouseout="this.style.background = 'transparent'"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--accent)"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          >
-            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
-          </svg>
-          <span style="font-size: 0.78rem; font-weight: 500; flex: 1"
-            >Synchronizace zařízení</span
-          >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="rgba(255,255,255,0.2)"
-            stroke-width="2"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
+
         <div
           style="
             height: 0.5px;
@@ -3129,88 +2907,7 @@
       <span class="logo-progress-text" id="logoProgressText">0%</span>
     </div>
 
-    <!-- ☁️ SYNC SETTINGS MODAL -->
-    <div id="syncModal">
-      <div class="sync-box">
-
-        <!-- Header -->
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
-          <div style="
-            width:44px;height:44px;border-radius:14px;flex-shrink:0;
-            background:linear-gradient(145deg,rgba(0,122,255,0.18),rgba(90,200,250,0.1));
-            border:1px solid rgba(0,122,255,0.2);
-            display:flex;align-items:center;justify-content:center;
-          ">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="rgba(0,150,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
-            </svg>
-          </div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:1.05rem;font-weight:800;letter-spacing:-0.3px;line-height:1.2;">Cross-Device Sync</div>
-            <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);margin-top:2px;">Synchronizace přes Firebase</div>
-          </div>
-          <button onclick="closeSyncModal()" style="
-            width:30px;height:30px;border-radius:50%;flex-shrink:0;
-            background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);
-            color:rgba(255,255,255,0.35);font-size:0.8rem;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;
-            transition:all 0.18s;
-          " onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'"
-             onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.35)'">✕</button>
-        </div>
-
-        <!-- Firebase warn -->
-        <div id="syncFirebaseWarn" class="sync-firebase-warn" style="display:none;">
-          ⚠️ <strong>Firebase není nastaven.</strong> Nastav ho přes tlačítko níže — bez editace kódu.
-        </div>
-        <button id="syncFbSetupBtn" onclick="openFirebaseCfgModal()" style="
-          display:none;width:100%;padding:12px 16px;margin-bottom:12px;
-          border-radius:13px;background:rgba(0,122,255,0.1);border:1px solid rgba(0,122,255,0.28);
-          color:var(--accent);font-family:-apple-system,sans-serif;font-size:0.82rem;
-          font-weight:700;cursor:pointer;text-align:left;
-        ">🔥 Nastavit Firebase config →</button>
-
-        <!-- Status -->
-        <div style="font-size:0.55rem;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;">Stav připojení</div>
-        <div class="sync-status-row">
-          <div class="sync-status-dot" id="syncModalDot"></div>
-          <div class="sync-status-text" id="syncModalText">Inicializace…</div>
-          <button class="sync-now-btn" onclick="MFSync.pushData()">
-            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v13M7 9l5-5 5 5"/><path d="M3 19h18"/></svg>
-            Nahrát teď
-          </button>
-        </div>
-
-        <!-- Kód skupiny -->
-        <div style="font-size:0.55rem;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;">Kód skupiny</div>
-        <div class="sync-code-row">
-          <input class="sync-code-input" id="syncGroupInput" placeholder="Zadej nebo vygeneruj kód…" spellcheck="false"/>
-          <button class="sync-gen-btn" onclick="syncGenerateCode()">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-            Generovat
-          </button>
-          <button class="sync-btn" onclick="syncConnect()">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            Připojit
-          </button>
-        </div>
-
-        <!-- Info -->
-        <div class="sync-info-box">
-          <strong>Jak to funguje:</strong> Zadej stejný kód skupiny na všech svých zařízeních. Všechny změny (sledované epizody, watchlist, profily) se automaticky synchronizují přes Firebase. Kód je tajný — sdílej ho jen se sebou samým.
-        </div>
-
-        <!-- Footer -->
-        <div class="sync-footer-row">
-          <button class="sync-disconnect-btn" id="syncDisconnectBtn" onclick="syncDisconnect()">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18.36 6.64A9 9 0 1 1 5.63 5.63"/><path d="M12 2v10"/></svg>
-            Odpojit
-          </button>
-          <button class="sync-btn-sec" onclick="closeSyncModal()">Zavřít</button>
-        </div>
-
-      </div>
-    </div>
+    
 
     <div class="autosave-indicator" id="autosaveIndicator">
       <div class="autosave-dot"></div>
@@ -3696,32 +3393,7 @@
         <button class="rating-skip" onclick="closeRating()">Přeskočit</button>
       </div>
     </div>
-    <!-- NEXT EPISODE PROMPT -->
-    <div class="next-ep-overlay" id="nextEpOverlay">
-      <div class="next-ep-toast">
-        <div class="next-ep-thumb" id="nextEpThumb">
-          <img loading="lazy" id="nextEpThumbImg" src="" alt="" />
-        </div>
-        <div class="next-ep-info">
-          <div class="next-ep-label">Další epizoda</div>
-          <div class="next-ep-title" id="nextEpTitle">—</div>
-          <div class="next-ep-sub" id="nextEpSub">—</div>
-        </div>
-        <div class="next-ep-countdown" id="nextEpCountdown">10s</div>
-        <div class="next-ep-btns">
-          <button
-            class="next-ep-play"
-            id="nextEpPlayBtn"
-            onclick="nextEpPlay()"
-          >
-            Otevřít epizodu
-          </button>
-          <button class="next-ep-dismiss" onclick="nextEpDismiss()">
-            Přeskočit
-          </button>
-        </div>
-      </div>
-    </div>
+    
 
     <!-- CONFIRM -->
     <div class="confirm-overlay" id="confirmOverlay">
@@ -4516,12 +4188,7 @@
                 >
                   📥 Import DB (JSON)
                 </button>
-                <button
-                  class="admin-btn secondary"
-                  onclick="adminRefetchAllPosters()"
-                >
-                  🖼 Znovu stáhnout postery
-                </button>
+
                 <button class="admin-btn danger" onclick="adminResetWatched()">
                   🗑 Reset sledovanosti
                 </button>
@@ -5830,73 +5497,7 @@
      ║  MůjFlix PATCH v4  — finální opravy                          ║
      ╚════════════════════════════════════════════════════════════════╝ -->
 
-    <!-- Firebase config modal HTML ──────────────────────── -->
-    <div id="mfFbModal">
-      <div class="mfFbBox">
-        <div class="mfFbTitle">🔥 Firebase — nastavení sync</div>
-        <div class="mfFbSub">
-          Data se synchronizují přes
-          <strong>Firebase Realtime Database</strong> (zdarma).<br />
-          1. Otevři
-          <a href="https://console.firebase.google.com" target="_blank"
-            >console.firebase.google.com</a
-          ><br />
-          2. Nový projekt → Build → Realtime Database → Create (test mode)<br />
-          3. Project Settings → Your apps → Web → zkopíruj config
-        </div>
-
-        <div class="mfFbLbl">API Key</div>
-        <input
-          class="mfFbInp"
-          id="fbI_apiKey"
-          placeholder="AIzaSy…"
-          autocomplete="off"
-        />
-        <div class="mfFbLbl">Auth Domain</div>
-        <input
-          class="mfFbInp"
-          id="fbI_authDomain"
-          placeholder="muj-projekt.firebaseapp.com"
-        />
-        <div class="mfFbLbl">
-          Database URL <span style="color: #e17055">⚠ povinné</span>
-        </div>
-        <input
-          class="mfFbInp"
-          id="fbI_databaseURL"
-          placeholder="https://muj-projekt-default-rtdb.firebaseio.com"
-        />
-        <div class="mfFbLbl">Project ID</div>
-        <input class="mfFbInp" id="fbI_projectId" placeholder="muj-projekt" />
-        <div class="mfFbLbl">App ID</div>
-        <input
-          class="mfFbInp"
-          id="fbI_appId"
-          placeholder="1:123456789:web:abc123def456"
-        />
-
-        <hr class="mfFbSep" />
-        <div class="mfFbLbl" style="margin-top: 0">
-          Sync klíč skupiny — stejný na všech zařízeních
-        </div>
-        <div class="mfFbGroupRow">
-          <input
-            class="mfFbGroupInp"
-            id="fbI_groupKey"
-            placeholder="Zadej nebo vygeneruj tajný klíč…"
-          />
-          <button class="mfFbGenBtn" onclick="mfFbGenKey()">🎲 Gen</button>
-        </div>
-
-        <div class="mfFbActions">
-          <button class="mfFbSave" onclick="mfFbSave()">
-            💾 Uložit &amp; aktivovat
-          </button>
-          <button class="mfFbCancel" onclick="mfFbClose()">Zrušit</button>
-        </div>
-        <div class="mfFbStatus" id="mfFbStatusLegacy"></div>
-      </div>
-    </div>
+    
 
     <!-- ── SEKCE: PRO TEBE ──────────────────────────────────────────────── -->
     <!-- Tato sekce se zobrazí místo hlavního menu když uživatel klikne "Pro tebe" -->
@@ -6894,7 +6495,6 @@
       </div>
     </div>
 
-    <!-- Firebase sync engine — přesunuto do firebase-sync.js -->
     <!-- config.js drží API klíče a je v .gitignore (viz config.example.js) -->
     <script src="config.js"></script>
     <script src="app.js?v=6" defer></script>
@@ -7119,17 +6719,15 @@
          app.js, takže jejich opravy/wrappery skutečně zůstanou platit.
 
          Konsolidace: cinema.js = cinema-player.js + legal-streaming-
-         providers.js (v tomto pořadí uvnitř). ui-patches.js =
-         app-patches.js + notifications-changelog.js + dock.js (v tomto
-         pořadí uvnitř). home.js = bývalý inline script id="mfh-script".
-         firebase-sync.js = bývalý inline script type="module", proto
-         si ponechává type="module" (moduly jsou vždy deferred). -->
+         providers.js (v tomto pořadí uvnitř). home.js = bývalý inline
+         script id="mfh-script". dock.js = chytrý dock (aktivní ikona,
+         auto-skrývání). Odstraněno: odkazy na discover.css, discover.js,
+         ui-patches.js a firebase-sync.js — soubory v projektu nikdy
+         neexistovaly (zapomenuté odkazy z dřívější verze), prohlížeč je
+         tiše přeskakoval (404) bez dopadu na funkčnost. -->
     <script src="cinema.js" defer></script>
     <script src="home.js" defer></script>
     <script src="dock.js" defer></script>
-    <script src="discover.js" defer></script>
-    <script src="ui-patches.js" defer></script>
-    <script type="module" src="firebase-sync.js"></script>
 
   
   <script>
