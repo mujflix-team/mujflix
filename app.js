@@ -16,13 +16,6 @@ function escapeHTML(e) {
   return e || 0 === e ? String(e).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;") : ""
 }
 
-// OPRAVA — TOHLE byla skutečná příčina "prázdné" sekce Oblíbené:
-// renderWatchlist() (a pár dalších míst) volá funkci `_esc(...)`, která
-// ale nikde v kódu neexistovala (existuje jen `escapeHTML`). Jakmile bylo
-// v Oblíbených alespoň 1 položka, JS spadl na "_esc is not defined" ještě
-// PŘED vykreslením první karty — celá sekce tak zůstala prázdná (bez
-// karet i bez hlášky "nic tu není"), přestože se položka do localStorage
-// v pořádku uložila. `_esc` teď existuje jako alias pro `escapeHTML`.
 function _esc(e) {
   return escapeHTML(e)
 }
@@ -35,18 +28,7 @@ function safeSetItem(e, t) {
   }
 }
 
-function _slugBase(e) {
-  return /[\u3000-\u9fff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff]/.test(e) ? "" : e.toLowerCase().replace(/[áàâ]/g, "a").replace(/[éěê]/g, "e").replace(/[íîì]/g, "i").replace(/[óô]/g, "o").replace(/[úůû]/g, "u").replace(/[ý]/g, "y").replace(/[ž]/g, "z").replace(/[š]/g, "s").replace(/[č]/g, "c").replace(/[ř]/g, "r").replace(/[ď]/g, "d").replace(/[ť]/g, "t").replace(/[ň]/g, "n").replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
-}
-
-function slugifyBombuj(e) {
-  const t = _slugBase(e);
-  return t ? t + "-" + (new Date).getFullYear() : ""
-}
-
-function slugifySvet(e) {
-  return _slugBase(e)
-}! function() {
+! function() {
   var e = EventTarget.prototype.addEventListener,
     t = {
       wheel: !0,
@@ -66,17 +48,14 @@ function slugifySvet(e) {
   window.MF_DEBUG && console.error("[MF] Unhandled rejection:", e.reason)
 });
 
-// ══ CLEANUP HANDLER - Čistí timery při unload ══
 const _mfIntervals = new Set();
 const _mfTimeouts = new Set();
-// Wrapper pro setInterval který sleduje všechny intervaly
 const originalSetInterval = setInterval;
 window.setInterval = function(fn, delay) {
   const id = originalSetInterval(fn, delay);
   _mfIntervals.add(id);
   return id;
 };
-// Wrapper pro setTimeout
 const originalSetTimeout = setTimeout;
 window.setTimeout = function(fn, delay) {
   const id = originalSetTimeout(fn, delay);
@@ -84,7 +63,6 @@ window.setTimeout = function(fn, delay) {
   return id;
 };
 
-// Cleanup na unload - zastaví všechny timery
 window.addEventListener("beforeunload", () => {
   _mfIntervals.forEach(id => clearInterval(id));
   _mfTimeouts.forEach(id => clearTimeout(id));
@@ -93,8 +71,6 @@ window.addEventListener("beforeunload", () => {
   window.MF_DEBUG && console.log("[MF] Cleanup - všechny timery zastaveny");
 });
 
-// ⚠️ API KLÍČE - DOPORUČENO PŘESUNOUT DO PROXY NEBO ENVIRONMENT
-// Aktuální klíče jsou exponované v client-side kódu
 const TMDB_KEY = window.TMDB_KEY_DEFAULT || "",
   TMDB = "https://api.themoviedb.org/3",
   IMG = "https://image.tmdb.org/t/p/w400",
@@ -168,13 +144,6 @@ const TMDB_KEY = window.TMDB_KEY_DEFAULT || "",
     krimi: 80
   };
 
-// OPRAVA: admin panel volal saveDb()/autoSave() při každé úpravě (přejmenování,
-// smazání, přidání série), ale ani jedna z těch funkcí nikde v kódu neexistovala —
-// změny tedy zmizely hned po refreshi. Teď se katalog ukládá do localStorage a
-// při startu appky se uložené úpravy vrátí zpět do `db`.
-function saveDb() {
-  try { safeSetItem("mf_db_custom", JSON.stringify(db)) } catch (err) {}
-}
 try {
   const _savedDb = JSON.parse(localStorage.getItem("mf_db_custom") || "{}");
   Object.assign(db, _savedDb);
@@ -183,8 +152,6 @@ try {
 function epsInSeason(e, t) {
   const n = epsBySeason[e];
   if (n && n[t - 1]) return n[t - 1];
-  // Fallback pro seriály bez napevno zadaného epsBySeason (typicky vše
-  // přidané přes "Objevovat") — použij reálná data z TMDB uložená v db.
   const d = db[e];
   if (d && d._seasonEpCounts && d._seasonEpCounts[t - 1]) return d._seasonEpCounts[t - 1];
   return 10
@@ -227,18 +194,15 @@ function getWatched() {
 function saveWatched(e) {
   showAutosave("saving"), safeSetItem(uKey("mf_watched"), JSON.stringify(e)), clearTimeout(asTimer), asTimer = setTimeout(() => showAutosave("saved"), 280)
 }
-// ══ TMDB CACHE S LRU A TIMESTAMP ══
 const _tmdbMemCache = new Map();
 const TMDB_CACHE_MAX = 100;
-const TMDB_CACHE_TTL = 30 * 60 * 1000; // 30 minut
+const TMDB_CACHE_TTL = 30 * 60 * 1000;
 
 function _tmdbMemSet(key, value) {
-  // TTL-based cleanup
   const now = Date.now();
   for (const [k, v] of _tmdbMemCache) {
     if (now - v._ts > TMDB_CACHE_TTL) _tmdbMemCache.delete(k);
   }
-  // LRU cleanup when full
   if (_tmdbMemCache.size >= TMDB_CACHE_MAX) {
     const firstKey = _tmdbMemCache.keys().next().value;
     _tmdbMemCache.delete(firstKey);
@@ -256,34 +220,19 @@ function _tmdbMemGet(key) {
   return entry.data;
 }
 
-// ══ PROXY CONFIG - Pro server-side API volání ══
-// Nastaveno na Cloudflare Pages Functions
 window.MF_PROXY = {
-  enabled: false,  // ← ZMĚŇ NA true PRO CLOUDFLARE
-  baseUrl: '/api', // ← Cloudflare Pages: /api/tmdb
-  // Pro externí server použij: baseUrl: 'https://tvuj-server.cz/api'
+  enabled: false,
+  baseUrl: '/api',
   tmdbEndpoint: '/tmdb'
 };
 
-// ══ PROXY INSTALACE (Cloudflare Pages) ══
-// 1. Vytvoř: functions/api/tmdb/[[catchall]].js
-// 2. wrangler secret put TMDB_KEY
-// 3. Push na GitHub → auto deploy
-
 async function tmdbGet(e, forceDirect = false) {
-  // Automaticky použít proxy pokud je povolena (pokud forceDirect není true)
   const useProxy = window.MF_PROXY?.enabled && !forceDirect;
 
   if (useProxy) {
     try {
-      // Sestavit proxy URL
-      // baseUrl = '/api' (nebo 'https://server.cz/api')
-      // endpoint = '/tmdb'
-      // path = 'tv/456'
-      // Výsledek: /api/tmdb?path=tv/456
       const base = window.MF_PROXY.baseUrl || '';
       const endpoint = window.MF_PROXY.tmdbEndpoint || '/tmdb';
-      // Přidat trailing slash k base pokud chybí a endpoint nezačíná na /
       const baseWithSlash = base && !base.endsWith('/') ? base + '/' : base;
       const endpointClean = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
       const cleanPath = e.startsWith('/') ? e.slice(1) : e;
@@ -295,9 +244,8 @@ async function tmdbGet(e, forceDirect = false) {
       const resp = await mfFetch(proxyUrl);
       if (!resp.ok) {
         console.warn("[TMDB-Proxy] HTTP error:", resp.status, resp.statusText);
-        // ⚠️ FALLBACK: Pokud proxy selže, zkusíme přímé volání
         console.info("[TMDB] Fallback to direct API");
-        return tmdbGet(e, true); // forceDirect = true
+        return tmdbGet(e, true);
       }
       const data = await resp.json();
       if (!data) return null;
@@ -305,12 +253,10 @@ async function tmdbGet(e, forceDirect = false) {
       return data;
     } catch (err) {
       console.error("[TMDB-Proxy] Fetch error:", err.message, "- fallback to direct");
-      // FALLBACK: Network error - zkusíme přímé volání
       return tmdbGet(e, true);
     }
   }
 
-  // Standardní přímé volání (pokud proxy není povolena)
   try {
     const t = e.startsWith("http") ? e : `${TMDB}${e}`,
       n = new URL(t);
@@ -324,7 +270,6 @@ async function tmdbGet(e, forceDirect = false) {
       return null;
     }
     const a = await i.json();
-    // Validate response
     if (!a || typeof a !== 'object') {
       console.warn("[TMDB] Invalid response structure");
       return null;
@@ -361,12 +306,7 @@ async function fetchTmdbSeason(e, t) {
     return tmdbCache[n] = null, null
   }
 }
-async function getTmdbStill(e, t, n) {
-  const o = await fetchTmdbSeason(e, t);
-  if (!o) return null;
-  const i = o.find(e => e.ep === n);
-  return i ? i.stillS || i.still : null
-}
+
 async function fetchTmdbDetails(e) {
   if (!db[e]) return null;
   try {
@@ -457,10 +397,6 @@ function renderForYouFallback(e) {
 
 function openForYouSeries() {
   _forYouSeries && openWithCopy(_forYouSeries.name, _forYouSeries.mediaType || "tv")
-}
-
-function rerollForYou() {
-  loadForYouTile()
 }
 
 function calcProgress(e) {
@@ -567,7 +503,6 @@ function updateLogoProgress() {
   })
 }();
 function updateContinueWidget() {
-  /* no-op — #continueWidget bylo nahrazeno #mfhContinue v home.js (viz skupina K) */
 }
 
 function showToast(e, t) {
@@ -652,16 +587,9 @@ function handleSearchInputKey(e) {
   "Escape" !== e.key || closeUniverse()
 }
 
-const MF_SEARCH_HISTORY_KEY = "mf_search_history";
-function getSearchHistory() {
-  const e = safeLS(MF_SEARCH_HISTORY_KEY, "[]");
-  return Array.isArray(e) ? e.filter(t => typeof t === "string" && t.trim()).slice(0, 6) : [];
-}
 function renderSearchHistory() {
-  /* no-op — historie vyhledávání vypnuta na přání uživatele */
 }
 function saveSearchHistory(e) {
-  /* no-op — historie vyhledávání vypnuta na přání uživatele, nic se neukládá */
 }
 
 function onSearchInput(e) {
@@ -1013,8 +941,6 @@ function renderPersonalisedRow(e, t, n) {
       p = null !== t && t > 0,
       g = document.createElement("div");
     g.className = "disco-card ai-match-card", g.style.position = "relative";
-    // Odznak "X% Shoda" byl na přání odstraněn — karty v "Doporučení"
-    // teď vypadají stejně jako ostatní disco karty, bez procentuální shody.
     const f = "";
     if (g.innerHTML = `\n          ${f}\n          <img class="disco-card-img" src="${m}" alt="" loading="lazy">\n          <div class="disco-card-overlay"></div>\n          <div class="disco-play-btn"><svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg></div>\n          <div class="disco-card-finder-btn" title="Najít kde sledovat" onclick="event.stopPropagation();verifyAndOpen('${l.replace(/'/g,"\\'")}','${u}','${(e.release_date||e.first_air_date||"").slice(0,4)}')">\n            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>\n          </div>\n          ${e.id?`<div class="disco-card-fav-btn${isTmdbFavorite(e.id,u)?" faved":""}" title="Oblíbené" onclick="event.stopPropagation();toggleTmdbFavorite(${e.id},'${u}','${r.replace(/'/g,"\\'")}','${m.replace(/'/g,"\\'")}',this)"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 21s-6.7-4.3-9.3-8.2C1 10 1.7 6.6 4.4 5.1 6.6 3.9 9.2 4.6 12 7.6c2.8-3 5.4-3.7 7.6-2.5 2.7 1.5 3.4 4.9 1.7 7.7C18.7 16.7 12 21 12 21z"/></svg></div>`:""}\n          <div class="disco-card-glow"></div>\n          <div class="disco-card-info">\n            <div class="disco-card-name">${r}</div>\n            ${o?`<div style="font-size:0.42rem;color:${a}cc;margin-bottom:4px;font-weight:700;letter-spacing:0.3px;line-height:1.3;">💡 ${o}</div>`:""}\n            <div class="disco-card-meta">\n              <span class="disco-card-type">${"movie"===u?"🎬 Film":"📺 Seriál"}</span>\n              ${d?`<span class="disco-card-rating">★ ${d}</span>`:""}\n            </div>\n          </div>`, g.onclick = () => {
         e.id && (aiBrain.boostGenreIds(e.genre_ids || [], .05), aiBrain.recordTmdbSeen(e.id)), e.id ? (window._mfFinderTmdbId = e.id, window._cinYear = (e.release_date || e.first_air_date || "").slice(0, 4) || null, "tv" === u ? openDiscoverTv(e.id, r) : _showCinemaOrFinderChoice(e.id, r, u, null)) : (closeUniverse(), window._mfFinderTmdbId = null, openWithCopy(l, u, (e.release_date || e.first_air_date || "").slice(0, 4) || null))
@@ -1050,7 +976,6 @@ function _isNonLatin(e) {
   return /[\u3000-\u9fff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff\u4e00-\u9fff]/.test(e)
 }
 
-// MůjFlix — Discover TV → Series Modal
 async function openDiscoverTv(tmdbId, title) {
   const slug = '__dtv_' + tmdbId;
   const IMG_P = 'https://image.tmdb.org/t/p/w342';
@@ -1089,12 +1014,6 @@ async function openDiscoverTv(tmdbId, title) {
         seasonEpCounts.push(ec);
         for (let e = 1; e <= ec; e++) rec[slug+'-S'+s+'-E'+e] = { se: s, ep: e };
       }
-      // OPRAVA: totalSeasons()/epsInSeason() dřív uměly počítat sezóny jen
-      // pro pár napevno zadaných seriálů (epsBySeason). U seriálů přidaných
-      // přes Objevovat tak vždy vyšla jen 1 série / 10 epizod bez ohledu na
-      // to, kolik jich seriál doopravdy má. Teď si počet sezón a epizod na
-      // sezónu uložíme přímo do db záznamu a totalSeasons/epsInSeason si ho
-      // odtud umí přečíst.
       rec._seasonEpCounts = seasonEpCounts;
       db[slug] = rec;
     } catch(err) {
@@ -1312,30 +1231,6 @@ function shAddToWatchlistByItem(e) {
   addToWatchlistByName(e.name || e.title || "", "movie" === e.media_type || "movie" === e.type ? "movie" : "series")
 }
 
-function loadSearchPopular() {
-  loadDiscoContent(_discoCurrent.genre, _discoCurrent.type)
-}
-
-function searchTMDB(e) {
-  discoSearch(e)
-}
-
-function renderShResults(e) {
-  const t = document.getElementById("searchResults");
-  t && (t.innerHTML = "", e.length ? e.forEach((e, n) => {
-    t.appendChild(buildShCard(e, n))
-  }) : t.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:0.78rem;padding:50px 0;opacity:0.5;">Nic nenalezeno 🔍</div>')
-}
-
-function appendShResults(e) {
-  const t = document.getElementById("searchResults");
-  if (!t) return;
-  const n = _shCurrentItems.length - e.length;
-  e.forEach((e, o) => {
-    t.appendChild(buildShCard(e, n + o))
-  })
-}
-
 function buildShCard(e, t) {
   const n = "movie" === e.media_type || !!e.title,
     o = e.name || e.title || e.original_name || e.original_title || "",
@@ -1462,12 +1357,6 @@ async function fetchShPreviewDetails(e) {
       t && (t.textContent = `▶ Kopírovat: "${e.slice(0,20)}${e.length>20?"…":""}"`), showToast(`📋 Zvoleno: ${e}`, "info")
     }, r.appendChild(o)
   })) : (_uniSelectedVariant = n.cs || n.orig, s.style.display = "none")
-}
-
-function hideShPreview() {
-  const e = document.getElementById("shPreviewContent"),
-    t = document.getElementById("shPreviewEmpty");
-  e && (e.style.display = "none"), t && (t.style.display = "flex"), _shPreviewItem = null, _uniSelectedVariant = null
 }
 
 function shAddToWatchlist() {
@@ -1633,8 +1522,6 @@ function switchToEpisodesView() {
   })
 }
 
-function renderSeasonStrip() {}
-
 function toggleShowAll() {
   showAllSeasons = !showAllSeasons, renderSeasons(), renderEpisodes()
 }
@@ -1756,12 +1643,6 @@ document.getElementById("seriesModal").addEventListener("click", e => {
   e.target === document.getElementById("seriesModal") && closeModal()
 });
 
-
-
-
-
-
-
 function toggleWatch(e) {
   const t = getWatched(),
     n = !!t[e];
@@ -1810,13 +1691,6 @@ function saveWatchlistData(e) {
   safeSetItem(uKey("mf_watchlist"), JSON.stringify(e)), updateWatchlistBadge()
 }
 
-// ═══ Oblíbené pro filmy a seriály z Objevovat (TMDB) ═══
-// Dřív šlo do Oblíbených přidat jen pár napevno zadaných seriálů z db
-// (přes toggleWatchlistItem/slug). Filmy a cokoliv z Objevovat neměly
-// žádné tlačítko srdíčka vůbec — proto se to "nedalo přidat" a v sekci
-// Oblíbené to logicky nikdy nebylo. Tahle dvojice funkcí ukládá do
-// stejného úložiště (getWatchlist/saveWatchlistData), takže se položky
-// zobrazí ve stejné sekci Oblíbené jako seriály z lokálního katalogu.
 function tmdbFavSlug(id, mediaType) {
   return "__tmdbfav_" + ("tv" === mediaType ? "tv" : "movie") + "_" + id
 }
@@ -1855,7 +1729,6 @@ function updateWatchlistBadge() {
   t && (t.textContent = e.length, t.classList.toggle("visible", e.length > 0))
 }
 
-// ── KDO SE DÍVÁ — watcher avatary na dlaždicích ──
 function updateWatcherBadges() {
   const watchers = window._mfWatchers;
   if (!watchers) return;
@@ -1864,7 +1737,6 @@ function updateWatcherBadges() {
     const slug = wrapper.dataset.slug;
     const list = watchers[slug];
 
-    // Odstraň starý badge
     const old = wrapper.querySelector('.tile-watcher-badge');
     if (old) old.remove();
     if (!list || !list.length) return;
@@ -1872,7 +1744,6 @@ function updateWatcherBadges() {
     const badge = document.createElement('div');
     badge.className = 'tile-watcher-badge';
 
-    // Max 3 avatary, zbytek jako +N
     const visible = list.slice(0, 3);
     const rest = list.length - visible.length;
 
@@ -1884,19 +1755,16 @@ function updateWatcherBadges() {
       ? `<div class="twa twa-rest">+${rest}</div>`
       : '';
 
-    // Label se jmény — zobrazí se na hover
     const names = list.map(w => w.name).join(', ');
     const labelHtml = `<div class="twa-label">${names}</div>`;
 
     badge.innerHTML = avatarsHtml + restHtml + labelHtml;
 
-    // Přidej do .ps-tile (obsahuje obrázek + overlay), ne do wrapperu
     const tile = wrapper.querySelector('.ps-tile') || wrapper;
     tile.appendChild(badge);
   });
 }
 
-// Spusť také při startu pokud jsou watcher data k dispozici
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => { if (window._mfWatchers) updateWatcherBadges(); }, 1000);
 });
@@ -1911,21 +1779,71 @@ function closeWatchlist() {
   e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 280)
 }
 
-function renderWatchlist() {
-  const e = getWatchlist(),
-    t = document.getElementById("watchlistList"),
-    n = document.getElementById("watchlistEmpty");
-  t.querySelectorAll(".wl-item").forEach(e => e.remove()), e.length ? (n.style.display = "none", e.forEach((e, n) => {
-    const o = document.createElement("div");
-    o.className = "wl-item", o.innerHTML = `<div class="wl-item-thumb"><img src="${e.poster||""}" alt="" onerror="this.style.display='none'"></div><div class="wl-item-info"><div class="wl-item-name">${_esc(e.name)}</div><div class="wl-item-meta">${"series"===e.type?"Serial":"Film"}</div></div><div class="wl-item-actions"><button class="wl-search-btn">Otevřít</button><button class="wl-remove-btn">✕</button></div>`, o.querySelector(".wl-search-btn").onclick = () => openFavoriteItem(e), o.querySelector(".wl-remove-btn").onclick = () => {
-      const e = getWatchlist();
-      e.splice(n, 1), saveWatchlistData(e), renderWatchlist()
-    }, t.appendChild(o)
-  })) : n.style.display = "block"
+window._wlFilter = "all";
+window._wlQuery = "";
+
+function wlSetFilter(f) {
+  window._wlFilter = f, renderWatchlist()
 }
 
-// Tlačítko "Otevřít" v Oblíbených — dřív jen hledalo název na externím webu.
-// Teď otevře rovnou přehrávač (film) nebo výběr série/epizody (seriál).
+function wlSearch(v) {
+  window._wlQuery = (v || "").trim().toLowerCase(), renderWatchlist()
+}
+
+function renderWatchlist() {
+  const all = getWatchlist(),
+    list = document.getElementById("watchlistList"),
+    empty = document.getElementById("watchlistEmpty"),
+    count = document.getElementById("wlCount"),
+    tools = document.getElementById("wlTools"),
+    f = window._wlFilter || "all",
+    q = window._wlQuery || "";
+  if (!list || !empty) return;
+  list.querySelectorAll(".wl-card, .wl-noresult").forEach(x => x.remove());
+  const nSeries = all.filter(x => "series" === x.type).length,
+    nMovie = all.length - nSeries;
+  if (count && (count.textContent = all.length ? all.length + (1 === all.length ? " položka" : all.length < 5 ? " položky" : " položek") : ""), tools) {
+    tools.style.display = all.length ? "" : "none";
+    const set = (id, txt, n) => {
+      const b = document.getElementById(id);
+      b && (b.textContent = txt + " · " + n, b.classList.toggle("active", b.dataset.f === f))
+    };
+    set("wlTabAll", "Vše", all.length), set("wlTabMovie", "Filmy", nMovie), set("wlTabSeries", "Seriály", nSeries)
+  }
+  if (!all.length) return void(empty.style.display = "flex");
+  empty.style.display = "none";
+  const shown = [];
+  all.forEach((item, idx) => {
+    "all" !== f && ("series" === f ? "series" !== item.type : "series" === item.type) || q && !(item.name || "").toLowerCase().includes(q) || shown.push({
+      item,
+      idx
+    })
+  });
+  if (!shown.length) {
+    const n = document.createElement("div");
+    return n.className = "wl-noresult", n.textContent = "Nic nenalezeno. Zkus jiný filtr nebo hledání.", void list.appendChild(n)
+  }
+  shown.forEach(({
+    item,
+    idx
+  }) => {
+    const c = document.createElement("div"),
+      isSeries = "series" === item.type;
+    c.className = "wl-card", c.tabIndex = 0, c.setAttribute("role", "button"), c.setAttribute("aria-label", "Otevřít " + (item.name || "")), c.innerHTML = `<div class="wl-card-poster">${item.poster?`<img src="${_esc(item.poster)}" alt="" loading="lazy" onerror="this.remove()">`:""}<div class="wl-card-fallback">${isSeries?"📺":"🎬"}</div><span class="wl-card-badge">${isSeries?"Seriál":"Film"}</span><button type="button" class="wl-card-remove" title="Odebrat z Oblíbených" aria-label="Odebrat z Oblíbených">✕</button><div class="wl-card-play">▶</div></div><div class="wl-card-name">${_esc(item.name)}</div>`;
+    const open = () => openFavoriteItem(item);
+    c.onclick = e => {
+      e.target.closest(".wl-card-remove") || open()
+    }, c.onkeydown = e => {
+      "Enter" !== e.key && " " !== e.key || (e.preventDefault(), open())
+    }, c.querySelector(".wl-card-remove").onclick = e => {
+      e.stopPropagation();
+      const cur = getWatchlist(),
+        k = cur.findIndex(x => x.slug === item.slug);
+      k >= 0 && (cur.splice(k, 1), saveWatchlistData(cur), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), renderWatchlist())
+    }, list.appendChild(c)
+  })
+}
+
 function openFavoriteItem(e) {
   try { closeWatchlist() } catch (err) {}
   setTimeout(() => {
@@ -2029,21 +1947,6 @@ function submitRating(e) {
 document.getElementById("watchlistOverlay").addEventListener("click", e => {
   e.target === document.getElementById("watchlistOverlay") && closeWatchlist()
 });
-
-function importHistory(e) {
-  const t = e.target.files[0];
-  if (!t) return;
-  const n = new FileReader;
-  n.onload = e => {
-    try {
-      localStorage.setItem(uKey("mf_watched"), JSON.stringify(JSON.parse(e.target.result))), showAutosave("saved"), Object.keys(db).forEach(e => {
-        updateTileProgress(e), updateContinueBadge(e)
-      }), updateContinueWidget(), activeSeries && (renderEpisodes(), updatePanelProgress()), showToast("✓ Zaloha nactena!")
-    } catch {
-      showToast("⚠ Chybny soubor")
-    }
-  }, n.readAsText(t)
-}
 
 let _bgParticlesPaused = !1,
   _bgParticlesRaf = null;
@@ -2170,43 +2073,6 @@ function playOpen() {
   })
 }
 
-function playSuccess() {
-  const e = getAudioCtx();
-  if (!e) return;
-  const t = e.currentTime;
-  _apTone(1046.5, t, .065, .03, {
-    attack: .003
-  }), _apTone(1318.5, t + .075, .06, .026, {
-    attack: .003
-  }), _apTone(1567.98, t + .14, .08, .022, {
-    attack: .003
-  })
-}
-
-function playClose() {
-  const e = getAudioCtx();
-  if (!e) return;
-  const t = e.currentTime;
-  _apTone(987.77, t, .06, .025, {
-    attack: .003
-  }), _apTone(783.99, t + .055, .05, .018, {
-    attack: .003
-  })
-}
-
-function playError() {
-  const e = getAudioCtx();
-  if (!e) return;
-  const t = e.currentTime;
-  _apTone(220, t, .08, .035, {
-    type: "triangle",
-    attack: .005
-  }), _apTone(196, t + .1, .07, .028, {
-    type: "triangle",
-    attack: .005
-  })
-}
-
 const SERIES_COLORS = {
   "the-simpsons": "255,185,0",
   "family-guy": "40,80,255",
@@ -2278,7 +2144,6 @@ function initUniversalHover(e) {
   }), e.addEventListener("mouseleave", () => {
     "mainMenu" === e.parentElement.id && t.classList.remove("focus-mode"), e.classList.remove("focused"), clearAdaptiveColor(), e._trailerTimer && clearTimeout(e._trailerTimer), removeTileTrailer(e)
   });
-  // Klik na tile → vždy rovnou do cinema mode / finder (ne jen při trailerech)
   e.addEventListener("click", function(ev) {
     if (!i || i === "__search__" || i === "__foryou__") return;
     const _gEl = document.getElementById("mfProfileGate");
@@ -2433,7 +2298,7 @@ function initMagnetic(e, t = .35) {
     e.style.transform = ""
   }))
 }
-let _popularType = "tv";
+
 async function loadTrending() {
   loadPopular("tv")
 }
@@ -2452,23 +2317,6 @@ async function loadPopular(e) {
     }), t?.classList.add("visible")
   } catch (e) {}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 class AIBrain {
   constructor() {
@@ -2557,8 +2405,6 @@ class AIBrain {
   recordTmdbSeen(e) {
     e && (this.memory.watchedTmdbIds[e] = !0), this.save()
   }
-  // Volá se při ProfileGate.activateProfile() — preference postupně
-  // vyprchávají, když profil delší dobu nikdo nepoužívá.
   applyDecay() {
     const e = Date.now(),
       t = (e - (this.memory.lastActive || e)) / 864e5,
@@ -2580,25 +2426,6 @@ class AIBrain {
 }
 const aiBrain = new AIBrain;
 
-
-
-
-
-
-
-
-
-
-function linkifyFilms(e) {
-  return e.replace(/\b([A-ZÁÉÍÓÚŮŽŠŘČĎŤŇĚ][a-záéíóúůžšřčďťňěA-ZÁÉÍÓÚŮŽŠŘČĎŤŇĚ\s\-:]{3,40})\b/g, e => {
-    if (["Ahoj", "Dobry", "Jsem", "Tvoj", "Tenhle", "Tato", "Tento", "Tohle", "Pokud", "Mohu", "Chces", "Zkus"].some(t => e.startsWith(t))) return e;
-    encodeURIComponent(e.trim());
-    return `<a class="ai-film-link" onclick="event.stopPropagation();window.open('https://svetserialu.to/serial/${slugifySvet(e.trim())}','_blank','noopener')">${e}</a>`
-  })
-}
-
-
-
 function openApikeyOverlay() {
   const e = document.getElementById("aiApikeyOverlay");
   e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible")));
@@ -2613,10 +2440,6 @@ function openApikeyOverlay() {
   const a = localStorage.getItem("mf_tavily_key");
   a && (document.getElementById("aiTavilyKeyInput").value = a)
 }
-
-
-
-
 
 function closeApikeyOverlay() {
   const e = document.getElementById("aiApikeyOverlay");
@@ -2634,14 +2457,6 @@ function switchKeyTab(e, t) {
     trakt: "keyPanelTrakt"
   } [e] || "keyPanelGemini")?.classList.add("active")
 }
-
-
-
-
-
-
-
-
 
 function saveGeminiKey() {
   const e = document.getElementById("aiGeminiKeyInput").value.trim();
@@ -2667,234 +2482,6 @@ function saveTavilyKey() {
   const e = document.getElementById("aiTavilyKeyInput").value.trim();
   e && (localStorage.setItem("mf_tavily_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_tavily_key", e), closeApikeyOverlay(), showToast("🌐 Tavily aktivován! Záložní vyhledávač odkazů."))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function autoResizeInput(e) {
-  e.style.height = "", e.style.height = Math.min(e.scrollHeight, 140) + "px"
-}
-
-
-
-
-
-
-let _tfPipeline = null,
-  _tfLoading = !1,
-  _tfReady = !1;
-async function initTransformers() {}
-
-function quickMoodDetect(e) {
-  const t = e.toLowerCase(),
-    n = [{
-      k: ["komedi", "vtip", "smích", "smich", "humor", "legra", "sranda", "depk", "nud"],
-      r: {
-        mood: "light",
-        ml: "😄 Komedie"
-      }
-    }, {
-      k: ["akci", "akce", "výbuch", "bojov", "superhrdinu", "napínavý"],
-      r: {
-        mood: "action",
-        ml: "💥 Akce"
-      }
-    }, {
-      k: ["drama", "dojemn", "pláč", "plac", "smutný", "emoci"],
-      r: {
-        mood: "deep",
-        ml: "🎭 Drama"
-      }
-    }, {
-      k: ["horor", "děsiv", "strach", "zombie", "upír", "upir"],
-      r: {
-        mood: "dark",
-        ml: "👻 Horor"
-      }
-    }, {
-      k: ["sci-fi", "scifi", "vesmír", "robot", "budoucnost"],
-      r: {
-        mood: "wonder",
-        ml: "🚀 Sci-Fi"
-      }
-    }, {
-      k: ["romantick", "lásk", "lask", "romance", "zamilovan"],
-      r: {
-        mood: "warm",
-        ml: "❤️ Romantika"
-      }
-    }, {
-      k: ["fantasy", "pohádku", "pohadku", "drak", "magie"],
-      r: {
-        mood: "wonder",
-        ml: "🧙 Fantasy"
-      }
-    }, {
-      k: ["krimi", "detektiv", "vražd", "vrazd", "mystery"],
-      r: {
-        mood: "mystery",
-        ml: "🔍 Krimi"
-      }
-    }, {
-      k: ["animovan", "anime", "kreslen"],
-      r: {
-        mood: "fun",
-        ml: "🎨 Animák"
-      }
-    }];
-  for (const e of n)
-    if (e.k.some(e => t.includes(e))) return {
-      mood: e.r.mood,
-      moodLabel: e.r.ml
-    };
-  return null
-}
-async function analyzeUserMood(e) {
-  const t = quickMoodDetect(e);
-  if (t) return t;
-  if (!_tfReady || !_tfPipeline) return null;
-  try {
-    const t = ["komedie humor", "akce", "drama", "horor", "sci-fi", "romantika", "fantasy", "krimi"],
-      n = await _tfPipeline(e, t, {
-        multi_label: !1
-      });
-    if (n.scores[0] < .4) return null;
-    const o = {
-      "komedie humor": "😄 Komedie",
-      akce: "💥 Akce",
-      drama: "🎭 Drama",
-      horor: "👻 Horor",
-      "sci-fi": "🚀 Sci-Fi",
-      romantika: "❤️ Romantika",
-      fantasy: "🧙 Fantasy",
-      krimi: "🔍 Krimi"
-    };
-    return {
-      mood: n.labels[0],
-      moodLabel: o[n.labels[0]] || n.labels[0]
-    }
-  } catch {
-    return null
-  }
-}
-
-function showMoodBadge(e) {
-  let t = document.getElementById("aiMoodBadge");
-  if (!t) {
-    t = document.createElement("div"), t.id = "aiMoodBadge", t.style.cssText = "display:inline-flex;align-items:center;gap:5px;background:rgba(0,122,255,0.1);border:1px solid rgba(0,122,255,0.3);border-radius:20px;padding:3px 10px;font-size:0.62rem;font-weight:700;color:var(--accent);margin:0 0 6px 0;transition:opacity 0.3s;";
-    const e = document.getElementById("aiInput");
-    e && e.parentElement && e.parentElement.insertBefore(t, e)
-  }
-  t.style.opacity = e ? "1" : "0", e && (t.textContent = "✦ Nálada: " + e)
-}
-const _groqCache = new Map;
-async function groqCleanSlug(e, t) {
-  const n = getGroqKey();
-  if (!n) return null;
-  const o = e + "|" + t;
-  if (_groqCache.has(o)) return _groqCache.get(o);
-  try {
-    const i = "movie" === t ? "bombuj.si format /online-film-{slug}" : "svetserialu.to format /serial/{slug}",
-      a = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + n
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          max_tokens: 40,
-          temperature: 0,
-          messages: [{
-            role: "user",
-            content: "URL slug for " + i + '. Title: "' + e + '". Rules: lowercase hyphens no accents no year. Reply ONLY the slug.'
-          }]
-        })
-      });
-    if (!a.ok) return null;
-    const s = await a.json(),
-      r = (s?.choices?.[0]?.message?.content || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/^-+|-+$/g, "");
-    return r && _groqCache.set(o, r), r || null
-  } catch {
-    return null
-  }
-}
-async function jinaVerifyUrl(e) {
-  try {
-    const t = getJinaKey(),
-      n = {
-        Accept: "text/plain"
-      };
-    t && "__enabled__" !== t && t.length > 10 && (n.Authorization = "Bearer " + t);
-    const o = await fetch("https://r.jina.ai/" + e, {
-      headers: n
-    });
-    if (!o.ok) return !1;
-    const i = await o.text();
-    if (i.length < 200) return !1;
-    const a = i.toLowerCase();
-    return !["404", "nenalezeno", "not found", "neexistuje", "page not found"].some(e => a.includes(e))
-  } catch {
-    return !1
-  }
-}
-async function tavilyFindUrl(e, t) {
-  const n = getTavilyKey();
-  if (!n) return null;
-  try {
-    const o = "movie" === t ? "bombuj.si" : "svetserialu.to",
-      i = await fetch("https://api.tavily.com/search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          api_key: n,
-          query: e + " " + ("movie" === t ? "film" : "serial") + " " + o,
-          max_results: 5,
-          include_domains: [o]
-        })
-      });
-    if (!i.ok) return null;
-    const a = await i.json(),
-      s = (a?.results || []).find(e => e.url && e.url.includes(o));
-    return s?.url || null
-  } catch {
-    return null
-  }
-}
-let _pTimer = null;
-
-function showPipelineProgress(e, t) {
-  let n = document.getElementById("mf-prog");
-  n || (n = document.createElement("div"), n.id = "mf-prog", n.style.cssText = "position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:99999;background:rgba(6,6,8,0.97);font-family:'Outfit',sans-serif;font-size:0.72rem;padding:8px 18px;border-radius:40px;border:1px solid rgba(0,122,255,0.2);backdrop-filter:blur(20px);white-space:nowrap;pointer-events:none;transition:opacity 0.3s;", document.body.appendChild(n)), n.innerHTML = e.map((e, n) => n < t ? '<span style="color:rgba(100,255,100,0.8)">✓ ' + e + "</span>" : n === t ? '<span style="color:var(--accent)">' + e + " ●</span>" : '<span style="opacity:0.3">' + e + "</span>").join(" → "), n.style.opacity = "1", clearTimeout(_pTimer)
-}
-
-function hidePipelineProgress() {
-  const e = document.getElementById("mf-prog");
-  e && (e.style.opacity = "0")
-}
-const _urlCache2 = new Map;
 
 function showFinderModal(e, t, n) {
   let o = document.getElementById("mfFinderModal");
@@ -2927,14 +2514,6 @@ let _finderCountdownTimer = null;
 
 function _cancelFinderCountdown() {
   _finderCountdownTimer && (clearInterval(_finderCountdownTimer), _finderCountdownTimer = null)
-}
-
-function _startFinderCountdown(e, t, n, o) {
-  _cancelFinderCountdown();
-  let i = o;
-  t.textContent = i, n && (n.style.width = "100%"), _finderCountdownTimer = setInterval(() => {
-    i--, t.textContent = i, n && (n.style.width = i / o * 100 + "%"), i <= 0 && (_cancelFinderCountdown(), closeFinderModal(), window.open(e, "_blank", "noopener"))
-  }, 1e3)
 }
 
 function showFinderResults(e, t, n) {
@@ -3057,14 +2636,6 @@ function _slugify(e) {
     "Ž": "z"
   };
   return e.split("").map(e => t[e] || e).join("").toLowerCase().replace(/&/g, "and").replace(/'/g, "").replace(/:/g, "").replace(/\.+/g, "").replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "")
-}
-
-function _svetSlugVariants(e, t) {
-  const n = e || _slugify(t || ""),
-    o = [n];
-  n.startsWith("the-") ? o.push(n.slice(4)) : t && t.toLowerCase().startsWith("the ") && o.push("the-" + n), o.push(n.replace(/-\d{4}$/, ""));
-  const i = n.replace(/-+/g, "-");
-  return i !== n && o.push(i), [...new Set(o)].filter(Boolean)
 }
 
 function _buildCandidateUrls(e, t, n) {
@@ -3551,23 +3122,6 @@ function setKbEpFocus(e) {
   }))
 }
 
-function applyKbTilt(e) {
-  if (!e) return;
-  const t = e.querySelector(".ps-tile"),
-    n = e.querySelector(".tile-glare"),
-    o = e.querySelector(".tile-bg"),
-    i = e.querySelector(".tile-logo");
-  t && (t.style.transition = "transform 0.4s cubic-bezier(0.34,1.2,0.64,1),box-shadow 0.4s ease,filter 0.4s ease", t.style.transform = "perspective(900px) rotateX(-4deg) rotateY(0deg) scale(1.06) translateY(-10px)", t.style.filter = "brightness(1.1) saturate(1.2)", t.style.boxShadow = "0 0 0 2.5px var(--accent),0 32px 64px rgba(0,0,0,0.85),0 0 40px rgba(0,122,255,0.18)", n && (n.style.transition = "opacity 0.4s ease", n.style.opacity = "1", n.style.background = "radial-gradient(ellipse 80% 60% at 50% 25%,rgba(255,255,255,0.13) 0%,transparent 65%)"), o && (o.style.transition = "transform 0.4s cubic-bezier(0.25,0.8,0.25,1)", o.style.transform = "scale(1.06)"), i && (i.style.transition = "transform 0.35s cubic-bezier(0.34,1.2,0.64,1)", i.style.transform = "translateX(-50%) scale(1.05) translateY(-3px)"))
-}
-
-function clearKbTilt(e) {
-  if (!e) return;
-  const t = e.querySelector(".ps-tile"),
-    n = e.querySelector(".tile-glare"),
-    o = e.querySelector(".tile-bg"),
-    i = e.querySelector(".tile-logo");
-  e.matches(":hover") || (t && (t.style.transform = "", t.style.filter = "", t.style.boxShadow = ""), n && (n.style.opacity = ""), o && (o.style.transform = ""), i && (i.style.transform = ""))
-}
 document.addEventListener("keydown", e => {
   if ("INPUT" !== e.target.tagName && "TEXTAREA" !== e.target.tagName) {
     if ("Escape" === e.key) {
@@ -3671,42 +3225,10 @@ function showEpisodeProgressDialog(e, t, n, o) {
     e.target === s && s.remove()
   }), document.body.appendChild(s)
 }
-const GENRE_LABELS = {
-  komedie: "😄 Komedie",
-  drama: "🎭 Drama",
-  akcni: "💥 Akce",
-  "sci-fi": "🚀 Sci-Fi",
-  horor: "👻 Horor",
-  fantasy: "🧙 Fantasy",
-  krimi: "🔍 Krimi",
-  animovany: "🎨 Animák",
-  dobrodruzny: "⚔️ Dobrodružství",
-  rodinny: "👨‍👩‍👧 Rodinné",
-  napinavy: "🔪 Thrillery"
-};
-
-function openGenreEditor() {
-  const e = document.getElementById("genreEditorOverlay");
-  e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible"))), renderGenreSliders(), pauseBgParticles()
-}
 
 function closeGenreEditor() {
   const e = document.getElementById("genreEditorOverlay");
   e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 280), resumeBgParticles()
-}
-
-function renderGenreSliders() {
-  const e = document.getElementById("genreSliders");
-  if (!e) return;
-  const t = aiBrain.memory.genrePreferences || {},
-    n = {
-      ...Object.fromEntries(Object.keys(GENRE_LABELS).map(e => [e, 0])),
-      ...t
-    };
-  e.innerHTML = Object.entries(n).map(([e, t]) => {
-    const n = Math.round(100 * t);
-    return `<div class="genre-slider-row">\n          <div class="genre-slider-label">\n            <span class="genre-slider-name">${GENRE_LABELS[e]||e}</span>\n            <span class="genre-slider-pct" id="gpct-${e}">${n}%</span>\n          </div>\n          <input type="range" class="genre-slider" data-key="${e}" min="0" max="100" value="${n}" step="5"\n            oninput="document.getElementById('gpct-${e}').textContent=this.value+'%'">\n        </div>`
-  }).join("")
 }
 
 function saveGenrePrefs() {
@@ -3716,12 +3238,8 @@ function saveGenrePrefs() {
     0 === n ? delete aiBrain.memory.genrePreferences[t] : aiBrain.memory.genrePreferences[t] = n
   }), aiBrain.save(), closeGenreEditor(), showToast("✦ AI preference uloženy!")
 }
-let _notifData = [];
+
 async function checkNewEpisodes() {
-  // Epizody odstraněny — panel používá pouze changelog (notifications-changelog.js)
-}
-function renderNotifPanel() {
-  // Epizody odstraněny — panel renderuje notifications-changelog.js
 }
 
 function openNotifPanel() {
@@ -3742,7 +3260,6 @@ function _notifOutsideClick(e) {
     n = document.getElementById("notifBell");
   !t || t.contains(e.target) || n.contains(e.target) || closeNotifPanel()
 }
-
 
 function buildEpCard(e, t, n, o, i, a, s) {
   const r = _buildEpCardBase(e, t, n, o, i, a, s),
@@ -3785,20 +3302,6 @@ function buildEpCard(e, t, n, o, i, a, s) {
   return r
 }
 
-function setMood(e, t) {
-  document.querySelectorAll(".uni-mood-chip").forEach(e => e.classList.remove("active")), e.classList.add("active")
-}
-
-function setSectionTab(e, t) {
-  document.querySelectorAll(".uni-section-tab").forEach(e => e.classList.remove("active")), e.classList.add("active");
-  const n = document.getElementById("uniSectionLabel");
-  n && (n.textContent = {
-    trending: "🔥 Právě letí",
-    toprated: "⭐ Nejlépe hodnocené",
-    new: "🆕 Nové přírůstky",
-    top10: "🏆 Top 10 CZ"
-  } [t] || "🔥 Právě letí")
-}
 window.addEventListener("load", () => {
   if (Object.keys(db).forEach(e => {
       updateTileProgress(e), updateContinueBadge(e)
@@ -3881,41 +3384,6 @@ window.addEventListener("load", () => {
   })
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const SW_CODE = "\nconst CACHE = 'mujflix-v1';\nconst PRECACHE = [];\n\nself.addEventListener('install', e => { self.skipWaiting(); });\nself.addEventListener('activate', e => { e.waitUntil(clients.claim()); });\n\n// Push notifikace\nself.addEventListener('push', e => {\n  const data = e.data ? e.data.json() : {};\n  const title = data.title || 'MůjFlix';\n  const options = {\n    body: data.body || 'Nová epizoda čeká!',\n    icon: data.icon || '',\n    badge: data.badge || '',\n    tag: data.tag || 'mujflix-notif',\n    data: { url: data.url || './' },\n    vibrate: [200, 100, 200],\n    requireInteraction: false,\n  };\n  e.waitUntil(self.registration.showNotification(title, options));\n});\n\n// Klik na notifikaci → otevři MůjFlix\nself.addEventListener('notificationclick', e => {\n  e.notification.close();\n  const target = e.notification.data?.url || './';\n  e.waitUntil(\n    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cls => {\n      for (const c of cls) {\n        if (c.url.includes(self.location.origin) && 'focus' in c) return c.focus();\n      }\n      if (clients.openWindow) return clients.openWindow(target);\n    })\n  );\n});\n";
 async function initPWA() {
   if ("serviceWorker" in navigator) try {
     let e = await navigator.serviceWorker.getRegistration("./");
@@ -3972,21 +3440,7 @@ function updatePwaBtn(e) {
     i = o[e] || o.default;
   n.textContent = i.text, t.style.color = i.color, t.style.background = i.bg, t.style.border = `1px solid ${i.border}`, t.firstChild.textContent = i.icon + " ", t.disabled = "granted" === e || "denied" === e || "error" === e || "unsupported" === e
 }
-async function requestPushPermission() {
-  if (!("Notification" in window)) return void showToast("⚠ Prohlížeč notifikace nepodporuje");
-  if ("denied" === Notification.permission) return void showToast("🚫 Notifikace jsou blokovány — odblokuj je v nastavení prohlížeče");
-  const e = await Notification.requestPermission();
-  "granted" === e ? (updatePwaBtn("granted"), showToast("✅ Notifikace povoleny! MůjFlix tě upozorní na nové epizody."), setTimeout(() => {
-    window._swReg ? window._swReg.showNotification("MůjFlix 🎬", {
-      body: "Notifikace fungují! Budeme tě informovat o nových epizodách.",
-      tag: "mujflix-test",
-      icon: "",
-      vibrate: [200, 100, 200]
-    }) : new Notification("MůjFlix 🎬", {
-      body: "Notifikace fungují!"
-    })
-  }, 800)) : "denied" === e && (updatePwaBtn("denied"), showToast("🚫 Notifikace blokovány — povol je v nastavení prohlížeče"))
-}
+
 window.mfNotify = function(e, t, n) {
   if ("granted" !== Notification.permission) return;
   const o = {
@@ -4065,25 +3519,11 @@ function uKey(e) {
   return t ? e + "_" + t : e
 }
 
-function getActiveUser() {
-  return getActiveProfile()
-}
-
-function getActiveUserId() {
-  return getActiveProfileId()
-}
-
 function setActiveUser(e) {
   localStorage.setItem(ACTIVE_PID_KEY, e), ProfileGate.renderBadge(), _applyProfileAccent()
 }
 
-// ══════════════════════════════════════════════════════════════════
-// ČESKÉ SKLOŇOVÁNÍ JMEN — 5. pád (vokativ) pro oslovení "Ahoj, ...!"
-// Nejdřív zkusí slovník nejběžnějších českých jmen, pak spadne na
-// obecná heuristická pravidla podle poslední hlásky jména.
-// ══════════════════════════════════════════════════════════════════
 const CZ_VOCATIVE_DICT = {
-  // Mužská jména
   "jan": "Jene", "honza": "Honzo", "jiří": "Jiří", "petr": "Petře", "pavel": "Pavle",
   "josef": "Josefe", "pepa": "Pepo", "jaroslav": "Jaroslave", "martin": "Martine",
   "tomáš": "Tomáši", "miroslav": "Miroslave", "františek": "Františku", "zdeněk": "Zdeňku",
@@ -4103,7 +3543,6 @@ const CZ_VOCATIVE_DICT = {
   "sebastián": "Sebastiáne", "matouš": "Matouši", "šťěpán": "Štěpáne", "štěpán": "Štěpáne",
   "vašek": "Vašku", "jindřich": "Jindřichu", "bedřich": "Bedřichu", "oskar": "Oskare",
   "leoš": "Leoši", "miloš": "Miloši", "luboš": "Luboši", "aleš": "Aleši",
-  // Ženská jména
   "jana": "Jano", "marie": "Marie", "eva": "Evo", "hana": "Hano", "anna": "Anno",
   "věra": "Věro", "petra": "Petro", "lenka": "Lenko", "lucie": "Lucie",
   "kateřina": "Kateřino", "káťa": "Káťo", "kristýna": "Kristýno", "barbora": "Barboro",
@@ -4129,12 +3568,10 @@ function czechVocative(name) {
     const key = trimmed.toLowerCase();
     if (CZ_VOCATIVE_DICT[key]) return CZ_VOCATIVE_DICT[key];
 
-    // Obecná heuristika, když jméno není ve slovníku
     const lower = trimmed.toLowerCase();
     const base = trimmed.slice(0, -1);
 
     if (/[aeiouyáéíóúůý]$/i.test(trimmed) === false) {
-      // Jméno končí na souhlásku → mužské skloňování
       if (lower.endsWith("ch")) return trimmed + "u";
       const last = lower.slice(-1);
       if ("khg".includes(last)) return trimmed + "u";
@@ -4144,87 +3581,15 @@ function czechVocative(name) {
         const isVowel = /[aeiouyáéíóúůý]/.test(before);
         return isVowel ? trimmed + "e" : trimmed.slice(0, -1) + "ře";
       }
-      // d, t, n, b, p, v, f, m, s, z, l a ostatní → +e
       return trimmed + "e";
     }
     if (lower.endsWith("a")) return base + "o";
-    // jména končící na e/ie/o/í/y zůstávají ve vokativu stejná
     return trimmed;
   } catch (e) {
     return name;
   }
 }
 window.czechVocative = czechVocative;
-
-function createUser(e, t) {
-  return ProfileGate.createProfile({
-    name: e,
-    avatar: t || "🎬",
-    color: PROFILE_COLORS[0]
-  })
-}
-
-function updateUser(e, t) {
-  const n = _getProfiles(),
-    o = n.findIndex(t => t.id === e);
-  o < 0 || (n[o] = {
-    ...n[o],
-    ...t
-  }, _saveProfiles(n))
-}
-
-function updateUserPrefs(e, t) {
-  const n = _getProfiles(),
-    o = n.findIndex(t => t.id === e);
-  o < 0 || (n[o].prefs || (n[o].prefs = {}), n[o].prefs = {
-    ...n[o].prefs,
-    ...t
-  }, _saveProfiles(n))
-}
-
-function updateUserFeature(e, t, n) {
-  const o = _getProfiles(),
-    i = o.findIndex(t => t.id === e);
-  i < 0 || (o[i].prefs || (o[i].prefs = {}), o[i].prefs.features || (o[i].prefs.features = {}), o[i].prefs.features[t] = n, _saveProfiles(o), _applyProfileAccent())
-}
-
-function addToUserHistory(e) {
-  const t = getActiveProfileId();
-  if (!t) return;
-  const n = _getProfiles(),
-    o = n.findIndex(e => e.id === t);
-  if (o < 0) return;
-  const i = {
-    id: e.id,
-    type: e.media_type || "movie",
-    name: e.title || e.name || "",
-    genres: e.genre_ids || [],
-    rating: e.vote_average || 0,
-    ts: Date.now()
-  };
-  n[o].history || (n[o].history = []), n[o].history = [i, ...n[o].history.filter(t => t.id !== e.id)].slice(0, 200);
-  const a = {};
-  n[o].history.forEach(e => (e.genres || []).forEach(e => {
-    a[e] = (a[e] || 0) + 1
-  })), n[o].likedGenres = Object.entries(a).sort((e, t) => t[1] - e[1]).slice(0, 5).map(e => +e[0]), getActiveProfileId() === t && void 0 !== aiBrain && aiBrain.boostGenreIds(i.genres || [], .04), _saveProfiles(n)
-}
-
-function deleteUser(e) {
-  if (!confirm("Smazat profil?")) return;
-  const t = _getProfiles().filter(t => t.id !== e);
-  _saveProfiles(t), getActiveProfileId() === e && (t.length ? setActiveUser(t[0].id) : localStorage.removeItem(ACTIVE_PID_KEY)), ProfileGate.renderBadge(), getActiveProfileId() || ProfileGate.show()
-}
-
-function _getUserDB() {
-  const e = {};
-  return _getProfiles().forEach(t => {
-    e[t.id] = t
-  }), e
-}
-
-function _saveUserDB(e) {
-  _saveProfiles(Object.values(e))
-}
 
 function _applyProfileAccent() {
   const e = getActiveProfile(),
@@ -4244,80 +3609,6 @@ function _applyProfileAccent() {
     o.style.background = `\n          radial-gradient(ellipse 70% 55% at 15% 15%, rgba(${e},${n},${i},0.07) 0%, transparent 65%),\n          radial-gradient(ellipse 55% 65% at 85% 85%, rgba(60,80,255,0.05) 0%, transparent 65%),\n          radial-gradient(ellipse 40% 40% at 50% 100%, rgba(${e},${n},${i},0.03) 0%, transparent 70%)`
   }
 }
-
-async function _userAwareFetch(e) {
-  const t = getActiveProfile(),
-    n = t?.likedGenres || [],
-    o = t?.prefs?.contentPref || e || "all",
-    i = t?.prefs?.algo || {
-      trending: .4,
-      topRated: .3,
-      watchlistBased: .3
-    },
-    a = Math.floor(6 * Math.random()) + 1;
-  let s = [];
-  try {
-    if (n.length && Math.random() < 1.2 * (i.watchlistBased + i.topRated)) {
-      const e = n.slice(0, 3).join(",");
-      if ("tv" !== o) {
-        const t = await tmdbGet(`/discover/movie?with_genres=${e}&sort_by=vote_average.desc&vote_count.gte=200&page=${a}`);
-        (t?.results || []).filter(e => e.poster_path).forEach(e => s.push({
-          ...e,
-          media_type: "movie",
-          _personalised: !0
-        }))
-      }
-      if ("movie" !== o) {
-        const t = await tmdbGet(`/discover/tv?with_genres=${e}&sort_by=vote_average.desc&vote_count.gte=100&page=${a}`);
-        (t?.results || []).filter(e => e.poster_path).forEach(e => s.push({
-          ...e,
-          media_type: "tv",
-          _personalised: !0
-        }))
-      }
-    }
-    if (Math.random() < i.trending) {
-      const e = await tmdbGet(`/trending/${"movie"===o?"movie":"tv"===o?"tv":"all"}/week?language=cs&page=${a}`);
-      (e?.results || []).filter(e => e.poster_path && ("movie" === e.media_type || "tv" === e.media_type)).forEach(e => s.push(e))
-    }
-    if (Math.random() < i.topRated) {
-      if ("tv" !== o) {
-        const e = await tmdbGet(`/movie/top_rated?language=cs&page=${a}`);
-        (e?.results || []).filter(e => e.poster_path).forEach(e => s.push({
-          ...e,
-          media_type: "movie"
-        }))
-      }
-      if ("movie" !== o) {
-        const e = await tmdbGet(`/tv/top_rated?language=cs&page=${a}`);
-        (e?.results || []).filter(e => e.poster_path).forEach(e => s.push({
-          ...e,
-          media_type: "tv"
-        }))
-      }
-    }
-  } catch (e) {}
-  return s
-}
-
-function _saveAlgoWeight(e, t) {
-  const n = getActiveProfileId();
-  if (!n) return;
-  const o = _getProfiles(),
-    i = o.findIndex(e => e.id === n);
-  i < 0 || (o[i].prefs || (o[i].prefs = {}), o[i].prefs.algo || (o[i].prefs.algo = {}), o[i].prefs.algo[e] = +t, _saveProfiles(o))
-}
-
-function _saveContentPref(e, t) {
-  const n = getActiveProfileId();
-  n && (updateUserPrefs(n, {
-    contentPref: e
-  }), t.closest("div").querySelectorAll("button").forEach(t => {
-    const n = t.dataset.pref === e;
-    t.style.borderColor = n ? "rgba(200,164,0,0.5)" : "rgba(255,255,255,0.1)", t.style.background = n ? "rgba(200,164,0,0.12)" : "rgba(255,255,255,0.03)", t.style.color = n ? "#c8a400" : "rgba(255,255,255,0.5)"
-  }))
-}
-
 
 const ProfileGate = {
   _pinBuffer: "",
@@ -4389,13 +3680,11 @@ const ProfileGate = {
     }, item ? 220 : 0);
   },
   selectProfile(e) {
-    // OPRAVA: robustní select — loguje proč případně selhalo
     try {
       const profiles = _getProfiles();
       const t = profiles.find(t => t.id === e);
       if (!t) {
         console.warn('[ProfileGate] selectProfile: profil nenalezen, id=', e, 'dostupné:', profiles.map(p=>p.id));
-        // Fallback: pokud existuje aspoň jeden profil, vezmi první
         if (profiles.length > 0) {
           console.info('[ProfileGate] Fallback: aktivuji první profil');
           this.activateProfile(profiles[0].id);
@@ -4405,7 +3694,6 @@ const ProfileGate = {
       t.pin ? this.openPin(t) : this.activateProfile(t.id);
     } catch(err) {
       console.error('[ProfileGate] selectProfile chyba:', err);
-      // Nouzový fallback — zavři gate i bez profilu
       this.hide();
     }
   },
@@ -4448,7 +3736,6 @@ const ProfileGate = {
     this._editingId = e || null, this._selectedEmoji = PROFILE_EMOJIS[0], this._selectedColor = PROFILE_COLORS[0], this._selectedAvatar = PROFILE_EMOJIS[0];
     const t = document.getElementById("mfProfileCreate");
     if (!t) return;
-    // FIX: Disable pointer-events on gate so it doesn't swallow clicks on the create modal
     const _gate = document.getElementById("mfProfileGate");
     if (_gate) _gate.style.pointerEvents = "none";
     document.getElementById("pcModalTitle").textContent = e ? "Upravit profil" : "Vytvoř si svůj profil";
@@ -4470,7 +3757,6 @@ const ProfileGate = {
   closeCreate() {
     const e = document.getElementById("mfProfileCreate");
     e && e.classList.remove("show"), this._editingId = null;
-    // FIX: Restore pointer-events on gate
     const _gate = document.getElementById("mfProfileGate");
     if (_gate) _gate.style.pointerEvents = "";
   },
@@ -4666,19 +3952,7 @@ const ProfileGate = {
   }
 };
 
-// OPRAVA: const ProfileGate není automaticky na window — inline onclick="window.ProfileGate?.xyz()"
-// by jinak tiše selhalo (optional chaining skryje undefined). Explicitní přiřazení to opravuje.
 window.ProfileGate = ProfileGate;
-
-function _renderUserBadge() {
-  ProfileGate.renderBadge()
-}
-
-function openUserPanel() {
-  ProfileGate.show()
-}
-
-function closeUserPanel() {}
 
 function refreshUserContent() {
   void 0 !== db && Object.keys(db).forEach(e => {
@@ -4712,12 +3986,8 @@ function refreshUserContent() {
       e && localStorage.setItem(ACTIVE_PID_KEY, "p_" + e)
     }
   } catch (e) {}
-  // Renderuj badge (aktualizuje avatar v hlavičce)
   ProfileGate.renderBadge();
 
-  // Zobraz gate ihned po načtení DOM — vždy, bez ohledu na uložený profil.
-  // Obsah stránky je zablokovaný gate překryvem (z-index 99999).
-  // Odemkne se teprve po ProfileGate.activateProfile() → hide().
   function _showProfileGateOnLoad() {
     const gate = document.getElementById("mfProfileGate");
     if (!gate) return;
@@ -4725,8 +3995,6 @@ function refreshUserContent() {
     gate.style.opacity = "1";
     gate.classList.remove("hiding");
     ProfileGate.renderGate();
-    // Render once more after the first layout pass so profiles are visible
-    // even when storage-backed profile data finishes initializing late.
     requestAnimationFrame(() => {
       const list = document.getElementById("pgProfilesList");
       if (list && !list.children.length) ProfileGate.renderGate();
@@ -4739,7 +4007,6 @@ function refreshUserContent() {
     _showProfileGateOnLoad();
   }
 }();
-
 
 async function _checkAdminCredentials(e, t) {
   const n = (new TextEncoder).encode(e + ":" + t),
@@ -4842,17 +4109,6 @@ let _adminLoggedIn = !1,
   _adminFpsRaf = null,
   _adminFpsLast = 0,
   _adminFpsFrames = 0;
-
-function adminLogin() {
-  const e = document.getElementById("adminLoginModal");
-  if (!e) return;
-  e.style.display = "flex";
-  const t = document.getElementById("adminLoginErr");
-  t && (t.style.display = "none");
-  const n = document.getElementById("adminUser"),
-    o = document.getElementById("adminPass");
-  n && (n.value = "", setTimeout(() => n.focus(), 80)), o && (o.value = "")
-}
 
 function adminCloseLogin() {
   const e = document.getElementById("adminLoginModal");
@@ -5150,15 +4406,6 @@ function adminTestConfetti() {
   }) : "function" == typeof showToast && showToast("❌ confetti není dostupné")
 }
 
-
-
-function adminToggleDebugLegacy() {
-  const e = "1" === localStorage.getItem("mf_admin_debug");
-  localStorage.setItem("mf_admin_debug", e ? "0" : "1");
-  const t = document.getElementById("adminDebugToggleLegacy");
-  t && (t.textContent = e ? "OFF" : "ON", t.style.color = e ? "rgba(255,255,255,0.5)" : "var(--accent)"), "function" == typeof showToast && showToast("Debug: " + (e ? "vypnut" : "zapnut"))
-}
-
 function adminToggleFps() {
   _adminFpsActive = !_adminFpsActive;
   const e = document.getElementById("adminFpsToggle"),
@@ -5223,11 +4470,6 @@ let _premiereMonth = new Date,
   _premiereCache = {};
 const CZECH_MONTHS = ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
   CZECH_DAYS_SHORT = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"];
-
-function openPremiereCalendar() {
-  const e = document.getElementById("premiereOverlay");
-  e && (e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible"))), _premiereMonth = new Date, renderPremiereCalendar())
-}
 
 function closePremiereCalendar() {
   const e = document.getElementById("premiereOverlay");
@@ -5719,11 +4961,6 @@ const COLLECTIONS_DATA = [{
 }];
 let _collectionsActive = null;
 
-function openCollections() {
-  const e = document.getElementById("collectionsOverlay");
-  e && (e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible"))), collectionsShowGrid())
-}
-
 function closeCollections() {
   const e = document.getElementById("collectionsOverlay");
   e && (e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 320))
@@ -5804,16 +5041,6 @@ function collectionsPlayFilm(e, t) {
   }, 400)
 }
 
-
-
-
-
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     const e = document.getElementById("premiereFabBadge");
@@ -5847,260 +5074,6 @@ function adminOpen() {
   openAdmin()
 }
 
-function adminClose() {
-  closeAdmin()
-}
-
-function adminTab(e, t) {
-  document.querySelectorAll(".admin-nav-item").forEach(e => e.classList.remove("active")), document.querySelectorAll(".admin-panel").forEach(e => e.classList.remove("active")), e.classList.add("active"), document.getElementById("adminPanel-" + t)?.classList.add("active"), adminRefreshPanel(t)
-}
-
-function adminRefreshAll() {
-  adminRefreshPanel("stats"), adminLoadSettings()
-}
-
-function adminRefreshPanel(e) {
-  switch (e) {
-    case "stats":
-      adminRenderStats();
-      break;
-    case "content":
-      adminRenderContent();
-      break;
-    case "algo":
-      adminRenderAlgo();
-      break;
-    case "users":
-      adminRenderUsers();
-      break;
-    case "storage":
-      adminRefreshStorage();
-      break;
-    case "logs":
-      adminRefreshLogs()
-  }
-}
-
-function adminRenderStats() {
-  const e = "function" == typeof getWatched ? getWatched() : {},
-    t = Object.keys(e).length,
-    n = void 0 !== db ? Object.keys(db).length : 0,
-    o = "function" == typeof getWatchlist ? getWatchlist() : [],
-    i = safeLS(uKey?.("mf_ratings", "mf_ratings") || "{}");
-  let a;
-  try {
-    a = safeLS("function" == typeof uKey ? uKey("mf_watch_timeline") : "mf_watch_timeline", "[]")
-  } catch {
-    a = []
-  }
-  const s = ("function" == typeof _getProfiles ? _getProfiles() : []).length,
-    r = [{
-      value: n,
-      label: "Seriálů v DB",
-      sub: "sledované tituly"
-    }, {
-      value: t,
-      label: "Zhlédnutých epizod",
-      sub: "~" + (45 * t / 60).toFixed(1) + " hod odhadovaně"
-    }, {
-      value: o.length,
-      label: "Watchlist",
-      sub: "chci koukat"
-    }, {
-      value: Object.keys(i).length,
-      label: "Hodnocení",
-      sub: "loved/liked/meh"
-    }, {
-      value: a.length,
-      label: "Watch events",
-      sub: "timeline záznamy"
-    }, {
-      value: s,
-      label: "Profilů",
-      sub: "Netflix-style"
-    }],
-    l = document.getElementById("adminStatsGrid");
-  l && (l.innerHTML = r.map(e => `\n        <div class="admin-stat-card">\n          <div class="admin-stat-value">${e.value}</div>\n          <div class="admin-stat-label">${e.label}</div>\n          <div class="admin-stat-sub">${e.sub}</div>\n        </div>`).join(""));
-  const c = document.getElementById("adminSeriesTableBody");
-  c && void 0 !== db && (c.innerHTML = Object.entries(db).map(([e, t]) => {
-    const n = "function" == typeof calcProgress ? calcProgress(e) : {
-        done: 0,
-        total: t.totalEps || 0,
-        pct: 0
-      },
-      o = i[e]?.rating || "—",
-      a = "loved" === o ? "green" : "liked" === o ? "blue" : "meh" === o ? "red" : "",
-      s = n.pct >= 80 ? "#2ecc71" : n.pct >= 40 ? "#f1c40f" : "#e74c3c";
-    return `<tr>\n          <td><strong>${t.name}</strong></td>\n          <td>${n.done}/${n.total}</td>\n          <td><span style="color:${s};font-weight:700">${n.pct}%</span></td>\n          <td>${t._rating?"★ "+t._rating:"—"}</td>\n          <td>${a?`<span class="admin-badge ${a}">${o}</span>`:'<span style="color:rgba(255,255,255,0.25)">—</span>'}</td>\n        </tr>`
-  }).join("") || '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,0.3)">Žádné seriály</td></tr>');
-  const d = document.getElementById("adminGenreBars");
-  if (d && void 0 !== aiBrain) {
-    const e = aiBrain.memory?.genrePreferences || {},
-      t = Object.entries(e).sort((e, t) => t[1] - e[1]).slice(0, 10),
-      n = t[0]?.[1] || 1,
-      o = {
-        komedie: "😄 Komedie",
-        drama: "🎭 Drama",
-        akcni: "💥 Akce",
-        "sci-fi": "🚀 Sci-Fi",
-        horor: "👻 Horor",
-        fantasy: "🧙 Fantasy",
-        krimi: "🔍 Krimi",
-        animovany: "🎨 Animák",
-        napinavy: "🔪 Thriller",
-        rodinny: "👨‍👩‍👧 Rodinné"
-      },
-      i = ["#ff5050", "#ff7040", "#e8c020", "#50ff80", "#50c0ff", "#9060ff", "#ff60c0", "#60ffd0", "#ffa040", "#80ff40"];
-    d.innerHTML = t.length ? t.map(([e, t], a) => `\n        <div class="admin-algo-bar-row">\n          <div class="admin-algo-bar-label">${o[e]||e}</div>\n          <div class="admin-algo-bar-track"><div class="admin-algo-bar-fill" style="width:${Math.round(t/n*100)}%;background:${i[a%i.length]}"></div></div>\n          <div class="admin-algo-bar-val">${Math.round(100*t)}%</div>\n        </div>`).join("") : '<div style="font-size:0.65rem;color:rgba(255,255,255,0.3)">Žádná data — sleduj seriály pro AI učení</div>'
-  }
-}
-
-function adminRenderContent(e = "") {
-  const t = document.getElementById("adminSeriesGrid");
-  if (!t || void 0 === db) return;
-  const n = Object.entries(db).filter(([t, n]) => !e || n.name.toLowerCase().includes(e.toLowerCase()));
-  t.innerHTML = n.map(([e, t]) => {
-    const n = "function" == typeof calcProgress ? calcProgress(e) : {
-      pct: 0
-    };
-    return `<div class="admin-series-card">\n        <img src="${t._poster||t.poster||""}" alt="" onerror="this.style.opacity=0">\n        <div class="admin-series-card-info">\n          <div class="admin-series-card-name" title="${e}">${t.name}</div>\n          <div class="admin-series-card-meta">tmdb:${t.tmdbId||"?"} · ${t.totalEps||0} ep · ${n.pct}%</div>\n        </div>\n        <div class="admin-series-card-actions">\n          <button class="admin-series-action-btn" onclick="adminEditSeries('${e}')" title="Editovat">✏️</button>\n          <button class="admin-series-action-btn" onclick="adminRemoveSeries('${e}')" title="Odstranit">🗑</button>\n        </div>\n      </div>`
-  }).join("") || '<div style="color:rgba(255,255,255,0.3);font-size:0.72rem;padding:20px">Žádné seriály nalezeny</div>'
-}
-
-function adminFilterContent(e) {
-  adminRenderContent(e)
-}
-
-function adminEditSeries(e) {
-  if (void 0 === db || !db[e]) return;
-  const t = db[e],
-    n = prompt("Nový název:", t.name);
-  n && n.trim() && (db[e].name = n.trim(), "function" == typeof saveDb ? saveDb() : "function" == typeof autoSave && autoSave(), adminLog(`Série "${e}" přejmenována na "${n.trim()}"`, "info"), adminRenderContent(), showToast?.(`✏️ Přejmenováno: ${n.trim()}`))
-}
-
-function adminRemoveSeries(e) {
-  confirm(`Opravdu odstranit "${db[e]?.name||e}"?\nTato akce je nevratná!`) && (delete db[e], "function" == typeof saveDb && saveDb(), adminLog(`Série "${e}" odstraněna`, "warn"), adminRenderContent(), showToast?.(`🗑 Odstraněno: ${e}`))
-}
-
-function adminAddSeriesPrompt() {
-  const e = prompt("Název seriálu:");
-  if (!e?.trim()) return;
-  const t = e.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-    n = parseInt(prompt("TMDB ID (nebo 0):") || "0");
-  void 0 !== db && (db[t] = {
-    name: e.trim(),
-    tmdbId: n,
-    poster: "",
-    totalEps: 0,
-    runtime: 45
-  }, void 0 !== epsBySeason && (epsBySeason[t] = [12]), "function" == typeof saveDb && saveDb(), adminLog(`Přidána série: ${e} (${t})`, "info"), adminRenderContent(), showToast?.(`✅ Přidáno: ${e.trim()}`))
-}
-
-function adminExportDB() {
-  if (void 0 === db) return;
-  const e = JSON.stringify({
-      db: db,
-      epsBySeason: void 0 !== epsBySeason ? epsBySeason : {}
-    }, null, 2),
-    t = new Blob([e], {
-      type: "application/json"
-    }),
-    n = document.createElement("a");
-  n.href = URL.createObjectURL(t), n.download = "mujflix_db_export_" + (new Date).toISOString().slice(0, 10) + ".json", n.click(), adminLog("DB exportována", "ok")
-}
-
-function adminImportDBPrompt() {
-  const e = document.createElement("input");
-  e.type = "file", e.accept = ".json", e.onchange = e => {
-    const t = e.target.files[0];
-    if (!t) return;
-    const n = new FileReader;
-    n.onload = e => {
-      try {
-        const t = JSON.parse(e.target.result);
-        t.db && (Object.assign(db, t.db), t.epsBySeason && void 0 !== epsBySeason && Object.assign(epsBySeason, t.epsBySeason), "function" == typeof saveDb && saveDb(), adminLog("DB importována: " + Object.keys(t.db).length + " seriálů", "ok"), adminRenderContent(), showToast?.("✅ DB importována!"))
-      } catch (e) {
-        alert("Chyba parsování JSON: " + e.message)
-      }
-    }, n.readAsText(t)
-  }, e.click()
-}
-
-function adminResetWatched() {
-  confirm("Opravdu smazat celou sledovanost? Toto nelze vrátit!") && (localStorage.removeItem("function" == typeof uKey ? uKey("mf_watched") : "mf_watched"), "function" == typeof refreshUserContent && refreshUserContent(), adminLog("Sledovanost smazána", "warn"), showToast?.("🗑 Sledovanost smazána"), adminRenderStats())
-}
-
-function adminRenderAlgo() {
-  const e = (void 0 !== aiBrain && aiBrain.memory || {}).genreIdPrefs || {},
-    t = Object.entries(e).sort((e, t) => t[1] - e[1]).slice(0, 8),
-    n = t[0]?.[1] || 1,
-    o = ["#ff5050", "#ff7040", "#e8c020", "#50ff80", "#50c0ff", "#9060ff", "#ff60c0", "#60ffd0"],
-    i = document.getElementById("adminAlgoBrainBars");
-  i && (i.innerHTML = t.length ? t.map(([e, t], i) => `\n        <div class="admin-algo-bar-row">\n          <div class="admin-algo-bar-label">${TMDB_GENRE_CS?.[e]||"ID:"+e} (${e})</div>\n          <div class="admin-algo-bar-track"><div class="admin-algo-bar-fill" style="width:${Math.round(t/n*100)}%;background:${o[i%o.length]}"></div></div>\n          <div class="admin-algo-bar-val">${t.toFixed(2)}</div>\n        </div>`).join("") : '<div style="font-size:0.65rem;color:rgba(255,255,255,0.3)">Prázdný AI Brain — sleduj obsah</div>'), adminRefreshAlgo()
-}
-
-function adminRefreshAlgo() {
-  const e = safeLS("function" == typeof uKey ? uKey("mf_watch_timeline") : "mf_watch_timeline", "[]"),
-    t = document.getElementById("adminTimelineCode");
-  if (t) {
-    if (!e.length) return void(t.textContent = "Žádné záznamy v timeline");
-    const n = e.slice(-20).reverse();
-    t.textContent = n.map(e => {
-      const t = new Date(e.ts),
-        n = Math.round((Date.now() - e.ts) / 6e4);
-      return `${t.toTimeString().slice(0,8)} (${n}m ago) | ${e.slug} | genres: [${(e.genres||[]).join(",")}]`
-    }).join("\n")
-  }
-}
-
-function adminTestScore() {
-  const e = document.getElementById("adminAlgoTestTitle").value || "Test Film",
-    t = document.getElementById("adminAlgoTestGenres").value || "",
-    n = parseFloat(document.getElementById("adminAlgoTestRating").value) || 7.5,
-    o = t.split(",").map(Number).filter(Boolean),
-    i = {
-      id: Math.floor(1e5 * Math.random()),
-      name: e,
-      genre_ids: o,
-      vote_average: n,
-      vote_count: 1e3,
-      release_date: (new Date).getFullYear() + "-01-01",
-      _rowType: "tv"
-    },
-    a = "function" == typeof computeAiScore ? computeAiScore(i) : null,
-    s = document.getElementById("adminAlgoTestResult");
-  if (s && a) {
-    s.style.display = "block";
-    const e = a.signals || {};
-    s.innerHTML = `\n        <div class="admin-score-title">Výsledek: <strong style="font-size:1.1rem">${a.score}% Shoda</strong> ${a.whyLabel?"— "+a.whyLabel:""}</div>\n        <div class="admin-algo-bars">\n          ${Object.entries(e).map(([e,t])=>`\n            <div class="admin-algo-bar-row">\n              <div class="admin-algo-bar-label">${e})</div>\n              <div class="admin-algo-bar-track"><div class="admin-algo-bar-fill" style="width:${Math.round(100*Math.abs(t))}%;background:${t<0?"#ff4040":"#50c0ff"}"></div></div>\n              <div class="admin-algo-bar-val">${t.toFixed(2)}</div>\n            </div>`).join("")}\n        </div>`
-  }
-}
-
-function adminClearTimeline() {
-  if (!confirm("Smazat watch timeline?")) return;
-  const e = "function" == typeof uKey ? uKey("mf_watch_timeline") : "mf_watch_timeline";
-  localStorage.removeItem(e), _momentumCache = null, adminRefreshAlgo(), showToast?.("🗑 Timeline smazána"), adminLog("Watch timeline vymazána", "warn")
-}
-
-
-
-function adminRenderUsers() {
-  const e = "function" == typeof _getProfiles ? _getProfiles() : [],
-    t = "function" == typeof getActiveProfileId ? getActiveProfileId() : null,
-    n = document.getElementById("adminUsersTableBody");
-  n && (n.innerHTML = e.map(e => {
-    const n = Object.keys("function" == typeof getWatched ? getWatched() : {}).length,
-      o = e.id === t;
-    return `<tr>\n          <td style="font-size:1.4rem">${e.avatar||"🎬"}</td>\n          <td><strong>${e.name}</strong>${o?' <span class="admin-badge green">AKTIVNÍ</span>':""}</td>\n          <td style="font-family:monospace;font-size:0.6rem;color:rgba(255,255,255,0.35)">${e.id}</td>\n          <td>${e.pin?'<span class="admin-badge yellow">●●●●</span>':'<span style="color:rgba(255,255,255,0.25)">žádný</span>'}</td>\n          <td><div style="width:18px;height:18px;border-radius:50%;background:${e.color||"#007AFF"};border:1px solid rgba(255,255,255,0.2)"></div></td>\n          <td>${o?n:"—"}</td>\n          <td><button class="admin-series-action-btn" onclick="adminSwitchToProfile('${e.id}')">Přepnout</button></td>\n        </tr>`
-  }).join("") || '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,0.3)">Žádné profily</td></tr>');
-  const o = document.getElementById("adminProfileSwitchBtns");
-  o && (o.innerHTML = e.map(e => `<button class="admin-btn secondary" onclick="adminSwitchToProfile('${e.id}')" style="${e.id===t?"border-color:rgba(80,220,120,0.5);color:#50dc78":""}">${e.avatar||"🎬"} ${e.name}</button>`).join(""))
-}
-
-function adminSwitchToProfile(e) {
-  void 0 !== ProfileGate && ProfileGate.activateProfile(e), adminLog("Přepnuto na profil: " + e, "info"), adminRenderUsers()
-}
-
 function adminRefreshStorage(e = "") {
   const t = [];
   for (let n = 0; n < localStorage.length; n++) {
@@ -6127,44 +5100,6 @@ function adminFilterStorage(e) {
   adminRefreshStorage(e)
 }
 
-function adminExportAllStorage() {
-  const e = {};
-  for (let t = 0; t < localStorage.length; t++) {
-    const n = localStorage.key(t);
-    e[n] = localStorage.getItem(n)
-  }
-  const t = new Blob([JSON.stringify(e, null, 2)], {
-      type: "application/json"
-    }),
-    n = document.createElement("a");
-  n.href = URL.createObjectURL(t), n.download = "mujflix_storage_backup_" + (new Date).toISOString().slice(0, 10) + ".json", n.click(), adminLog("localStorage exportován", "ok")
-}
-
-function adminClearCache() {
-  const e = [];
-  for (let t = 0; t < localStorage.length; t++) {
-    const n = localStorage.key(t);
-    (n.includes("_cache") || n.includes("tmdb_cache")) && e.push(n)
-  }
-  e.forEach(e => localStorage.removeItem(e)), adminLog(`Cache vymazána (${e.length} klíčů)`, "ok"), showToast?.(`🗑 Cache vymazána (${e.length} klíčů)`), adminRefreshStorage()
-}
-
-function adminRefreshLogs() {
-  const e = document.getElementById("adminLogViewer");
-  e && (e.innerHTML = _adminLogs.length ? _adminLogs.slice(-50).reverse().map(e => `<div class="${e.includes("[INFO]")?"log-info":e.includes("[WARN]")?"log-warn":e.includes("[OK]")?"log-ok":""}">${e}</div>`).join("") : '<div style="color:rgba(255,255,255,0.3)">Žádné logy</div>');
-  const t = document.getElementById("adminErrorLog");
-  t && (t.innerHTML = _adminErrors.length ? _adminErrors.slice(-30).reverse().map(e => `<div class="log-err">${e}</div>`).join("") : '<div style="color:rgba(80,220,120,0.6)">Žádné chyby 🎉</div>')
-}
-
-function adminClearLogs() {
-  _adminLogs = [], _adminErrors = [], adminRefreshLogs()
-}
-
-function adminCopyLogs() {
-  const e = [..._adminLogs, ..._adminErrors].join("\n");
-  navigator.clipboard?.writeText(e).then(() => showToast?.("📋 Logy zkopírovány"))
-}
-
 function adminLoadSettings() {
   try {
     const e = safeLS(ADMIN_SETTINGS_KEY, "{}"),
@@ -6182,43 +5117,13 @@ function adminSaveSettings(e) {
   Object.assign(t, e), safeSetItem(ADMIN_SETTINGS_KEY, JSON.stringify(t)), adminLoadSettings()
 }
 
-function adminSavePin() {
-  const e = document.getElementById("adminNewPin").value.trim();
-  e.length < 4 ? showToast?.("PIN musí mít alespoň 4 číslice") : (localStorage.setItem(ADMIN_PIN_KEY, e), document.getElementById("adminNewPin").value = "", showToast?.("🔐 Admin PIN uložen"), adminLog("Admin PIN změněn", "ok"))
-}
-
-function adminToggleVisible(e) {
-  e.classList.toggle("on"), adminSaveSettings({
-    visible: e.classList.contains("on")
-  })
-}
-
 function adminToggleDebug(e) {
   e.classList.toggle("on"), adminSaveSettings({
     debug: e.classList.contains("on")
   }), showToast?.(e.classList.contains("on") ? "🐛 Debug mode ON — AI skóre viditelné" : "🐛 Debug mode OFF")
 }
 
-function adminToggleVerbose(e) {
-  e.classList.toggle("on"), adminSaveSettings({
-    verbose: e.classList.contains("on")
-  })
-}
-
-function adminFactoryReset() {
-  if (!confirm("⚠️ FACTORY RESET ⚠️\n\nToto smaže VŠECHNA data MůjFlixu.\nJsi si jistý? Toto nelze vrátit!")) return;
-  if (!confirm("Opravdu? Všechna data budou smazána!")) return;
-  const e = [];
-  for (let t = 0; t < localStorage.length; t++) {
-    const n = localStorage.key(t);
-    (n.startsWith("mf_") || n.startsWith("trakt_") || n.startsWith("ai_")) && e.push(n)
-  }
-  e.forEach(e => localStorage.removeItem(e)), adminLog("FACTORY RESET proveden", "warn"), showToast?.("☠ Factory reset hotov — obnovuji stránku..."), setTimeout(() => location.reload(), 1500)
-}
-
-function adminClearAllProfiles() {
-  confirm("Smazat všechny profily?") && (localStorage.removeItem("mf_profiles"), localStorage.removeItem("mf_profiles_v2"), localStorage.removeItem("mf_active_pid"), showToast?.("🗑 Profily smazány — obnovuji..."), setTimeout(() => location.reload(), 1e3))
-}! function() {
+! function() {
   const e = console.error.bind(console),
     t = console.warn.bind(console);
   console.error = (...t) => {
@@ -6626,19 +5531,6 @@ _pulseStyle.textContent = "@keyframes fabPulse { 0%,100%{transform:scale(1)}50%{
       })
     } catch {}
   }();
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function _custStorageKey() {
   try {
@@ -7315,51 +6207,6 @@ function updateTimerDisplay(e) {
   }
 }
 
-function startTimer() {
-  if (!_selectedPreset) return void showToast?.("⏱ Zvol délku sledování");
-  _timerInterval && clearInterval(_timerInterval);
-  const e = document.getElementById("timerStartBtn"),
-    t = document.getElementById("timerStopBtn"),
-    n = document.getElementById("timerFab");
-  e && (e.textContent = "⏸ Běží…"), t && t.classList.add("visible"), n && n.classList.add("active"), showToast?.(`⏱ Časovač spuštěn — ${_selectedPreset} min`), _timerInterval = setInterval(() => {
-    _timerRemaining--, updateTimerDisplay(_timerRemaining), _timerRemaining <= 0 && (clearInterval(_timerInterval), _timerInterval = null, timerFinished())
-  }, 1e3)
-}
-
-function stopTimer() {
-  _timerInterval && (clearInterval(_timerInterval), _timerInterval = null);
-  const e = document.getElementById("timerStartBtn"),
-    t = document.getElementById("timerStopBtn"),
-    n = document.getElementById("timerFab");
-  e && (e.textContent = "▶ Start"), t && t.classList.remove("visible"), n && (n.classList.remove("active"), n.style.background = ""), _timerRemaining = _selectedPreset ? 60 * _selectedPreset : 0, updateTimerDisplay(_timerRemaining), showToast?.("⏱ Časovač zastaven")
-}
-
-function timerFinished() {
-  const e = document.getElementById("timerFab"),
-    t = document.getElementById("timerStartBtn"),
-    n = document.getElementById("timerStopBtn");
-  e && (e.classList.remove("active"), e.style.background = ""), t && (t.textContent = "▶ Start"), n && n.classList.remove("visible"), showToast?.("⏱ Čas sledování vypršel! 🎬", "success"), Notification && "granted" === Notification.permission && new Notification("MůjFlix ⏱", {
-    body: "Čas sledování vypršel!",
-    icon: "LOGO.png"
-  });
-  const o = document.getElementById("timerFab");
-  o && (o.style.animation = "none", o.style.boxShadow = "0 0 0 0 rgba(0,122,255,0.8)", o.style.transition = "box-shadow 0s", setTimeout(() => {
-    o.style.boxShadow = "0 0 0 30px rgba(0,122,255,0)", o.style.transition = "box-shadow 0.8s ease"
-  }, 10))
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 function setDockActive(e) {
   document.querySelectorAll(".dock-btn").forEach(e => e.classList.remove("active"));
   const t = document.getElementById(e);
@@ -7372,18 +6219,6 @@ function setDockActive(e) {
 
 function closeDockOverlays() {
   "function" == typeof closeModal && closeModal(), "function" == typeof closeWatchlist && document.getElementById("watchlistOverlay")?.classList.contains("open") && closeWatchlist(), setDockActive("dockHome")
-}
-
-function openDockMore() {
-  const e = document.getElementById("dockMoreSheet"),
-    t = document.getElementById("dockMoreBg");
-  e && (e.style.display = "block", e.style.visibility = "visible", e.offsetHeight, e.style.transform = "translateY(0)"), t && (t.style.background = "rgba(0,0,0,0.5)", t.style.pointerEvents = "auto"), setDockActive("dockMore");
-  const n = document.getElementById("sheetPremiereBadge"),
-    o = document.getElementById("premiereFabBadge");
-  if (n && o) {
-    const e = parseInt(o.textContent) || 0;
-    e > 0 && (n.textContent = e + " nových", n.style.display = "inline")
-  }
 }
 
 function closeDockMore() {
@@ -7605,9 +6440,6 @@ function triggerPwaInstall() {
         "function" == typeof updateTileProgress && updateTileProgress(e), "function" == typeof updateContinueBadge && updateContinueBadge(e)
       }), "function" == typeof updateContinueWidget && updateContinueWidget(), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateWatchlistBadge && updateWatchlistBadge(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns()
     }, document.addEventListener("DOMContentLoaded", () => {
-      // VÝKON: dřív se tenhle callback (15× querySelector) spouštěl při KAŽDÉ změně
-      // style/class kdekoli na stránce — tedy i při každém pohybu myši (tilt efekty
-      // mění style.transform). Teď jen class a max 1× za 150 ms.
       let _moT = null;
       new MutationObserver(() => {
         _moT || (_moT = setTimeout(() => { _moT = null; n() }, 150))
@@ -8030,8 +6862,6 @@ window.adminSavePerKey = function(e, t) {
         };
         const n = ProfileGate.activateProfile.bind(ProfileGate);
         ProfileGate.activateProfile = function(...t) {
-          // OPRAVA: původní kód pushoval #serialy dvakrát (zde + v hide override)
-          // Nyní jen zavoláme originál — hide override se postará o hash
           return n(...t);
         }
       }
@@ -8145,10 +6975,6 @@ window.adminSavePerKey = function(e, t) {
             w = document.querySelector(".key-hint");
           q && (q.style.display = ""), w && (w.style.display = ""), setDockActive("dockHome"), e = "serialy", location.hash = "#serialy"
         } else {
-          // OPRAVA: dřív se dock resetoval jen když bylo "Objevovat"
-          // otevřené ze sekce "filmy". Pokud se otevřelo přímo tlačítkem
-          // v docku z jiné sekce (Domů/Pro tebe), aktivní ikonka
-          // v docku po zavření zůstala chybně na "Objevovat".
           setDockActive({serialy:"dockHome",protebe:"dockProtebe"}[e] || "dockHome")
         }
       }, 50)
@@ -8209,31 +7035,21 @@ window.adminSavePerKey = function(e, t) {
     function n() {
       setTimeout(() => {
         ! function() {
-          // BUG FIX: Původní kód nastavoval transform přímo na .disco-card,
-          // kde CSS :hover už má transform: scale(1.13) translateY(-18px).
-          // JS override způsoboval "pulsování" — CSS a JS bojovaly o stejnou vlastnost.
-          // Řešení: JS tilt aplikujeme POUZE na vnitřní shimmer overlay (pointer-events:none),
-          // transform na samotné kartě nechám čistě na CSS :hover. Click tak vždy funguje.
           function e(e) {
             if (e._tiltInited) return;
             e._tiltInited = !0;
             const t = document.createElement("div");
             t.style.cssText = "\n        position:absolute;inset:0;border-radius:20px;pointer-events:none;\n        background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, transparent 65%);\n        opacity:0;transition:opacity 0.2s ease;z-index:20;mix-blend-mode:screen;\n      ";
-            // OPRAVA: přidáme overlay ale NENASTAVUJEME transform na 'e' (disco-card)
-            // Pouze pohybujeme světelným shimmerem po ploše karty
             e.appendChild(t);
             e.addEventListener("mousemove", n => {
               const c = (n.clientX - e.getBoundingClientRect().left) / e.offsetWidth * 100,
                 d = (n.clientY - e.getBoundingClientRect().top) / e.offsetHeight * 100;
               t.style.background = `radial-gradient(circle at ${c}% ${d}%, rgba(255,255,255,0.22) 0%, transparent 60%)`;
               t.style.opacity = "1";
-              // ŽÁDNÝ transform na 'e' — necháme CSS :hover dělat svou práci
             }, { passive: true });
             e.addEventListener("mouseleave", () => {
               t.style.opacity = "0";
-              // ŽÁDNÝ e.style.transform reset — CSS se postará sám
             });
-            // Click fix: okamžitě resetuj hover vizuál před kliknutím
             e.addEventListener("pointerdown", () => {
               t.style.opacity = "0";
             }, { passive: true });
@@ -8594,9 +7410,6 @@ window.adminSavePerKey = function(e, t) {
       }
     }
   }(), window.MFSettings = function() {
-    function e(e, n, o, i, a, s) {
-      return `<div style="margin-bottom:10px;">\n      <label style="font-size:0.65rem;color:rgba(255,255,255,0.45);display:block;margin-bottom:4px;">${n}</label>\n      <input id="${e}" type="${a||"text"}" placeholder="${s||""}" value="${t(i[o]||"")}"\n        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:9px;padding:9px 11px;color:#fff;font-size:0.75rem;outline:none;box-sizing:border-box;font-family:monospace;">\n    </div>`
-    }
 
     function t(e) {
       return (e || "").replace(/"/g, "&quot;").replace(/</g, "&lt;")
@@ -8836,7 +7649,6 @@ function _cinShowEmbedPlayer(e) {
   s.style.cssText = "flex:1;position:relative;background:#000;";
   const r = document.createElement("iframe");
   r.src = e, r.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:none;", r.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture; fullscreen"), r.setAttribute("referrerpolicy", "no-referrer"), r.setAttribute("allowfullscreen", "");
-  // Bez sandbox — Bombuj a SvetSerialu potřebují volný přístup
   const l = document.createElement("div");
   l.style.cssText = "position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(0,0,0,0.92);pointer-events:none;z-index:2;transition:opacity 0.5s;";
   l.innerHTML = `
@@ -8865,17 +7677,14 @@ function _cinShowEmbedPlayer(e) {
   }, 8e3);
   r.onload = () => {
     clearTimeout(c);
-    // Zkontroluj po 1s jestli iframe má skutečný obsah (ne prázdná stránka)
     setTimeout(() => {
       try {
         const doc = r.contentDocument || r.contentWindow?.document;
         if (doc && (doc.title === "" || doc.body?.innerHTML === "")) {
-          // Prázdný iframe — zobraz fallback
           l.style.pointerEvents = "auto";
           return;
         }
       } catch (ex) {
-        // Cross-origin — to je OK, znamená že stránka se načetla
       }
       l.style.opacity = "0";
       setTimeout(() => { l.style.display = "none"; }, 500);
@@ -8894,43 +7703,6 @@ function _cinShowEmbedPlayer(e) {
   const u = document.createElement("button");
   u.innerHTML = "🔗 Nová karta", u.style.cssText = "padding:8px 14px;border-radius:20px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;", u.onclick = () => window.open(e, "_blank", "noopener");
   d.appendChild(m), d.appendChild(u), a.appendChild(s), a.appendChild(d), t.appendChild(a)
-}
-
-function _cinShowLauncher(e) {
-  const t = document.getElementById("cinemaFrameWrap");
-  if (!t) return void console.warn("[Cinema] cinemaFrameWrap not found");
-  t.innerHTML = "";
-  const n = _cinState,
-    o = CINEMA_SOURCES[n.sourceIdx].label,
-    i = "tv" === n.type ? `S${String(n.season).padStart(2,"0")}E${String(n.ep).padStart(2,"0")} · ${o}` : o,
-    a = document.createElement("div");
-  a.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;font-family:Inter,sans-serif;padding:20px;text-align:center;";
-  const s = document.createElement("div");
-  s.textContent = "🎬", s.style.fontSize = "3rem";
-  const r = document.createElement("div");
-  r.textContent = n.title || "Přehrávám…", r.style.cssText = "font-size:1.1rem;font-weight:700;color:#fff;";
-  const l = document.createElement("div");
-  l.textContent = i, l.style.cssText = "font-size:0.75rem;color:rgba(255,255,255,0.4);";
-  const c = document.createElement("div");
-  c.style.cssText = "display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:8px;";
-  const d = document.createElement("button");
-  d.style.cssText = "padding:16px 24px;border-radius:16px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 24px rgba(0,122,255,0.35);", d.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg> Spustit kino', d.addEventListener("click", function() {
-    const t = window.screen.width,
-      n = window.screen.height,
-      o = window.open(e, "MujFlixCinema", "width=" + t + ",height=" + n + ",left=0,top=0,menubar=no,toolbar=no,location=no,status=no,scrollbars=no");
-    o && !o.closed || window.open(e, "_blank", "noopener")
-  });
-  const m = document.createElement("div");
-  m.textContent = "Přehrávač se otevře v novém okně. Pokud prohlížeč blokuje popup, klikni na ikonu v adresním řádku a povol.", m.style.cssText = "font-size:0.62rem;color:rgba(255,255,255,0.22);line-height:1.5;";
-  const u = document.createElement("button");
-  u.textContent = "🔗 Otevřít v nové kartě", u.style.cssText = "padding:12px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);font-size:0.8rem;cursor:pointer;", u.addEventListener("click", function() {
-    window.open(e, "_blank", "noopener")
-  }), c.appendChild(d), c.appendChild(m), c.appendChild(u), a.appendChild(s), a.appendChild(r), a.appendChild(l), a.appendChild(c), t.appendChild(a)
-}
-
-function _cinShowFileWarning(e) {
-  let t = document.getElementById("cinemaFileWarn");
-  t || (t = document.createElement("div"), t.id = "cinemaFileWarn", t.style.cssText = "position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;", document.getElementById("cinemaModal").appendChild(t)), t.style.display = "flex", t.innerHTML = `\n      <div style="background:rgba(28,28,30,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:32px 28px;max-width:420px;width:100%;text-align:center;font-family:Inter,sans-serif;">\n        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>\n        <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;">Chrome blokuje přehrávač</div>\n        <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:24px;">\n          Soubor je otevřen přes <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">file://</code> protokol.<br>\n          Chrome z bezpečnostních důvodů blokuje video iframy.<br><br>\n          <strong style="color:rgba(255,255,255,0.7);">Řešení:</strong> Otevři MůjFlix přes lokální server.\n        </div>\n\n        \x3c!-- Možnost 1: Otevřít přímo zdroj --\x3e\n        <button onclick="window.open('${e}','_blank','noopener')" style="width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;">\n          <svg viewBox="0 0 24 24" width="15" height="15" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>\n            Otevřít na externím webu\n        </button>\n\n        \x3c!-- Možnost 2: Instrukce na lokální server --\x3e\n        <button onclick="document.getElementById('cinLocalServerHelp').style.display=document.getElementById('cinLocalServerHelp').style.display==='none'?'block':'none'" style="width:100%;padding:12px;border-radius:14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-size:0.78rem;font-weight:600;cursor:pointer;margin-bottom:10px;">\n          🖥️ Jak spustit lokální server?\n        </button>\n        <div id="cinLocalServerHelp" style="display:none;text-align:left;background:rgba(0,0,0,0.4);border-radius:12px;padding:16px;margin-bottom:10px;">\n          <div style="color:rgba(255,255,255,0.8);font-size:0.72rem;line-height:1.8;">\n            <strong style="color:#5ac8fa;">Možnost A — VS Code:</strong><br>\n            Nainstaluj rozšíření <em>Live Server</em> → klikni pravým na soubor → <em>Open with Live Server</em><br><br>\n            <strong style="color:#5ac8fa;">Možnost B — Python:</strong><br>\n            Otevři terminál ve složce se souborem a spusť:<br>\n            <code style="display:block;background:rgba(255,255,255,0.08);padding:8px 12px;border-radius:8px;margin-top:6px;font-size:0.75rem;color:#fff;">python -m http.server 8080</code>\n            <span style="color:rgba(255,255,255,0.4);font-size:0.65rem;">Pak otevři: http://localhost:8080/mujflix.html</span>\n          </div>\n        </div>\n\n        <button onclick="closeCinema()" style="width:100%;padding:10px;border-radius:12px;background:transparent;border:none;color:rgba(255,255,255,0.25);font-size:0.72rem;cursor:pointer;">Zavřít</button>\n      </div>`
 }
 
 function _cinBuildSourceBar() {
@@ -9516,12 +8288,8 @@ document.addEventListener("keydown", function(e) {
       }))
     })
   }();
-// ══════════════════════════════════════════════════════════════════
-// 🔧 PATCH: Timer FAB schovat v Objevování + oprava klikání na karty
-// ══════════════════════════════════════════════════════════════════
 ;(function _mfDiscoverClickFix() {
 
-  // 1) Přidej/odeber třídu na body podle stavu universe overlay
   const _origOpen  = window.openUniverse;
   const _origClose = window.closeUniverse;
 
@@ -9535,14 +8303,12 @@ document.addEventListener("keydown", function(e) {
     return _origClose?.apply(this, args);
   };
 
-  // 2) Synchronizuj stav při načtení (kdyby bylo hash #discover)
   document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('universeOverlay');
     if (overlay?.classList.contains('open')) {
       document.body.classList.add('disco-open');
     }
 
-    // 3) MutationObserver jako záloha
     if (overlay) {
       new MutationObserver(() => {
         if (overlay.classList.contains('open')) {
@@ -9557,17 +8323,10 @@ document.addEventListener("keydown", function(e) {
   console.log('[MůjFlix Fix] ✓ Timer FAB + Discover click fix načten');
 })();
 
-// ══════════════════════════════════════════════════════════════════
-// 📝 CHANGELOG SYSTEM — MůjFlix Update Notifications
-// Správce: adminSaveChangelog() přidá záznam, uživatel ho vidí
-// při příštím načtení přes modal (pokud je novější než posledně viděný).
-// ══════════════════════════════════════════════════════════════════
-
 const MF_CHANGELOG_KEY = 'mf_changelog_v1';
 const MF_CHANGELOG_SEEN_KEY = 'mf_changelog_seen_ts';
 let _clSelectedType = 'feature';
 
-// ── Typy changelogů — ikona + barva ──────────────────────────────
 const CL_TYPES = {
   feature:     { label: '✨ Novinka',        color: '#4da6ff', bg: 'rgba(0,122,255,0.12)',  border: 'rgba(0,122,255,0.3)'  },
   fix:         { label: '🐛 Oprava bugu',    color: '#5fffb0', bg: 'rgba(0,200,100,0.1)',   border: 'rgba(0,200,100,0.3)'  },
@@ -9575,7 +8334,6 @@ const CL_TYPES = {
   breaking:    { label: '⚠️ Změna chování', color: '#ff8c69', bg: 'rgba(255,100,60,0.1)',   border: 'rgba(255,100,60,0.3)' },
 };
 
-// ── Výběr typu v admin panelu ─────────────────────────────────────
 function clSetType(type) {
   _clSelectedType = type;
   Object.keys(CL_TYPES).forEach(t => {
@@ -9593,7 +8351,6 @@ function clSetType(type) {
   });
 }
 
-// ── Uložení nového záznamu (volá admin) ──────────────────────────
 function adminSaveChangelog() {
   const version = document.getElementById('clVersion')?.value?.trim();
   const title   = document.getElementById('clTitle')?.value?.trim();
@@ -9614,7 +8371,6 @@ function adminSaveChangelog() {
     const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
     all.unshift(entry);
     localStorage.setItem(MF_CHANGELOG_KEY, JSON.stringify(all.slice(0, 50)));
-    // Vymazat pole po uložení
     document.getElementById('clVersion').value = '';
     document.getElementById('clTitle').value   = '';
     document.getElementById('clDesc').value    = '';
@@ -9625,7 +8381,6 @@ function adminSaveChangelog() {
   }
 }
 
-// ── Smazání záznamu z changelogu ─────────────────────────────────
 function adminDeleteChangelog(id) {
   try {
     const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
@@ -9635,7 +8390,6 @@ function adminDeleteChangelog(id) {
   } catch (e) {}
 }
 
-// ── Render historie v admin panelu ────────────────────────────────
 function adminRenderChangelogHistory() {
   const el = document.getElementById('adminChangelogHistory');
   if (!el) return;
@@ -9666,14 +8420,12 @@ function adminRenderChangelogHistory() {
   }
 }
 
-// ── Zobrazení changelog modalu pro uživatele ──────────────────────
 function openChangelog() {
   try {
     const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
     if (!all.length) return;
 
     const seenTs  = parseInt(localStorage.getItem(MF_CHANGELOG_SEEN_KEY) || '0');
-    // Nepřečtené = novější než poslední viděný timestamp
     const unseen  = all.filter(e => e.ts > seenTs);
     const toShow  = unseen.length ? unseen : all.slice(0, 5);
 
@@ -9711,18 +8463,15 @@ function openChangelog() {
   }
 }
 
-// ── Zavření modalu — uložení timestamp "viděno" ───────────────────
 function closeChangelog() {
   const modal = document.getElementById('mfChangelogModal');
   if (!modal) return;
   modal.style.display = 'none';
   localStorage.setItem(MF_CHANGELOG_SEEN_KEY, Date.now().toString());
-  // Skrýt badge na profilu
   const badge = document.getElementById('clNewBadge');
   if (badge) badge.style.display = 'none';
 }
 
-// ── Automatická kontrola nepřečtených změn po načtení ────────────
 function checkChangelogOnLoad() {
   try {
     const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
@@ -9731,10 +8480,8 @@ function checkChangelogOnLoad() {
     const unseen = all.filter(e => e.ts > seenTs);
     if (!unseen.length) return;
 
-    // Zobrazí toast s možností otevřít changelog po 4s (aby se stránka stihla načíst)
     setTimeout(() => {
       if (typeof showToast !== 'function') return;
-      // Přidáme klikatelný toast ručně
       let t = document.getElementById('mf-toast');
       if (!t) {
         t = document.createElement('div');
@@ -9757,10 +8504,8 @@ function checkChangelogOnLoad() {
   } catch (e) {}
 }
 
-// Zavolej při načtení (po DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', () => {
   checkChangelogOnLoad();
-  // Načti historii v adminu pokud je tab aktivní
   const obs = new MutationObserver(() => {
     const tab = document.getElementById('adminTab_changelog');
     if (tab && tab.style.display !== 'none') adminRenderChangelogHistory();
@@ -9771,13 +8516,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
 
-// ════════════════════════════════════════════════════════════
-// EPISODE PICKER REMAKE — přepisuje renderSeasonSelectView
-//                         a _buildEpCardBase za běhu
-// ════════════════════════════════════════════════════════════
 (function() {
 
-  // ── Inject CSS přes JS (highest specificity, after all other styles) ──
   const style = document.createElement('style');
   style.id = 'mf-remake-styles';
   style.textContent = `
@@ -10006,11 +8746,9 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
   `;
   document.head.appendChild(style);
 
-  // ── Přepis renderEpisodes — změní season header class ──
   const _origRenderEpisodes = window.renderEpisodes;
   window.renderEpisodes = async function() {
     await _origRenderEpisodes.apply(this, arguments);
-    // Oprav season headers v "Vše" módu — přidej třídu
     const grid = document.getElementById('episodesGrid');
     if (!grid) return;
     grid.querySelectorAll('div[style*="font-weight:700"], div[style*="font-weight: 700"]').forEach(el => {
@@ -10021,7 +8759,6 @@ console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
     });
   };
 
-  // ── Dock MutationObserver ──
   document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('seriesModal');
     if (!modal) return;
