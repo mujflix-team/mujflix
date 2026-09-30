@@ -1,27 +1,12 @@
-/* ══════════════════════════════════════════════════════════════
-   MůjFlix — cinema.js (konsolidováno)
-   Sloučeno z: cinema-player.js + legal-streaming-providers.js
-   Pořadí zachováno: cinema-player.js nejdřív (definuje
-   window.MFCinemaPlayer), legal-streaming-providers.js pak
-   ho obaluje (potřebuje MFCinemaPlayer už existovat).
-   ══════════════════════════════════════════════════════════════ */
 
-/* ══════════════════════════════════════════════════════════════
- * MůjFlix Cinema Player v2
- * Samostatný přehrávač s podporou více zdrojů a navigací epizod.
- *
- * Zdroje filmů:  Bombuj, Prehrajto.cz, Uzi.la
- * Zdroje seriálů: SvetSerialu, Bombuj, Prehrajto.cz, Uzi.la
- * ══════════════════════════════════════════════════════════════ */
 (function () {
   "use strict";
 
   var modal, frame, titleNode, sourceLabelNode, sourceCounterNode;
   var tvBar, epGridPanel, epGridBody;
   var favBtn;
-  var current = null; // { tmdbId, title, type, season, episode, sourceIdx, localSlug, year, tried: Set }
+  var current = null;
 
-  /* ── Helpery na slugy / dotazy ───────────────────────────── */
   function pad2(n) {
     return String(n).padStart(2, "0");
   }
@@ -30,8 +15,6 @@
     return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
-  // Dash-slug — použij globální _czSlug z app.js (stejná logika jako
-  // pro Bombuj/SvetSerialu), s lokálním fallbackem pro jistotu.
   function daslug(value) {
     if (typeof window._czSlug === "function") return window._czSlug(value);
     if (typeof _czSlug === "function") {
@@ -46,7 +29,6 @@
       .replace(/^-+|-+$/g, "");
   }
 
-  // Slug pro vyhledávací dotaz (mezery zůstávají mezerami → %20)
   function searchQuery(value) {
     return stripDiacritics(String(value || ""))
       .toLowerCase()
@@ -59,7 +41,6 @@
     return String(t || "").replace(/\s*[—–-]+\s*S\d+E\d+.*/i, "").trim();
   }
 
-  /* ── URL buildery pro filmy ──────────────────────────────── */
   function bombujMovieUrl(title, year) {
     if (typeof window._bombujMovieUrlVariants === "function") {
       try {
@@ -90,7 +71,6 @@
     return s ? "https://uzi.la/p/" + s : "https://uzi.la/?s=" + encodeURIComponent(title || "");
   }
 
-  /* ── URL buildery pro seriály (season/episode) ───────────── */
   function svetSerialuUrl(title, season, episode, siteSlug) {
     if (typeof window._svetSerialuSlugVariants === "function") {
       try {
@@ -132,7 +112,6 @@
       : "https://uzi.la/p/" + s;
   }
 
-  /* ── Seznamy zdrojů ───────────────────────────────────────── */
   var MOVIE_SOURCES = [
     { id: "bombuj", label: "Bombuj", build: function (t, y) { return bombujMovieUrl(t, y); } },
     { id: "bombuj-noyear", label: "Bombuj (bez roku)", build: function (t) { return bombujMovieUrlNoYear(t); } },
@@ -161,7 +140,6 @@
     return src.build(current.title, current.season, current.episode, current.localSlug);
   }
 
-  /* ── Napojení na appku (watched stav, seznam seriálů) ────── */
   function appGetWatched() {
     try {
       return typeof getWatched === "function" ? getWatched() : {};
@@ -206,7 +184,6 @@
     return !!w[current.localSlug + "-S" + season + "-E" + episode];
   }
 
-  // Zjisti počet sezón/epizod — z lokální db, jinak dotažením z TMDB (fallback).
   function ensureEpCounts(cb) {
     if (current.localSlug && appDb() && appDb()[current.localSlug]) {
       current.totalSeasonsCount = appTotalSeasons(current.localSlug);
@@ -214,7 +191,6 @@
       cb && cb();
       return;
     }
-    // fallback: TMDB
     var key = (typeof TMDB_KEY !== "undefined" && TMDB_KEY) || null;
     if (key && current.tmdbId && !isNaN(parseInt(current.tmdbId, 10))) {
       fetch("https://api.themoviedb.org/3/tv/" + current.tmdbId + "?api_key=" + key + "&language=cs")
@@ -251,7 +227,6 @@
     return null;
   }
 
-  /* ── Modal DOM ────────────────────────────────────────────── */
   function ensureModal() {
     if (modal) return;
     modal = document.createElement("div");
@@ -330,7 +305,6 @@
     });
   }
 
-  /* ── Zdroje: přepínání + počítadlo ────────────────────────── */
   function cycleSource(dir) {
     var sources = sourcesFor(current.type);
     current.sourceIdx = (current.sourceIdx + dir + sources.length) % sources.length;
@@ -349,7 +323,6 @@
       "Vyzkoušeno " + used + " z " + total + (remaining > 0 ? " · zbývá ještě " + remaining : " · vyzkoušeny všechny");
   }
 
-  /* ── TV navigace (epizody) ────────────────────────────────── */
   function updateEpCurrentLabel() {
     modal.querySelector("#mfCinEpCurrent").textContent =
       "S" + pad2(current.season) + " · E" + pad2(current.episode);
@@ -407,7 +380,6 @@
     });
   }
 
-  /* ── Panel výběru konkrétní epizody (se stavem zhlédnutí) ─── */
   function toggleEpGrid() {
     var show = epGridPanel.style.display === "none";
     epGridPanel.style.display = show ? "flex" : "none";
@@ -464,7 +436,6 @@
     }
   }
 
-  /* ── Vykreslení / načtení přehrávače ──────────────────────── */
   function loadUrl(url, label) {
     frame.classList.remove("mf-cinema-ready");
     frame.innerHTML =
@@ -489,10 +460,6 @@
     modal.querySelector("#mfStandaloneCinemaExternal").href = url;
   }
 
-  /* ── Oblíbené — srdíčko přímo v Cinema mode přehrávači ───────
-     Používá stejné úložiště jako zbytek appky (window.toggleTmdbFavorite
-     / window.isTmdbFavorite z app.js), takže se položka objeví ve
-     stejné sekci Oblíbené jako vše ostatní. */
   function toggleCurrentFavorite() {
     if (!current || !current.tmdbId) return;
     if (typeof window.toggleTmdbFavorite !== "function") return;
@@ -527,7 +494,6 @@
     }
   }
 
-  /* ── Veřejné API ──────────────────────────────────────────── */
   function open(tmdbId, title, type, extra) {
     ensureModal();
     var rawId = String(tmdbId || "");
@@ -576,153 +542,119 @@
   window.MFCinemaPlayer = { open: open, close: close };
 })();
 
-/* ══════════════ ZAČÁTEK: bývalý legal-streaming-providers.js ══════════════ */
-/**
- * ═══════════════════════════════════════════════════════════════════
- * MŮJFLIX — Legal Streaming Providers (Apple TV+ style)
- * ═══════════════════════════════════════════════════════════════════
- *
- * Zobrazí legální streamingové služby kde lze pustit film/seriál
- * v cinema mode. Používá TMDB Watch Providers API.
- */
 
 (function() {
-  // ══ STREAMING PROVIDERS CONFIG ══
-  // Mapování TMDB provider IDs na logo + URL
   const STREAMING_PROVIDERS = {
-    // Apple TV+
     350: {
       name: "Apple TV+",
       logo: "https://upload.wikimedia.org/wikipedia/commons/2/23/Apple_TV_Plus_Logo.svg",
       url: (title, type) => `https://tv.apple.com/search?term=${encodeURIComponent(title)}`
     },
-    // Netflix
     8: {
       name: "Netflix",
       logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
       url: (title, type) => `https://www.netflix.com/search?query=${encodeURIComponent(title)}`
     },
-    // Prime Video
     9: {
       name: "Prime Video",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Amazon_Prime_Video_logo.jpg",
       url: (title, type) => `https://www.primevideo.com/search?phrase=${encodeURIComponent(title)}`
     },
-    // Disney+
     337: {
       name: "Disney+",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Disney%2B_logo.svg",
       url: (title, type) => `https://www.disneyplus.com/search?query=${encodeURIComponent(title)}`
     },
-    // HBO Max (now Max)
     1899: {
       name: "Max",
       logo: "https://upload.wikimedia.org/wikipedia/commons/8/89/Max_Logo.svg",
       url: (title, type) => `https://www.max.com/search/${encodeURIComponent(title)}`
     },
-    // HBO Max (old)
     274: {
       name: "HBO Max",
       logo: "https://upload.wikimedia.org/wikipedia/commons/1/1e/HBO_Max_Logo.svg",
       url: (title, type) => `https://www.hbomax.com/search?query=${encodeURIComponent(title)}`
     },
-    // Crunchyroll
     372: {
       name: "Crunchyroll",
       logo: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Crunchyroll_2021.svg",
       url: (title, type) => `https://www.crunchyroll.com/search?query=${encodeURIComponent(title)}`
     },
-    // Canal+ (Czech)
     203: {
       name: "Canal+",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d6/Canal_plus.svg",
       url: (title, type) => `https://canalplus.cz/vyhledavani?query=${encodeURIComponent(title)}`
     },
-    // Voyo
     679: {
       name: "Voyo",
       logo: "https://upload.wikimedia.org/wikipedia/commons/5/5d/Voyo_logo.svg",
       url: (title, type) => `https://voyo.cz/hledat?q=${encodeURIComponent(title)}`
     },
-    // Netflix basic (sk)
     100032: {
       name: "Netflix",
       logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
       url: (title, type) => `https://www.netflix.com/search?query=${encodeURIComponent(title)}`
     },
-    // SkyShowtime
     625: {
       name: "SkyShowtime",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d6/SkyShowtime_2022.svg",
       url: (title, type) => `https://www.skyshowtime.com/search?q=${encodeURIComponent(title)}`
     },
-    // O2 TV
     1777: {
       name: "O2 TV",
       logo: "https://upload.wikimedia.org/wikipedia/commons/3/3e/O2_logo.svg",
       url: (title, type) => `https://www.o2tv.cz/hledej?q=${encodeURIComponent(title)}`
     },
-    // Mall.TV
     435: {
       name: "Mall.TV",
       logo: "https://upload.wikimedia.org/wikipedia/commons/e/e8/MallTV_logo.svg",
       url: (title, type) => `https://mall.tv/vysledky-vyhledavani?search=${encodeURIComponent(title)}`
     },
-    // Kiwi
     682: {
       name: "Kiwi",
       logo: "https://upload.wikimedia.org/wikipedia/commons/f/f3/Kiwi.com_logo.svg",
       url: (title, type) => `https://kiwi.com/cz/search?search=${encodeURIComponent(title)}`
     },
-    // Plex
     68: {
       name: "Plex",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/df/Plex_logo.svg",
       url: (title, type) => `https://app.plex.tv/search?query=${encodeURIComponent(title)}`
     },
-    // Rakuten TV
     358: {
       name: "Rakuten",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Rakuten_TV_logo.svg",
       url: (title, type) => `https://rakuten.tv/search/${encodeURIComponent(title)}`
     },
-    // Mubi
     326: {
       name: "Mubi",
       logo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/MUBI_Logo.svg",
       url: (title, type) => `https://mubi.com/search?q=${encodeURIComponent(title)}`
     },
-    // Amazon Prime (old ID)
     10: {
       name: "Prime Video",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Amazon_Prime_Video_logo.jpg",
       url: (title, type) => `https://www.primevideo.com/search?phrase=${encodeURIComponent(title)}`
     },
-    // Hulu
     418: {
       name: "Hulu",
       logo: "https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg",
       url: (title, type) => `https://www.hulu.com/search?query=${encodeURIComponent(title)}`
     },
-    // Disney+ Hotstar
     122: {
       name: "Disney+ Hotstar",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Disney%2B_Logo.svg",
       url: (title, type) => `https://www.hotstar.com/search?query=${encodeURIComponent(title)}`
     },
-    // Paramount+
     531: {
       name: "Paramount+",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Paramount%2B_logo.svg",
       url: (title, type) => `https://www.paramountplus.com/search/${encodeURIComponent(title)}`
     },
-    // Peacock
     391: {
       name: "Peacock",
       logo: "https://upload.wikimedia.org/wikipedia/commons/0/07/Peacock_Logo.svg",
       url: (title, type) => `https://www.peacocktv.com/search/${encodeURIComponent(title)}`
     },
-    // Discovery+
     1537: {
       name: "Discovery+",
       logo: "https://upload.wikimedia.org/wikipedia/commons/8/89/Discovery%2B_logo.svg",
@@ -730,10 +662,8 @@
     }
   };
 
-  // Region priority for Czech Republic
   const REGIONS_TO_TRY = ['CZ', 'SK', 'US', 'GB', 'DE'];
 
-  // ══ FETCH WATCH PROVIDERS FROM TMDB ══
   async function fetchWatchProviders(tmdbId, type) {
     const endpoint = type === 'movie' ? 'movie' : 'tv';
     const url = `https://api.themoviedb.org/3/${endpoint}/${tmdbId}/watch/providers?api_key=${window.TMDB_KEY || window.TMDB_KEY_DEFAULT || ''}`;
@@ -749,11 +679,9 @@
     }
   }
 
-  // ══ GET PROVIDERS FOR CZECH REGION ══
   function getCzechProviders(providersData) {
     if (!providersData?.results) return null;
 
-    // Try CZ first, then SK, then US
     for (const region of REGIONS_TO_TRY) {
       const regionData = providersData.results[region];
       if (regionData?.flatrate?.length) {
@@ -766,9 +694,7 @@
     return null;
   }
 
-  // ══ RENDER PROVIDERS — floating badge v pravém dolním rohu ══
   function renderLegalProviders(tmdbId, title, type) {
-    // Odstraň existující
     const existing = document.getElementById('legalProvidersSection');
     if (existing) existing.remove();
 
@@ -776,7 +702,6 @@
                       || document.getElementById('mfStandaloneCinema');
     if (!cinemaModal) return;
 
-    // ── Wrapper: fixně v pravém dolním rohu cinema modalu ──
     const wrap = document.createElement('div');
     wrap.id = 'legalProvidersSection';
     wrap.style.cssText = `
@@ -791,7 +716,6 @@
       pointer-events: none;
     `;
 
-    // ── Rozbalený panel (skrytý dokud nejsou data) ──
     const panel = document.createElement('div');
     panel.id = 'legalProvidersPanel';
     panel.style.cssText = `
@@ -830,7 +754,6 @@
     `;
     panel.appendChild(providersRow);
 
-    // ── Toggle badge ──
     const badge = document.createElement('button');
     badge.id = 'legalProvidersBadge';
     badge.title = 'Kde legálně sledovat';
@@ -881,24 +804,20 @@
     wrap.appendChild(badge);
     cinemaModal.appendChild(wrap);
 
-    // ── Fetch providers ──
     fetchWatchProviders(tmdbId, type).then(data => {
       const czData = getCzechProviders(data);
 
       if (!czData?.providers?.length) {
-        badge.style.display = 'none'; // Skryj badge pokud nic není
+        badge.style.display = 'none';
         return;
       }
 
-      // Aktualizuj badge text
       const badgeText = document.getElementById('legalBadgeText');
       if (badgeText) badgeText.textContent = `Dostupné v ${czData.region === 'CZ' ? 'ČR' : czData.region}`;
 
-      // Zvýrazni badge — jsou data
       badge.style.borderColor = 'rgba(0,122,255,0.3)';
       badge.querySelector('svg').style.stroke = '#007aff';
 
-      // Přidej provider tlačítka
       czData.providers.forEach(provider => {
         const info = STREAMING_PROVIDERS[provider.provider_id];
         if (!info) return;
@@ -949,10 +868,6 @@
     });
   }
 
-  // ══ HOOK INTO NEW CINEMA PLAYER (window.MFCinemaPlayer) ══
-  // app.js's openMovieInCinema delegates to MFCinemaPlayer.open() when it
-  // exists, which opens #mfStandaloneCinema instead of #cinemaModal — so we
-  // need to hook this too, or the badge never shows in the new player.
   if (window.MFCinemaPlayer && typeof window.MFCinemaPlayer.open === 'function') {
     const _origPlayerOpen = window.MFCinemaPlayer.open;
     window.MFCinemaPlayer.open = function(tmdbId, title, type, extra) {
@@ -965,25 +880,19 @@
     };
   }
 
-  // ══ HOOK INTO CINEMA MODE (starý #cinemaModal fallback) ══
-  // Override openMovieInCinema to add providers
   const originalOpenMovieInCinema = window.openMovieInCinema;
   window.openMovieInCinema = function(tmdbId, title, type) {
-    // Call original
     if (originalOpenMovieInCinema) {
       originalOpenMovieInCinema.apply(this, arguments);
     }
 
-    // Extract actual tmdbId (handle tv_ep format: id/season/ep)
     const actualTmdbId = String(tmdbId).split('/')[0];
 
-    // Add legal providers after a short delay to let modal render
     setTimeout(() => {
       renderLegalProviders(actualTmdbId, title, type);
     }, 800);
   };
 
-  // ══ EXPORT FOR MANUAL USE ══
   window.MFLegalProviders = {
     show: renderLegalProviders,
     providers: STREAMING_PROVIDERS
@@ -992,23 +901,3 @@
   console.log('[MFLegalProviders] Legal streaming providers loaded');
 })();
 
-/**
- * ══ POUŽITÍ ══
- *
- * Funkce se automaticky spustí při otevření cinema mode.
- * Zobrazí sekci s logy legálních streaming služeb.
- *
- * Podporované služby:
- * - Apple TV+
- * - Netflix
- * - Prime Video
- * - Disney+
- * - Max (HBO)
- * - Crunchyroll
- * - Canal+
- * - Voyo
- * - SkyShowtime
- * - O2 TV
- * - Mall.TV
- * - a další...
- */
