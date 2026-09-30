@@ -1,11 +1,5 @@
-/* dock.js — chytrý dock + zdroj pravdy o tom, kde uživatel je.
-   Samostatný soubor: nespadne, ani když se v app.js něco pokazí. */
-;/* ═══ DOCK SYNC v2 — dock ví, kde uživatel skutečně je ═══
-   Jediný zdroj pravdy je to, co je OPRAVDU vidět (overlaye, sekce), ne to,
-   co si kdo naposledy zapamatoval. Nejvýše položená vrstva vyhrává:
-   Profil → Objevovat → Oblíbené → sekce (Pro tebe) → Domů.
-   Přepočítává se: při změně tříd overlayů, po Esc / kliknutí, při každém
-   volání setDockActive (i ze starého kódu) a jako pojistka 2× za sekundu. */
+;
+
 (function mfDockSync() {
   try {
     var IDS = ["dockHome", "dockFilmy", "dockProtebe", "dockProfile"];
@@ -38,7 +32,6 @@
           if (want) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
         });
         if (typeof window.mfhUpdateDockVisibility === "function") window.mfhUpdateDockVisibility();
-        // ostatní tlačítka (např. dockAI/dockMore) nikdy nesmí zůstat "viset" jako aktivní
         document.querySelectorAll(".dock-btn.active").forEach(function (b) {
           if (IDS.indexOf(b.id) === -1) b.classList.remove("active");
         });
@@ -57,7 +50,6 @@
         if (el) new MutationObserver(function () { sync(); }).observe(el, { attributes: true, attributeFilter: ["class", "style"] });
       });
       new MutationObserver(function () { apply(); }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-      // jakékoliv volání setDockActive (i ze starého kódu) se po chvíli ověří proti realitě
       var orig = window.setDockActive;
       if (typeof orig === "function") window.setDockActive = function () {
         var r = orig.apply(this, arguments);
@@ -68,7 +60,7 @@
       document.addEventListener("click", function () { sync(120); setTimeout(apply, 450); }, true);
       window.addEventListener("hashchange", function () { sync(); });
       window.addEventListener("popstate", function () { sync(); });
-      setInterval(apply, 500); // pojistka
+      setInterval(apply, 500);
       apply();
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
@@ -76,12 +68,8 @@
   } catch (err) { console.warn("[dock sync]", err); }
 })();
 
-;/* ═══ CHYTRÝ DOCK ═══
-   1) plynule klouzavá "pilulka" pod aktivní ikonou
-   2) počet položek v Oblíbených jako odznak na srdíčku
-   3) automatické schování při rolování dolů / vrácení při rolování nahoru
-   4) opakované klepnutí na aktivní ikonu: Domů → nahoru, Objevovat → do hledání
-   Samostatný blok v try/catch — nezávislý na zbytku appky. */
+;
+
 (function mfSmartDock() {
   try {
     var dock, pill, badge, hidden = false, lastY = {}, ticking = false;
@@ -113,7 +101,6 @@
     function onScroll(e) {
       var t = e.target === document ? document.scrollingElement : e.target;
       if (!t || t.nodeType !== 1) return;
-      // ignoruj vodorovné karusely a malé kontejnery
       if (t.scrollHeight - t.clientHeight < 120) return;
       var key = t.id || t.className || "doc";
       var y = t.scrollTop, prev = lastY[key];
@@ -169,7 +156,6 @@
       if (window.ResizeObserver) new ResizeObserver(function () { movePill(); }).observe(dock);
       window.addEventListener("resize", movePill);
       window.addEventListener("storage", updateBadge);
-      // badge se přepočítá po každém uložení Oblíbených
       if (typeof window.saveWatchlistData === "function") {
         var orig = window.saveWatchlistData;
         window.saveWatchlistData = function () {
@@ -180,11 +166,9 @@
       }
       document.addEventListener("scroll", onScroll, { capture: true, passive: true });
       document.addEventListener("click", onDockClick, true);
-      // schovaný dock se vrátí při pohybu myši u spodní hrany
       document.addEventListener("mousemove", function (e) {
         if (hidden && e.clientY > window.innerHeight - 70) setHidden(false);
       }, { passive: true });
-      // při otevření overlaye se dock vždy ukáže
       setTimeout(movePill, 300); setTimeout(movePill, 1200);
       updateBadge();
       setInterval(updateBadge, 5000);
