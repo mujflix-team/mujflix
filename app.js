@@ -244,7 +244,7 @@ async function tmdbGet(e, forceDirect = false) {
       const resp = await mfFetch(proxyUrl);
       if (!resp.ok) {
         console.warn("[TMDB-Proxy] HTTP error:", resp.status, resp.statusText);
-        console.info("[TMDB] Fallback to direct API");
+        
         return tmdbGet(e, true);
       }
       const data = await resp.json();
@@ -347,52 +347,6 @@ async function loadTmdbTileImages() {
       }))
     }
   }
-}
-async function loadForYouTile() {
-  const e = document.getElementById("forYouInner");
-  if (!e) return;
-  const t = void 0 !== aiBrain && aiBrain?.memory?.genrePreferences || {},
-    n = Object.entries(t).sort((e, t) => t[1] - e[1]).slice(0, 3).map(([e]) => e);
-  n.length || n.push("drama", "akcni", "sci-fi");
-  const o = n[Math.floor(Math.random() * n.length)],
-    i = TMDB_GENRE_MAP[o] || 18,
-    a = o.charAt(0).toUpperCase() + o.slice(1),
-    s = Math.floor(5 * Math.random()) + 1,
-    r = Math.random() > .35 ? "tv" : "movie";
-  window._forYouSeen || (window._forYouSeen = new Set);
-  const l = new Set(Object.values(db).map(e => e.tmdbId));
-  try {
-    const t = "tv" === r ? `/discover/tv?with_genres=${i}&sort_by=vote_average.desc&vote_count.gte=200&page=${s}&language=cs` : `/discover/movie?with_genres=${i}&sort_by=vote_average.desc&vote_count.gte=500&page=${s}&language=cs`,
-      n = await tmdbGet(t);
-    if (!n?.results?.length) return void renderForYouFallback(e);
-    const o = n.results.filter(e => e.poster_path && !l.has(e.id) && !window._forYouSeen.has(e.id)),
-      c = o.length ? o : n.results.filter(e => e.poster_path && !l.has(e.id));
-    if (!c.length) return void renderForYouFallback(e);
-    const d = c[Math.floor(Math.random() * Math.min(8, c.length))];
-    window._forYouSeen.add(d.id);
-    const m = d.name || d.title || d.original_name || "?";
-    _forYouSeries = {
-      tmdbId: d.id,
-      name: m,
-      mediaType: r,
-      backdrop: d.backdrop_path ? IMG_B + d.backdrop_path : null,
-      poster: d.poster_path ? IMG_P + d.poster_path : null,
-      genre: a,
-      overview: d.overview || "",
-      rating: d.vote_average ? d.vote_average.toFixed(1) : null,
-      year: (d.first_air_date || d.release_date || "").slice(0, 4)
-    }, e.innerHTML = `\n      <img class="fyi-bg" src="${_forYouSeries.backdrop||_forYouSeries.poster||""}" alt="" onerror="this.style.display='none'">\n      <div class="fyi-gradient"></div>\n      <div class="fyi-badge-wrap">\n            <div class="fyi-badge">✦ Doporučení</div>\n        ${_forYouSeries.rating?`<div class="fyi-rating">★ ${_forYouSeries.rating}</div>`:""}\n      </div>\n      <div class="fyi-title">${m}</div>\n      <div class="fyi-genre">${a} · ${"tv"===r?"Seriál":"Film"}${_forYouSeries.year?" · "+_forYouSeries.year:""}</div>`
-  } catch (t) {
-    renderForYouFallback(e)
-  }
-}
-
-function renderForYouFallback(e) {
-  _forYouSeries = {
-    name: "Objevi neco",
-    genre: "Doporučení",
-    tmdbId: 0
-  }, e.innerHTML = '<div class="fyi-loading"><div style="font-size:2rem;">🎲</div><div class="fyi-loading-text">Doporučení</div></div>'
 }
 
 function openForYouSeries() {
@@ -502,8 +456,6 @@ function updateLogoProgress() {
     })
   })
 }();
-function updateContinueWidget() {
-}
 
 function showToast(e, t) {
   let n = document.getElementById("mf-toast");
@@ -1421,7 +1373,6 @@ function closeConfirm() {
 
 function openSeries(e) {
   if (!db[e]) return;
-  playOpen();
   try {
     db[e]._genres && aiBrain.boostGenresFromTmdb(db[e]._genres, .04), aiBrain.recordWatchTime()
   } catch (e) {}
@@ -1444,7 +1395,6 @@ function openSeries(e) {
 }
 
 function closeModal() {
-  playClick();
   const e = document.getElementById("seriesModal");
   e.classList.remove("visible");
   const t = e.querySelector(".modal-hero-content");
@@ -1637,7 +1587,7 @@ function markWatched(e) {
     const e = n.querySelector(".ep-btn-mark");
     e && (e.textContent = "✓")
   }
-  updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateContinueWidget(), updateLogoProgress(), aiBrain && db[activeSeries] && db[activeSeries]._genres && aiBrain.boostGenresFromTmdb(db[activeSeries]._genres)
+  updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateLogoProgress(), aiBrain && db[activeSeries] && db[activeSeries]._genres && aiBrain.boostGenresFromTmdb(db[activeSeries]._genres)
 }
 document.getElementById("seriesModal").addEventListener("click", e => {
   e.target === document.getElementById("seriesModal") && closeModal()
@@ -1646,7 +1596,7 @@ document.getElementById("seriesModal").addEventListener("click", e => {
 function toggleWatch(e) {
   const t = getWatched(),
     n = !!t[e];
-  if (n ? delete t[e] : t[e] = !0, saveWatched(t), renderEpisodes(), updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateContinueWidget(), updateLogoProgress(), !n && "function" == typeof openEpRating) {
+  if (n ? delete t[e] : t[e] = !0, saveWatched(t), renderEpisodes(), updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateLogoProgress(), !n && "function" == typeof openEpRating) {
     const t = e.split("-"),
       n = t.slice(0, t.length - 2).join("-"),
       o = (void 0 !== db && db[n] ? db[n] : {}).name || n,
@@ -1688,7 +1638,7 @@ function getWatchlist() {
 }
 
 function saveWatchlistData(e) {
-  safeSetItem(uKey("mf_watchlist"), JSON.stringify(e)), updateWatchlistBadge()
+  safeSetItem(uKey("mf_watchlist"), JSON.stringify(e))
 }
 
 function tmdbFavSlug(id, mediaType) {
@@ -1721,12 +1671,6 @@ function toggleTmdbFavorite(id, mediaType, name, poster, btn) {
   saveWatchlistData(list);
   if (btn) btn.classList.toggle("faved", idx < 0);
   if (typeof updateWatchlistBtns === "function") updateWatchlistBtns()
-}
-
-function updateWatchlistBadge() {
-  const e = getWatchlist(),
-    t = document.getElementById("watchlistFabBadge");
-  t && (t.textContent = e.length, t.classList.toggle("visible", e.length > 0))
 }
 
 function updateWatcherBadges() {
@@ -1942,7 +1886,7 @@ function submitRating(e) {
     const t = "loved" === e ? .25 : "liked" === e ? .15 : "ok" === e ? .05 : -.1;
     db[_ratingSlug]._genres && aiBrain.boostGenresFromTmdb(db[_ratingSlug]._genres, t)
   }
-  closeRating(), showToast("loved" === e ? "Super! AI si to zapamuje pro doporuceni 🎉" : "meh" === e ? "Chapeme, priste neco lepsiho 👍" : "Diky za hodnoceni!"), setTimeout(loadForYouTile, 500)
+  closeRating(), showToast("loved" === e ? "Super! AI si to zapamuje pro doporuceni 🎉" : "meh" === e ? "Chapeme, priste neco lepsiho 👍" : "Diky za hodnoceni!")
 }
 document.getElementById("watchlistOverlay").addEventListener("click", e => {
   e.target === document.getElementById("watchlistOverlay") && closeWatchlist()
@@ -1991,88 +1935,6 @@ let _bgParticlesDraw = null;
   }
   _bgParticlesDraw = i, i()
 }();
-let audioCtx = null,
-  _audioUnlocked = !1;
-
-function getAudioCtx() {
-  if (!audioCtx) try {
-    audioCtx = new(window.AudioContext || window.webkitAudioContext)
-  } catch {}
-  return audioCtx && "suspended" === audioCtx.state && audioCtx.resume().catch(() => {}), audioCtx
-}
-
-function _unlockAudio() {
-  if (!_audioUnlocked) {
-    if (_audioUnlocked = !0, !audioCtx) try {
-      audioCtx = new(window.AudioContext || window.webkitAudioContext)
-    } catch {}
-    audioCtx && "suspended" === audioCtx.state && audioCtx.resume().catch(() => {})
-  }
-}
-document.addEventListener("pointerdown", _unlockAudio, {
-  once: !0,
-  passive: !0
-}), document.addEventListener("keydown", _unlockAudio, {
-  once: !0,
-  passive: !0
-});
-let _masterComp = null,
-  _masterReverb = null,
-  _masterGain = null;
-
-function _getMaster() {
-  const e = getAudioCtx();
-  return e ? (_masterGain || (_masterGain = e.createGain(), _masterGain.gain.value = .85, _masterComp = e.createDynamicsCompressor(), _masterComp.threshold.value = -18, _masterComp.knee.value = 6, _masterComp.ratio.value = 3, _masterComp.attack.value = .003, _masterComp.release.value = .12, _masterGain.connect(_masterComp), _masterComp.connect(e.destination)), _masterGain) : null
-}
-
-function _apTone(e, t, n, o, i = {}) {
-  try {
-    const a = getAudioCtx();
-    if (!a) return;
-    const s = _getMaster();
-    if (!s) return;
-    const {
-      type: r = "sine",
-      detune: l = 0,
-      attack: c = .003,
-      hold: d = 0,
-      releaseRatio: m = .85
-    } = i, u = a.createOscillator(), p = a.createGain();
-    u.type = r, u.frequency.value = e, l && (u.detune.value = l);
-    const g = t;
-    p.gain.setValueAtTime(0, g), p.gain.linearRampToValueAtTime(o, g + c), d > 0 && p.gain.setValueAtTime(o, g + c + d), p.gain.exponentialRampToValueAtTime(1e-4, g + n), u.connect(p), p.connect(s), u.start(g), u.stop(g + n + .01)
-  } catch {}
-}
-
-function playClick() {
-  const e = getAudioCtx();
-  if (!e) return;
-  const t = e.currentTime;
-  _apTone(1046.5, t, .045, .032, {
-    attack: .002
-  }), _apTone(1318.5, t + .004, .038, .018, {
-    attack: .002
-  })
-}
-
-function playHover() {
-  const e = getAudioCtx();
-  e && _apTone(1e3, e.currentTime, .02, .012, {
-    attack: .002
-  })
-}
-
-function playOpen() {
-  const e = getAudioCtx();
-  if (!e) return;
-  const t = e.currentTime;
-  _apTone(783.99, t, .075, .03, {
-    attack: .003
-  }), _apTone(987.77, t + .065, .06, .022, {
-    attack: .003
-  })
-}
-
 const SERIES_COLORS = {
   "the-simpsons": "255,185,0",
   "family-guy": "40,80,255",
@@ -2136,7 +1998,7 @@ function initUniversalHover(e) {
     o = e.dataset.type || "tv",
     i = e.dataset.slug;
   e.addEventListener("mouseenter", () => {
-    "mainMenu" === e.parentElement.id && t.classList.add("focus-mode"), e.classList.add("focused"), i && setAdaptiveColor(i), playHover();
+    "mainMenu" === e.parentElement.id && t.classList.add("focus-mode"), e.classList.add("focused"), i && setAdaptiveColor(i);
     const a = i && HARDCODED_TRAILERS[i];
     (n || a) && (n && getTrailerKey(n, o, i), e._trailerTimer = setTimeout(() => {
       (e.classList.contains("focused") || e.classList.contains("kb-focus")) && loadTileTrailer(e, n || null, o, i)
@@ -2288,36 +2150,6 @@ function removeTileTrailer(e) {
   }
 }
 
-function initMagnetic(e, t = .35) {
-  e && (e.addEventListener("mousemove", n => {
-    const o = e.getBoundingClientRect(),
-      i = (n.clientX - o.left - o.width / 2) * t,
-      a = (n.clientY - o.top - o.height / 2) * t;
-    e.style.transform = `translate(${i}px,${a}px)`
-  }), e.addEventListener("mouseleave", () => {
-    e.style.transform = ""
-  }))
-}
-
-async function loadTrending() {
-  loadPopular("tv")
-}
-async function loadPopular(e) {
-  const i = document.getElementById("popularList");
-  if (!i) return;
-  const t = document.getElementById("popularSection");
-  try {
-    const n = "tv" === e ? "/trending/tv/week" : "/trending/movie/week",
-      o = await tmdbGet(n);
-    if (!o || !o.results) return;
-    i.innerHTML = "", o.results.filter(e => e.poster_path).slice(0, 30).forEach((t, n) => {
-      const o = t.name || t.title || t.original_name || "",
-        a = document.createElement("div");
-      a.className = "pop-item", a.innerHTML = `<div class="pop-rank">${n+1}</div><img src="${t.poster_path?"https://image.tmdb.org/t/p/w92"+t.poster_path:""}" alt="" loading="lazy" onerror="this.style.display='none'"><div class="pop-item-name">${_esc(o)}</div>`, a.onclick = () => openWithCopy(o, "tv" === e ? "tv" : "movie"), a.addEventListener("mouseenter", playHover), i.appendChild(a)
-    }), t?.classList.add("visible")
-  } catch (e) {}
-}
-
 class AIBrain {
   constructor() {
     this._key = () => "mf_ai_brain_" + (getActiveProfileId() || "default"), this.memory = this._load()
@@ -2425,63 +2257,6 @@ class AIBrain {
   }
 }
 const aiBrain = new AIBrain;
-
-function openApikeyOverlay() {
-  const e = document.getElementById("aiApikeyOverlay");
-  e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible")));
-  const t = localStorage.getItem("mf_gemini_key");
-  t && (document.getElementById("aiGeminiKeyInput").value = t);
-  const n = localStorage.getItem("mf_or_key");
-  n && (document.getElementById("aiOrKeyInput").value = n);
-  const o = localStorage.getItem("mf_groq_key");
-  o && (document.getElementById("aiGroqKeyInput").value = o, document.getElementById("groqStatus").textContent = "✅ Groq aktivní");
-  const i = localStorage.getItem("mf_jina_key");
-  i && "__enabled__" !== i && (document.getElementById("aiJinaKeyInput").value = i);
-  const a = localStorage.getItem("mf_tavily_key");
-  a && (document.getElementById("aiTavilyKeyInput").value = a)
-}
-
-function closeApikeyOverlay() {
-  const e = document.getElementById("aiApikeyOverlay");
-  e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 280)
-}
-
-function switchKeyTab(e, t) {
-  document.querySelectorAll(".ai-key-tab").forEach(e => e.classList.remove("active")), document.querySelectorAll(".ai-key-panel").forEach(e => e.classList.remove("active")), t.classList.add("active");
-  document.getElementById({
-    gemini: "keyPanelGemini",
-    or: "keyPanelOr",
-    groq: "keyPanelGroq",
-    jina: "keyPanelJina",
-    tavily: "keyPanelTavily",
-    trakt: "keyPanelTrakt"
-  } [e] || "keyPanelGemini")?.classList.add("active")
-}
-
-function saveGeminiKey() {
-  const e = document.getElementById("aiGeminiKeyInput").value.trim();
-  e && (localStorage.setItem("mf_gemini_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_gemini_key", e), closeApikeyOverlay(), showToast("✦ Gemini aktivován!"))
-}
-
-function saveOrKey() {
-  const e = document.getElementById("aiOrKeyInput").value.trim();
-  e && (localStorage.setItem("mf_or_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_or_key", e), closeApikeyOverlay(), showToast("↻ OpenRouter přidán!"))
-}
-
-function saveGroqKey() {
-  const e = document.getElementById("aiGroqKeyInput").value.trim();
-  e && (localStorage.setItem("mf_groq_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_groq_key", e), showToast("⚡ Groq aktivován! Slugy se budou čistit AI."), document.getElementById("groqStatus").textContent = "✅ Groq aktivní — automatické čištění URL slugů")
-}
-
-function saveJinaKey() {
-  const e = document.getElementById("aiJinaKeyInput").value.trim() || "__enabled__";
-  localStorage.setItem("mf_jina_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_jina_key", e), closeApikeyOverlay(), showToast("👁 Jina Reader aktivována! Budu ověřovat odkazy.")
-}
-
-function saveTavilyKey() {
-  const e = document.getElementById("aiTavilyKeyInput").value.trim();
-  e && (localStorage.setItem("mf_tavily_key", e), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey("mf_tavily_key", e), closeApikeyOverlay(), showToast("🌐 Tavily aktivován! Záložní vyhledávač odkazů."))
-}
 
 function showFinderModal(e, t, n) {
   let o = document.getElementById("mfFinderModal");
@@ -3126,7 +2901,7 @@ document.addEventListener("keydown", e => {
   if ("INPUT" !== e.target.tagName && "TEXTAREA" !== e.target.tagName) {
     if ("Escape" === e.key) {
       const e = document.getElementById("mfFinderModal");
-      return e && "none" !== e.style.pointerEvents && "none" !== e.style.display ? void closeFinderModal() : modalOpen ? void closeModal() : document.getElementById("watchlistOverlay").classList.contains("open") ? void closeWatchlist() : document.getElementById("universeOverlay").classList.contains("open") ? void closeSearch() : document.getElementById("adminOverlay").classList.contains("open") ? void closeAdmin() : document.getElementById("customizeOverlay").classList.contains("open") ? void closeCustomize() : document.getElementById("collectionsOverlay").classList.contains("open") ? void closeCollections() : document.getElementById("editOverlay")?.classList.contains("open") ? void closeEditMode() : document.getElementById("ratingOverlay")?.classList.contains("open") ? void closeRating() : document.getElementById("genreEditorOverlay")?.classList.contains("open") ? void closeGenreEditor() : void 0
+      return e && "none" !== e.style.pointerEvents && "none" !== e.style.display ? void closeFinderModal() : modalOpen ? void closeModal() : document.getElementById("watchlistOverlay").classList.contains("open") ? void closeWatchlist() : document.getElementById("universeOverlay").classList.contains("open") ? void closeSearch() : document.getElementById("customizeOverlay").classList.contains("open") ? void closeCustomize() : document.getElementById("collectionsOverlay").classList.contains("open") ? void closeCollections() : document.getElementById("ratingOverlay")?.classList.contains("open") ? void closeRating() : document.getElementById("genreEditorOverlay")?.classList.contains("open") ? void closeGenreEditor() : void 0
     }
     if (!("/" !== e.key && "." !== e.key || modalOpen || aiPanelOpen)) return e.preventDefault(), void openSearch();
     if ("menu" !== kbLayer || modalOpen || aiPanelOpen) {
@@ -3169,9 +2944,8 @@ document.addEventListener("keydown", e => {
   }
   if ("ArrowDown" === e.key) {
     const t = document.getElementById("universeOverlay").classList.contains("open"),
-      n = document.getElementById("seriesModal").classList.contains("open"),
-      o = document.getElementById("aiFullscreen")?.classList.contains("open");
-    if (!t && !n && !o && "menu" === kbLayer) return e.preventDefault(), void openDiscover()
+      n = document.getElementById("seriesModal").classList.contains("open");
+    if (!t && !n && "menu" === kbLayer) return e.preventDefault(), void openDiscover()
   }
   if ("ArrowUp" === e.key) {
     if (document.getElementById("universeOverlay").classList.contains("open")) return e.preventDefault(), void closeDiscover()
@@ -3305,18 +3079,14 @@ function buildEpCard(e, t, n, o, i, a, s) {
 window.addEventListener("load", () => {
   if (Object.keys(db).forEach(e => {
       updateTileProgress(e), updateContinueBadge(e)
-    }), updateContinueWidget(), updateLogoProgress(), updateWatchlistBadge(), updateWatchlistBtns(), showAutosave("idle"), initTileEffects(), loadTmdbTileImages().then(() => initTileEffects()), document.querySelectorAll(".ps-tile-wrapper .tile-bg, .ps-tile-wrapper .tile-logo").forEach(e => {
+    }), updateLogoProgress(), updateWatchlistBtns(), showAutosave("idle"), initTileEffects(), loadTmdbTileImages().then(() => initTileEffects()), document.querySelectorAll(".ps-tile-wrapper .tile-bg, .ps-tile-wrapper .tile-logo").forEach(e => {
       const t = () => e.classList.add("loaded");
       e.complete && e.naturalWidth > 0 ? t() : (e.addEventListener("load", t, {
         once: !0
       }), e.addEventListener("error", t, {
         once: !0
       }))
-    }), loadForYouTile(), loadTrending(), setKbMenuFocus(0), initMagnetic(document.getElementById("aiFab"), .3), document.querySelectorAll(".ps-tile-wrapper").forEach(e => {
-      e.addEventListener("click", () => playOpen(), {
-        passive: !0
-      })
-    }), function() {
+    }), setKbMenuFocus(0), function() {
       const e = ["Akce", "Drama", "Sci-Fi", "Horor", "Krimi", "Animák", "Komedie", "Thriller", "Dokument", "Reality", "Romantika", "Fantasy"],
         t = document.getElementById("tsiTags");
       if (!t) return;
@@ -3387,58 +3157,11 @@ window.addEventListener("load", () => {
 async function initPWA() {
   if ("serviceWorker" in navigator) try {
     let e = await navigator.serviceWorker.getRegistration("./");
-    if (!e) return void updatePwaBtn("unsupported");
-    window._swReg = e;
-    const t = Notification.permission;
-    updatePwaBtn("granted" === t ? "granted" : "denied" === t ? "denied" : "default")
+    if (!e) return;
+    window._swReg = e
   } catch (e) {
-    console.warn("[PWA] SW error:", e), updatePwaBtn("error")
-  } else updatePwaBtn("unsupported")
-}
-
-function updatePwaBtn(e) {
-  const t = document.getElementById("pwaNotifBtn"),
-    n = document.getElementById("pwaNotifBtnLbl");
-  if (!t || !n) return;
-  const o = {
-      default: {
-        text: "Povolit push notifikace",
-        color: "rgba(100,200,255,0.9)",
-        bg: "rgba(100,180,255,0.1)",
-        border: "rgba(100,180,255,0.25)",
-        icon: "🔔"
-      },
-      granted: {
-        text: "Notifikace povoleny ✓",
-        color: "rgba(80,220,120,0.9)",
-        bg: "rgba(60,200,100,0.1)",
-        border: "rgba(60,200,100,0.3)",
-        icon: "✅"
-      },
-      denied: {
-        text: "Notifikace blokovány",
-        color: "rgba(255,100,80,0.8)",
-        bg: "rgba(255,80,60,0.08)",
-        border: "rgba(255,80,60,0.25)",
-        icon: "🚫"
-      },
-      error: {
-        text: "Notifikace nedostupné",
-        color: "rgba(160,160,160,0.7)",
-        bg: "rgba(150,150,150,0.06)",
-        border: "rgba(150,150,150,0.15)",
-        icon: "⚠️"
-      },
-      unsupported: {
-        text: "Prohlížeč nepodporuje",
-        color: "rgba(160,160,160,0.7)",
-        bg: "rgba(150,150,150,0.06)",
-        border: "rgba(150,150,150,0.15)",
-        icon: "⚠️"
-      }
-    },
-    i = o[e] || o.default;
-  n.textContent = i.text, t.style.color = i.color, t.style.background = i.bg, t.style.border = `1px solid ${i.border}`, t.firstChild.textContent = i.icon + " ", t.disabled = "granted" === e || "denied" === e || "error" === e || "unsupported" === e
+    console.warn("[PWA] SW error:", e)
+  }
 }
 
 window.mfNotify = function(e, t, n) {
@@ -3686,7 +3409,7 @@ const ProfileGate = {
       if (!t) {
         console.warn('[ProfileGate] selectProfile: profil nenalezen, id=', e, 'dostupné:', profiles.map(p=>p.id));
         if (profiles.length > 0) {
-          console.info('[ProfileGate] Fallback: aktivuji první profil');
+          
           this.activateProfile(profiles[0].id);
         }
         return;
@@ -3699,7 +3422,7 @@ const ProfileGate = {
   },
   activateProfile(e) {
     localStorage.setItem(ACTIVE_PID_KEY, e), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
-      void 0 !== aiBrain && (aiBrain.reloadForProfile(), aiBrain.applyDecay()), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof updateWatchlistBadge && updateWatchlistBadge(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateContinueWidget && updateContinueWidget()
+      void 0 !== aiBrain && (aiBrain.reloadForProfile(), aiBrain.applyDecay()), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), "function" == typeof updateLogoProgress && updateLogoProgress()
     }, 100);
     const t = _getProfiles().find(t => t.id === e);
     if (t) {
@@ -3891,7 +3614,6 @@ const ProfileGate = {
           showTrailer: !0,
           showRating: !0,
           confettiOnWin: !0,
-          soundEnabled: !0,
           darkGold: !0
         },
         contentPref: "all",
@@ -3957,7 +3679,7 @@ window.ProfileGate = ProfileGate;
 function refreshUserContent() {
   void 0 !== db && Object.keys(db).forEach(e => {
     "function" == typeof updateTileProgress && updateTileProgress(e), "function" == typeof updateContinueBadge && updateContinueBadge(e)
-  }), "function" == typeof updateContinueWidget && updateContinueWidget(), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateWatchlistBadge && updateWatchlistBadge(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns()
+  }), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns()
 }! function() {
   const e = _getProfiles();
   try {
@@ -4008,463 +3730,6 @@ function refreshUserContent() {
   }
 }();
 
-async function _checkAdminCredentials(e, t) {
-  const n = (new TextEncoder).encode(e + ":" + t),
-    o = await crypto.subtle.digest("SHA-256", n);
-  return "8f10270aba9208087a115fb18fc008a47e349f3d17ceeba3292eddbc7be97b37" === Array.from(new Uint8Array(o)).map(e => e.toString(16).padStart(2, "0")).join("")
-}
-console.log("🎤 Speech Manager zaregistrován!"), console.log("💡 Zkratky: V = start listening, M = stop"),
-  function() {
-    const e = document.getElementById("ai-bubble-canvas");
-    if (!e) return;
-    const t = e.getContext("2d"),
-      n = 320,
-      o = 320,
-      i = 110;
-    e.width = n, e.height = o;
-    let a = !1,
-      s = null,
-      r = 0,
-      l = 0,
-      c = 0,
-      d = 0;
-
-    function m(e, t, n) {
-      return .5 * (Math.sin(2.1 * e + n) * Math.cos(1.7 * t + .7 * n) + Math.sin(3.4 * e - 1.1 * n) * Math.sin(2.9 * t + .5 * n))
-    }
-
-    function u(e) {
-      if (s = requestAnimationFrame(u), document.hidden) return;
-      if (e - d < (a ? 20 : 50)) return;
-      d = e, t.clearRect(0, 0, n, o), c += .018 + .06 * r, r += .12 * (l - r), t.save(), t.translate(160, 160);
-      for (let e = 3; e >= 0; e--) {
-        const n = i * (1.05 + .18 * r) + 18 * e,
-          o = .06 - .012 * e,
-          a = t.createRadialGradient(0, 0, .3 * n, 0, 0, n);
-        a.addColorStop(0, "hsla(65,100%,75%," + (o + .08 * r) + ")"), a.addColorStop(1, "hsla(95,80%,50%,0)"), t.beginPath(), t.arc(0, 0, n, 0, 2 * Math.PI), t.fillStyle = a, t.fill()
-      }
-      t.beginPath();
-      for (let e = 0; e <= 128; e++) {
-        const n = e / 128 * Math.PI * 2,
-          o = Math.cos(n),
-          a = Math.sin(n),
-          s = m(o, a, c) * (.08 + .22 * r),
-          l = i * (1 + s),
-          d = o * l,
-          u = a * l;
-        0 === e ? t.moveTo(d, u) : t.lineTo(d, u)
-      }
-      t.closePath();
-      const p = t.createRadialGradient(.28 * -i, -35.2, 5.5, 0, 0, 1.15 * i);
-      p.addColorStop(0, "hsla(80,100%,92%,0.98)"), p.addColorStop(.25, "hsla(65,100%,68%,0.95)"), p.addColorStop(.55, "hsla(55,90%,42%,0.92)"), p.addColorStop(.82, "hsla(40,80%,18%,0.97)"), p.addColorStop(1, "hsla(30,70%,8%,1)"), t.fillStyle = p, t.fill(), t.save(), t.clip();
-      const g = t.createRadialGradient(-41.8, .42 * -i, 0, -22, -22, 71.5);
-      g.addColorStop(0, "rgba(255,255,255,0.75)"), g.addColorStop(.35, "rgba(255,255,255,0.18)"), g.addColorStop(1, "rgba(255,255,255,0)"), t.fillStyle = g, t.fillRect(-160, -160, n, o);
-      const f = t.createRadialGradient(55, .55 * i, 0, 33, 44, 66);
-      if (f.addColorStop(0, "hsla(105,100%,85%," + (.12 + .18 * r) + ")"), f.addColorStop(1, "rgba(0,0,0,0)"), t.fillStyle = f, t.fillRect(-160, -160, n, o), t.restore(), r > .04)
-        for (let e = 0; e < 3; e++) {
-          const n = (2.5 * c + 1.2 * e) % (2 * Math.PI),
-            o = i * (1.05 + .12 * e + .06 * Math.sin(n) * r),
-            a = r * (.35 - .1 * e) * Math.abs(Math.sin(.5 * n));
-          t.beginPath(), t.arc(0, 0, o, 0, 2 * Math.PI), t.strokeStyle = "hsla(65,100%,70%," + a + ")", t.lineWidth = 1.5 - .4 * e, t.stroke()
-        }
-      const y = t.createRadialGradient(0, 0, 0, 0, 0, 77);
-      y.addColorStop(0, "hsla(75,100%,85%," + (.05 + .25 * r) + ")"), y.addColorStop(1, "rgba(0,0,0,0)"), t.beginPath(), t.arc(0, 0, 77, 0, 2 * Math.PI), t.fillStyle = y, t.fill(), t.restore()
-    }
-    window.aiBubbleShow = function(e) {
-      const t = document.getElementById("ai-voice-bubble-overlay");
-      t && (a = !0, r = 0, l = .1, t.classList.add("active"), s || u(), e && function(e) {
-        let t = !1;
-        e.onstart = () => {
-          t = !0, l = .45;
-          const e = document.getElementById("ai-bubble-label");
-          e && (e.textContent = "AI mluvi...")
-        }, e.onend = e.onerror = () => {
-          t = !1, l = 0, setTimeout(() => {
-            t || aiBubbleStop()
-          }, 900)
-        }, e.onboundary = () => {
-          l = .5 + .4 * Math.random(), setTimeout(() => {
-            l = Math.max(.2, l - .2)
-          }, 80)
-        };
-        const n = setInterval(() => {
-          if (!t) return void clearInterval(n);
-          const e = Date.now() / 1e3,
-            o = Math.abs(.3 * Math.sin(3.8 * e) + .15 * Math.sin(7.2 * e) + .2 * Math.sin(1.4 * e));
-          l = .2 + .6 * o
-        }, 40)
-      }(e))
-    }, window.aiBubbleStop = function() {
-      a = !1, l = 0;
-      const e = document.getElementById("ai-voice-bubble-overlay");
-      e && e.classList.remove("active"), window.speechSynthesis && window.speechSynthesis.cancel(), setTimeout(() => {
-        a || (cancelAnimationFrame(s), s = null, t.clearRect(0, 0, n, o))
-      }, 600)
-    }
-  }();
-let _adminLoggedIn = !1,
-  _adminLoginTime = null,
-  _adminBcastType = "toast",
-  _adminFpsActive = !1,
-  _adminFpsRaf = null,
-  _adminFpsLast = 0,
-  _adminFpsFrames = 0;
-
-function adminCloseLogin() {
-  const e = document.getElementById("adminLoginModal");
-  e && (e.style.display = "none")
-}
-async function adminDoLogin() {
-  const e = (document.getElementById("adminUser")?.value || "").trim(),
-    t = document.getElementById("adminPass")?.value || "",
-    n = document.getElementById("adminLoginErr");
-  if (await _checkAdminCredentials(e, t)) _adminLoggedIn = !0, _adminLoginTime = Date.now(), adminCloseLogin(), adminOpenPanel();
-  else {
-    n && (n.style.display = "block");
-    const e = document.getElementById("adminPass");
-    e && (e.value = "", e.focus());
-    const t = document.getElementById("adminLoginModal")?.querySelector("div");
-    t && (t.style.animation = "none", t.style.transform = "translateX(0)", setTimeout(() => {
-      t.style.transition = "transform 0.08s ease", [10, -10, 7, -7, 4, -4, 0].forEach((e, n) => {
-        setTimeout(() => t.style.transform = `translateX(${e}px)`, 60 * n)
-      })
-    }, 10))
-  }
-}
-
-function adminLogout() {
-  _adminLoggedIn = !1, adminStopFps(), document.getElementById("adminPanel").style.display = "none", "function" == typeof showToast && showToast("👋 Admin odhlášen")
-}
-
-function adminOpenPanel() {
-  if (!_adminLoggedIn) return;
-  const e = document.getElementById("adminPanel");
-  if (!e) return;
-  e.style.display = "block", document.querySelectorAll(".adm-tab-content").forEach(e => e.style.display = "none");
-  const t = document.getElementById("adminTab_profiles");
-  t && (t.style.display = "block"), document.querySelectorAll(".adm-tab").forEach(e => {
-    e.style.background = "rgba(255,255,255,0.04)", e.style.borderColor = "rgba(255,255,255,0.08)", e.style.color = "rgba(255,255,255,0.5)"
-  });
-  const n = document.querySelector(".adm-tab");
-  n && (n.style.background = "rgba(0,122,255,0.12)", n.style.borderColor = "rgba(0,122,255,0.3)", n.style.color = "var(--accent)"), adminRefresh(), adminStartSessionTimer(), adminLoadBroadcastHistory();
-  const o = "1" === localStorage.getItem("mf_admin_debug"),
-    i = document.getElementById("adminDebugToggle");
-  i && (i.textContent = o ? "ON" : "OFF", i.style.color = o ? "var(--accent)" : "rgba(255,255,255,0.5)")
-}
-let _adminSessionInterval = null;
-
-function adminStartSessionTimer() {
-  clearInterval(_adminSessionInterval), _adminSessionInterval = setInterval(() => {
-    const e = document.getElementById("adminSessionTime");
-    if (!e || !_adminLoginTime) return;
-    const t = Math.floor((Date.now() - _adminLoginTime) / 1e3),
-      n = Math.floor(t / 60),
-      o = t % 60;
-    e.textContent = `Session: ${n}:${String(o).padStart(2,"0")}`
-  }, 1e3)
-}
-
-function adminRefresh() {
-  adminLoadStats(), adminLoadProfiles(), adminLoadWatchlists(), adminLoadHistory(), adminLoadStorage()
-}
-
-function adminLoadStats() {
-  const e = document.getElementById("adminStatsRow");
-  if (!e) return;
-  let t = 0,
-    n = 0,
-    o = 0;
-  try {
-    t = safeLS("mf_profiles_v2", "[]").length
-  } catch (e) {}
-  try {
-    Object.keys(localStorage).forEach(e => {
-      if (e.includes("watchlist") || e.includes("wl")) try {
-        const t = JSON.parse(localStorage.getItem(e));
-        Array.isArray(t) && (n += t.length)
-      } catch (e) {}
-    })
-  } catch (e) {}
-  try {
-    Object.keys(localStorage).forEach(e => {
-      if (e.includes("history") || e.includes("hist")) try {
-        const t = JSON.parse(localStorage.getItem(e));
-        Array.isArray(t) && (o += t.length)
-      } catch (e) {}
-    })
-  } catch (e) {}
-  const i = Object.keys(localStorage).reduce((e, t) => e + (localStorage.getItem(t) || "").length, 0),
-    a = [{
-      icon: "👥",
-      label: "Profilů",
-      value: t,
-      color: "var(--accent)"
-    }, {
-      icon: "📋",
-      label: "Watchlist položek",
-      value: n,
-      color: "#00cfff"
-    }, {
-      icon: "📜",
-      label: "Historie záznamů",
-      value: o,
-      color: "#ff4ecb"
-    }, {
-      icon: "💾",
-      label: "Storage",
-      value: (i / 1024).toFixed(1) + " KB",
-      color: "#50fa7b"
-    }];
-  e.innerHTML = a.map(e => `\n      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px;text-align:center;">\n        <div style="font-size:1.4rem;margin-bottom:4px;">${e.icon}</div>\n        <div style="font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-size:1.35rem;font-weight:900;color:${e.color};">${e.value}</div>\n        <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:2px;">${e.label}</div>\n      </div>\n    `).join("")
-}
-
-function adminSwitchTab(e, t) {
-  document.querySelectorAll(".adm-tab").forEach(e => {
-    e.style.background = "rgba(255,255,255,0.04)", e.style.borderColor = "rgba(255,255,255,0.08)", e.style.color = "rgba(255,255,255,0.5)"
-  }), document.querySelectorAll(".adm-tab-content").forEach(e => e.style.display = "none");
-  const n = t || ("undefined" != typeof event ? event.currentTarget : null);
-  n && (n.style.background = "rgba(0,122,255,0.12)", n.style.borderColor = "rgba(0,122,255,0.3)", n.style.color = "var(--accent)");
-  const o = document.getElementById("adminTab_" + e);
-  o && (o.style.display = "block"), "apikeys" === e && setTimeout(adminRenderPerProfileKeys, 60)
-}
-
-function adminLoadProfiles() {
-  const e = document.getElementById("adminProfilesList");
-  if (!e) return;
-  let t = [];
-  try {
-    t = safeLS("mf_profiles_v2", "[]")
-  } catch (e) {}
-  t.length ? e.innerHTML = t.map((e, t) => `\n      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">\n        <div style="width:40px;height:40px;border-radius:50%;background:${e.color||"#333"};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${e.avatar||"🎬"}</div>\n        <div style="flex:1;min-width:0;">\n          <div style="font-size:0.85rem;font-weight:700;">${e.name||"Profil "+(t+1)}</div>\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:2px;">\n            PIN: ${e.pin?"••••":"—"} · Barva: <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${e.color||"#888"};vertical-align:middle;"></span>\n            ${e.traktToken?" · Trakt ✓":""}\n          </div>\n        </div>\n        <div style="display:flex;gap:6px;">\n          <button onclick="adminEditProfile(${t})" style="padding:6px 12px;border-radius:8px;background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);color:rgba(0,122,255,0.7);font-size:0.62rem;font-weight:700;cursor:pointer;">✏ Upravit</button>\n          <button onclick="adminDeleteProfile(${t})" style="padding:6px 12px;border-radius:8px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);color:rgba(255,100,100,0.7);font-size:0.62rem;font-weight:700;cursor:pointer;">🗑</button>\n        </div>\n      </div>\n    `).join("") : e.innerHTML = '<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;padding:20px;">Žádné profily</div>'
-}
-
-function adminDeleteProfile(e) {
-  if (confirm("Smazat profil č. " + (e + 1) + "? Toto je nevratné!")) try {
-    const t = safeLS("mf_profiles_v2", "[]");
-    t.splice(e, 1), safeSetItem("mf_profiles_v2", JSON.stringify(t)), adminRefresh(), "function" == typeof showToast && showToast("🗑 Profil smazán")
-  } catch (e) {}
-}
-
-function adminEditProfile(e) {
-  try {
-    const t = safeLS("mf_profiles_v2", "[]"),
-      n = t[e];
-    if (!n) return;
-    const o = prompt("Nové jméno profilu:", n.name || "");
-    if (null === o) return;
-    o.trim() && (n.name = o.trim());
-    const i = prompt("Nový PIN (4 číslice, prázdné = bez PINu):", "");
-    null !== i && (n.pin = i.trim() || null), t[e] = n, safeSetItem("mf_profiles_v2", JSON.stringify(t)), adminLoadProfiles(), "function" == typeof showToast && showToast("✓ Profil upraven")
-  } catch (e) {}
-}
-
-function adminCreateProfile() {
-  const e = prompt("Jméno nového profilu:");
-  if (e && e.trim()) try {
-    const t = safeLS("mf_profiles_v2", "[]");
-    t.push({
-      name: e.trim(),
-      avatar: "🎬",
-      color: "#007AFF",
-      pin: null
-    }), safeSetItem("mf_profiles_v2", JSON.stringify(t)), adminRefresh(), "function" == typeof showToast && showToast("✓ Profil vytvořen: " + e.trim())
-  } catch (e) {}
-}
-
-function adminLoadWatchlists() {
-  const e = document.getElementById("adminWatchlistContent");
-  if (!e) return;
-  let t = [];
-  try {
-    t = safeLS("mf_profiles_v2", "[]")
-  } catch (e) {}
-  t.length ? (e.innerHTML = "", t.forEach((t, n) => {
-    t.id;
-    let o = [];
-    ["mf_watchlist_" + (t.id || n), "mf_watchlist_" + n, "mf_watchlist"].forEach(e => {
-      try {
-        const t = safeLS(e, "[]");
-        Array.isArray(t) && t.length && (o = t)
-      } catch (e) {}
-    });
-    const i = document.createElement("div");
-    i.style.cssText = "background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;", i.innerHTML = `\n        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">\n          <div style="font-size:1rem;">${t.avatar||"🎬"}</div>\n          <div style="font-size:0.82rem;font-weight:700;">${t.name||"Profil "+(n+1)}</div>\n          <div style="margin-left:auto;font-size:0.6rem;color:rgba(255,255,255,0.3);">${o.length} položek</div>\n        </div>\n        ${o.length?o.slice(0,5).map(e=>`\n          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,0.04);font-size:0.7rem;">\n            <span>${"movie"===e.type?"🎬":"📺"}</span>\n            <span style="flex:1;">${e.name||e.title||"?"}</span>\n          </div>\n        `).join("")+(o.length>5?`<div style="font-size:0.62rem;color:rgba(255,255,255,0.3);margin-top:6px;">... a ${o.length-5} dalších</div>`:""):'<div style="font-size:0.68rem;color:rgba(255,255,255,0.25);">Prázdný watchlist</div>'}\n      `, e.appendChild(i)
-  })) : e.innerHTML = '<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);">Žádné profily</div>'
-}
-
-function adminLoadHistory() {
-  const e = document.getElementById("adminHistoryContent");
-  if (!e) return;
-  let t = [];
-  try {
-    t = safeLS("mf_user_history", "[]")
-  } catch (e) {}
-  Object.keys(localStorage).forEach(e => {
-    if (e.includes("history") && !t.length) try {
-      const n = safeLS(e, "[]");
-      Array.isArray(n) && n.length && (t = n)
-    } catch (e) {}
-  }), t.length ? e.innerHTML = t.slice(0, 30).map((e, t) => {
-    const n = e.title || e.name || e.t || JSON.stringify(e).slice(0, 40),
-      o = e.ts || e.timestamp || e.date;
-    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);">\n        <span style="font-size:0.65rem;color:rgba(255,255,255,0.2);min-width:20px;">${t+1}</span>\n        <span style="flex:1;font-size:0.72rem;">${n}</span>\n        <span style="font-size:0.6rem;color:rgba(255,255,255,0.25);">${o?new Date(o).toLocaleDateString("cs-CZ"):""}</span>\n      </div>`
-  }).join("") + (t.length > 30 ? `<div style="font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:8px;">... a ${t.length-30} dalších záznamů</div>` : "") : e.innerHTML = '<div style="color:rgba(255,255,255,0.3);">Žádná historie</div>'
-}
-
-function adminClearHistory() {
-  confirm("Smazat celou historii sledování?") && (Object.keys(localStorage).forEach(e => {
-    e.includes("history") && localStorage.removeItem(e)
-  }), adminRefresh(), "function" == typeof showToast && showToast("🗑 Historie smazána"))
-}
-
-function adminLoadStorage() {
-  const e = document.getElementById("adminStorageList"),
-    t = document.getElementById("adminStorageSize");
-  if (!e) return;
-  const n = Object.keys(localStorage).sort(),
-    o = n.reduce((e, t) => e + (localStorage.getItem(t) || "").length, 0);
-  t && (t.textContent = "Celkem: " + (o / 1024).toFixed(1) + " KB / ~5 MB");
-  const i = (document.getElementById("adminStorageSearch")?.value || "").toLowerCase(),
-    a = n.filter(e => !i || e.toLowerCase().includes(i));
-  e.innerHTML = a.map(e => {
-    const t = localStorage.getItem(e) || "",
-      n = (t.length / 1024).toFixed(2);
-    let o = t.length > 60 ? t.slice(0, 60) + "…" : t;
-    try {
-      o = JSON.stringify(JSON.parse(t)).slice(0, 60) + "…"
-    } catch (e) {}
-    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;background:rgba(255,255,255,0.02);">\n        <div style="flex:1;min-width:0;">\n          <div style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.6);font-family:monospace;">${e}</div>\n          <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o}</div>\n        </div>\n        <div style="font-size:0.6rem;color:rgba(255,255,255,0.2);white-space:nowrap;">${n} KB</div>\n        <button onclick="adminViewKey('${e.replace(/'/g,"\\'")}')" style="padding:3px 8px;border-radius:5px;background:rgba(100,180,255,0.08);border:1px solid rgba(100,180,255,0.18);color:rgba(120,190,255,0.7);font-size:0.55rem;cursor:pointer;">👁</button>\n        <button onclick="adminClearKey('${e.replace(/'/g,"\\'")}')" style="padding:3px 8px;border-radius:5px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.18);color:rgba(255,100,100,0.65);font-size:0.55rem;cursor:pointer;">×</button>\n      </div>`
-  }).join("")
-}
-
-function adminViewKey(e) {
-  const t = localStorage.getItem(e) || "(prázdné)";
-  let n = t;
-  try {
-    n = JSON.stringify(JSON.parse(t), null, 2)
-  } catch (e) {}
-  const o = document.createElement("div");
-  o.style.cssText = "position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,0.88);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;", o.innerHTML = `<div style="background:rgba(8,8,12,0.99);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px;width:min(600px,95vw);max-height:80vh;display:flex;flex-direction:column;">\n      <div style="font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-weight:800;margin-bottom:12px;">🔑 ${e}</div>\n      <pre style="flex:1;overflow:auto;font-size:0.65rem;color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-all;">${n}</pre>\n      <div style="display:flex;gap:8px;margin-top:14px;">\n        <button onclick="navigator.clipboard.writeText(${JSON.stringify(t)});showToast&&showToast('✓ Zkopírováno!')" style="padding:9px 18px;border-radius:10px;background:rgba(0,122,255,0.08);border:1px solid rgba(0,122,255,0.2);color:var(--accent);font-size:0.7rem;font-weight:700;cursor:pointer;">📋 Kopírovat</button>\n        <button onclick="this.closest('div[style]').remove()" style="margin-left:auto;padding:9px 18px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.7rem;cursor:pointer;">Zavřít</button>\n      </div>\n    </div>`, o.addEventListener("click", e => {
-    e.target === o && o.remove()
-  }), document.body.appendChild(o)
-}
-
-function adminClearKey(e) {
-  confirm("Smazat klíč: " + e + "?") && (localStorage.removeItem(e), adminLoadStorage(), adminLoadStats(), "function" == typeof showToast && showToast("✓ Klíč smazán: " + e))
-}
-
-function adminClearAll() {
-  confirm("⚠️ Smazat VŠECHNA data?\nToto je nevratné — zmizí profily, watchlisty, nastavení, vše.") && confirm("Opravdu si jistý? Klikni OK pro definitivní reset.") && (localStorage.clear(), adminRefresh(), "function" == typeof showToast && showToast("💣 Vše smazáno — aplikace resetována"))
-}
-
-function adminExport() {
-  const e = {};
-  Object.keys(localStorage).forEach(t => {
-    e[t] = localStorage.getItem(t)
-  });
-  const t = new Blob([JSON.stringify(e, null, 2)], {
-      type: "application/json"
-    }),
-    n = URL.createObjectURL(t),
-    o = document.createElement("a");
-  o.href = n, o.download = "mujflix-backup-" + (new Date).toISOString().slice(0, 10) + ".json", o.click(), URL.revokeObjectURL(n), "function" == typeof showToast && showToast("📤 Export stažen")
-}
-
-function adminImport() {
-  const e = document.createElement("input");
-  e.type = "file", e.accept = ".json", e.onchange = e => {
-    const t = e.target.files[0];
-    if (!t) return;
-    const n = new FileReader;
-    n.onload = e => {
-      try {
-        const t = JSON.parse(e.target.result);
-        if (!confirm("Importovat " + Object.keys(t).length + " klíčů? Stávající data budou přepsána.")) return;
-        Object.entries(t).forEach(([e, t]) => localStorage.setItem(e, t)), adminRefresh(), "function" == typeof showToast && showToast("📥 Import dokončen!")
-      } catch (e) {
-        alert("Chyba při importu: " + e.message)
-      }
-    }, n.readAsText(t)
-  }, e.click()
-}
-
-function adminSetAccent(e) {
-  document.documentElement.style.setProperty("--accent", e), localStorage.setItem("mf_admin_accent", e), "function" == typeof showToast && showToast("🎨 Accent: " + e)
-}
-
-function adminTestToast() {
-  "function" == typeof showToast ? showToast("🍞 Testovací toast od admina!") : alert("showToast není dostupný")
-}
-
-function adminTestConfetti() {
-  "function" == typeof confetti ? confetti({
-    particleCount: 200,
-    spread: 90,
-    origin: {
-      y: .5
-    }
-  }) : "function" == typeof showToast && showToast("❌ confetti není dostupné")
-}
-
-function adminToggleFps() {
-  _adminFpsActive = !_adminFpsActive;
-  const e = document.getElementById("adminFpsToggle"),
-    t = document.getElementById("adminFpsCounter");
-  if (e && (e.textContent = _adminFpsActive ? "ON" : "OFF", e.style.color = _adminFpsActive ? "var(--accent)" : "rgba(255,255,255,0.5)"), _adminFpsActive) {
-    t && (t.style.display = "block"), _adminFpsLast = performance.now(), _adminFpsFrames = 0, _adminFpsRaf = requestAnimationFrame(function e(n) {
-      if (_adminFpsFrames++, n - _adminFpsLast >= 500) {
-        const e = Math.round(1e3 * _adminFpsFrames / (n - _adminFpsLast));
-        t && (t.textContent = "FPS: " + e, t.style.color = e >= 55 ? "#0f0" : e >= 30 ? "#ff0" : "#f00"), _adminFpsLast = n, _adminFpsFrames = 0
-      }
-      _adminFpsActive && (_adminFpsRaf = requestAnimationFrame(e))
-    })
-  } else adminStopFps()
-}
-
-function adminStopFps() {
-  _adminFpsActive = !1, _adminFpsRaf && (cancelAnimationFrame(_adminFpsRaf), _adminFpsRaf = null);
-  const e = document.getElementById("adminFpsCounter");
-  e && (e.style.display = "none")
-}
-
-function adminBcastType(e) {
-  _adminBcastType = e, document.getElementById("admBcastToast").style.background = "toast" === e ? "rgba(0,122,255,0.1)" : "rgba(255,255,255,0.04)", document.getElementById("admBcastToast").style.borderColor = "toast" === e ? "rgba(0,122,255,0.3)" : "rgba(255,255,255,0.08)", document.getElementById("admBcastToast").style.color = "toast" === e ? "var(--accent)" : "rgba(255,255,255,0.45)", document.getElementById("admBcastBanner").style.background = "banner" === e ? "rgba(0,122,255,0.1)" : "rgba(255,255,255,0.04)", document.getElementById("admBcastBanner").style.borderColor = "banner" === e ? "rgba(0,122,255,0.3)" : "rgba(255,255,255,0.08)", document.getElementById("admBcastBanner").style.color = "banner" === e ? "var(--accent)" : "rgba(255,255,255,0.45)"
-}
-
-function adminSendBroadcast() {
-  const e = document.getElementById("adminBroadcastMsg")?.value?.trim();
-  if (!e) return void("function" == typeof showToast && showToast("⚠ Napiš zprávu!"));
-  if ("toast" === _adminBcastType) "function" == typeof showToast && showToast(e);
-  else {
-    let t = document.getElementById("adminBanner");
-    t || (t = document.createElement("div"), t.id = "adminBanner", t.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:999997;background:var(--accent);color:#000;font-family:-apple-system, SF Pro Display, Helvetica Neue,sans-serif;font-weight:800;font-size:0.78rem;padding:10px 20px;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;", t.innerHTML = '<span id="adminBannerText"></span><button onclick="document.getElementById(\'adminBanner\').remove()" style="background:rgba(0,0,0,0.15);border:none;border-radius:6px;padding:3px 10px;cursor:pointer;font-weight:900;font-size:0.7rem;">✕</button>', document.body.appendChild(t)), document.getElementById("adminBannerText").textContent = e
-  }
-  const t = safeLS("mf_admin_broadcasts", "[]");
-  t.unshift({
-    msg: e,
-    type: _adminBcastType,
-    ts: Date.now()
-  }), localStorage.setItem("mf_admin_broadcasts", JSON.stringify(t.slice(0, 20))), adminLoadBroadcastHistory(), document.getElementById("adminBroadcastMsg").value = "", "function" == typeof showToast && showToast("📢 Zpráva odeslána!")
-}
-
-function adminScheduleBroadcast() {
-  const e = document.getElementById("adminBroadcastMsg")?.value?.trim();
-  if (!e) return void("function" == typeof showToast && showToast("⚠ Napiš zprávu!"));
-  const t = prompt("Za kolik sekund odeslat?", "30");
-  if (!t) return;
-  const n = 1e3 * parseInt(t);
-  "function" == typeof showToast && showToast("⏰ Naplánováno za " + t + "s"), setTimeout(() => adminSendBroadcast(), n)
-}
-
-function adminLoadBroadcastHistory() {
-  const e = document.getElementById("adminBroadcastHistory");
-  if (!e) return;
-  const t = safeLS("mf_admin_broadcasts", "[]");
-  t.length ? e.innerHTML = '<div style="font-size:0.62rem;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Historie zpráv</div>' + t.slice(0, 5).map(e => `<div style="padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);margin-bottom:5px;font-size:0.68rem;">\n        <span style="color:rgba(255,255,255,0.5);">${e.msg}</span>\n        <span style="float:right;font-size:0.58rem;color:rgba(255,255,255,0.2);">${new Date(e.ts).toLocaleTimeString("cs-CZ")}</span>\n      </div>`).join("") : e.innerHTML = ""
-}! function() {
-  const e = localStorage.getItem("mf_admin_accent");
-  e && document.documentElement.style.setProperty("--accent", e)
-}();
 let _premiereMonth = new Date,
   _premiereFilter = "tracked",
   _premiereCache = {};
@@ -5047,490 +4312,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e && e.classList.remove("has-items")
   }, 500), renderCollectionsGrid()
 });
-const ADMIN_PIN_KEY = "mf_admin_pin",
-  ADMIN_SETTINGS_KEY = "mf_admin_settings";
-let _adminLogs = [],
-  _adminErrors = [];
-
-function adminLog(e, t = "info") {
-  const n = (new Date).toTimeString().slice(0, 8);
-  _adminLogs.push(`[${n}] [${t.toUpperCase()}] ${e}`), _adminLogs.length > 200 && _adminLogs.shift()
-}
-
-function adminPinGateOpen() {
-  document.getElementById("adminPinGate").classList.add("open"), setTimeout(() => document.getElementById("adminPinInput").focus(), 100)
-}
-
-function adminPinGateClose() {
-  document.getElementById("adminPinGate").classList.remove("open"), document.getElementById("adminPinInput").value = "", document.getElementById("adminPinHint").textContent = "Nastav vlastní PIN v Admin → Nastavení", document.getElementById("adminPinHint").style.color = "rgba(255,255,255,0.25)"
-}
-
-function adminCheckPin() {
-  const e = document.getElementById("adminPinInput").value;
-  e === (localStorage.getItem(ADMIN_PIN_KEY) || "1337") ? (adminPinGateClose(), adminOpen()) : e.length >= 4 && (document.getElementById("adminPinHint").textContent = "❌ Špatný PIN", document.getElementById("adminPinHint").style.color = "#ff5050", document.getElementById("adminPinInput").value = "")
-}
-
-function adminOpen() {
-  openAdmin()
-}
-
-function adminRefreshStorage(e = "") {
-  const t = [];
-  for (let n = 0; n < localStorage.length; n++) {
-    const o = localStorage.key(n);
-    e && !o.toLowerCase().includes(e.toLowerCase()) || t.push(o)
-  }
-  t.sort();
-  let n = 0;
-  t.forEach(e => {
-    n += 2 * (localStorage.getItem(e) || "").length
-  });
-  const o = document.getElementById("adminStorageStats");
-  o && (o.innerHTML = `\n        <div class="admin-stat-card"><div class="admin-stat-value">${t.length}</div><div class="admin-stat-label">Klíčů</div></div>\n        <div class="admin-stat-card"><div class="admin-stat-value">${(n/1024).toFixed(1)}</div><div class="admin-stat-label">KB použito</div><div class="admin-stat-sub">z ~5MB limitu</div></div>\n        <div class="admin-stat-card"><div class="admin-stat-value">${(n/1024/5e3*100).toFixed(1)}%</div><div class="admin-stat-label">Plnost</div></div>\n      `);
-  const i = document.getElementById("adminStorageCode");
-  i && (i.textContent = t.map(e => {
-    let t = localStorage.getItem(e) || "";
-    return t.length > 120 && (t = t.slice(0, 120) + "..."), `${e}\n  → ${t}`
-  }).join("\n\n") || "Žádné klíče", i.onclick = () => {
-    navigator.clipboard?.writeText(i.textContent), showToast?.("📋 Zkopírováno!")
-  })
-}
-
-function adminFilterStorage(e) {
-  adminRefreshStorage(e)
-}
-
-function adminLoadSettings() {
-  try {
-    const e = safeLS(ADMIN_SETTINGS_KEY, "{}"),
-      t = document.getElementById("adminVisibleToggle"),
-      n = document.getElementById("adminDebugToggle"),
-      o = document.getElementById("adminVerboseToggle");
-    t && t.classList.toggle("on", !!e.visible), n && n.classList.toggle("on", !!e.debug), o && o.classList.toggle("on", !!e.verbose);
-    const i = document.getElementById("adminTriggerBtn");
-    i && i.classList.toggle("visible", !!e.visible)
-  } catch {}
-}
-
-function adminSaveSettings(e) {
-  const t = safeLS(ADMIN_SETTINGS_KEY, "{}");
-  Object.assign(t, e), safeSetItem(ADMIN_SETTINGS_KEY, JSON.stringify(t)), adminLoadSettings()
-}
-
-function adminToggleDebug(e) {
-  e.classList.toggle("on"), adminSaveSettings({
-    debug: e.classList.contains("on")
-  }), showToast?.(e.classList.contains("on") ? "🐛 Debug mode ON — AI skóre viditelné" : "🐛 Debug mode OFF")
-}
-
-! function() {
-  const e = console.error.bind(console),
-    t = console.warn.bind(console);
-  console.error = (...t) => {
-    _adminErrors.push("[ERR] " + t.join(" ")), _adminErrors.length > 100 && _adminErrors.shift(), e(...t)
-  }, console.warn = (...e) => {
-    _adminLogs.push("[WARN] " + e.join(" ")), _adminLogs.length > 200 && _adminLogs.shift(), t(...e)
-  }
-}(), document.addEventListener("keydown", e => {
-    e.ctrlKey && e.shiftKey && "A" === e.key && (e.preventDefault(), adminPinGateOpen())
-  }),
-  function() {
-    try {
-      const e = safeLS(ADMIN_SETTINGS_KEY, "{}"),
-        t = document.getElementById("adminTriggerBtn");
-      t && e.visible && t.classList.add("visible")
-    } catch {}
-    adminLog("MůjFlix admin modul načten", "ok")
-  }();
-const EDIT_STORAGE_KEY = "mf_fab_layout_v2",
-  SNAP_PX = 16,
-  ROW_HEIGHTS = [22, 96, 170],
-  FAB_REGISTRY = [{
-    id: "aiFab",
-    name: "AI",
-    icon: "🤖",
-    selector: "#aiFab"
-  }, {
-    id: "voiceModeFab",
-    name: "Hlas",
-    icon: "🎤",
-    selector: "#voiceModeFab"
-  }, {
-    id: "syncBtn",
-    name: "Sync",
-    icon: "🔄",
-    selector: "#syncBtn"
-  }];
-let _editActive = !1,
-  _selectedFab = null,
-  _editProps = {},
-  _dragState = null,
-  _copiedStyle = null;
-
-function openEditMode() {
-  _editActive = !0, _loadEditLayout(), document.body.classList.add("edit-mode-active"), document.getElementById("editOverlay").classList.add("open"), requestAnimationFrame(() => document.getElementById("editOverlay").classList.add("visible")), document.getElementById("editTopbar").classList.add("visible"), FAB_REGISTRY.forEach(e => {
-    const t = document.querySelector(e.selector);
-    t && (t.dataset.fabId = e.id, _applyStoredProps(t, e.id), _attachDrag(t, e))
-  }), _buildFabList(), _openTray()
-}
-
-function closeEditMode() {
-  _editActive = !1, _selectedFab = null, document.body.classList.remove("edit-mode-active"), document.getElementById("editOverlay").classList.remove("visible"), setTimeout(() => document.getElementById("editOverlay").classList.remove("open"), 300), document.getElementById("editTopbar").classList.remove("visible"), closeTray(), _saveEditLayout()
-}
-
-function handleOverlayClick(e) {
-  e.target === document.getElementById("editOverlay") && _deselectFab()
-}
-
-function _openTray() {
-  const e = document.getElementById("editFabTray");
-  e.classList.add("open"), requestAnimationFrame(() => e.classList.add("visible"))
-}
-
-function closeTray() {
-  const e = document.getElementById("editFabTray");
-  e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 350)
-}
-
-function _buildFabList() {
-  const e = document.getElementById("editFabList");
-  e && (e.innerHTML = FAB_REGISTRY.map(e => {
-    document.querySelector(e.selector);
-    const t = (_editProps[e.id] || {}).hidden;
-    return `<div class="edit-fab-chip${t?" hidden-fab":""}" id="chip_${e.id}" onclick="selectFabById('${e.id}')">\n        <span class="edit-fab-chip-icon">${e.icon}</span>\n        <span>${e.name}</span>\n        ${t?'<span style="font-size:0.4rem;color:rgba(255,100,100,0.7);">skrytá</span>':""}\n      </div>`
-  }).join(""))
-}
-
-function selectFabById(e) {
-  const t = FAB_REGISTRY.find(t => t.id === e);
-  if (!t) return;
-  const n = document.querySelector(t.selector);
-  n && _selectFab(n, t)
-}
-
-function _selectFab(e, t) {
-  document.querySelectorAll(".fab-selected").forEach(e => e.classList.remove("fab-selected")), document.querySelectorAll(".edit-fab-chip").forEach(e => e.classList.remove("selected")), e.classList.add("fab-selected");
-  const n = document.getElementById("chip_" + t.id);
-  n && n.classList.add("selected"), _selectedFab = {
-    el: e,
-    fab: t
-  }, _showTrayProps(e, t)
-}
-
-function _deselectFab() {
-  document.querySelectorAll(".fab-selected").forEach(e => e.classList.remove("fab-selected")), document.querySelectorAll(".edit-fab-chip").forEach(e => e.classList.remove("selected")), _selectedFab = null;
-  const e = document.getElementById("editPropsSection");
-  e && (e.style.display = "none");
-  const t = document.getElementById("editTrayName");
-  t && (t.innerHTML = "✏ <span>Vyber ikonku</span>")
-}
-
-function _showTrayProps(e, t) {
-  const n = document.getElementById("editPropsSection");
-  n && (n.style.display = "block");
-  const o = document.getElementById("editTrayName");
-  o && (o.innerHTML = `${t.icon} <span>${t.name}</span>`);
-  const i = t.id,
-    a = _editProps[i] || {},
-    s = e.querySelector(".mf-fab-icon") || e,
-    r = parseInt(s.style.width) || 52,
-    l = parseInt(s.style.height) || 52,
-    c = parseInt(s.style.borderRadius) || 16,
-    d = Math.round(100 * (parseFloat(e.style.opacity) || 1));
-  _setSlider("editSliderW", "editValW", r), _setSlider("editSliderH", "editValH", l), _setSlider("editSliderR", "editValR", c), _setSlider("editSliderO", "editValO", d), _syncToggle("editToggleShadow", !1 !== a.shadow), _syncToggle("editToggleGlow", !1 !== a.glow), _syncToggle("editToggleLabel", !1 !== a.label), _syncToggle("editToggleMagnet", !1 !== a.magnet), _syncToggle("editToggleBlur", !1 !== a.blur), _syncToggle("editToggleBorder", !1 !== a.border), _syncToggle("editTogglePulse", !!a.pulse), _syncToggle("editToggleBounce", !!a.bounce);
-  const m = document.getElementById("editToggleHide");
-  m && (m.textContent = a.hidden ? "👁 Zobrazit ikonku" : "🙈 Skrýt ikonku")
-}
-
-function _setSlider(e, t, n) {
-  const o = document.getElementById(e),
-    i = document.getElementById(t);
-  o && (o.value = n), i && (i.textContent = n)
-}
-
-function _syncToggle(e, t) {
-  const n = document.getElementById(e);
-  n && n.classList.toggle("on", !!t)
-}
-
-function applyEditProp(e, t, n) {
-  if (!_selectedFab) return;
-  const {
-    el: o,
-    fab: i
-  } = _selectedFab, a = i.id;
-  _editProps[a] || (_editProps[a] = {});
-  const s = _editProps[a],
-    r = o.querySelector(".mf-fab-icon") || o;
-  switch (n && (document.querySelectorAll(".edit-color-swatch").forEach(e => e.classList.remove("active")), n.classList.add("active")), e) {
-    case "width":
-      r.style.width = t + "px", document.getElementById("editValW").textContent = t, s.w = +t;
-      break;
-    case "height":
-      r.style.height = t + "px", document.getElementById("editValH").textContent = t, s.h = +t;
-      break;
-    case "radius":
-      r.style.borderRadius = t + "px", document.getElementById("editSliderR").value = t, document.getElementById("editValR").textContent = t, s.r = +t;
-      break;
-    case "opacity":
-      o.style.opacity = t / 100, document.getElementById("editValO").textContent = t, s.opacity = +t;
-      break;
-    case "color":
-      _applyColor(o, r, t), s.color = t
-  }
-  _saveEditLayout()
-}
-
-function applyPresetSize(e) {
-  applyEditProp("width", e), applyEditProp("height", e), _setSlider("editSliderW", "editValW", e), _setSlider("editSliderH", "editValH", e)
-}
-
-function toggleEditProp(e, t) {
-  if (!_selectedFab) return;
-  const {
-    el: n,
-    fab: o
-  } = _selectedFab, i = o.id;
-  _editProps[i] || (_editProps[i] = {});
-  const a = _editProps[i],
-    s = n.querySelector(".mf-fab-icon") || n;
-  switch (e) {
-    case "shadow":
-      a.shadow = !1 === a.shadow, s.style.boxShadow = !1 === a.shadow ? "none" : "", _syncToggle("editToggleShadow", !1 !== a.shadow);
-      break;
-    case "glow":
-      a.glow = !1 === a.glow, s.style.filter = !1 === a.glow ? "none" : "", _syncToggle("editToggleGlow", !1 !== a.glow);
-      break;
-    case "label":
-      a.label = !1 === a.label;
-      const e = n.querySelector(".mf-fab-label");
-      e && (e.style.display = !1 === a.label ? "none" : ""), _syncToggle("editToggleLabel", !1 !== a.label);
-      break;
-    case "magnet":
-      a.magnet = !1 === a.magnet, _syncToggle("editToggleMagnet", !1 !== a.magnet);
-      break;
-    case "blur":
-      a.blur = !1 === a.blur, s.style.backdropFilter = !1 === a.blur ? "none" : "", _syncToggle("editToggleBlur", !1 !== a.blur);
-      break;
-    case "border":
-      a.border = !1 === a.border, s.style.borderWidth = !1 === a.border ? "0" : "", _syncToggle("editToggleBorder", !1 !== a.border);
-      break;
-    case "pulse":
-      a.pulse = !a.pulse, n.style.animation = a.pulse ? "fabPulse 2s ease-in-out infinite" : "", _syncToggle("editTogglePulse", !!a.pulse);
-      break;
-    case "bounce":
-      a.bounce = !a.bounce, a.bounce && (n.dataset.origTransition = s.style.transition, s.style.setProperty("--fab-hover-transform", "translateY(-8px) scale(1.12)")), _syncToggle("editToggleBounce", !!a.bounce)
-  }
-  _saveEditLayout()
-}
-
-function toggleHideFab() {
-  if (!_selectedFab) return;
-  const {
-    el: e,
-    fab: t
-  } = _selectedFab, n = t.id;
-  _editProps[n] || (_editProps[n] = {}), _editProps[n].hidden = !_editProps[n].hidden, e.classList.toggle("fab-hidden-by-user", !!_editProps[n].hidden);
-  const o = document.getElementById("editToggleHide");
-  o && (o.textContent = _editProps[n].hidden ? "👁 Zobrazit ikonku" : "🙈 Skrýt ikonku"), _buildFabList(), _saveEditLayout(), showToast?.(_editProps[n].hidden ? "🙈 Ikonka skryta" : "👁 Ikonka zobrazena")
-}
-
-function snapFabTo(e) {
-  if (!_selectedFab) return;
-  const {
-    el: t
-  } = _selectedFab, n = window.innerWidth, o = window.innerHeight, i = t.offsetWidth, a = t.offsetHeight, s = 22, r = {
-    tl: [s, null, null, o - a - s],
-    tc: [(n - i) / 2, null, null, o - a - s],
-    tr: [null, s, null, o - a - s],
-    ml: [s, null, null, (o - a) / 2],
-    mc: [(n - i) / 2, null, null, (o - a) / 2],
-    mr: [null, s, null, (o - a) / 2],
-    bl: [s, null, null, s],
-    bc: [(n - i) / 2, null, null, s],
-    br: [null, s, null, s]
-  }, [l, c, d, m] = r[e] || [null, null, null, null];
-  t.style.left = null !== l ? l + "px" : "", t.style.right = null !== c ? c + "px" : "", t.style.top = null !== d ? d + "px" : "", t.style.bottom = null !== m ? m + "px" : "", null !== l && (t.style.right = "auto"), null !== c && (t.style.left = "auto"), _savePos(t), _saveEditLayout(), showToast?.("📍 Přesunuto")
-}
-
-function snapFabToRow(e) {
-  if (!_selectedFab) return;
-  const {
-    el: t
-  } = _selectedFab, n = ROW_HEIGHTS[e - 1] ?? 22;
-  t.style.bottom = n + "px", t.style.top = "auto", _savePos(t), _saveEditLayout(), showToast?.("📍 Řada " + e)
-}
-
-function _savePos(e) {
-  const t = FAB_REGISTRY.find(t => document.querySelector(t.selector) === e);
-  if (!t) return;
-  const n = e.getBoundingClientRect();
-  _editProps[t.id] || (_editProps[t.id] = {}), _editProps[t.id].x = n.left, _editProps[t.id].y = window.innerHeight - n.bottom
-}
-
-function duplicateFabStyle() {
-  _selectedFab && (_copiedStyle = Object.assign({}, _editProps[_selectedFab.fab.id] || {}), delete _copiedStyle.x, delete _copiedStyle.y, delete _copiedStyle.hidden, showToast?.("⧉ Styl zkopírován"))
-}
-
-function pasteFabStyle() {
-  if (!_selectedFab || !_copiedStyle) return void showToast?.("Nejdřív zkopíruj styl");
-  const {
-    el: e,
-    fab: t
-  } = _selectedFab, n = t.id, o = {
-    x: _editProps[n]?.x,
-    y: _editProps[n]?.y,
-    hidden: _editProps[n]?.hidden
-  };
-  _editProps[n] = Object.assign({}, _copiedStyle, o), _applyStoredProps(e, n), _showTrayProps(e, t), _saveEditLayout(), showToast?.("✓ Styl vložen")
-}
-
-function resetSelectedFab() {
-  if (!_selectedFab) return;
-  const {
-    el: e,
-    fab: t
-  } = _selectedFab, n = t.id;
-  _editProps[n] = {}, _clearFabStyles(e), _showTrayProps(e, t), _saveEditLayout(), showToast?.("↺ Ikonka resetována")
-}
-
-function _clearFabStyles(e) {
-  e.style.left = "", e.style.right = "", e.style.top = "", e.style.bottom = "", e.style.opacity = "", e.style.animation = "", e.classList.remove("fab-hidden-by-user");
-  const t = e.querySelector(".mf-fab-icon") || e;
-  t.style.width = "", t.style.height = "", t.style.borderRadius = "", t.style.boxShadow = "", t.style.filter = "", t.style.borderColor = "", t.style.backdropFilter = "", t.style.borderWidth = "";
-  const n = e.querySelector("svg");
-  n && (n.style.color = "");
-  const o = e.querySelector(".mf-fab-label");
-  o && (o.style.display = "")
-}
-
-function _applyColor(e, t, n) {
-  t.style.borderColor = n + "55", t.style.boxShadow = `0 4px 20px rgba(0,0,0,0.6), 0 0 18px ${n}22`;
-  const o = e.querySelector("svg");
-  o && (o.style.color = n);
-  const i = e.querySelector(".mf-fab-label");
-  i && (i.style.color = n)
-}
-
-function _attachDrag(e, t) {
-  e._editDragAttached || (e._editDragAttached = !0, e.addEventListener("mousedown", n => {
-    if (!_editActive) return;
-    n.preventDefault(), n.stopPropagation(), _selectFab(e, t);
-    const o = e.getBoundingClientRect();
-    _dragState = {
-      el: e,
-      startX: n.clientX,
-      startY: n.clientY,
-      startLeft: o.left,
-      startBottom: window.innerHeight - o.bottom
-    };
-    const i = n => {
-        if (!_dragState) return;
-        const o = n.clientX - _dragState.startX,
-          i = -(n.clientY - _dragState.startY);
-        let a = _dragState.startLeft + o,
-          s = _dragState.startBottom + i;
-        if (!1 !== (_editProps[t.id] || {}).magnet) {
-          const t = window.innerWidth,
-            n = window.innerHeight,
-            o = e.offsetWidth,
-            i = e.offsetHeight;
-          a < 16 ? (a = 0, _showSnap("v", 0)) : a + o > t - 16 ? (a = t - o, _showSnap("v", t - o)) : _hideSnap("v"), s < 16 ? (s = 0, _showSnap("h", n)) : s + i > n - 16 ? (s = n - i, _showSnap("h", i)) : _hideSnap("h");
-          const r = (t - o) / 2;
-          Math.abs(a - r) < 16 && (a = r, _showSnap("v", r))
-        }
-        e.style.left = a + "px", e.style.right = "auto", e.style.bottom = s + "px", e.style.top = "auto"
-      },
-      a = () => {
-        if (!_dragState) return;
-        const e = _dragState.el.getBoundingClientRect();
-        _editProps[t.id] || (_editProps[t.id] = {}), _editProps[t.id].x = e.left, _editProps[t.id].y = window.innerHeight - e.bottom, _dragState = null, _hideSnap("h"), _hideSnap("v"), _saveEditLayout(), document.removeEventListener("mousemove", i), document.removeEventListener("mouseup", a)
-      };
-    document.addEventListener("mousemove", i), document.addEventListener("mouseup", a)
-  }), e.addEventListener("touchstart", n => {
-    if (!_editActive) return;
-    n.preventDefault(), n.stopPropagation(), _selectFab(e, t);
-    const o = n.touches[0],
-      i = e.getBoundingClientRect();
-    _dragState = {
-      el: e,
-      startX: o.clientX,
-      startY: o.clientY,
-      startLeft: i.left,
-      startBottom: window.innerHeight - i.bottom
-    }
-  }, {
-    passive: !1
-  }), e.addEventListener("touchmove", t => {
-    if (!_dragState || !_editActive) return;
-    t.preventDefault();
-    const n = t.touches[0],
-      o = n.clientX - _dragState.startX,
-      i = -(n.clientY - _dragState.startY);
-    let a = _dragState.startLeft + o,
-      s = _dragState.startBottom + i;
-    e.style.left = a + "px", e.style.right = "auto", e.style.bottom = s + "px", e.style.top = "auto"
-  }, {
-    passive: !1
-  }), e.addEventListener("touchend", n => {
-    if (!_dragState) return;
-    const o = e.getBoundingClientRect();
-    _editProps[t.id] || (_editProps[t.id] = {}), _editProps[t.id].x = o.left, _editProps[t.id].y = window.innerHeight - o.bottom, _dragState = null, _saveEditLayout()
-  }))
-}
-
-function _loadEditLayout() {
-  try {
-    _editProps = safeLS(EDIT_STORAGE_KEY, "{}")
-  } catch {
-    _editProps = {}
-  }
-}
-
-function _saveEditLayout() {
-  localStorage.setItem(EDIT_STORAGE_KEY, JSON.stringify(_editProps))
-}
-
-function _applyStoredProps(e, t) {
-  const n = _editProps[t];
-  if (!n) return;
-  const o = e.querySelector(".mf-fab-icon") || e;
-  void 0 !== n.x && (e.style.left = "auto", e.style.right = "auto", e.style.left = n.x + "px"), void 0 !== n.y && (e.style.bottom = "auto", e.style.top = "auto", e.style.bottom = n.y + "px"), n.w && (o.style.width = n.w + "px"), n.h && (o.style.height = n.h + "px"), void 0 !== n.r && (o.style.borderRadius = n.r + "px"), void 0 !== n.opacity && (e.style.opacity = n.opacity / 100), n.color && _applyColor(e, o, n.color), !1 === n.shadow && (o.style.boxShadow = "none"), !1 === n.glow && (o.style.filter = "none"), !1 === n.blur && (o.style.backdropFilter = "none"), !1 === n.border && (o.style.borderWidth = "0"), n.pulse && (e.style.animation = "fabPulse 2s ease-in-out infinite");
-  const i = e.querySelector(".mf-fab-label");
-  i && !1 === n.label && (i.style.display = "none"), n.hidden ? e.classList.add("fab-hidden-by-user") : e.classList.remove("fab-hidden-by-user")
-}
-
-function _showSnap(e, t) {
-  if ("h" === e) {
-    const e = document.getElementById("snapLineH");
-    e && (e.style.display = "block", e.style.bottom = t + "px", e.style.top = "auto")
-  } else {
-    const e = document.getElementById("snapLineV");
-    e && (e.style.display = "block", e.style.left = t + "px")
-  }
-}
-
-function _hideSnap(e) {
-  const t = document.getElementById("h" === e ? "snapLineH" : "snapLineV");
-  t && (t.style.display = "none")
-}
-
-function resetEditLayout() {
-  confirm("Obnovit výchozí rozložení všech ikonek?") && (_editProps = {}, localStorage.removeItem(EDIT_STORAGE_KEY), FAB_REGISTRY.forEach(e => {
-    const t = document.querySelector(e.selector);
-    t && _clearFabStyles(t)
-  }), _deselectFab(), _buildFabList(), showToast?.("✓ Rozložení obnoveno"))
-}
-const _pulseStyle = document.createElement("style");
-_pulseStyle.textContent = "@keyframes fabPulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.08)} }", document.head.appendChild(_pulseStyle),
-  function() {
-    try {
-      _editProps = safeLS(EDIT_STORAGE_KEY, "{}"), FAB_REGISTRY.forEach(e => {
-        const t = document.querySelector(e.selector);
-        t && (t.dataset.fabId = e.id, _applyStoredProps(t, e.id))
-      })
-    } catch {}
-  }();
 
 function _custStorageKey() {
   try {
@@ -5684,350 +4465,7 @@ function closeCustomize() {
       custApplyAll(Object.keys(i).length ? i : e)
     } catch {}
   }();
-const ADMIN_CODE = "mfadmin99",
-  ADMIN_KEY = "mf_admin_unlocked";
 
-function isAdminUnlocked() {
-  return "1" === localStorage.getItem(ADMIN_KEY)
-}
-
-function openAdmin() {
-  if (!isAdminUnlocked()) {
-    const e = prompt("Admin kód:");
-    if (e !== ADMIN_CODE) return null !== e ? void showToast?.("❌ Nesprávný kód") : void 0;
-    localStorage.setItem(ADMIN_KEY, "1"), showAdminFab()
-  }
-  adminRefreshStats();
-  const e = document.getElementById("adminOverlay");
-  e.classList.add("open"), requestAnimationFrame(() => e.classList.add("visible"))
-}
-
-function closeAdmin() {
-  const e = document.getElementById("adminOverlay");
-  e.classList.remove("visible"), setTimeout(() => e.classList.remove("open"), 300)
-}
-
-function adminLock() {
-  localStorage.removeItem(ADMIN_KEY), hideAdminFab(), closeAdmin(), showToast?.("🔐 Admin zamčen")
-}
-
-function showAdminFab() {
-  document.getElementById("adminFab")?.classList.add("visible")
-}
-
-function hideAdminFab() {
-  document.getElementById("adminFab")?.classList.remove("visible")
-}
-isAdminUnlocked() && showAdminFab();
-let _logoClickTimer, _logoClickCount = 0;
-
-function adminRefreshStats() {
-  try {
-    const e = safeLS("mf_profiles_v2", "[]");
-    document.getElementById("adminStatProfiles").textContent = e.length || 1;
-    let t = 0,
-      n = 0;
-    try {
-      t += safeLS("watchlist", "[]").length
-    } catch {}
-    try {
-      Object.keys(localStorage).forEach(e => {
-        if (e.startsWith("watched_")) {
-          const t = safeLS(e, "{}");
-          n += Object.keys(t).length
-        }
-      })
-    } catch {}
-    document.getElementById("adminStatShows").textContent = t, document.getElementById("adminStatEps").textContent = n;
-    let o = 0;
-    Object.keys(localStorage).forEach(e => {
-      (e.startsWith("mf_") || e.startsWith("watchlist") || e.startsWith("watched_") || e.startsWith("ai_")) && (o += (localStorage.getItem(e) || "").length)
-    }), document.getElementById("adminStatStorage").textContent = (o / 1024).toFixed(1) + " KB"
-  } catch (e) {}
-}
-
-function adminExportAll() {
-  try {
-    const e = {};
-    Object.keys(localStorage).forEach(t => {
-      e[t] = localStorage.getItem(t)
-    });
-    const t = JSON.stringify(e, null, 2),
-      n = new Blob([t], {
-        type: "application/json"
-      }),
-      o = URL.createObjectURL(n),
-      i = document.createElement("a");
-    i.href = o, i.download = "mujflix_backup_" + (new Date).toISOString().slice(0, 10) + ".json", i.click(), URL.revokeObjectURL(o), showToast?.("✓ Záloha stažena")
-  } catch (e) {
-    showToast?.("❌ Export selhal: " + e.message)
-  }
-}
-
-function adminImportAll() {
-  const e = document.createElement("input");
-  e.type = "file", e.accept = ".json", e.onchange = e => {
-    const t = e.target.files[0];
-    if (!t) return;
-    const n = new FileReader;
-    n.onload = e => {
-      try {
-        const t = JSON.parse(e.target.result);
-        if (!confirm("Přepsat všechna data? Tato akce je nevratná!")) return;
-        Object.keys(t).forEach(e => localStorage.setItem(e, t[e])), showToast?.("✓ Import dokončen — obnovuji stránku…"), setTimeout(() => location.reload(), 1500)
-      } catch (e) {
-        showToast?.("❌ Neplatný soubor zálohy")
-      }
-    }, n.readAsText(t)
-  }, e.click()
-}
-
-function adminShowStorage() {
-  const e = Object.keys(localStorage).sort();
-  let t = "LocalStorage klíče MůjFlix:\n\n";
-  e.forEach(e => {
-    const n = localStorage.getItem(e);
-    t += `${e}: ${n?n.slice(0,80):"(prázdné)"}${n&&n.length>80?"…":""}\n`
-  });
-  const n = document.createElement("pre");
-  n.textContent = t, n.style.cssText = "background:#0a0a0f;color:#007AFF;padding:20px;border-radius:12px;max-height:60vh;overflow:auto;font-size:0.65rem;line-height:1.5;white-space:pre-wrap;word-break:break-all;";
-  const o = document.createElement("div");
-  o.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.9);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:20px;";
-  const i = document.createElement("div");
-  i.style.cssText = "background:#0d0d12;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;max-width:700px;width:100%;max-height:90vh;display:flex;flex-direction:column;gap:12px;";
-  const a = document.createElement("div");
-  a.style.cssText = "display:flex;align-items:center;justify-content:space-between;", a.innerHTML = '<span style="font-family:-apple-system,sans-serif;font-weight:900;font-size:1rem;">🗄️ LocalStorage</span><button onclick="this.closest(\'[style*="z-index:999999"]\').remove()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;cursor:pointer;">✕</button>', i.appendChild(a), i.appendChild(n), o.appendChild(i), document.body.appendChild(o)
-}
-
-function adminShowAllProfiles() {
-  try {
-    const e = safeLS("mf_profiles_v2", "[]");
-    if (!e.length) return void showToast?.("Žádné profily v localStorage");
-    let t = '<div style="font-family:-apple-system,sans-serif;font-size:0.9rem;font-weight:900;margin-bottom:14px;">👥 Profily</div>';
-    e.forEach(e => {
-      t += `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:7px;">\n          <span style="font-size:1.4rem;">${e.avatar||"👤"}</span>\n          <div style="flex:1;"><div style="font-weight:700;font-size:0.82rem;">${e.name||"—"}</div><div style="font-size:0.58rem;color:rgba(255,255,255,0.3);">ID: ${e.id||"?"}</div></div>\n          <button onclick="if(confirm('Smazat profil ${(e.name||"?").replace(/'/g,"")}')){let ps;try{ps=safeLS('mf_profiles_v2', '[]')}catch{ps=[]};localStorage.setItem('mf_profiles_v2',JSON.stringify(ps.filter(x=>x.id!=='${e.id}')));this.closest('[style*="z-index"]').remove();showToast?.('Profil smazán');}" style="background:rgba(255,60,60,0.1);border:1px solid rgba(255,60,60,0.25);color:#ff6666;border-radius:7px;padding:5px 10px;cursor:pointer;font-size:0.65rem;">Smazat</button>\n        </div>`
-    });
-    const n = document.createElement("div");
-    n.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:20px;";
-    const o = document.createElement("div");
-    o.style.cssText = "background:#0d0d12;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;", o.innerHTML = t + '<button onclick="this.closest(\'[style*="z-index:999999"]\').remove()" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.5);cursor:pointer;margin-top:10px;">Zavřít</button>', n.appendChild(o), document.body.appendChild(n)
-  } catch (e) {
-    showToast?.("Chyba: " + e.message)
-  }
-}
-
-function adminForceCache() {
-  Object.keys(localStorage).filter(e => e.startsWith("tmdb_") || e.startsWith("mf_cache_")).forEach(e => localStorage.removeItem(e)), showToast?.("✓ TMDB cache smazána"), adminRefreshStats()
-}
-
-function adminShowDebugLog() {
-  const e = window._mfDebugLog || [],
-    t = e.length ? e.join("\n") : "Žádné záznamy v debug logu.\n\nPro pokročilé ladění otevři DevTools (F12) → Console.",
-    n = document.createElement("div");
-  n.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.9);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:20px;";
-  const o = document.createElement("div");
-  o.style.cssText = "background:#050508;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;max-width:700px;width:100%;max-height:90vh;display:flex;flex-direction:column;gap:12px;", o.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-family:-apple-system,sans-serif;font-weight:900;">🪲 Debug Log</span><button onclick="this.closest('[style*="z-index:999999"]').remove()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;cursor:pointer;">✕</button></div><pre style="background:#020204;color:#50ff80;padding:16px;border-radius:10px;flex:1;overflow:auto;font-size:0.62rem;line-height:1.6;white-space:pre-wrap;word-break:break-all;">${t}</pre>`, n.appendChild(o), document.body.appendChild(n)
-}
-
-function adminCloneProfile() {
-  try {
-    const e = safeLS("mf_profiles_v2", "[]"),
-      t = localStorage.getItem("mf_active_pid"),
-      n = e.find(e => e.id === t) || e[0];
-    if (!n) return void showToast?.("Žádný aktivní profil");
-    const o = prompt("Název klonu:", n.name + " (kopie)");
-    if (!o) return;
-    const i = {
-      ...n,
-      id: "prof_" + Date.now(),
-      name: o
-    };
-    e.push(i), safeSetItem("mf_profiles_v2", JSON.stringify(e));
-    const a = localStorage.getItem("mf_customize_" + n.id);
-    a && localStorage.setItem("mf_customize_" + i.id, a), showToast?.("✓ Profil klonován: " + o), adminRefreshStats()
-  } catch (e) {
-    showToast?.("Chyba: " + e.message)
-  }
-}
-
-function adminBroadcastToast() {
-  const e = prompt("Zpráva pro všechny profily:");
-  e && (localStorage.setItem("mf_broadcast_msg", JSON.stringify({
-    text: e,
-    ts: Date.now()
-  })), showToast?.("✓ Zpráva nastavena — zobrazí se při příštím přihlášení"))
-}
-
-function adminRecalcStats() {
-  showToast?.("🔄 Přepočítávám statistiky…"), setTimeout(() => {
-    showToast?.("✓ Statistiky přepočítány")
-  }, 800)
-}
-
-function adminThemeLock() {
-  const e = prompt("Akcentová barva pro všechny profily (hex, např. #007AFF):");
-  if (e) try {
-    safeLS("mf_profiles_v2", "[]").forEach(t => {
-      const n = "mf_customize_" + t.id,
-        o = safeLS(n, "{}");
-      o.accent = e, localStorage.setItem(n, JSON.stringify(o))
-    }), document.documentElement.style.setProperty("--accent", e), showToast?.("✓ Téma aplikováno na všechny profily")
-  } catch (e) {
-    showToast?.("Chyba: " + e.message)
-  }
-}
-
-function adminClearWatched() {
-  confirm("Smazat VEŠKEROU historii sledování? Tato akce je nevratná!") && (Object.keys(localStorage).filter(e => e.startsWith("watched_")).forEach(e => localStorage.removeItem(e)), showToast?.("✓ Historie sledování smazána"), adminRefreshStats())
-}
-
-function adminNukeAll() {
-  confirm("⚠️ SMAZAT VEŠKERÁ DATA MUJFLIX? Toto je nevratné!") && confirm("Opravdu? Přijdeš o všechny profily, sledování, nastavení!") && (Object.keys(localStorage).filter(e => e.startsWith("mf_") || e.startsWith("watchlist") || e.startsWith("watched_") || e.startsWith("ai_") || e.startsWith("tmdb_")).forEach(e => localStorage.removeItem(e)), showToast?.("💣 Factory reset dokončen. Obnovuji…"), setTimeout(() => location.reload(), 1800))
-}
-
-function adminLoadApiKeys() {
-  const e = document.getElementById("adminApiKeysList");
-  if (!e) return;
-  e.innerHTML = [{
-    key: "mf_gemini_key",
-    label: "✦ Gemini API",
-    prefix: "AIza",
-    color: "#007AFF"
-  }, {
-    key: "mf_or_key",
-    label: "↻ OpenRouter",
-    prefix: "sk-or-",
-    color: "#00cfff"
-  }, {
-    key: "mf_groq_key",
-    label: "⚡ Groq",
-    prefix: "gsk_",
-    color: "#ff9a3c"
-  }, {
-    key: "mf_jina_key",
-    label: "👁 Jina",
-    prefix: "jina_",
-    color: "#bd93f9"
-  }, {
-    key: "mf_tavily_key",
-    label: "🌐 Tavily",
-    prefix: "tvly-",
-    color: "#50fa7b"
-  }, {
-    key: "mf_tmdb_key",
-    label: "🎬 TMDB",
-    prefix: "",
-    color: "#ff6b35"
-  }].map(e => {
-    const t = localStorage.getItem(e.key) || "",
-      n = t ? t.slice(0, 6) + "••••••••" + t.slice(-3) : "— není nastaven —",
-      o = !!t;
-    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">\n        <div style="font-size:0.78rem;font-weight:700;color:${e.color};min-width:100px;">${e.label}</div>\n        <div style="flex:1;font-family:monospace;font-size:0.65rem;color:${o?"rgba(255,255,255,0.6)":"rgba(255,255,255,0.2)"};">${n}</div>\n        <div style="font-size:0.6rem;padding:2px 8px;border-radius:6px;background:${o?"rgba(80,250,123,0.12)":"rgba(255,80,80,0.1)"};border:1px solid ${o?"rgba(80,250,123,0.3)":"rgba(255,80,80,0.25)"};color:${o?"#50fa7b":"rgba(255,100,100,0.7)"};">${o?"✓ OK":"✗ Chybí"}</div>\n        ${o?`<button onclick="if(confirm('Smazat klíč ${e.label}?')){localStorage.removeItem('${e.key}');adminLoadApiKeys();showToast?.('🗑 Klíč smazán');}" style="padding:4px 10px;border-radius:7px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);color:rgba(255,100,100,0.65);font-size:0.6rem;cursor:pointer;">Smazat</button>`:""}\n      </div>`
-  }).join("")
-}
-
-function adminSetGlobalKey(e, t) {
-  t && t.trim() ? (localStorage.setItem(e, t.trim()), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey(e, t.trim()), showToast?.("✓ Klíč uložen: " + e.replace("mf_", "").replace("_key", "").toUpperCase()), adminLoadApiKeys(), adminLog("API klíč nastaven: " + e, "ok")) : showToast?.("❌ Zadej hodnotu klíče")
-}
-
-function adminClearAllApiKeys() {
-  confirm("Smazat VŠECHNY API klíče? (Gemini, OpenRouter, Groq, Jina, Tavily, TMDB)") && (["mf_gemini_key", "mf_or_key", "mf_groq_key", "mf_jina_key", "mf_tavily_key", "mf_tmdb_key"].forEach(e => localStorage.removeItem(e)), showToast?.("🗑 Všechny API klíče smazány"), adminLoadApiKeys(), adminLog("Všechny API klíče smazány", "warn"))
-}
-document.querySelector(".logo")?.addEventListener("click", () => {
-  if (_logoClickCount++, clearTimeout(_logoClickTimer), _logoClickTimer = setTimeout(() => {
-      _logoClickCount = 0
-    }, 1500), _logoClickCount >= 5)
-    if (_logoClickCount = 0, isAdminUnlocked()) openAdmin();
-    else {
-      const e = prompt("🔐 Admin kód:");
-      e === ADMIN_CODE ? (localStorage.setItem(ADMIN_KEY, "1"), showAdminFab(), showToast?.("⚡ Admin odemčen")) : null !== e && showToast?.("❌ Nesprávný kód")
-    }
-});
-const MF_DEVICE_KEY = "mf_device_id",
-  MF_DEVICES_REG_KEY = "mf_registered_devices",
-  MF_BLOCKED_KEY = "mf_blocked_devices";
-
-function adminGetDeviceId() {
-  let e = localStorage.getItem(MF_DEVICE_KEY);
-  return e || (e = "dev_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now().toString(36), localStorage.setItem(MF_DEVICE_KEY, e)), e
-}
-
-function adminRegisterThisDevice() {
-  const e = adminGetDeviceId(),
-    t = prompt("Název tohoto zařízení:", navigator.platform || "Moje zařízení") || navigator.platform || "Neznámé";
-  let n = safeLS(MF_DEVICES_REG_KEY, "[]");
-  const o = n.find(t => t.id === e);
-  o ? (o.name = t, o.lastSeen = Date.now()) : n.push({
-    id: e,
-    name: t,
-    registered: Date.now(),
-    lastSeen: Date.now(),
-    ua: navigator.userAgent.slice(0, 80)
-  }), localStorage.setItem(MF_DEVICES_REG_KEY, JSON.stringify(n)), showToast?.("✓ Zařízení registrováno: " + t), adminRefreshDevices()
-}
-
-function adminRefreshDevices() {
-  const e = document.getElementById("adminDevicesList"),
-    t = document.getElementById("adminCurrentDeviceId"),
-    n = adminGetDeviceId();
-  t && (t.textContent = "📍 Toto zařízení: " + n);
-  let o = safeLS(MF_DEVICES_REG_KEY, "[]"),
-    i = safeLS(MF_BLOCKED_KEY, "[]");
-  o.find(e => e.id === n) || o.push({
-    id: n,
-    name: "Toto zařízení (neregistrované)",
-    registered: null,
-    lastSeen: Date.now(),
-    ua: navigator.userAgent.slice(0, 80)
-  }), e && (o.length ? e.innerHTML = o.map(e => {
-    const t = i.some(t => t.id === e.id),
-      o = e.id === n,
-      a = e.lastSeen ? new Date(e.lastSeen).toLocaleDateString("cs-CZ") : "—";
-    return `<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;background:rgba(255,255,255,0.025);border:1px solid ${t?"rgba(255,80,80,0.25)":o?"rgba(0,122,255,0.2)":"rgba(255,255,255,0.06)"};border-radius:10px;">\n        <div style="font-size:1.2rem;">${o?"💻":"📱"}</div>\n        <div style="flex:1;min-width:0;">\n          <div style="font-size:0.8rem;font-weight:700;display:flex;align-items:center;gap:6px;">\n            ${e.name||"Neznámé"}\n            ${o?'<span style="font-size:0.48rem;background:rgba(0,122,255,0.1);border:1px solid rgba(0,122,255,0.3);color:var(--accent);padding:1px 7px;border-radius:20px;font-weight:800;letter-spacing:1px;">TOTO</span>':""}\n            ${t?'<span style="font-size:0.48rem;background:rgba(255,80,80,0.12);border:1px solid rgba(255,80,80,0.3);color:rgba(255,100,100,0.9);padding:1px 7px;border-radius:20px;font-weight:800;letter-spacing:1px;">BLOKOVÁNO</span>':""}\n          </div>\n          <div style="font-size:0.58rem;color:rgba(255,255,255,0.28);margin-top:2px;font-family:monospace;">${e.id}</div>\n          <div style="font-size:0.55rem;color:rgba(255,255,255,0.2);margin-top:1px;">Naposledy: ${a}</div>\n        </div>\n        <div style="display:flex;gap:5px;">\n          ${t?`<button onclick="adminUnblockDevice('${e.id}')" style="padding:5px 10px;border-radius:7px;background:rgba(80,250,123,0.1);border:1px solid rgba(80,250,123,0.25);color:#50fa7b;font-size:0.6rem;font-weight:700;cursor:pointer;">🔓 Odblokovat</button>`:o?"":`<button onclick="adminBlockDeviceById('${e.id}','${(e.name||"").replace(/'/g,"'")}','${e.id}')" style="padding:5px 10px;border-radius:7px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.22);color:rgba(255,100,100,0.7);font-size:0.6rem;font-weight:700;cursor:pointer;">🚫 Blokovat</button>`}\n          ${e.registered?`<button onclick="adminRemoveDevice('${e.id}')" style="padding:5px 10px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);font-size:0.6rem;cursor:pointer;">Odebrat</button>`:""}\n        </div>\n      </div>`
-  }).join("") : e.innerHTML = '<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);padding:10px">Žádná zařízení</div>')
-}
-
-function adminBlockDeviceById(e, t, n) {
-  if (!confirm(`Zablokovat zařízení "${t}"?\n\nID: ${e}\nToto zařízení nebude moci používat MůjFlix.`)) return;
-  let o = safeLS(MF_BLOCKED_KEY, "[]");
-  o.some(t => t.id === e) || o.push({
-    id: e,
-    name: t,
-    blockedAt: Date.now()
-  }), localStorage.setItem(MF_BLOCKED_KEY, JSON.stringify(o)), showToast?.("🚫 Zařízení zablokováno: " + t), adminRefreshDevices(), adminLog("Zařízení zablokováno: " + e + " (" + t + ")", "warn")
-}
-
-function adminBlockDevice() {
-  const e = document.getElementById("adminBlockDeviceId")?.value?.trim(),
-    t = document.getElementById("adminBlockDeviceName")?.value?.trim() || "Neznámé";
-  e ? (adminBlockDeviceById(e, t, e), document.getElementById("adminBlockDeviceId") && (document.getElementById("adminBlockDeviceId").value = ""), document.getElementById("adminBlockDeviceName") && (document.getElementById("adminBlockDeviceName").value = "")) : showToast?.("❌ Zadej Device ID")
-}
-
-function adminUnblockDevice(e) {
-  let t = safeLS(MF_BLOCKED_KEY, "[]");
-  t = t.filter(t => t.id !== e), localStorage.setItem(MF_BLOCKED_KEY, JSON.stringify(t)), showToast?.("🔓 Zařízení odblokováno"), adminRefreshDevices(), adminLog("Zařízení odblokováno: " + e, "ok")
-}
-
-function adminRemoveDevice(e) {
-  if (!confirm("Odebrat záznam o zařízení?")) return;
-  let t = safeLS(MF_DEVICES_REG_KEY, "[]");
-  t = t.filter(t => t.id !== e), localStorage.setItem(MF_DEVICES_REG_KEY, JSON.stringify(t)), adminRefreshDevices()
-}
-
-function adminClearBlockedDevices() {
-  confirm("Odblokovat všechna zařízení?") && (localStorage.removeItem(MF_BLOCKED_KEY), showToast?.("🔓 Všechna zařízení odblokována"), adminRefreshDevices(), adminLog("Všechna blokování smazána", "ok"))
-}
-const _origAdminRefresh = adminRefresh;
-adminRefresh = function() {
-    _origAdminRefresh(), adminLoadApiKeys(), adminRefreshDevices()
-  },
-  function() {
-    try {
-      const e = localStorage.getItem(MF_DEVICE_KEY);
-      if (!e) return;
-      if (safeLS(MF_BLOCKED_KEY, "[]").some(t => t.id === e)) return void(document.body.innerHTML = `<div style="position:fixed;inset:0;background:#060608;display:flex;align-items:center;justify-content:center;font-family:Outfit,sans-serif;"><div style="text-align:center;max-width:400px;padding:40px;"><div style="font-size:3rem;margin-bottom:20px;">🚫</div><div style="font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:10px;color:#fff;">Přístup zamítnut</div><div style="font-size:0.82rem;color:rgba(255,255,255,0.4);line-height:1.6;">Toto zařízení bylo zablokováno administrátorem. Kontaktuj správce aplikace pro obnovení přístupu.</div><div style="margin-top:16px;font-size:0.6rem;color:rgba(255,255,255,0.2);font-family:monospace;">Device ID: ${e}</div></div></div>`)
-    } catch (e) {}
-  }();
 try {
   const e = safeLS("mf_broadcast_msg", "null");
   e && Date.now() - e.ts < 6048e5 && setTimeout(() => showToast?.("📣 " + e.text), 3e3)
@@ -6175,37 +4613,6 @@ function selectMood(e) {
     s.innerHTML = i.map(e => `\n      <div class="mood-ep-card" onclick="closeMoodPicker();openSeries('${e.slug}');setTimeout(()=>{activeSeason=${e.se};showAllSeasons=false;renderSeasons&&renderSeasons();renderEpisodes&&renderEpisodes();setTimeout(()=>{const c=document.getElementById('card-${e.slug}-S${e.se}-E${e.ep}');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});},200);},350)">\n        <img class="mood-ep-thumb" loading="lazy" src="${e.poster||""}" alt="${e.name}" onerror="this.style.background='#111'">\n        <div class="mood-ep-info">\n          <div class="mood-ep-show">${e.name}</div>\n          <div class="mood-ep-title">Série ${e.se}, Epizoda ${e.ep}</div>\n          <div class="mood-ep-meta">${n.label}</div>\n        </div>\n        <div class="mood-play-icon">▶</div>\n      </div>\n    `).join(""), r.classList.add("visible"), showToast?.("🎭 " + n.label + " — vybráno!")
   }
 }
-let _timerInterval = null,
-  _timerRemaining = 0,
-  _timerTotal = 0,
-  _timerPanelOpen = !1,
-  _selectedPreset = null;
-
-function toggleTimerPanel() {
-  _timerPanelOpen = !_timerPanelOpen;
-  const e = document.getElementById("timerPanel");
-  e && e.classList.toggle("open", _timerPanelOpen)
-}
-
-function setTimerPreset(e) {
-  _selectedPreset = e, _timerTotal = 60 * e, _timerRemaining = _timerTotal, updateTimerDisplay(_timerRemaining), document.querySelectorAll(".timer-preset-btn").forEach(t => {
-    t.classList.toggle("active", parseInt(t.dataset.min) === e)
-  })
-}
-
-function updateTimerDisplay(e) {
-  const t = Math.floor(e / 60),
-    n = e % 60,
-    o = `${String(t).padStart(2,"0")}:${String(n).padStart(2,"0")}`,
-    i = document.getElementById("timerDisplay"),
-    a = document.getElementById("timerFabLabel");
-  i && (i.textContent = o), a && (a.textContent = o);
-  const s = document.getElementById("timerFab");
-  if (s && _timerTotal > 0) {
-    const t = (_timerTotal - e) / _timerTotal * 100;
-    s.style.background = `conic-gradient(rgba(0,122,255,0.35) ${t}%, rgba(8,8,14,0.92) ${t}%)`
-  }
-}
 
 function setDockActive(e) {
   document.querySelectorAll(".dock-btn").forEach(e => e.classList.remove("active"));
@@ -6235,34 +4642,19 @@ function closeDockMore() {
 }
 
 function _syncDockBadges() {
-  const e = document.getElementById("watchlistFabBadge"),
-    t = document.getElementById("dockWatchlistBadge");
-  if (e && t) {
-    const n = parseInt(e.textContent) || 0;
-    t.textContent = n > 0 ? n : "", t.classList.toggle("visible", n > 0)
-  }
   const n = document.getElementById("notifBellBadge"),
     o = document.getElementById("hdrNotifBadge");
   if (o) {
     const e = n && "" !== n.textContent.trim() && "none" !== n.style.display;
     o.textContent = e ? "!" : "", o.classList.toggle("visible", e)
   }
-  const i = document.getElementById("hdrSyncDot");
-  if (i) {
-    const e = window._mfSyncStatus || "offline";
-    i.className = "mf-sync-dot", "online" === e ? i.classList.add("online") : "syncing" === e ? i.classList.add("syncing") : "error" === e && i.classList.add("error")
-  }
-  const a = document.getElementById("hdrTimerBtn");
-  a && window._timerInterval ? a.classList.add("active-btn") : a && a.classList.remove("active-btn")
 }
-setTimerPreset(45), document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function(e) {
     if ("INPUT" === e.target.tagName || "TEXTAREA" === e.target.tagName) return;
     const t = document.getElementById("seriesModal"),
       n = t && t.classList.contains("open");
-    "M" !== e.key && "m" !== e.key || n || (e.preventDefault(), openMoodPicker()), "T" !== e.key && "t" !== e.key || n || (e.preventDefault(), toggleTimerPanel())
-  }), setTimeout(() => {
-    Notification && Notification.permission
-  }, 5e3),
+    "M" !== e.key && "m" !== e.key || n || (e.preventDefault(), openMoodPicker())
+  }),
   function() {
     const e = window.openWithCopy;
     "function" == typeof e && (window.openWithCopy = function(...t) {
@@ -6270,7 +4662,7 @@ setTimerPreset(45), document.addEventListener("keydown", function(e) {
     });
     const t = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(e, n) {
-      t(e, n), e && e.includes("watched") && setTimeout(updateStreak, 100), e && (e.startsWith("mf_") || e.startsWith("watched_") || e.startsWith("watchlist") || e.startsWith("streak")) && (void 0)
+      t(e, n), e && e.includes("watched") && setTimeout(updateStreak, 100)
     }
   }();
 const _origOpenWatchlist = window.openWatchlist;
@@ -6430,7 +4822,7 @@ function triggerPwaInstall() {
     let t = null;
 
     function n() {
-      const e = [".wrapped-overlay.open", "#ai-voice-bubble-overlay.open", ".premiere-overlay.open", ".collections-overlay.open", ".trakt-overlay.open", ".voice-cmd-overlay.open", ".mood-overlay.open", ".universe-overlay.open", ".genre-editor-overlay.open", "#epRatingOverlay.open", "#voiceCmdOverlay.open", "#syncModal.open", ".pm-overlay.open", ".watchlist-overlay.open"].some(e => !!document.querySelector(e));
+      const e = [".wrapped-overlay.open", ".premiere-overlay.open", ".collections-overlay.open", ".mood-overlay.open", ".universe-overlay.open", ".genre-editor-overlay.open", "#epRatingOverlay.open", ".pm-overlay.open", ".watchlist-overlay.open"].some(e => !!document.querySelector(e));
       document.body.classList.toggle("modal-open", e)
     }
     localStorage.setItem = function(n, o) {
@@ -6438,7 +4830,7 @@ function triggerPwaInstall() {
     }, window.refreshUserContent = window.refreshUserContent || function() {
       void 0 !== db && Object.keys(db).forEach(e => {
         "function" == typeof updateTileProgress && updateTileProgress(e), "function" == typeof updateContinueBadge && updateContinueBadge(e)
-      }), "function" == typeof updateContinueWidget && updateContinueWidget(), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateWatchlistBadge && updateWatchlistBadge(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns()
+      }), "function" == typeof updateLogoProgress && updateLogoProgress(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns()
     }, document.addEventListener("DOMContentLoaded", () => {
       let _moT = null;
       new MutationObserver(() => {
@@ -6450,105 +4842,7 @@ function triggerPwaInstall() {
       }), n()
     })
   }();
-const _APK_KEYS = [{
-  id: "mf_gemini_key",
-  label: "✦ Gemini API Key",
-  placeholder: "AIza...",
-  type: "password"
-}, {
-  id: "mf_or_key",
-  label: "↻ OpenRouter Key",
-  placeholder: "sk-or-...",
-  type: "password"
-}, {
-  id: "mf_groq_key",
-  label: "⚡ Groq Key",
-  placeholder: "gsk_...",
-  type: "password"
-}, {
-  id: "mf_jina_key",
-  label: "👁 Jina Key",
-  placeholder: "jina_...",
-  type: "password"
-}, {
-  id: "mf_tavily_key",
-  label: "🌐 Tavily Key",
-  placeholder: "tvly-...",
-  type: "password"
-}, {
-  id: "mf_tmdb_key",
-  label: "🎬 TMDB Key",
-  placeholder: "TMDB API key...",
-  type: "text"
-}, {
-  id: "mf_trakt_client_id",
-  label: "📡 Trakt Client ID",
-  placeholder: "Trakt client ID...",
-  type: "text"
-}];
-let _apkCurrentProfileId = null,
-  _apkCurrentProfileName = "";
 
-function adminOpenProfileApiKeys(e) {
-  try {
-    const t = safeLS("mf_profiles_v2", "[]")[e];
-    if (!t) return;
-    _apkCurrentProfileId = t.id, _apkCurrentProfileName = t.name, document.getElementById("apkProfileName").textContent = t.name;
-    const n = document.getElementById("apkKeyRows");
-    n.innerHTML = "", _APK_KEYS.forEach(e => {
-      const o = e.id + "_" + t.id,
-        i = e.id,
-        a = localStorage.getItem(o) || localStorage.getItem(i) || "",
-        s = document.createElement("div");
-      s.className = "apk-key-item", s.innerHTML = `\n        <div class="apk-key-label">${e.label}</div>\n        <div class="apk-key-input-row">\n          <input \n            class="apk-key-input" \n            id="apk_input_${e.id}"\n            type="${e.type}" \n            placeholder="${e.placeholder}"\n            value="${a?"••••••••••••":""}"\n            data-key="${o}"\n            data-has-value="${a?"1":"0"}"\n            onfocus="if(this.dataset.hasValue==='1'&&this.value==='••••••••••••'){this.value='';this.dataset.hasValue='0';}"\n          >\n          <button class="apk-save-btn" onclick="_apkSaveKey('${e.id}','${o}','${t.id}')">Uložit</button>\n          <button class="apk-clear-btn" onclick="_apkClearKey('${o}','${e.id}','${t.id}')">🗑</button>\n        </div>\n        <div class="apk-status" id="apk_status_${e.id}">✓ Uloženo</div>\n      `, n.appendChild(s)
-    }), document.getElementById("adminProfileApiModal").classList.add("open")
-  } catch (e) {
-    console.error("adminOpenProfileApiKeys error:", e)
-  }
-}
-
-function _apkSaveKey(e, t, n) {
-  const o = document.getElementById("apk_input_" + e);
-  if (!o) return;
-  const i = o.value.trim();
-  if (!i || "••••••••••••" === i) return void("function" == typeof showToast && showToast("⚠ Zadej hodnotu klíče"));
-  localStorage.setItem(t, i);
-  n === localStorage.getItem("mf_active_pid") && localStorage.setItem(e, i);
-  const a = document.getElementById("apk_status_" + e);
-  a && (a.style.display = "block", setTimeout(() => a.style.display = "none", 2e3)), o.value = "••••••••••••", o.dataset.hasValue = "1", "function" == typeof showToast && showToast("✓ Klíč uložen pro profil " + _apkCurrentProfileName)
-}
-
-function _apkClearKey(e, t, n) {
-  if (!confirm("Smazat tento API klíč?")) return;
-  localStorage.removeItem(e);
-  n === localStorage.getItem("mf_active_pid") && localStorage.removeItem(t);
-  const o = document.getElementById("apk_input_" + t);
-  o && (o.value = "", o.dataset.hasValue = "0"), "function" == typeof showToast && showToast("🗑 Klíč smazán")
-}
-
-function _apkClose() {
-  document.getElementById("adminProfileApiModal").classList.remove("open"), _apkCurrentProfileId = null
-}! function() {
-  window.adminLoadProfiles;
-  window.adminLoadProfiles = function() {
-    const e = document.getElementById("adminProfilesList");
-    if (!e) return;
-    let t = [];
-    try {
-      t = safeLS("mf_profiles_v2", "[]")
-    } catch (e) {}
-    t.length ? e.innerHTML = t.map((e, t) => {
-      const n = _APK_KEYS.filter(t => !!localStorage.getItem(t.id + "_" + e.id) || !!localStorage.getItem(t.id)).length;
-      return `\n      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">\n        <div style="width:40px;height:40px;border-radius:50%;background:${e.color||"#333"};display:flex;align-items:center;justify-content:center;font-size:${e.avatarUrl?"0":" 1.2"}rem;flex-shrink:0;overflow:hidden;">\n          ${e.avatarUrl?`<img src="${e.avatarUrl}" style="width:100%;height:100%;object-fit:cover;" alt="">`:e.avatar||"🎬"}\n        </div>\n        <div style="flex:1;min-width:0;">\n          <div style="font-size:0.85rem;font-weight:700;">${e.name||"Profil "+(t+1)}</div>\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:2px;">\n            PIN: ${e.pin?"••••":"—"} · Barva: <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${e.color||"#888"};vertical-align:middle;"></span>\n            ${e.traktToken?" · Trakt ✓":""} · 🔑 ${n}/${_APK_KEYS.length} klíčů\n          </div>\n        </div>\n        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">\n          <button onclick="adminOpenProfileApiKeys(${t})" style="padding:6px 12px;border-radius:8px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);color:rgba(255,200,0,0.8);font-size:0.62rem;font-weight:700;cursor:pointer;">🔑 API</button>\n          <button onclick="adminEditProfile(${t})" style="padding:6px 12px;border-radius:8px;background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);color:rgba(0,122,255,0.7);font-size:0.62rem;font-weight:700;cursor:pointer;">✏ Upravit</button>\n          <button onclick="adminDeleteProfile(${t})" style="padding:6px 12px;border-radius:8px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);color:rgba(255,100,100,0.7);font-size:0.62rem;font-weight:700;cursor:pointer;">🗑</button>\n        </div>\n      </div>`
-    }).join("") : e.innerHTML = '<div style="font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;padding:20px;">Žádné profily</div>'
-  }
-}();
-const _origAdminOpenPanel = window.adminOpenPanel;
-window.adminOpenPanel = function() {
-  _origAdminOpenPanel && _origAdminOpenPanel(), setTimeout(() => {
-    "function" == typeof window.adminLoadProfiles && window.adminLoadProfiles()
-  }, 100)
-};
 let _tmdbAvSelectedUrl = null,
   _tmdbAvSelectedName = null,
   _tmdbAvCallback = null,
@@ -6683,33 +4977,23 @@ window._tmdbSetTab = function(e) {
       const n = e ? document.getElementById(e) : document.querySelector(t);
       return !!n && (n.classList.contains("open") || n.classList.contains("visible") || n.style.display && "none" !== n.style.display)
     }
-    "Escape" === e.key && (t("adminProfileApiModal") ? _apkClose() : t("tmdbAvatarModal") ? _tmdbAvClose() : t("epRatingOverlay") ? "function" == typeof closeEpRating && closeEpRating(!1) : void 0)
+    "Escape" === e.key && (t("tmdbAvatarModal") ? _tmdbAvClose() : t("epRatingOverlay") ? "function" == typeof closeEpRating && closeEpRating(!1) : void 0)
   }, {
     capture: !0
   }), document.getElementById("tmdbAvatarModal").addEventListener("click", function(e) {
     e.target === this && _tmdbAvClose()
-  }), document.getElementById("adminProfileApiModal").addEventListener("click", function(e) {
-    e.target === this && _apkClose()
   }), document.addEventListener("DOMContentLoaded", function() {
     void 0 !== ProfileGate && setTimeout(() => {
       ProfileGate.renderBadge(), ProfileGate.renderGate()
     }, 200)
-  }), console.info("[MůjFlix Patch v3] ✓ Všechny opravy načteny: z-index fix, real-time sync, per-profil API klíče, TMDB avatary"),
-  function() {
+  }), function() {
     function e() {
-      const e = document.getElementById("aiFullscreen"),
-        t = e && e.classList.contains("open"),
-        n = document.querySelector(".pg-gate"),
+      const n = document.querySelector(".pg-gate"),
         o = n && (n.classList.contains("visible") || "none" !== n.style.display);
-      document.body.classList.toggle("mf-panel-open", !(!t && !o))
+      document.body.classList.toggle("mf-panel-open", !!o)
     }
     const t = new MutationObserver(e);
     document.addEventListener("DOMContentLoaded", () => {
-      const n = document.getElementById("aiFullscreen");
-      n && t.observe(n, {
-        attributes: !0,
-        attributeFilter: ["class", "style"]
-      });
       const o = document.querySelector(".pg-gate");
       o && t.observe(o, {
         attributes: !0,
@@ -6756,15 +5040,7 @@ function _bombujMovieUrlVariants(e, t) {
   if (!o) return [q];
   return [`https://www.bombuj.si/online-film-${n}-${o}`, `https://www.bombuj.si/online-film-${n}-${o-1}`, `https://www.bombuj.si/online-film-${n}`, q]
 }
-window.adminRenderPerProfileKeys=function(){const e=document.getElementById("adminTab_apikeys");if(!e)return;let t=document.getElementById("mfPerProfileSection");t||(t=document.createElement("div"),t.id="mfPerProfileSection",e.querySelector(":scope > div")?.appendChild(t),t.parentNode||e.appendChild(t));let n=[];try{n=safeLS("mf_profiles_v2","[]")}catch(e){}n.length?t.innerHTML=`\n    <div class="mfPPS-title">👤 API klíče pro konkrétní profil</div>\n    <div class="mfPPS-sub">Každý profil může mít vlastní klíč — použije ho místo globálního.</div>\n    ${n.map(e=>{const t=e.id,n=e.avatarUrl?`<img src="${e.avatarUrl}" alt="">`:e.avatar||"🎬",o=_PP_KEYS.map(e=>{const n=e.key+"_"+t,o=localStorage.getItem(n)||"",i=o?o.slice(0,5)+"•••"+o.slice(-3):"";return`<div class="mfPPS-row">\n          <span class="mfPPS-lbl" style="color:${e.color}">${e.label}</span>\n          <input class="mfPPS-inp" id="ppk_${t}_${e.key}"\n            type="password" placeholder="${i||e.ph}"\n            ${o?`value="${o}"`:""}>\n          <button class="mfPPS-save"\n            onclick="adminSavePerKey('${t}','${e.key}')">Uložit</button>\n          ${o?`<button class="mfPPS-del"\n            onclick="adminDelPerKey('${t}','${e.key}')">✕</button>`:""}\n        </div>`}).join("");return`<div class="mfPPS-card">\n        <div class="mfPPS-head">\n          <div class="mfPPS-av" style="background:${e.color||"rgba(255,255,255,0.08)"}33;\n            border:1px solid ${e.color||"rgba(255,255,255,0.1)"}44">${n}</div>\n          <div>\n            <div class="mfPPS-name">${e.name||"Profil"}</div>\n            <div class="mfPPS-id">${t}</div>\n          </div>\n        </div>\n        ${o}\n      </div>`}).join("")}\n  `:t.innerHTML='<div class="mfPPS-title">👤 Per-profil API klíče</div><div class="mfPPS-sub" style="color:rgba(255,255,255,0.25)">Žádné profily.</div>'},
-window.adminSavePerKey = function(e, t) {
-    const n = document.getElementById("ppk_" + e + "_" + t),
-      o = n?.value?.trim();
-    o ? (localStorage.setItem(t + "_" + e, o), showToast?.("✓ Klíč uložen pro " + e.slice(0, 10) + "…"), adminRenderPerProfileKeys()) : showToast?.("❌ Zadej hodnotu klíče")
-  }, window.adminDelPerKey = function(e, t) {
-    localStorage.removeItem(t + "_" + e), showToast?.("🗑 Klíč smazán"), adminRenderPerProfileKeys()
-  },
-  function() {
+! function() {
     function e() {
       const e = localStorage.getItem("mf_active_pid");
       e && _PP_KEYS.forEach(t => {
@@ -6803,11 +5079,8 @@ window.adminSavePerKey = function(e, t) {
       "#watchlist": () => {
         "function" == typeof openWatchlist && openWatchlist()
       },
-      "#admin": () => {
-        "function" == typeof openAdmin && openAdmin()
-      },
       "#settings": () => {
-        "function" == typeof openSettings ? openSettings() : "function" == typeof openApikeyOverlay && openApikeyOverlay()
+        "function" == typeof openSettings && openSettings()
       },
       "#profil": () => {
         void 0 !== ProfileGate && ProfileGate.show()
@@ -6838,9 +5111,7 @@ window.adminSavePerKey = function(e, t) {
       if ([
           ["openUniverse", "#discover"],
           ["openWatchlist", "#watchlist"],
-          ["openAdmin", "#admin"],
-          ["openSettings", "#settings"],
-          ["openApikeyOverlay", "#settings"]
+          ["openSettings", "#settings"]
         ].forEach(([t, n]) => {
           if ("function" == typeof window[t]) {
             const o = window[t];
@@ -6874,13 +5145,7 @@ window.adminSavePerKey = function(e, t) {
         n(), location.hash && "#" !== location.hash || history.replaceState(null, "", "#serialy"), t()
       }, 900)
     })
-  }(), document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-      const t = document.getElementById("aiFab");
-      t && !t.classList.contains("dock-btn") && (t.style.display = "none")
-    }, 500)
-  }), console.info("[MůjFlix v4] ✓ AI fix, Firebase GUI, per-profil API, URL routing, badge fix"),
-  function() {
+  }(), function() {
     let e = "movie";
     window.ptSetType = function(t) {
       e = t;
@@ -6993,8 +5258,7 @@ window.adminSavePerKey = function(e, t) {
         n && (t === e ? n.classList.add("active") : n.classList.remove("active"))
       })
     }
-  }(), console.info("[MůjFlix v4 sekce] ✓ Edit fix, Seriály/Filmy/Pro tebe sekce, dock redesign"),
-  function() {
+  }(), function() {
     function e() {
       function e(e) {
         if (e._tiltInited) return;
@@ -7461,10 +5725,6 @@ window.adminSavePerKey = function(e, t) {
   function() {
     window.openSettings;
     window.openSettings = function() {
-      MFSettings.open()
-    };
-    window.openApikeyOverlay;
-    window.openApikeyOverlay = function() {
       MFSettings.open()
     }
   }();
@@ -8072,12 +6332,6 @@ document.addEventListener("keydown", function(e) {
         e && MFAttention.bounce(e, 600)
       }, 800)
     });
-    const h = window.updateWatchlistBadge;
-    "function" == typeof h && (window.updateWatchlistBadge = function() {
-      h.apply(this, arguments);
-      const e = document.querySelector(".dock-badge");
-      e && requestAnimationFrame(() => MFAttention.bounce(e, 100))
-    }), console.info("[MůjFlix FX Engine v2.0] ✓ Skeleton · OptimisticUI · ProgressIllusion · Stagger · Attention · Anticipation")
   }(),
   function() {
     "use strict";
@@ -8267,7 +6521,7 @@ document.addEventListener("keydown", function(e) {
       t.open && t.kbActive && (t.rows = i(), t.rows[t.rowIdx] || (t.rowIdx = 0, t.cardIdx = 0, t.rows.length && r(0, 0)))
     }).observe(y, {
       childList: !0
-    }), console.info("[MujFlix FX Engine v3.0] Disco KB Nav + Skeleton + Stagger + Optimistic + Typography")
+    })
   }(),
   function() {
     let e = null,
@@ -8320,12 +6574,10 @@ document.addEventListener("keydown", function(e) {
     }
   });
 
-  console.log('[MůjFlix Fix] ✓ Timer FAB + Discover click fix načten');
 })();
 
 const MF_CHANGELOG_KEY = 'mf_changelog_v1';
 const MF_CHANGELOG_SEEN_KEY = 'mf_changelog_seen_ts';
-let _clSelectedType = 'feature';
 
 const CL_TYPES = {
   feature:     { label: '✨ Novinka',        color: '#4da6ff', bg: 'rgba(0,122,255,0.12)',  border: 'rgba(0,122,255,0.3)'  },
@@ -8333,92 +6585,6 @@ const CL_TYPES = {
   improvement: { label: '⚡ Vylepšení',      color: '#ffd166', bg: 'rgba(255,180,0,0.1)',   border: 'rgba(255,180,0,0.3)'  },
   breaking:    { label: '⚠️ Změna chování', color: '#ff8c69', bg: 'rgba(255,100,60,0.1)',   border: 'rgba(255,100,60,0.3)' },
 };
-
-function clSetType(type) {
-  _clSelectedType = type;
-  Object.keys(CL_TYPES).forEach(t => {
-    const btn = document.getElementById('clType_' + t);
-    if (!btn) return;
-    if (t === type) {
-      btn.style.background = CL_TYPES[t].bg;
-      btn.style.borderColor = CL_TYPES[t].border;
-      btn.style.color = CL_TYPES[t].color;
-    } else {
-      btn.style.background = 'rgba(255,255,255,0.04)';
-      btn.style.borderColor = 'rgba(255,255,255,0.08)';
-      btn.style.color = 'rgba(255,255,255,0.4)';
-    }
-  });
-}
-
-function adminSaveChangelog() {
-  const version = document.getElementById('clVersion')?.value?.trim();
-  const title   = document.getElementById('clTitle')?.value?.trim();
-  const desc    = document.getElementById('clDesc')?.value?.trim();
-
-  if (!title) return void (typeof showToast === 'function' && showToast('⚠ Zadej alespoň nadpis změny!'));
-
-  const entry = {
-    id:      Date.now(),
-    version: version || '',
-    title,
-    desc:    desc || '',
-    type:    _clSelectedType,
-    ts:      Date.now(),
-  };
-
-  try {
-    const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
-    all.unshift(entry);
-    localStorage.setItem(MF_CHANGELOG_KEY, JSON.stringify(all.slice(0, 50)));
-    document.getElementById('clVersion').value = '';
-    document.getElementById('clTitle').value   = '';
-    document.getElementById('clDesc').value    = '';
-    adminRenderChangelogHistory();
-    typeof showToast === 'function' && showToast('📝 Changelog přidán! Uživatelé uvidí notifikaci.', 'success');
-  } catch (e) {
-    console.warn('[Changelog] Uložení selhalo:', e);
-  }
-}
-
-function adminDeleteChangelog(id) {
-  try {
-    const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
-    localStorage.setItem(MF_CHANGELOG_KEY, JSON.stringify(all.filter(e => e.id !== id)));
-    adminRenderChangelogHistory();
-    typeof showToast === 'function' && showToast('🗑 Záznam smazán');
-  } catch (e) {}
-}
-
-function adminRenderChangelogHistory() {
-  const el = document.getElementById('adminChangelogHistory');
-  if (!el) return;
-  try {
-    const all = JSON.parse(localStorage.getItem(MF_CHANGELOG_KEY) || '[]');
-    if (!all.length) {
-      el.innerHTML = '<div style="font-size:0.72rem;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Zatím žádné záznamy</div>';
-      return;
-    }
-    el.innerHTML = all.slice(0, 20).map(e => {
-      const ct = CL_TYPES[e.type] || CL_TYPES.feature;
-      const d  = new Date(e.ts);
-      const dateStr = d.toLocaleDateString('cs-CZ') + ' ' + d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
-      return `
-        <div style="padding:12px 14px;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;position:relative;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:${e.desc ? '6px' : '0'};">
-            <span style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:20px;background:${ct.bg};border:1px solid ${ct.border};color:${ct.color};">${ct.label}</span>
-            ${e.version ? `<span style="font-size:0.58rem;color:rgba(255,255,255,0.3);font-family:monospace;">${e.version}</span>` : ''}
-            <span style="font-size:0.58rem;color:rgba(255,255,255,0.2);margin-left:auto;">${dateStr}</span>
-          </div>
-          <div style="font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:${e.desc ? '4px' : '0'};">${e.title}</div>
-          ${e.desc ? `<div style="font-size:0.7rem;color:rgba(255,255,255,0.45);line-height:1.5;">${e.desc}</div>` : ''}
-          <button onclick="adminDeleteChangelog(${e.id})" style="position:absolute;top:10px;right:10px;background:rgba(255,50,50,0.12);border:none;border-radius:6px;padding:3px 8px;color:rgba(255,100,100,0.7);font-size:0.6rem;cursor:pointer;">✕</button>
-        </div>`;
-    }).join('');
-  } catch (e) {
-    el.innerHTML = '';
-  }
-}
 
 function openChangelog() {
   try {
@@ -8506,15 +6672,7 @@ function checkChangelogOnLoad() {
 
 document.addEventListener('DOMContentLoaded', () => {
   checkChangelogOnLoad();
-  const obs = new MutationObserver(() => {
-    const tab = document.getElementById('adminTab_changelog');
-    if (tab && tab.style.display !== 'none') adminRenderChangelogHistory();
-  });
-  const panel = document.getElementById('adminPanel');
-  if (panel) obs.observe(panel, { attributes: true, subtree: true, attributeFilter: ['style'] });
 });
-
-console.log('[MůjFlix Changelog] ✓ Changelog systém načten');
 
 (function() {
 
