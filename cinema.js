@@ -542,7 +542,6 @@
   window.MFCinemaPlayer = { open: open, close: close };
 })();
 
-
 (function() {
   const STREAMING_PROVIDERS = {
     350: {
@@ -898,6 +897,5 @@
     providers: STREAMING_PROVIDERS
   };
 
-  console.log('[MFLegalProviders] Legal streaming providers loaded');
 })();
 
