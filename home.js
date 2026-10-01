@@ -2,41 +2,8 @@
       'use strict';
       if (window._mfhInstalled) return;
       window._mfhInstalled = true;
-      console.log('[mfh] Script START');
 
-      var DATA = {
-        continueWatching: {
-          title: 'Simpsonovi',
-          episode: 'S12 E04',
-          timeLeft: '18 min',
-          description: 'Homer se tentokrát zaplete do podvodného plánu, který zahrnuje...',
-          progress: 85,
-          image: 'https://image.tmdb.org/t/p/w780/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg'
-        },
-        recentlyWatched: [
-          { title: 'Rick and Morty', ep: 'S6 E1', image: 'https://image.tmdb.org/t/p/w300/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg' },
-          { title: 'Simpsonovi',     ep: 'S6 E1', image: 'https://image.tmdb.org/t/p/w300/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg' },
-          { title: 'Futurama',       ep: 'S6 E1', image: 'https://image.tmdb.org/t/p/w300/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg' },
-          { title: 'South Park',     ep: 'S6 E1', image: 'https://image.tmdb.org/t/p/w300/lMZv8bGHDWQFbUMAfBOsyHAR3dX.jpg' },
-          { title: 'Family Guy',     ep: 'S6 E1', image: 'https://image.tmdb.org/t/p/w300/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg' }
-        ],
-        forYou: [
-          { title: 'Kočka',       image: 'https://image.tmdb.org/t/p/w300/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg' },
-          { title: 'Temný rytíř', image: 'https://image.tmdb.org/t/p/w300/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg' },
-          { title: 'Earth',       image: 'https://image.tmdb.org/t/p/w300/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg' },
-          { title: 'Simpsonovi',  image: 'https://image.tmdb.org/t/p/w300/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg' },
-          { title: 'Futurama',    image: 'https://image.tmdb.org/t/p/w300/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg' }
-        ],
-        myList: [
-          { title: 'MůjFlix',     image: 'https://image.tmdb.org/t/p/w300/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg' },
-          { title: 'Temný rytíř', image: 'https://image.tmdb.org/t/p/w300/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg' },
-          { title: 'Avengers',    image: 'https://image.tmdb.org/t/p/w300/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg' },
-          { title: 'Müdenieek',   image: 'https://image.tmdb.org/t/p/w300/lMZv8bGHDWQFbUMAfBOsyHAR3dX.jpg' },
-          { title: 'Rick a Morty',image: 'https://image.tmdb.org/t/p/w300/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg' }
-        ]
-      };
-      window.MFH_DATA = DATA;
-      var _lastContinue = DATA.continueWatching;
+      var _lastContinue = null;
 
       function esc(s) {
         return String(s == null ? '' : s)
@@ -260,12 +227,10 @@
         }
       }
 
-      function mfhCardHtml(it) {
+      function mfhCardHtml(it, cid, idx) {
         var src = it.image ? esc(it.image) : '';
-        var tmdbId = it.tmdbId ? String(it.tmdbId) : '';
-        var mediaType = it.mediaType ? String(it.mediaType) : '';
         return (
-          '<div class="mfh-card" onclick="mfhOpenCard(\'' + esc(it.title) + '\',\'' + esc(tmdbId) + '\',\'' + esc(mediaType) + '\')">' +
+          '<div class="mfh-card" onclick="mfhOpenIdx(\'' + cid + '\',' + idx + ')">' +
             '<img class="mfh-card-img mfh-skeleton" ' +
               'src="' + src + '" ' +
               'alt="' + esc(it.title) + '" ' +
@@ -294,7 +259,7 @@
         var el = document.getElementById(id);
         if (!el) return;
         el._mfhItems = items || [];
-        el.innerHTML = items.map(mfhCardHtml).join('');
+        el.innerHTML = items.map(function (it, i) { return mfhCardHtml(it, id, i); }).join('');
         mfhBindCardImages(el);
       }
 
@@ -310,7 +275,7 @@
         var grid = document.getElementById('mfhSeeAllGrid');
         if (grid) {
           grid.innerHTML = items.length
-            ? items.map(mfhCardHtml).join('')
+            ? items.map(function (it, i) { return mfhCardHtml(it, carouselId, i); }).join('')
             : '<p class="mfh-seeall-empty">Zatím tu nic není.</p>';
           mfhBindCardImages(grid);
         }
@@ -329,14 +294,12 @@
 
       function mfhApplyHomeLayout(hasContinueItem) {
         var continueSection = document.getElementById('mfhContinue');
-        var recentSection = document.getElementById('mfhRecentSection');
         var forYouSection = document.getElementById('mfhForYouSection');
         var forYouTitle = document.getElementById('mfhForYouTitle');
         var forYouSub = document.getElementById('mfhForYouSub');
         var wrap = document.querySelector('.mfh-wrap');
 
         if (continueSection) continueSection.style.display = hasContinueItem ? '' : 'none';
-        if (recentSection) recentSection.style.display = hasContinueItem ? '' : 'none';
 
         if (forYouTitle) forYouTitle.textContent = hasContinueItem ? '✨ Vybráno pro tebe' : '✨ Pro tebe — mohlo by se ti líbit';
         if (forYouSub) forYouSub.textContent = hasContinueItem
@@ -358,6 +321,101 @@
         }
       }
 
+      function mfhSetSection(el, visible) {
+        var s = el && el.closest('section');
+        if (s) s.style.display = visible ? '' : 'none';
+      }
+
+      function mfhRecentItems() {
+        var out = [];
+        try {
+          var sorted = mfhGetWatchTimeline().slice().sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+          var seen = {};
+          for (var i = 0; i < sorted.length && out.length < 14; i++) {
+            var slug = sorted[i].slug;
+            if (!slug || seen[slug]) continue;
+            seen[slug] = true;
+            if (typeof db === 'undefined' || !db[slug]) continue;
+            var next = (typeof findNextEp === 'function') ? findNextEp(slug) : null;
+            out.push({
+              title: db[slug].name,
+              image: db[slug].poster,
+              ep: next ? 'Další: S' + next.se + ' E' + next.ep : '',
+              slug: slug
+            });
+          }
+        } catch (e) {}
+        return out;
+      }
+
+      function mfhMyListItems() {
+        try {
+          if (typeof getWatchlist !== 'function') return [];
+          return getWatchlist().map(function (w) {
+            return {
+              title: w.name,
+              image: w.poster || (typeof db !== 'undefined' && db[w.slug] ? db[w.slug].poster : null),
+              ep: w.type === 'series' ? 'Seriál' : 'Film',
+              fav: w
+            };
+          });
+        } catch (e) { return []; }
+      }
+
+      function mfhSeenTmdbIds() {
+        var seen = {};
+        try {
+          var memory = typeof aiBrain !== 'undefined' && aiBrain.memory;
+          if (memory && memory.watchedTmdbIds) Object.keys(memory.watchedTmdbIds).forEach(function (k) { seen[k] = true; });
+        } catch (e) {}
+        try {
+          mfhMyListItems().forEach(function (it) { if (it.fav && it.fav.tmdbId) seen[it.fav.tmdbId] = true; });
+        } catch (e) {}
+        return seen;
+      }
+
+      function mfhTopGenreIds() {
+        try {
+          var prefs = (typeof aiBrain !== 'undefined' && aiBrain.memory && aiBrain.memory.genreIdPrefs) || {};
+          return Object.keys(prefs)
+            .filter(function (k) { return prefs[k] > 0.05; })
+            .sort(function (a, b) { return prefs[b] - prefs[a]; })
+            .slice(0, 3);
+        } catch (e) { return []; }
+      }
+
+      function mfhFetchForYou(tmdb) {
+        var genres = mfhTopGenreIds();
+        var key = getTmdbKey();
+        var toItem = function (type) {
+          return function (item) {
+            return {
+              title: item.title || item.name || 'Neznámé',
+              image: getPosterUrl(item.poster_path, 'w300'),
+              ep: (item.release_date || item.first_air_date || '').substring(0, 4),
+              tmdbId: item.id,
+              mediaType: type
+            };
+          };
+        };
+        if (!genres.length || !key) {
+          return Promise.resolve((tmdb && tmdb.trending ? tmdb.trending : []).map(function (item) {
+            return toItem(item.media_type || (item.title ? 'movie' : 'tv'))(item);
+          }));
+        }
+        var q = '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=100&with_genres=' + encodeURIComponent(genres.join('|'));
+        return Promise.all(['tv', 'movie'].map(function (type) {
+          return fetch(TMDB_BASE + '/discover/' + type + '?api_key=' + encodeURIComponent(key) + q)
+            .then(function (r) { return r.json(); })
+            .then(function (d) { return (d.results || []).map(toItem(type)); })
+            .catch(function () { return []; });
+        })).then(function (lists) {
+          var out = [], max = Math.max(lists[0].length, lists[1].length);
+          for (var i = 0; i < max; i++) { if (lists[0][i]) out.push(lists[0][i]); if (lists[1][i]) out.push(lists[1][i]); }
+          return out;
+        });
+      }
+
       function renderHomepage() {
         try {
           var nameEl = document.getElementById('mfhUserName');
@@ -370,59 +428,53 @@
         var realContinueItem = hasHistory ? mfhGetRealContinueItem() : null;
         mfhApplyHomeLayout(!!realContinueItem);
         if (realContinueItem) renderContinue(realContinueItem);
+        else _lastContinue = null;
+
+        var recent = mfhRecentItems();
+        renderCarousel('mfhRecent', recent);
+        mfhSetSection(document.getElementById('mfhRecent'), recent.length > 0);
+
+        var mine = mfhMyListItems();
+        renderCarousel('mfhMyList', mine);
+        mfhSetSection(document.getElementById('mfhMyList'), mine.length > 0);
 
         fetchTmdbData().then(function (tmdb) {
-          if (tmdb && tmdb.trending && tmdb.trending.length) {
-            if (realContinueItem) {
-              renderCarousel('mfhRecent', tmdb.trending.map(function (item) {
-                return {
-                  title: item.title || item.name || 'Neznámé',
-                  image: getPosterUrl(item.poster_path, 'w300'),
-                  tmdbId: item.id,
-                  mediaType: item.media_type || (item.title ? 'movie' : 'tv')
-                };
-              }));
-            }
-
-            renderCarousel('mfhForYou', tmdb.tv.map(function (item) {
-              return {
-                title: item.name || 'Neznámé',
-                image: getPosterUrl(item.poster_path, 'w300'),
-                ep: item.first_air_date ? item.first_air_date.substring(0, 4) : '',
-                tmdbId: item.id,
-                mediaType: 'tv'
-              };
-            }));
-
-            renderCarousel('mfhMyList', tmdb.movies.map(function (item) {
-              return {
-                title: item.title || 'Neznámé',
-                image: getPosterUrl(item.poster_path, 'w300'),
-                ep: item.release_date ? item.release_date.substring(0, 4) : '',
-                tmdbId: item.id,
-                mediaType: 'movie'
-              };
-            }));
-          } else {
-            if (realContinueItem) renderCarousel('mfhRecent', DATA.recentlyWatched);
-            renderCarousel('mfhForYou', DATA.forYou);
-            renderCarousel('mfhMyList', DATA.myList);
-          }
+          return mfhFetchForYou(tmdb);
+        }).then(function (items) {
+          var seen = mfhSeenTmdbIds();
+          items = items.filter(function (it) { return it.image && !seen[it.tmdbId]; }).slice(0, 20);
+          renderCarousel('mfhForYou', items);
+          mfhSetSection(document.getElementById('mfhForYou'), items.length > 0);
         }).catch(function (e) {
-          console.warn('[mfh] renderHomepage fallback:', e);
-          if (realContinueItem) renderCarousel('mfhRecent', DATA.recentlyWatched);
-          renderCarousel('mfhForYou', DATA.forYou);
-          renderCarousel('mfhMyList', DATA.myList);
+          console.warn('[mfh] renderHomepage for-you error:', e);
+          renderCarousel('mfhForYou', []);
+          mfhSetSection(document.getElementById('mfhForYou'), false);
         });
       }
 
-      window.mfhResume = function () {
-        var item = _lastContinue || DATA.continueWatching;
-        if (item && item.tmdbId) {
-          mfhOpenCard(item.title, item.tmdbId, item.mediaType || 'movie');
+      window.mfhOpenIdx = function (cid, idx) {
+        var el = document.getElementById(cid);
+        var it = el && el._mfhItems && el._mfhItems[idx];
+        if (!it) return;
+        if (it.slug && typeof openSeries === 'function' && typeof db !== 'undefined' && db[it.slug]) {
+          openSeries(it.slug);
           return;
         }
-        if (typeof openSeries === 'function') openSeries('the-simpsons');
+        if (it.fav && typeof openFavoriteItem === 'function') {
+          openFavoriteItem(it.fav);
+          return;
+        }
+        mfhOpenCard(it.title, it.tmdbId, it.mediaType);
+      };
+
+      window.mfhResume = function () {
+        var item = _lastContinue;
+        if (!item) return;
+        if (item.slug && typeof openSeries === 'function') {
+          openSeries(item.slug);
+          return;
+        }
+        if (item.tmdbId) mfhOpenCard(item.title, item.tmdbId, item.mediaType || 'movie');
       };
       window.mfhToggleFav = function (slug, btn) {
         if (typeof toggleWatchlistItem === 'function') toggleWatchlistItem(slug);
@@ -459,8 +511,6 @@
       };
 
       window.mfhOpenCard = function (title, tmdbId, mediaType) {
-        console.log('[mfh] Otevřít kartu:', title, tmdbId, mediaType);
-
         var cinType = (mediaType === 'tv' || mediaType === 'tv_ep') ? 'tv_ep' : 'movie';
 
         if (cinType === 'tv_ep' && tmdbId && typeof openDiscoverTv === 'function') {
@@ -515,7 +565,7 @@
             'pointer-events:auto!important;z-index:10000!important;' +
           '}';
         document.head.appendChild(css);
-        console.log('[mfh] Hard CSS injected');
+        
       }
 
       function forceHome(opts) {
@@ -528,9 +578,9 @@
           var OPEN_OVERLAY_IDS = [
             'cinemaModal', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
             'premiereOverlay', 'collectionsOverlay', 'moodOverlay',
-            'genreEditorOverlay', 'traktOverlay', 'customizeOverlay',
-            'voiceCmdOverlay', 'wrappedOverlay', 'adminPanel',
-            'adminLoginModal', 'aiFullscreen', 'aiApikeyOverlay', 'dockMoreSheet'
+            'genreEditorOverlay', 'customizeOverlay',
+            'wrappedOverlay',
+            'dockMoreSheet'
           ];
           var anyOverlayOpen = OPEN_OVERLAY_IDS.some(function (id) {
             var el = document.getElementById(id);
@@ -553,14 +603,8 @@
             'collectionsOverlay',
             'moodOverlay',
             'genreEditorOverlay',
-            'traktOverlay',
             'customizeOverlay',
-            'voiceCmdOverlay',
             'wrappedOverlay',
-            'adminPanel',
-            'adminLoginModal',
-            'aiFullscreen',
-            'aiApikeyOverlay',
             'dockMoreSheet'
           ];
           overlaysToClose.forEach(function(id) {
@@ -626,7 +670,7 @@
         };
         wrapped._mfhWrapped = true;
         window.mfShowSection = wrapped;
-        console.log('[mfh] mfShowSection wrapped');
+        
         return true;
       }
 
@@ -634,9 +678,9 @@
         'cinemaModal', 'mfStandaloneCinema', 'universeOverlay',
         'watchlistOverlay', 'seriesModal', 'premiereOverlay',
         'collectionsOverlay', 'moodOverlay', 'genreEditorOverlay',
-        'traktOverlay', 'customizeOverlay', 'voiceCmdOverlay',
-        'wrappedOverlay', 'adminPanel', 'adminLoginModal',
-        'aiFullscreen', 'aiApikeyOverlay', 'dockMoreSheet', 'mfhSeeAllModal'
+        'customizeOverlay',
+        'wrappedOverlay',
+        'dockMoreSheet', 'mfhSeeAllModal'
       ];
 
       function dockShouldShow() {
@@ -644,8 +688,7 @@
         if (typeof window.mfDockTarget === 'function' && window.mfDockTarget() !== 'dockHome') return false;
         if (document.body.classList.contains('modal-open') ||
             document.body.classList.contains('discover-open') ||
-            document.body.classList.contains('disco-open') ||
-            document.body.classList.contains('edit-mode-active')) return false;
+            document.body.classList.contains('disco-open')) return false;
         for (var i = 0; i < DOCK_HIDE_OVERLAY_IDS.length; i++) {
           var el = document.getElementById(DOCK_HIDE_OVERLAY_IDS[i]);
           if (el && (el.classList.contains('open') || el.classList.contains('visible') || el.classList.contains('show'))) {
@@ -709,7 +752,7 @@
       }
 
       function init() {
-        console.log('[mfh] init START');
+        
         injectHardCSS();
         hookDock();
         initHomeDockScrollFade();
@@ -781,7 +824,6 @@
           go.observe(gateEl, { attributes: true, attributeFilter: ['style', 'class'] });
         }
 
-        console.log('[mfh] init DONE — homepage aktivní');
       }
 
       if (document.readyState === 'loading') {
