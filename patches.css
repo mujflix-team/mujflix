@@ -569,11 +569,6 @@ body.discover-open #mfDock:focus-within {
     max-width: 420px !important;
   }
 
-  .disco-nav {
-    -webkit-mask-image: linear-gradient(to right, #000 92%, transparent 100%) !important;
-    mask-image: linear-gradient(to right, #000 92%, transparent 100%) !important;
-  }
-
   #mfSectionHome h1,
   .mfh-greeting {
     font-size: 1.5rem !important;
@@ -757,104 +752,11 @@ html body.discover-open #mfDock {
   background: linear-gradient(90deg, #fff 30%, #7cb8ff);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.mfd-hero-sub { margin: 0 0 22px; color: rgba(255,255,255,0.5); font-size: 1rem; }
-
-.mfd-filters-1 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
-.mfd-f-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: 40px; padding: 0 18px; border-radius: 999px; cursor: pointer;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09);
-  color: rgba(255,255,255,0.78); font: inherit; font-size: 0.88rem; font-weight: 600;
-  transition: background .16s ease, color .16s ease, transform .16s ease, border-color .16s ease;
-}
-.mfd-f-btn svg { width: 16px; height: 16px; }
-.mfd-f-btn:hover { background: rgba(255,255,255,0.13); color: #fff; }
-.mfd-f-btn:active { transform: scale(0.96); }
-.mfd-f-btn.active {
-  background: #fff; color: #08080c; border-color: #fff;
-}
-.mfd-f-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.14); margin: 0 4px; }
-.mfd-select {
-  height: 40px; padding: 0 34px 0 16px; border-radius: 999px; cursor: pointer;
-  background-color: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09);
-  color: #fff; font: inherit; font-size: 0.86rem; font-weight: 600; outline: none;
-  appearance: none; -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/></svg>");
-  background-repeat: no-repeat; background-position: right 14px center;
-}
-.mfd-select:hover { background-color: rgba(255,255,255,0.12); }
-.mfd-select option { background: #14141b; color: #fff; }
-
-.mfd-filters-2 {
-  display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 18px;
-  scrollbar-width: none;
-}
-.mfd-filters-2::-webkit-scrollbar { display: none; }
-.mfd-filters-2 .disco-nav-item {
-  flex: none; height: 34px; padding: 0 16px; border-radius: 999px;
-  background: transparent !important; border: 1px solid rgba(255,255,255,0.14) !important;
-  color: rgba(255,255,255,0.7) !important; font-size: 0.82rem; font-weight: 600;
-  transform: none !important; transition: background .16s ease, color .16s ease, border-color .16s ease;
-}
-.mfd-filters-2 .disco-nav-item:hover { background: rgba(255,255,255,0.09) !important; color: #fff !important; }
-.mfd-filters-2 .disco-nav-item.active {
-  background: linear-gradient(135deg, #0a84ff, #5e5ce6) !important;
-  border-color: transparent !important; color: #fff !important;
-  box-shadow: 0 6px 18px rgba(10,132,255,0.35) !important;
-}
-
-.mfd-section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 0 14px; }
-.mfd-section-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
-.mfd-em { color: #0a84ff; }
-
-.mfd-top10-row {
-  display: flex; gap: 16px; overflow-x: auto; padding: 6px 2px 18px;
-  scroll-snap-type: x proximity; scrollbar-width: none;
-}
-.mfd-top10-row::-webkit-scrollbar { display: none; }
-.mfd-top10-row > * { flex: none; scroll-snap-align: start; }
-.mfd-top10-row .disco-card { width: 170px; }
-
-.mfd-mood-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-.mfd-mood-card {
-  position: relative; overflow: hidden; cursor: pointer; border-radius: 22px;
-  min-height: 132px; padding: 22px; display: flex; align-items: flex-end;
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease;
-}
-.mfd-mood-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,0.5); }
-.mfd-mood-card.m1 { background: linear-gradient(135deg, #2b1030, #6b1d3a 70%, #b23a48); }
-.mfd-mood-card.m2 { background: linear-gradient(135deg, #0e2a3b, #14607a 70%, #2fb7a3); }
-.mfd-mood-card.m3 { background: linear-gradient(135deg, #2a1607, #7a3a0e 70%, #f08a24); }
-.mfd-mood-emoji { position: absolute; right: 18px; top: 12px; font-size: 3rem; opacity: .9; }
-.mfd-mood-title { font-size: 1.08rem; font-weight: 800; color: #fff; }
-.mfd-mood-sub { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
-
-.mfd-rec-grid {
-  display: grid; gap: 20px 16px;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-}
-.mfd-rec-grid .disco-card {
-  width: 100% !important; min-width: 0; height: auto !important;
-  aspect-ratio: 2 / 3; margin: 0 !important;
-}
-.mfd-rec-grid .disco-loading, .mfd-top10-row .disco-loading { grid-column: 1 / -1; }
-
-.mfd-loadmore-wrap { display: flex; justify-content: center; margin: 34px 0 10px; }
-.mfd-loadmore-btn {
-  height: 46px; padding: 0 34px; border-radius: 999px; cursor: pointer;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
-  color: #fff; font: inherit; font-size: 0.92rem; font-weight: 700;
-  transition: background .18s ease, transform .18s ease;
-}
-.mfd-loadmore-btn:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); }
 
 @media (max-width: 640px) {
   .mfd-header { gap: 10px; padding: 12px 14px; }
   .mfd-brand { display: none; }
   .mfd-search-wrap .uni-input { height: 44px; }
-  .mfd-rec-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px 10px; }
-  .mfd-top10-row .disco-card { width: 130px; }
 }
 
 .mf-dock {
@@ -887,7 +789,7 @@ html body.discover-open #mfDock {
 }
 .mf-dock-badge.visible { transform: scale(1); }
 
-#aiFab, #aiFullscreen, #aiApikeyOverlay, [onclick*="openAi"], [onclick*="toggleAiPanel"], #dockPlex, #mfSectionPlex {
+#aiApikeyOverlay, [onclick*="openAi"], [onclick*="toggleAiPanel"], #dockPlex, #mfSectionPlex {
   display: none !important;
 }
 body.discover-open #mfDock, body.disco-open #mfDock { display: none !important; }
