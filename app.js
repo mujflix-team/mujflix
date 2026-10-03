@@ -1208,6 +1208,32 @@ function saveWatchlistData(e) {
   safeSetItem(uKey("mf_watchlist"), JSON.stringify(e))
 }
 
+/* Doplní chybějící plakáty u oblíbených (starší záznamy / přidáno z přehrávače) */
+let _mfPosterFixBusy = false;
+async function mfBackfillFavPosters() {
+  if (_mfPosterFixBusy) return;
+  const list = getWatchlist();
+  const miss = list.filter(w => w && w.tmdbId && !w.poster);
+  if (!miss.length) return;
+  _mfPosterFixBusy = true;
+  try {
+    let changed = false;
+    for (const w of miss.slice(0, 30)) {
+      try {
+        const kind = w.type === "series" ? "tv" : "movie";
+        const d = await tmdbGet("/" + kind + "/" + w.tmdbId + "?language=cs-CZ");
+        if (d && d.poster_path) { w.poster = "https://image.tmdb.org/t/p/w342" + d.poster_path; changed = true; }
+      } catch (e) {}
+    }
+    if (changed) {
+      saveWatchlistData(list);
+      try { if (typeof renderHomepage === "function") renderHomepage(); } catch (e) {}
+      try { const o = document.getElementById("watchlistOverlay"); if (o && o.classList.contains("open")) renderWatchlist(); } catch (e) {}
+    }
+  } finally { _mfPosterFixBusy = false; }
+}
+window.mfBackfillFavPosters = mfBackfillFavPosters;
+
 function tmdbFavSlug(id, mediaType) {
   return "__tmdbfav_" + ("tv" === mediaType ? "tv" : "movie") + "_" + id
 }
@@ -1236,6 +1262,7 @@ function toggleTmdbFavorite(id, mediaType, name, poster, btn) {
     if (typeof showToast === "function") showToast("Přidáno do Oblíbených! ❤️")
   }
   saveWatchlistData(list);
+  if (idx < 0 && !poster) setTimeout(mfBackfillFavPosters, 50);
   if (btn) btn.classList.toggle("faved", idx < 0);
   if (typeof updateWatchlistBtns === "function") updateWatchlistBtns()
 }
@@ -1281,6 +1308,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function openWatchlist() {
+  setTimeout(mfBackfillFavPosters, 50);
   const e = document.getElementById("watchlistOverlay");
   e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => e.classList.add("visible"))), renderWatchlist()
 }
@@ -2984,7 +3012,7 @@ const ProfileGate = {
     }
   },
   activateProfile(e) {
-    localStorage.setItem(ACTIVE_PID_KEY, e), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
+    localStorage.setItem(ACTIVE_PID_KEY, e), window.dispatchEvent(new Event("mf:profile-changed")), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
       void 0 !== aiBrain && (aiBrain.reloadForProfile(), aiBrain.applyDecay()), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), "function" == typeof updateLogoProgress && updateLogoProgress()
     }, 100);
     const t = _getProfiles().find(t => t.id === e);
