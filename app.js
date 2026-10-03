@@ -463,111 +463,30 @@ function showToast(e, t) {
     n.style.opacity = "0", n.style.transform = "translateX(-50%) translateY(8px)"
   }, "error" === t ? 3500 : 2400)
 }
-let _searchPlatform = "movies",
-  _shType = "all",
-  _uniGenre = "",
-  _uniGenreType = "all",
-  _shCurrentItems = [],
-  _shPreviewItem = null,
-  _shFocusIdx = -1,
-  _searchDebounce = null,
-  _uniPage = 1,
-  _uniTotalPages = 1,
-  _uniSelectedVariant = null,
-  _discoCurrent = {
-    genre: "",
-    type: "tv"
-  };
 
-function openUniverse() {
-  const e = document.getElementById("universeOverlay");
-  document.body.classList.add("discover-open"), e.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => {
-    e.classList.add("visible");
-    const t = document.getElementById("searchTitleInput");
-    t && (renderSearchHistory(), setTimeout(() => t.focus(), 40));
-  })), kbLayer = "search", pauseBgParticles();
-  const t = document.getElementById("discoBody");
-  t && t.querySelector(".disco-loading") && loadDiscoContent(_discoCurrent.genre, _discoCurrent.type)
-}
 
-function openSearch() {
-  openUniverse()
-}
 
-function openDiscover() {
-  openUniverse()
-}
 
-function closeUniverse() {
-  const e = document.getElementById("universeOverlay");
-  document.body.classList.remove("discover-open"), e.classList.remove("visible"), setTimeout(() => {
-    e.classList.remove("open")
-  }, 350), kbLayer = "menu", resumeBgParticles();
-  const t = document.getElementById("searchTitleInput");
-  t && (t.value = "");
-  const n = document.getElementById("shClearBtn");
-  n && (n.style.display = "none")
-}
 
-function closeSearch() {
-  closeUniverse()
-}
 
-function closeDiscover() {
-  closeUniverse()
-}
 
-function clearSearch() {
-  const e = document.getElementById("searchTitleInput");
-  e && (e.value = "", e.focus());
-  const t = document.getElementById("shClearBtn");
-  t && (t.style.display = "none"), renderSearchHistory(), loadDiscoContent(_discoCurrent.genre, _discoCurrent.type)
-}
 
-function discoFilter(e, t, n) {
-  document.querySelectorAll(".disco-nav-item").forEach(e => e.classList.remove("active")), e.classList.add("active"), _discoCurrent = {
-    genre: t,
-    type: n
-  };
-  const o = document.getElementById("searchTitleInput");
-  o && (o.value = "");
-  const i = document.getElementById("shClearBtn");
-  i && (i.style.display = "none"), loadDiscoContent(t, n)
-}
 
-function handleSearchInputKey(e) {
-  "Escape" !== e.key || closeUniverse()
-}
 
-function renderSearchHistory() {
-}
-function saveSearchHistory(e) {
-}
 
-function onSearchInput(e) {
-  const t = document.getElementById("shClearBtn");
-  const n = document.getElementById("mfSearchHistory");
-  t && (t.style.display = e ? "flex" : "none"), n && (n.style.display = e.trim() ? "none" : ""), clearTimeout(_searchDebounce), e.trim() ? _searchDebounce = setTimeout(() => discoSearch(e.trim()), 320) : loadDiscoContent(_discoCurrent.genre, _discoCurrent.type)
-}
-async function discoSearch(e) {
-  const t = document.getElementById("discoBody");
-  if (t) {
-    saveSearchHistory(e);
-    t.innerHTML = '<div class="disco-loading"><div class="disco-spinner"></div><span>Hledám...</span></div>';
-    try {
-      const [n, o] = await Promise.all([tmdbGet(`/search/movie?query=${encodeURIComponent(e)}&language=cs`), tmdbGet(`/search/tv?query=${encodeURIComponent(e)}&language=cs`)]), i = (n?.results || []).filter(e => e.poster_path).map(e => ({
-        ...e,
-        _rowType: "movie"
-      })), a = (o?.results || []).filter(e => e.poster_path).map(e => ({
-        ...e,
-        _rowType: "tv"
-      }));
-      t.innerHTML = "", i.length && (renderDiscoRow(t, `🎬 Filmy (${i.length}) — <span class="disco-search-query">"${escapeHTML(e)}"</span>`, i.slice(0, 20), "movie"), t.lastElementChild?.classList.add("disco-search-section")), a.length && (renderDiscoRow(t, `📺 Seriály (${a.length}) — <span class="disco-search-query">"${escapeHTML(e)}"</span>`, a.slice(0, 20), "tv"), t.lastElementChild?.classList.add("disco-search-section")), i.length || a.length || (t.innerHTML = `<div class="mf-search-empty"><div class="mf-search-empty-icon">⌕</div><strong>Nic jsme nenašli</strong><span>Zkus jiný název nebo filtr.</span><button type="button" onclick="clearSearch()">Zobrazit doporučení</button></div>`)
-    } catch {
-      t.innerHTML = '<div class="disco-loading">Chyba při hledání</div>'
-    }
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 const TMDB_GENRE_CS = {
     28: "Akce",
     12: "Dobrodružství",
@@ -866,63 +785,9 @@ function scoreAndSortItems(e) {
   return n
 }
 
-function renderPersonalisedRow(e, t, n) {
-  if (!t || !t.length) return;
-  const o = scoreAndSortItems(t),
-    i = getActiveProfile(),
-    a = i?.color || "#007AFF",
-    s = document.createElement("div");
-  s.className = "disco-section";
-  const r = document.createElement("div");
-  r.className = "disco-row";
-  const l = document.createElement("div");
-  l.className = "disco-row-header", l.innerHTML = `\n        <div class="disco-row-title">\n            ✦ Doporučení\n        </div>\n        <div class="disco-row-nav" style="gap:8px;align-items:center;">\n          <button onclick="refreshPersonalisedRow()" style="font-size:0.52rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:${a};background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.2);border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,122,255,0.15)'" onmouseout="this.style.background='rgba(0,122,255,0.07)'">\n            ↻ Nová doporučení\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,-1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>\n          </button>\n        </div>`;
-  const c = document.createElement("div");
-  c.className = "disco-row-scroll", c.id = "personalisedRowScroll", o.slice(0, 24).forEach(({
-    item: e,
-    score: t,
-    whyLabel: o
-  }) => {
-    const i = e.name || e.title || "",
-      s = e.original_name || e.original_title || i,
-      r = i || s,
-      l = _isNonLatin(i) && s && !_isNonLatin(s) ? s : i,
-      d = e.vote_average ? e.vote_average.toFixed(1) : "",
-      m = e.poster_path ? `https://image.tmdb.org/t/p/w342${e.poster_path}` : e.poster || "",
-      u = e._rowType || n || (e.title ? "movie" : "tv"),
-      p = null !== t && t > 0,
-      g = document.createElement("div");
-    g.className = "disco-card ai-match-card", g.style.position = "relative";
-    const f = "";
-    if (g.innerHTML = `\n          ${f}\n          <img class="disco-card-img" src="${m}" alt="" loading="lazy">\n          <div class="disco-card-overlay"></div>\n          <div class="disco-play-btn"><svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg></div>\n          <div class="disco-card-finder-btn" title="Najít kde sledovat" onclick="event.stopPropagation();verifyAndOpen('${l.replace(/'/g,"\\'")}','${u}','${(e.release_date||e.first_air_date||"").slice(0,4)}')">\n            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>\n          </div>\n          ${e.id?`<div class="disco-card-fav-btn${isTmdbFavorite(e.id,u)?" faved":""}" title="Oblíbené" onclick="event.stopPropagation();toggleTmdbFavorite(${e.id},'${u}','${r.replace(/'/g,"\\'")}','${m.replace(/'/g,"\\'")}',this)"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 21s-6.7-4.3-9.3-8.2C1 10 1.7 6.6 4.4 5.1 6.6 3.9 9.2 4.6 12 7.6c2.8-3 5.4-3.7 7.6-2.5 2.7 1.5 3.4 4.9 1.7 7.7C18.7 16.7 12 21 12 21z"/></svg></div>`:""}\n          <div class="disco-card-glow"></div>\n          <div class="disco-card-info">\n            <div class="disco-card-name">${r}</div>\n            ${o?`<div style="font-size:0.42rem;color:${a}cc;margin-bottom:4px;font-weight:700;letter-spacing:0.3px;line-height:1.3;">💡 ${o}</div>`:""}\n            <div class="disco-card-meta">\n              <span class="disco-card-type">${"movie"===u?"🎬 Film":"📺 Seriál"}</span>\n              ${d?`<span class="disco-card-rating">★ ${d}</span>`:""}\n            </div>\n          </div>`, g.onclick = () => {
-        e.id && (aiBrain.boostGenreIds(e.genre_ids || [], .05), aiBrain.recordTmdbSeen(e.id)), e.id ? (window._mfFinderTmdbId = e.id, window._cinYear = (e.release_date || e.first_air_date || "").slice(0, 4) || null, "tv" === u ? openDiscoverTv(e.id, r) : _showCinemaOrFinderChoice(e.id, r, u, null)) : (closeUniverse(), window._mfFinderTmdbId = null, openWithCopy(l, u, (e.release_date || e.first_air_date || "").slice(0, 4) || null))
-      }, TMDB_KEY && e.id) {
-      const t = document.createElement("div");
-      t.style.cssText = "position:absolute;inset:0;z-index:8;pointer-events:none;border-radius:20px;overflow:hidden;opacity:0;background:#000;transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1);", g.appendChild(t), g.addEventListener("mouseenter", () => {
-        g._t = setTimeout(async () => {
-          if (!g.matches(":hover")) return;
-          const n = await getTrailerKey(e.id, u);
-          n && g.matches(":hover") && !t.querySelector("iframe") && (t.innerHTML = `<div style="width:100%;height:100%;position:relative;overflow:hidden;"><iframe src="https://www.youtube-nocookie.com/embed/${n}?autoplay=1&mute=1&controls=0&loop=1&playlist=${n}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&start=8&vq=hd720&hl=cs&widget_referrer=mujflix&enablejsapi=1&origin=https://mujflix.cz" style="position:absolute;top:50%;left:50%;width:350%;height:350%;transform:translate(-50%,-50%);border:none;pointer-events:none;display:block;" allow="autoplay;encrypted-media"></iframe><div style="position:absolute;inset:0;z-index:20;pointer-events:none;background:transparent;"></div><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.18) 38%,transparent 60%);pointer-events:none;border-radius:20px;"></div></div>`, t.style.opacity = "1")
-        }, 900)
-      }), g.addEventListener("mouseleave", () => {
-        clearTimeout(g._t), t.style.opacity = "0", setTimeout(() => {
-          t.innerHTML = ""
-        }, 650)
-      })
-    }
-    c.appendChild(g)
-  }), r.appendChild(l), r.appendChild(c), s.appendChild(r), e.insertBefore(s, e.firstChild)
-}
 
-function refreshPersonalisedRow() {
-  const e = document.getElementById("discoBody"),
-    t = e?.querySelector(".disco-section");
-  if (t) {
-    const e = t.querySelector(".disco-row-title");
-    e && e.textContent.includes("Doporučení") && t.remove()
-  }
-  loadDiscoContent(_discoCurrent.genre, _discoCurrent.type)
-}
+
+
 
 function _isNonLatin(e) {
   return /[\u3000-\u9fff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff\u4e00-\u9fff]/.test(e)
@@ -987,51 +852,9 @@ async function openDiscoverTv(tmdbId, title) {
   }
 }
 
-function renderDiscoRow(e, t, n, o) {
-  if (!n || !n.length) return;
-  const i = document.createElement("div");
-  i.className = "disco-section";
-  const a = document.createElement("div");
-  a.className = "disco-row";
-  const s = document.createElement("div");
-  s.className = "disco-row-header", s.innerHTML = `<div class="disco-row-title">${t}</div>\n        <div class="disco-row-nav">\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,-1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>\n          </button>\n          <button class="disco-row-nav-btn" onclick="discoScrollRow(this,1)">\n            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>\n          </button>\n        </div>`;
-  const r = document.createElement("div");
-  r.className = "disco-row-scroll", n.forEach(e => {
-    const t = e.name || e.title || "",
-      n = e.original_name || e.original_title || t,
-      i = t || n,
-      a = _isNonLatin(t) && n && !_isNonLatin(n) ? n : t,
-      s = e.vote_average ? e.vote_average.toFixed(1) : "",
-      l = e.poster_path ? `https://image.tmdb.org/t/p/w342${e.poster_path}` : e.poster || "",
-      c = e._rowType || o,
-      d = document.createElement("div");
-    if (d.className = "disco-card", d.innerHTML = `<img class="disco-card-img" src="${l}" alt="" loading="lazy">\n          <div class="disco-card-overlay"></div>\n          <div class="disco-play-btn"><svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg></div>\n          <div class="disco-card-finder-btn" title="Najít kde sledovat" onclick="event.stopPropagation();verifyAndOpen('${a.replace(/'/g,"\\'")}','${c}','${(e.release_date||e.first_air_date||"").slice(0,4)}')">\n            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>\n          </div>\n          ${e.id?`<div class="disco-card-fav-btn${isTmdbFavorite(e.id,c)?" faved":""}" title="Oblíbené" onclick="event.stopPropagation();toggleTmdbFavorite(${e.id},'${c}','${a.replace(/'/g,"\\'")}','${l.replace(/'/g,"\\'")}',this)"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 21s-6.7-4.3-9.3-8.2C1 10 1.7 6.6 4.4 5.1 6.6 3.9 9.2 4.6 12 7.6c2.8-3 5.4-3.7 7.6-2.5 2.7 1.5 3.4 4.9 1.7 7.7C18.7 16.7 12 21 12 21z"/></svg></div>`:""}\n          <div class="disco-card-glow"></div>\n          <div class="disco-card-info">\n            <div class="disco-card-name">${i}</div>\n            <div class="disco-card-meta">\n              <span class="disco-card-type">${"movie"===c?"🎬 Film":"📺 Seriál"}</span>\n              ${s?`<span class="disco-card-rating">★ ${s}</span>`:""}\n            </div>\n          </div>`, d.onclick = () => {
-        e.id ? (window._mfFinderTmdbId = e.id, window._cinYear = (e.release_date || e.first_air_date || "").slice(0, 4) || null, "tv" === c ? openDiscoverTv(e.id, i) : _showCinemaOrFinderChoice(e.id, i, c, null)) : (closeUniverse(), window._mfFinderTmdbId = null, openWithCopy(a, c, (e.release_date || e.first_air_date || "").slice(0, 4) || null))
-      }, TMDB_KEY && e.id) {
-      const t = document.createElement("div");
-      t.style.cssText = "position:absolute;inset:0;z-index:8;pointer-events:none;border-radius:20px;overflow:hidden;opacity:0;background:#000;transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1);", d.style.position = "relative", d.appendChild(t), d.addEventListener("mouseenter", () => {
-        d._t = setTimeout(async () => {
-          if (!d.matches(":hover")) return;
-          const n = await getTrailerKey(e.id, c);
-          n && d.matches(":hover") && !t.querySelector("iframe") && (t.innerHTML = `<div style="width:100%;height:100%;position:relative;overflow:hidden;"><iframe src="https://www.youtube-nocookie.com/embed/${n}?autoplay=1&mute=1&controls=0&loop=1&playlist=${n}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&start=8&vq=hd720&hl=cs&widget_referrer=mujflix&enablejsapi=1&origin=https://mujflix.cz" style="position:absolute;top:50%;left:50%;width:350%;height:350%;transform:translate(-50%,-50%);border:none;pointer-events:none;display:block;" allow="autoplay;encrypted-media"></iframe><div style="position:absolute;inset:0;z-index:20;pointer-events:none;background:transparent;"></div><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.18) 38%,transparent 60%);pointer-events:none;border-radius:20px;"></div></div>`, t.style.opacity = "1")
-        }, 900)
-      }), d.addEventListener("mouseleave", () => {
-        clearTimeout(d._t), t.style.opacity = "0", setTimeout(() => {
-          t.innerHTML = ""
-        }, 650)
-      })
-    }
-    r.appendChild(d)
-  }), a.appendChild(s), a.appendChild(r), i.appendChild(a), e.appendChild(i)
-}
 
-function discoScrollRow(e, t) {
-  const n = e.closest(".disco-row-header").nextElementSibling;
-  n && n.scrollBy({
-    left: 152 * t * 3,
-    behavior: "smooth"
-  })
-}
+
+
 async function tmdbRow(e) {
   try {
     const t = await tmdbGet(e);
@@ -1040,166 +863,11 @@ async function tmdbRow(e) {
     return []
   }
 }
-async function loadDiscoContent(e, t) {
-  const n = document.getElementById("discoBody");
-  if (!n) return;
-  n.innerHTML = '<div class="disco-loading"><div class="disco-spinner"></div><span>Načítám...</span></div>';
-  const o = Math.floor(15 * Math.random()) + 1,
-      i = Math.floor(10 * Math.random()) + 1;
-  let a = [];
-  if (TMDB_KEY) try {
-    if (e) {
-      const [t, n, s, r, l, c] = await Promise.all([tmdbRow("/discover/movie?with_genres=" + e + "&sort_by=popularity.desc&vote_count.gte=30&language=cs&page=" + o), tmdbRow("/discover/movie?with_genres=" + e + "&sort_by=vote_average.desc&vote_count.gte=100&language=cs&page=" + i), tmdbRow("/discover/movie?with_genres=" + e + "&sort_by=release_date.desc&vote_count.gte=10&language=cs&page=1"), tmdbRow("/discover/tv?with_genres=" + e + "&sort_by=popularity.desc&vote_count.gte=20&language=cs&page=" + o), tmdbRow("/discover/tv?with_genres=" + e + "&sort_by=vote_average.desc&vote_count.gte=50&language=cs&page=" + i), tmdbRow("/discover/tv?with_genres=" + e + "&sort_by=release_date.desc&vote_count.gte=10&language=cs&page=1")]);
-      a = [], t.length && a.push({
-        label: "🔥 Populární filmy",
-        items: t.slice(0, 24),
-        rowType: "movie"
-      }), r.length && a.push({
-        label: "📺 Populární seriály",
-        items: r.slice(0, 24),
-        rowType: "tv"
-      }), n.length && a.push({
-        label: "⭐ Nejlépe hodnocené filmy",
-        items: n.slice(0, 24),
-        rowType: "movie"
-      }), l.length && a.push({
-        label: "⭐ Nejlépe hodnocené seriály",
-        items: l.slice(0, 24),
-        rowType: "tv"
-      }), s.length && a.push({
-        label: "🆕 Nejnovější filmy",
-        items: s.filter(e => !t.find(t => t.id === e.id)).slice(0, 24),
-        rowType: "movie"
-      }), c.length && a.push({
-        label: "🆕 Nejnovější seriály",
-        items: c.filter(e => !r.find(t => t.id === e.id)).slice(0, 24),
-        rowType: "tv"
-      })
-    } else {
-      const e = Math.random() > .5 ? "week" : "day",
-        [t, n, s, r, l, c, d, m, u, p, g, f, y] = await Promise.all([tmdbRow("/trending/tv/" + e + "?language=cs"), tmdbRow("/tv/top_rated?language=cs&page=" + i), tmdbRow("/tv/on_the_air?language=cs"), tmdbRow("/trending/movie/" + e + "?language=cs"), tmdbRow("/movie/top_rated?language=cs&page=" + i), tmdbRow("/movie/now_playing?language=cs"), tmdbRow("/movie/upcoming?language=cs"), tmdbRow("/discover/movie?with_genres=28&sort_by=popularity.desc&vote_count.gte=100&language=cs&page=" + o), tmdbRow("/discover/tv?with_genres=18&sort_by=vote_average.desc&vote_count.gte=200&language=cs&page=" + i), tmdbRow("/discover/movie?with_genres=27&sort_by=popularity.desc&vote_count.gte=80&language=cs&page=" + o), tmdbRow("/discover/tv?with_genres=9648,27&sort_by=popularity.desc&vote_count.gte=50&language=cs&page=" + i), tmdbRow("/discover/movie?with_genres=35&sort_by=popularity.desc&vote_count.gte=100&language=cs&page=" + o), tmdbRow("/discover/movie?with_genres=878&sort_by=vote_average.desc&vote_count.gte=150&language=cs&page=" + i)]);
-      a = [{
-        label: "🔥 Trending filmy",
-        items: r.slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "📺 Trending seriály",
-        items: t.slice(0, 24),
-        rowType: "tv"
-      }, {
-        label: "🍿 Právě v kinech",
-        items: c.filter(e => !r.find(t => t.id === e.id)).slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "👻 Horor & Thriller filmy",
-        items: p.slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "😱 Děsivé seriály",
-        items: g.slice(0, 24),
-        rowType: "tv"
-      }, {
-        label: "⭐ Nejlépe hodnocené seriály",
-        items: n.slice(0, 24),
-        rowType: "tv"
-      }, {
-        label: "🏆 Největší filmy všech dob",
-        items: l.slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "💥 Akční filmy",
-        items: m.slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "🚀 Sci-Fi filmy",
-        items: y.slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "😂 Komedie",
-        items: f.slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "🎬 Brzy v kinech",
-        items: d.filter(e => e.backdrop_path).slice(0, 24),
-        rowType: "movie"
-      }, {
-        label: "🎭 Nejlepší dramata",
-        items: u.slice(0, 24),
-        rowType: "tv"
-      }, {
-        label: "📡 Právě vysílané",
-        items: s.filter(e => !t.find(t => t.id === e.id)).slice(0, 24),
-        rowType: "tv"
-      }]
-    }
-  } catch (e) {
-    console.warn("Disco load error:", e)
-  }
-  if (n.innerHTML = "", !e && a.length > 0) {
-    const e = a.flatMap(e => e.items.map(t => ({
-        ...t,
-        _rowType: e.rowType
-      }))),
-      t = new Set,
-      o = e.filter(e => !(!e.id || t.has(e.id)) && (t.add(e.id), !0));
-    o.length > 0 && renderPersonalisedRow(n, o, "all")
-  }
-  const s = [...a[0]?.items || [], ...a[1]?.items || []].filter(e => e.backdrop_path),
-    r = s[Math.floor(Math.random() * Math.min(12, s.length))];
-  if (r) {
-    const e = r._rowType || (r.title ? "movie" : "tv"),
-      t = r.name || r.title || "",
-      o = document.createElement("div");
-    o.className = "disco-hero";
-    const i = document.createElement("img");
-    i.src = "https://image.tmdb.org/t/p/w1280" + r.backdrop_path, i.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:transform 8s ease,opacity 0.8s ease;";
-    const a = document.createElement("div");
-    a.style.cssText = "position:absolute;inset:0;z-index:2;opacity:0;transition:opacity 0.8s ease;background:#000;overflow:hidden;pointer-events:none;";
-    const s = document.createElement("div");
-    s.className = "disco-hero-grad", s.style.zIndex = "4";
-    const l = document.createElement("div");
-    l.className = "disco-hero-content", l.style.zIndex = "5";
-    const c = t.replace(/'/g, "\\'"),
-      d = r.vote_average ? r.vote_average.toFixed(1) : "",
-      m = (r.release_date || r.first_air_date || "").slice(0, 4);
-    l.innerHTML = `\n          <div class="disco-hero-badge">\n            <span class="disco-hero-badge-type">${"movie"===e?"🎬 Film":"📺 Seriál"}</span>\n            ${d?`<span class="disco-hero-badge-rating">★ ${d}</span>`:""}\n            ${m?`<span class="disco-hero-badge-year">${m}</span>`:""}\n          </div>\n          <div class="disco-hero-title">${t}</div>\n          <div class="disco-hero-desc">${(r.overview||"Žádný popis není k dispozici.").substring(0,160)}${(r.overview||"").length>160?"…":""}</div>\n          <div class="disco-hero-btns">\n            <button class="disco-hero-btn primary" onclick="event.stopPropagation();if(heroItem.id){window._mfFinderTmdbId=heroItem.id;window._cinYear='${m}';'tv'==='${e}'?openDiscoverTv(heroItem.id,'${c}'):_showCinemaOrFinderChoice(heroItem.id,'${c}','${e}',null);}else{openWithCopy('${c}','${e}','${m}');closeUniverse();}    ">↗ Otevřít na externím webu</button>\n                <button class="disco-hero-btn secondary" onclick="event.stopPropagation();shAddToWatchlistByItem({name:'${c}',media_type:'${e}'});showToast('Přidáno do Oblíbených ❤️')">＋ Oblíbené</button>\n          </div>`, o.append(i, a, s, l), o.onclick = () => {
-      r.id ? (window._mfFinderTmdbId = r.id, window._cinYear = (r.release_date || r.first_air_date || "").slice(0, 4) || null, _showCinemaOrFinderChoice(r.id, t, e, t)) : (openWithCopy(t, e, (r.release_date || r.first_air_date || "").slice(0, 4) || null), closeUniverse())
-    }, TMDB_KEY && r.id && (o.addEventListener("mouseenter", () => {
-      o._t = setTimeout(async () => {
-        if (!o.matches(":hover")) return;
-        const t = await getTrailerKey(r.id, e);
-        t && o.matches(":hover") && !a.querySelector("iframe") && (a.innerHTML = `<div style="position:absolute;inset:0;overflow:hidden;"><iframe src="https://www.youtube-nocookie.com/embed/${t}?autoplay=1&mute=1&controls=0&loop=1&playlist=${t}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&start=5&vq=hd720&hl=cs&widget_referrer=mujflix&enablejsapi=1&origin=https://mujflix.cz" style="position:absolute;top:50%;left:50%;width:350%;height:350%;transform:translate(-50%,-50%);border:none;pointer-events:none;display:block;" allow="autoplay;encrypted-media"></iframe><div style="position:absolute;inset:0;z-index:20;pointer-events:none;background:transparent;"></div></div>`, a.style.opacity = "1", i.style.opacity = "0")
-      }, 1300)
-    }), o.addEventListener("mouseleave", () => {
-      clearTimeout(o._t), a.style.opacity = "0", i.style.opacity = "1", setTimeout(() => {
-        a.innerHTML = ""
-      }, 800)
-    })), n.appendChild(o)
-  }
-  a.filter(e => e.items.length).forEach(e => renderDiscoRow(n, e.label, e.items, e.rowType)), a.filter(e => e.items.length).length || 0 !== n.querySelectorAll(".disco-section").length || n.insertAdjacentHTML("beforeend", '<div class="disco-loading" style="padding:60px;text-align:center"><div style="font-size:2.5rem;margin-bottom:16px">😕</div><div style="font-size:0.9rem;color:rgba(255,255,255,0.5)">Žádný obsah se nepodařilo načíst.<br>Zkontroluj připojení k internetu.</div></div>')
-}
 
-function shAddToWatchlistByItem(e) {
-  addToWatchlistByName(e.name || e.title || "", "movie" === e.media_type || "movie" === e.type ? "movie" : "series")
-}
 
-function buildShCard(e, t) {
-  const n = "movie" === e.media_type || !!e.title,
-    o = e.name || e.title || e.original_name || e.original_title || "",
-    i = e.poster_path ? `https://image.tmdb.org/t/p/w342${e.poster_path}` : "",
-    a = e.vote_average ? e.vote_average.toFixed(1) : "",
-    s = (e.release_date || e.first_air_date || "").slice(0, 4),
-    r = document.createElement("div");
-  r.className = "sh-card", r.dataset.idx = t, r.innerHTML = `\n        ${i?`<img src="${i}" alt="" loading="lazy">`:'<div style="width:100%;height:100%;background:#111;"></div>'}\n        <div class="sh-card-overlay"></div>\n        <div class="sh-card-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>\n        <div class="sh-card-info">\n          <div class="sh-card-name">${o}</div>\n          <div class="sh-card-meta">\n            <span class="sh-card-type-badge${n?" movie":""}">${n?"Film":"Seriál"}</span>\n            ${a?`<span class="sh-card-rating">★${a}</span>`:""}\n            ${s?`<span style="font-size:0.5rem;color:rgba(255,255,255,0.4)">${s}</span>`:""}\n          </div>\n        </div>\n        <div class="sh-card-copy-hint">📋</div>\n      `, r.addEventListener("mouseenter", () => {
-    _shFocusIdx = t, window._shFocusedCard && window._shFocusedCard !== r && window._shFocusedCard.classList.remove("sh-focused"), window._shFocusedCard = r, r.classList.add("sh-focused"), showShPreview(e)
-  });
-  let l = !1;
-  return r.addEventListener("click", () => {
-    l || (l = !0, setTimeout(() => {
-      l = !1
-    }, 800), openShItem(e))
-  }), r
-}
+
+
+
 async function fetchNameVariants(e) {
   const t = "movie" === e.media_type || e.title ? "movie" : "tv",
     n = e.original_name || e.original_title || "",
@@ -1223,28 +891,11 @@ async function fetchNameVariants(e) {
 }
 async function getCorrectTmdbName(e) {
   const t = await fetchNameVariants(e);
-  if (_uniSelectedVariant) return _uniSelectedVariant;
   const n = t.cs || t.orig,
     o = t.orig || t.cs;
   return _isNonLatin(n) && o && !_isNonLatin(o) ? o : n
 }
-async function openShItem(e) {
-  const t = "movie" === e.media_type || !!e.title ? "movie" : "tv";
-  if (e.id) {
-    const n = e.name || e.title || e.original_name || e.original_title || "…";
-    return window._mfFinderTmdbId = e.id, window._cinYear = (e.release_date || e.first_air_date || "").slice(0, 4) || null, _showCinemaOrFinderChoice(e.id, n, t, n), void getCorrectTmdbName(e).then(e => {
-      if (!e || e === n) return;
-      const t = document.querySelector("#mfCinemaChoiceModal [data-mf-title]");
-      t && (t.textContent = e);
-      const o = document.getElementById("mfCinemaChoiceModal");
-      o && (o._mfSearchName = e)
-    }).catch(() => {})
-  }
-  const n = getCorrectTmdbName(e),
-    o = new Promise(t => setTimeout(() => t(e.name || e.title || ""), 3e3)),
-    i = await Promise.race([n, o]);
-  window._mfFinderTmdbId = null, openWithCopy(i, t, (e.release_date || e.first_air_date || "").slice(0, 4) || null), closeUniverse()
-}
+
 
 function _showCinemaOrFinderChoice(e, t, n, o) {
   const i = document.getElementById("mfCinemaChoiceModal");
@@ -1255,101 +906,17 @@ function _showCinemaOrFinderChoice(e, t, n, o) {
     console.warn("[Cinema] Discover close failed:", e)
   }
   openMovieInCinema(e, t, n)
-}! function() {
-  const e = document.createElement("style");
-  e.textContent = "\n        @keyframes aiMatchPulse {\n          0%, 100% { box-shadow: 0 0 8px var(--accent, #007AFF)55, 0 2px 8px rgba(0,0,0,0.5); }\n          50%       { box-shadow: 0 0 18px var(--accent, #007AFF)99, 0 2px 12px rgba(0,0,0,0.6); }\n        }\n        .ai-match-card .ai-match-badge {\n          transition: transform 0.2s;\n        }\n        .ai-match-card:hover .ai-match-badge {\n          transform: scale(1.08);\n        }\n      ", document.head.appendChild(e)
-}();
-let _shPreviewFetchTimeout = null;
-async function showShPreview(e) {
-  const t = document.getElementById("shPreviewContent"),
-    n = document.getElementById("shPreviewEmpty");
-  if (!t || !n) return;
-  _shPreviewItem = e, _uniSelectedVariant = null;
-  const o = e.name || e.title || "",
-    i = e.backdrop_path ? `https://image.tmdb.org/t/p/w780${e.backdrop_path}` : e.poster_path ? `https://image.tmdb.org/t/p/w342${e.poster_path}` : "",
-    a = e.vote_average ? e.vote_average.toFixed(1) : "",
-    s = (e.release_date || e.first_air_date || "").slice(0, 4),
-    r = "movie" === e.media_type || !!e.title,
-    l = r ? "movie" : "tv",
-    c = document.getElementById("uniHeroBadges");
-  c && (c.innerHTML = `\n        <span class="uni-hero-badge ${r?"type-movie":"type-tv"}">${r?"🎬 Film":"📺 Seriál"}</span>\n        ${a?`<span class="uni-hero-badge rating">★ ${a}</span>`:""}\n        ${s?`<span class="uni-hero-badge year">${s}</span>`:""}\n      `), document.getElementById("shPreviewTitle").textContent = o, document.getElementById("shPreviewMeta").textContent = "", document.getElementById("shPreviewDesc").textContent = e.overview || "", document.getElementById("shPreviewNames").innerHTML = "", document.getElementById("uniNameVariants").style.display = "none";
-  document.getElementById("shPreviewBackdrop").innerHTML = i ? `<img src="${i}" alt="">` : "";
-  const d = document.getElementById("shPreviewOpenBtn");
-  d.onclick = () => openShItem(e), d.textContent = "▶ Otevřít" + (r ? " na Bombuj" : " na SvetSerialu");
-  const m = getWatchlist().some(e => e.name === o),
-    u = document.getElementById("shPreviewWlBtn");
-  u.classList.toggle("in-wl", m), u.textContent = m ? "✓ V oblíbených" : "❤️ Chci koukat", n.style.display = "none", t.style.display = "flex";
-  let p = document.getElementById("shJwAvail");
-  if (!p) {
-    p = document.createElement("div"), p.id = "shJwAvail", p.className = "jw-avail-slot";
-    const e = document.getElementById("shPreviewNames");
-    e && e.parentNode && e.parentNode.insertBefore(p, e.nextSibling)
-  }
-  e.id && window.JWAvail ? JWAvail.render(p, e.id, l) : p.innerHTML = "", clearTimeout(_shPreviewFetchTimeout), _shPreviewFetchTimeout = setTimeout(() => fetchShPreviewDetails(e), 350)
-}
-async function fetchShPreviewDetails(e) {
-  if (!e.id || e !== _shPreviewItem) return;
-  const t = "movie" === e.media_type || e.title ? "movie" : "tv",
-    [n, o] = await Promise.all([fetchNameVariants(e), tmdbGet(`/${t}/${e.id}/credits?language=cs`).catch(() => null)]);
-  if (e !== _shPreviewItem) return;
-  const i = (o?.cast || []).slice(0, 4).map(e => e.name).join(", "),
-    a = document.getElementById("shPreviewNames");
-  a && i && (a.innerHTML = `<strong>Hrají:</strong> ${i}`);
-  const s = document.getElementById("uniNameVariants"),
-    r = document.getElementById("uniNameVariantBtns");
-  if (!s || !r) return;
-  n.cs !== n.orig && n.cs && n.orig ? (s.style.display = "block", r.innerHTML = "", [
-    [n.cs, "CZ", "🇨🇿 Český název"],
-    [n.orig, "EN", "🌍 Originální název"]
-  ].forEach(([e, t, n]) => {
-    const o = document.createElement("button");
-    o.className = "uni-name-variant-btn" + ("CZ" === t ? " active" : ""), "CZ" === t && (_uniSelectedVariant = e), o.innerHTML = `\n            <div class="uni-variant-text">\n              <div class="uni-variant-lang">${n}</div>\n              <div class="uni-variant-name">${e}</div>\n            </div>\n            <span class="uni-variant-copy-icon">📋</span>\n          `, o.onclick = () => {
-      document.querySelectorAll(".uni-name-variant-btn").forEach(e => e.classList.remove("active")), o.classList.add("active"), _uniSelectedVariant = e;
-      const t = document.getElementById("shPreviewOpenBtn");
-      t && (t.textContent = `▶ Kopírovat: "${e.slice(0,20)}${e.length>20?"…":""}"`), showToast(`📋 Zvoleno: ${e}`, "info")
-    }, r.appendChild(o)
-  })) : (_uniSelectedVariant = n.cs || n.orig, s.style.display = "none")
 }
 
-function shAddToWatchlist() {
-  if (!_shPreviewItem) return;
-  const e = _shPreviewItem,
-    t = e.name || e.title || "",
-    n = "movie" === e.media_type || !!e.title,
-    o = getWatchlist(),
-    i = o.findIndex(e => e.name === t);
-  if (i >= 0) o.splice(i, 1), saveWatchlistData(o), showToast("Odebráno z oblíbených");
-  else {
-    o.push({
-      name: t,
-      type: n ? "movie" : "series",
-      poster: e.poster_path ? `https://image.tmdb.org/t/p/w185${e.poster_path}` : ""
-    }), saveWatchlistData(o), showToast("Přidáno do Oblíbených! ❤️");
-    try {
-      e.genre_ids?.length && aiBrain.boostGenreIds(e.genre_ids, .12)
-    } catch (e) {
-      console.warn("[Watchlist] aiBrain boost failed:", e)
-    }
-  }
-  const a = document.getElementById("shPreviewWlBtn"),
-    s = getWatchlist().some(e => e.name === t);
-  a && (a.classList.toggle("in-wl", s), a.textContent = s ? "✓ V oblíbených" : "❤️ Chci koukat")
-}
 
-function doSearch() {
-  const e = document.getElementById("searchTitleInput")?.value?.trim();
-  e && (openWithCopy(e, "tv" === _shType ? "tv" : "movie"), closeUniverse())
-}
 
-function openSearchPlatform(e) {
-  doSearch()
-}
-function updateSearchFocus() {}
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("universeOverlay")?.addEventListener("click", e => {
-    e.target === document.getElementById("universeOverlay") && closeUniverse()
-  })
-});
+
+
+
+
+
+
+
 let pendingCb = null;
 
 function showConfirm(e, t, n, o, i) {
@@ -2926,7 +2493,6 @@ document.addEventListener("keydown", e => {
         }
         return
       }
-      "search" !== kbLayer || ("ArrowLeft" === e.key ? (e.preventDefault(), kbSearchIndex = 0, updateSearchFocus()) : "ArrowRight" === e.key ? (e.preventDefault(), kbSearchIndex = 1, updateSearchFocus()) : "Enter" === e.key && (e.preventDefault(), openSearchPlatform(0 === kbSearchIndex ? "movies" : "series")))
     } else if ("ArrowLeft" === e.key) e.preventDefault(), setKbMenuFocus(kbMenuIndex - 1);
     else if ("ArrowRight" === e.key) e.preventDefault(), setKbMenuFocus(kbMenuIndex + 1);
     else if ("Enter" === e.key) {
@@ -2946,9 +2512,6 @@ document.addEventListener("keydown", e => {
     const t = document.getElementById("universeOverlay").classList.contains("open"),
       n = document.getElementById("seriesModal").classList.contains("open");
     if (!t && !n && "menu" === kbLayer) return e.preventDefault(), void openDiscover()
-  }
-  if ("ArrowUp" === e.key) {
-    if (document.getElementById("universeOverlay").classList.contains("open")) return e.preventDefault(), void closeDiscover()
   }
 }, {
   capture: !0
@@ -4822,7 +4385,7 @@ function triggerPwaInstall() {
     let t = null;
 
     function n() {
-      const e = [".wrapped-overlay.open", ".premiere-overlay.open", ".collections-overlay.open", ".mood-overlay.open", ".universe-overlay.open", ".genre-editor-overlay.open", "#epRatingOverlay.open", ".pm-overlay.open", ".watchlist-overlay.open"].some(e => !!document.querySelector(e));
+      const e = [".wrapped-overlay.open", ".premiere-overlay.open", ".collections-overlay.open", ".mood-overlay.open", ".universe-overlay.open", "#universeOverlay.open", ".genre-editor-overlay.open", "#epRatingOverlay.open", ".pm-overlay.open", ".watchlist-overlay.open"].some(e => !!document.querySelector(e));
       document.body.classList.toggle("modal-open", e)
     }
     localStorage.setItem = function(n, o) {
@@ -5066,9 +4629,7 @@ function _bombujMovieUrlVariants(e, t) {
         else if (typeof mfShowSection === "function") mfShowSection("serialy");
       },
       "#filmy": () => {
-        "function" == typeof openUniverse && (openUniverse(), setTimeout(() => {
-          document.querySelectorAll('[data-rtype="movie"]').forEach(e => e.click())
-        }, 400))
+        "function" == typeof mfDiscoverOpen ? mfDiscoverOpen("movie") : "function" == typeof openUniverse && openUniverse()
       },
       "#protebe": () => {
         if ("function" == typeof mfShowSection) {
@@ -5109,7 +4670,6 @@ function _bombujMovieUrlVariants(e, t) {
         return o[t] && e(o[t]), window._mfShowSection_orig.call(this, t, ...n)
       });
       if ([
-          ["openUniverse", "#discover"],
           ["openWatchlist", "#watchlist"],
           ["openSettings", "#settings"]
         ].forEach(([t, n]) => {
@@ -5220,11 +4780,7 @@ function _bombujMovieUrlVariants(e, t) {
         setDockActive("dockHome");
         location.hash = "#serialy";
       }
-      else if ("filmy" === t) n && (n.style.display = "none"), o && (o.style.display = "none"), i && (i.style.display = "none"), setDockActive("dockFilmy"), location.hash = "#filmy", "function" == typeof openUniverse && (openUniverse(), setTimeout(() => {
-        document.querySelectorAll('[data-rtype="movie"], [onclick*="movie"], .disco-filter-btn').forEach(e => {
-          (e.textContent.toLowerCase().includes("film") || "movie" === e.dataset.rtype) && e.click()
-        })
-      }, 350));
+      else if ("filmy" === t) n && (n.style.display = "none"), o && (o.style.display = "none"), i && (i.style.display = "none"), setDockActive("dockFilmy"), location.hash = "#filmy", "function" == typeof mfDiscoverOpen ? mfDiscoverOpen("movie") : "function" == typeof openUniverse && openUniverse();
       else if ("protebe" === t) n && (n.style.display = "none"), o && (o.style.display = "none"), i && (i.style.display = "none"), a && (a.style.display = "block"), document.body.classList.add("mf-section-protebe"), setDockActive("dockProtebe"), location.hash = "#protebe";
     };
     const t = window.closeUniverse;
@@ -5282,124 +4838,7 @@ function _bombujMovieUrlVariants(e, t) {
       })
     }
 
-    function t() {
-      if (document.addEventListener("pointerdown", e => {
-          const t = e.target.closest(".disco-nav-item, .disco-hero-btn, .disco-row-nav-btn, .disco-close");
-          if (!t) return;
-          const n = document.createElement("span"),
-            o = t.getBoundingClientRect(),
-            i = 2.2 * Math.max(o.width, o.height);
-          n.style.cssText = `\n        position:absolute;border-radius:50%;pointer-events:none;\n        width:${i}px;height:${i}px;\n        left:${e.clientX-o.left-i/2}px;\n        top:${e.clientY-o.top-i/2}px;\n        background:rgba(255,255,255,0.15);\n        transform:scale(0);\n        animation:ios26Ripple 0.55s cubic-bezier(0.25,0.8,0.25,1) forwards;\n        z-index:99;\n      `, "static" === getComputedStyle(t).position && (t.style.position = "relative"), t.style.overflow = "hidden", t.appendChild(n), setTimeout(() => n.remove(), 600)
-        }), !document.getElementById("ios26RippleStyle")) {
-        const e = document.createElement("style");
-        e.id = "ios26RippleStyle", e.textContent = "@keyframes ios26Ripple { to { transform:scale(1); opacity:0; } }", document.head.appendChild(e)
-      }
-    }
-
-    function n() {
-      setTimeout(() => {
-        ! function() {
-          function e(e) {
-            if (e._tiltInited) return;
-            e._tiltInited = !0;
-            const t = document.createElement("div");
-            t.style.cssText = "\n        position:absolute;inset:0;border-radius:20px;pointer-events:none;\n        background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28) 0%, transparent 65%);\n        opacity:0;transition:opacity 0.2s ease;z-index:20;mix-blend-mode:screen;\n      ";
-            e.appendChild(t);
-            e.addEventListener("mousemove", n => {
-              const c = (n.clientX - e.getBoundingClientRect().left) / e.offsetWidth * 100,
-                d = (n.clientY - e.getBoundingClientRect().top) / e.offsetHeight * 100;
-              t.style.background = `radial-gradient(circle at ${c}% ${d}%, rgba(255,255,255,0.22) 0%, transparent 60%)`;
-              t.style.opacity = "1";
-            }, { passive: true });
-            e.addEventListener("mouseleave", () => {
-              t.style.opacity = "0";
-            });
-            e.addEventListener("pointerdown", () => {
-              t.style.opacity = "0";
-            }, { passive: true });
-          }
-          document.querySelectorAll(".disco-card").forEach(e), new MutationObserver(t => {
-            t.forEach(t => t.addedNodes.forEach(t => {
-              1 === t.nodeType && (t.classList?.contains("disco-card") && e(t), t.querySelectorAll?.(".disco-card").forEach(e))
-            }))
-          }).observe(document.body, {
-            childList: !0,
-            subtree: !0
-          })
-        }(), document.querySelectorAll(".disco-nav-item").forEach(e => {
-            e.addEventListener("mousemove", t => {
-              const n = e.getBoundingClientRect(),
-                o = .18 * (t.clientX - (n.left + n.width / 2)),
-                i = .18 * (t.clientY - (n.top + n.height / 2));
-              e.style.transform = `translate(${o}px, ${i}px) scale(1.05)`
-            }), e.addEventListener("mouseleave", () => {
-              e.style.transform = ""
-            })
-          }),
-          function() {
-            const e = document.querySelector(".disco-hero");
-            if (!e) return;
-            const t = e.querySelector("img");
-            t && (e.addEventListener("mousemove", n => {
-              const o = e.getBoundingClientRect(),
-                i = (n.clientX - o.width / 2) / o.width,
-                a = (n.clientY - o.height / 2) / o.height;
-              t.style.transform = `scale(1.07) translate(${-14*i}px, ${-8*a}px)`, t.style.transition = "transform 0.15s ease"
-            }), e.addEventListener("mouseleave", () => {
-              t.style.transform = "scale(1.06)", t.style.transition = "transform 1.2s ease"
-            }))
-          }(), document.addEventListener("mouseover", e => {
-            const t = e.target.closest(".disco-card");
-            if (!t || t._colorSampled) return;
-            t._colorSampled = !0;
-            const n = t.querySelector(".disco-card-img");
-            if (n && n.complete) try {
-              const e = document.createElement("canvas");
-              e.width = 4, e.height = 4;
-              const o = e.getContext("2d");
-              o.drawImage(n, 0, .65 * n.naturalHeight, n.naturalWidth, .35 * n.naturalHeight, 0, 0, 4, 4);
-              const i = o.getImageData(0, 0, 4, 4).data;
-              let a = 0,
-                s = 0,
-                r = 0,
-                l = 0;
-              for (let e = 0; e < i.length; e += 4) a += i[e], s += i[e + 1], r += i[e + 2], l++;
-              a = Math.round(a / l), s = Math.round(s / l), r = Math.round(r / l);
-              const c = t.querySelector(".disco-card-glow");
-              c && (c.style.background = `radial-gradient(ellipse 80% 100% at 50% 0%, rgba(${a},${s},${r},0.45) 0%, transparent 70%)`), t.addEventListener("mouseenter", () => {
-                t.style.setProperty("--card-accent", `rgba(${a},${s},${r},0.5)`), t.style.borderColor = `rgba(${Math.min(a+40,255)},${Math.min(s+40,255)},${Math.min(r+40,255)},0.38)`
-              }, {
-                passive: !0
-              }), t.addEventListener("mouseleave", () => {
-                t.style.borderColor = ""
-              }, {
-                passive: !0
-              })
-            } catch (e) {}
-          }, {
-            passive: !0
-          })
-      }, 80)
-    }
-    const o = window.openUniverse;
-    o && (window.openUniverse = function(...e) {
-      const t = o.apply(this, e);
-      return n(), t
-    });
-    let _tiltT = null;
-    new MutationObserver(() => {
-      _tiltT || (_tiltT = setTimeout(() => {
-        _tiltT = null;
-        const e = document.querySelector(".universe-overlay.visible");
-        e && !e._tiltInited && (e._tiltInited = !0, n())
-      }, 200))
-    }).observe(document.body, {
-      attributes: !0,
-      subtree: !0,
-      attributeFilter: ["class"]
-    }), "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", () => {
-      e(), t()
-    }) : (e(), t())
+    "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", e) : e()
   }(), window.CinAI = function() {
     const e = "mf_cin_ai_stats";
 
@@ -5573,20 +5012,6 @@ function _bombujMovieUrlVariants(e, t) {
       },
       SUPPORTS: e
     }
-  }(), window.showShSkeletons = function() {
-    const e = document.getElementById("searchResults");
-    e && MFTransition.searchSkeleton(e, 8)
-  },
-  function() {
-    window.buildShCard;
-    document.addEventListener("click", function(e) {
-      const t = e.target.closest(".sh-card");
-      if (!t) return;
-      const n = t.querySelector("img");
-      n && document.startViewTransition && (n.style.viewTransitionName = "movie-poster", setTimeout(() => {
-        n.style.viewTransitionName = ""
-      }, 600))
-    }, !0)
   }(), document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", function(e) {
       const t = e.target.closest(".ps-tile-wrapper");
@@ -6067,81 +5492,7 @@ document.addEventListener("keydown", function(e) {
         s = document.createElement("div");
       s.className = "mf-ripple-wave", s.style.cssText = `\n      width: ${a}px; height: ${a}px;\n      left: ${o-a/2}px; top: ${i-a/2}px;`, e.appendChild(s), s.addEventListener("animationend", () => s.remove())
     }
-    window.MFProgress = {
-      start() {
-        t.classList.add("active"), o = 0, t.style.transform = "scaleX(0)", clearInterval(n), n = setInterval(() => {
-          const e = .08 * (.92 - o) + .004;
-          o = Math.min(o + e, .92), t.style.transform = `scaleX(${o})`
-        }, 80)
-      },
-      finish() {
-        clearInterval(n), o = 1, t.style.transform = "scaleX(1)", t.style.transition = "transform 0.18s ease", setTimeout(() => {
-          t.style.opacity = "0", t.style.transition = "transform 0.18s ease, opacity 0.25s ease", setTimeout(() => {
-            t.classList.remove("active"), t.style.opacity = "", t.style.transform = "scaleX(0)", t.style.transition = "", o = 0
-          }, 280)
-        }, 180)
-      },
-      error() {
-        clearInterval(n), t.style.background = "linear-gradient(90deg, #ff3b30, #ff6b6b)", t.style.transform = "scaleX(1)", setTimeout(() => this.finish(), 800)
-      }
-    }, window.MFSkeleton = {
-      buildDiscoSkeleton(e = 8) {
-        const t = document.createElement("div");
-        t.className = "mf-skeleton-section", t.dataset.mfSkeleton = "1";
-        const n = document.createElement("div");
-        n.className = "mf-skeleton-header", n.innerHTML = '\n        <div class="mf-skeleton mf-skeleton-title"></div>\n        <div class="mf-skeleton mf-skeleton-tag"></div>';
-        const o = document.createElement("div");
-        o.className = "mf-skeleton-row";
-        for (let t = 0; t < e; t++) {
-          const e = document.createElement("div");
-          e.className = "mf-skeleton mf-skeleton-tile", e.style.animationDelay = .06 * t + "s", o.appendChild(e)
-        }
-        return t.appendChild(n), t.appendChild(o), t
-      },
-      buildEpisodeSkeleton(e = 5) {
-        const t = document.createElement("div");
-        t.dataset.mfSkeleton = "1", t.style.display = "flex", t.style.flexDirection = "column", t.style.gap = "8px", t.style.padding = "8px 0";
-        for (let n = 0; n < e; n++) {
-          const e = document.createElement("div");
-          e.className = "mf-skeleton-ep", e.innerHTML = `\n          <div class="mf-skeleton mf-skeleton-ep-thumb" style="animation-delay:${.07*n}s"></div>\n          <div class="mf-skeleton-ep-body">\n            <div class="mf-skeleton mf-skeleton-line short" style="animation-delay:${.07*n+.04}s"></div>\n            <div class="mf-skeleton mf-skeleton-line medium" style="animation-delay:${.07*n+.08}s"></div>\n            <div class="mf-skeleton mf-skeleton-line long" style="animation-delay:${.07*n+.12}s"></div>\n          </div>`, t.appendChild(e)
-        }
-        return t
-      },
-      inject(e, t = "disco", n = 8) {
-        this.remove(e);
-        const o = "episode" === t ? this.buildEpisodeSkeleton(n) : this.buildDiscoSkeleton(n);
-        return e.insertBefore(o, e.firstChild), o
-      },
-      remove(e) {
-        e?.querySelectorAll("[data-mf-skeleton]").forEach(e => e.remove())
-      }
-    }, window.MFStagger = {
-      run(e, t = {}) {
-        const {
-          delay: n = 15,
-          duration: o = 160,
-          easing: i = "cubic-bezier(0.16,1,0.3,1)",
-          from: a = "bottom"
-        } = t;
-        [...e.children].forEach((e, t) => {
-          e.style.opacity = "0", e.style.transform = "left" === a ? "translateX(-8px)" : "scale" === a ? "scale(0.94)" : "translateY(8px)", e.style.transition = "none", requestAnimationFrame(() => {
-            setTimeout(() => {
-              e.style.transition = `opacity ${o}ms ${i}, transform ${o}ms ${i}`, e.style.opacity = "1", e.style.transform = "none"
-            }, t * n)
-          })
-        })
-      },
-      observe(e, t = {}) {
-        if (!("IntersectionObserver" in window)) return void this.run(e, t);
-        new IntersectionObserver((e, n) => {
-          e.forEach(e => {
-            e.isIntersecting && (this.run(e.target, t), n.unobserve(e.target))
-          })
-        }, {
-          threshold: .06
-        }).observe(e)
-      }
-    }, document.querySelectorAll(".dock-btn").forEach(e => {
+    document.querySelectorAll(".dock-btn").forEach(e => {
       e.classList.add("mf-ripple-container"), e.addEventListener("click", t => {
         i(e, t)
       })
@@ -6181,12 +5532,6 @@ document.addEventListener("keydown", function(e) {
         })
       }
     };
-    const a = window.loadDiscoContent;
-    "function" == typeof a && (window.loadDiscoContent = function(...e) {
-      MFProgress.start();
-      const t = a.apply(this, e);
-      return t && "function" == typeof t.then ? t.then(() => MFProgress.finish()).catch(() => MFProgress.error()) : setTimeout(() => MFProgress.finish(), 600), t
-    });
     const s = new IntersectionObserver(e => {
         e.forEach(e => {
           if (e.isIntersecting && !e.target._mfEntered) {
@@ -6203,44 +5548,7 @@ document.addEventListener("keydown", function(e) {
       }, {
         threshold: .05,
         rootMargin: "0px 0px -20px 0px"
-      }),
-      r = window.renderDiscoRow;
-    "function" == typeof r && (window.renderDiscoRow = function(e, t, n, o) {
-      r.apply(this, arguments);
-      const i = e.querySelector(".disco-row:last-child .disco-row-scroll");
-      i && setTimeout(() => {
-        MFStagger.observe(i, {
-          delay: 15,
-          duration: 160
-        })
-      }, 0)
-    });
-    const l = document.getElementById("discoBody");
-    if (l) {
-      new MutationObserver(e => {
-        e.forEach(e => {
-          e.addedNodes.forEach(e => {
-            if (e instanceof HTMLElement && e.classList?.contains("disco-section")) {
-              const t = [...l.children].indexOf(e);
-              e.style.opacity = "0", e.style.transform = "translateY(6px)", setTimeout(() => {
-                e.style.transition = "opacity 0.16s cubic-bezier(0.16,1,0.3,1), transform 0.16s cubic-bezier(0.16,1,0.3,1)", e.style.opacity = "1", e.style.transform = "none"
-              }, 20 * t);
-              const n = e.querySelector(".disco-row-scroll");
-              n && setTimeout(() => {
-                [...n.querySelectorAll(".disco-card")].forEach((e, n) => {
-                  e.style.opacity = "0", e.style.transform = "translateY(4px) scale(0.98)", setTimeout(() => {
-                    e.style.transition = "opacity 0.14s cubic-bezier(0.16,1,0.3,1), transform 0.14s cubic-bezier(0.16,1,0.3,1)", e.style.opacity = "1", e.style.transform = "none"
-                  }, 12 * n)
-                })
-              }, 0)
-            }
-          })
-        })
-      }).observe(l, {
-        childList: !0,
-        subtree: !1
-      })
-    }
+      });
     const c = new MutationObserver(e => {
       e.forEach(e => {
         if (0 === e.addedNodes.length) return;
@@ -6265,33 +5573,6 @@ document.addEventListener("keydown", function(e) {
     m && new MutationObserver(() => d()).observe(m, {
       attributes: !0,
       attributeFilter: ["class"]
-    });
-    const u = window.loadDiscoContent;
-    "function" != typeof u || u._mfPatched || (u._mfPatched = !0, window.loadDiscoContent = function(e, t) {
-      const n = document.getElementById("discoBody");
-      n && (n.style.opacity = "0.4", n.style.transition = "opacity 0.15s ease", n.querySelector("[data-mf-skeleton]") || (n.insertBefore(MFSkeleton.buildDiscoSkeleton(10), n.firstChild), n.insertBefore(MFSkeleton.buildDiscoSkeleton(10), n.firstChild)));
-      const o = u.apply(this, arguments),
-        i = () => {
-          n && (MFSkeleton.remove(n), n.style.opacity = "1", n.style.transition = "opacity 0.3s ease", setTimeout(() => {
-            n.style.transition = ""
-          }, 350)), MFProgress.finish()
-        };
-      return o && "function" == typeof o.then ? o.then(i).catch(() => {
-        i(), MFProgress.error()
-      }) : setTimeout(i, 500), o
-    });
-    const p = new MutationObserver(() => {
-        [...document.querySelectorAll(".disco-filter-btn:not([data-mf-staggered])")].forEach((e, t) => {
-          e.dataset.mfStaggered = "1", e.style.opacity = "0", e.style.transform = "translateX(-6px)", setTimeout(() => {
-            e.style.transition = "opacity 0.2s cubic-bezier(0.34,1.1,0.64,1), transform 0.22s cubic-bezier(0.34,1.1,0.64,1)", e.style.opacity = "", e.style.transform = "", setTimeout(() => {
-              e.style.transition = ""
-            }, 250)
-          }, 50 * t)
-        })
-      }),
-      g = document.querySelector(".disco-filters, .filter-bar, #discoFilters");
-    g && p.observe(g, {
-      childList: !0
     });
     const f = window.showToast;
     "function" == typeof f && (window.showToast = function(e, t, n) {
@@ -6334,196 +5615,6 @@ document.addEventListener("keydown", function(e) {
     });
   }(),
   function() {
-    "use strict";
-    const e = document.createElement("style");
-    e.id = "mf-disco-fx", e.textContent = "\n\n  /* TYPOGRAPHY POLISH */\n  .disco-row-title {\n    font-size: clamp(0.95rem, 2vw, 1.05rem) !important;\n    font-weight: 800 !important;\n    letter-spacing: -0.35px !important;\n    line-height: 1.15 !important;\n  }\n  .disco-card-name {\n    font-size: clamp(0.66rem, 1.4vw, 0.72rem) !important;\n    font-weight: 800 !important;\n    letter-spacing: -0.15px !important;\n    line-height: 1.25 !important;\n  }\n  .disco-nav-item {\n    font-size: clamp(0.68rem, 1.5vw, 0.75rem) !important;\n    letter-spacing: 0.1px !important;\n    font-weight: 700 !important;\n  }\n\n  /* SPACING — 48px rail matches new header padding */\n  .disco-section { padding-bottom: 0 !important; }\n  .disco-row-header { padding: 0 48px 14px !important; }\n  .disco-row-scroll { gap: 10px !important; padding-left: 48px !important; padding-right: 48px !important; padding-bottom: 16px !important; }\n\n  /* SKELETON SCREENS */\n  @keyframes mf-disco-shimmer {\n    0%   { background-position: -700px 0; }\n    100% { background-position:  700px 0; }\n  }\n  .mf-disco-skel {\n    background: rgba(255,255,255,0.045);\n    border-radius: 8px;\n    position: relative;\n    overflow: hidden;\n    flex-shrink: 0;\n  }\n  .mf-disco-skel::after {\n    content: '';\n    position: absolute;\n    inset: 0;\n    background: linear-gradient(\n      105deg,\n      transparent 20%,\n      rgba(255,255,255,0.055) 45%,\n      rgba(255,255,255,0.11) 50%,\n      rgba(255,255,255,0.055) 55%,\n      transparent 80%\n    );\n    background-size: 700px 100%;\n    animation: mf-disco-shimmer 1.5s ease-in-out infinite;\n    border-radius: inherit;\n  }\n  .mf-disco-skel-card  { width: 154px; height: 231px; }\n  .mf-disco-skel-wide  { width: 220px; height: 130px; }\n  .mf-disco-skel-title { width: 160px; height: 20px; border-radius: 8px; margin-bottom: 10px; }\n  .mf-disco-skel-tag   { width: 70px;  height: 14px; border-radius: 6px; }\n  .mf-disco-skel-row   { display: flex; gap: 10px; overflow: hidden; }\n  .mf-disco-skel-section { padding: 16px 0 8px; display: flex; flex-direction: column; gap: 12px; }\n  .mf-disco-skel-hdr   { display: flex; align-items: center; gap: 10px; }\n\n  /* KEYBOARD FOCUS IN DISCO */\n  .mf-disco-kb-focus {\n    outline: none !important;\n    box-shadow:\n      0 0 0 2px rgba(255,255,255,0.8),\n      0 16px 48px rgba(0,0,0,0.85) !important;\n    transform: scale(1.07) translateY(-6px) !important;\n    z-index: 10;\n    position: relative;\n    transition:\n      transform 0.22s cubic-bezier(0.25,1,0.5,1),\n      box-shadow 0.2s ease !important;\n  }\n  .mf-disco-kb-focus .disco-card-info {\n    opacity: 1 !important;\n    transform: translateY(0) !important;\n  }\n  .mf-disco-kb-focus .disco-card-overlay {\n    opacity: 1 !important;\n  }\n  .mf-disco-row-active .disco-row-title {\n    color: #fff !important;\n    transition: color 0.2s ease;\n  }\n\n  /* ATTENTION BOUNCE on kb-selected card */\n  @keyframes mf-disco-attention {\n    0%   { transform: scale(1.07) translateY(-6px); }\n    25%  { transform: scale(1.11) translateY(-9px); }\n    55%  { transform: scale(1.06) translateY(-5px); }\n    75%  { transform: scale(1.08) translateY(-7px); }\n    100% { transform: scale(1.07) translateY(-6px); }\n  }\n  .mf-disco-kb-focus.mf-disco-attention-play {\n    animation: mf-disco-attention 0.65s cubic-bezier(0.34,1.56,0.64,1);\n  }\n\n  /* OPTIMISTIC CHIP */\n  .disco-nav-item.mf-chip-optimistic {\n    background: rgba(255,255,255,0.14) !important;\n    border-color: rgba(255,255,255,0.3) !important;\n    color: #fff !important;\n    transition: background 0.08s ease, border-color 0.08s ease, color 0.08s ease !important;\n  }\n\n  /* KEYBOARD HINT */\n  #mf-disco-kb-hint {\n    position: fixed;\n    bottom: 90px;\n    left: 50%;\n    transform: translateX(-50%) translateY(8px);\n    background: rgba(10,10,16,0.92);\n    backdrop-filter: blur(20px);\n    border: 1px solid rgba(255,255,255,0.1);\n    border-radius: 50px;\n    padding: 7px 18px;\n    font-family: -apple-system, 'SF Pro Text', sans-serif;\n    font-size: 0.6rem;\n    font-weight: 600;\n    color: rgba(255,255,255,0.5);\n    letter-spacing: 0.3px;\n    pointer-events: none;\n    z-index: 9999;\n    opacity: 0;\n    transition: opacity 0.22s ease, transform 0.26s cubic-bezier(0.34,1.2,0.64,1);\n    white-space: nowrap;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n  }\n  #mf-disco-kb-hint.visible {\n    opacity: 1;\n    transform: translateX(-50%) translateY(0);\n  }\n  #mf-disco-kb-hint kbd {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    background: rgba(255,255,255,0.08);\n    border: 1px solid rgba(255,255,255,0.14);\n    border-radius: 5px;\n    padding: 1px 5px;\n    font-size: 0.55rem;\n    font-weight: 700;\n    color: rgba(255,255,255,0.6);\n    line-height: 1.4;\n  }\n\n  /* ATTENTION bounce reuse */\n  @keyframes mf-attention-bounce {\n    0%   { transform: scale(1); }\n    20%  { transform: scale(1.14); }\n    40%  { transform: scale(0.96); }\n    60%  { transform: scale(1.07); }\n    80%  { transform: scale(0.99); }\n    100% { transform: scale(1); }\n  }\n\n  /* ── REDESIGN OVERRIDES ── */\n  .disco-header {\n    background: rgba(6,6,9,0.92) !important;\n    backdrop-filter: blur(44px) saturate(1.8) !important;\n    -webkit-backdrop-filter: blur(44px) saturate(1.8) !important;\n    border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;\n    position: sticky !important;\n    top: 0 !important;\n    z-index: 20 !important;\n    box-shadow: 0 1px 0 rgba(0,0,0,0.5) !important;\n  }\n  .disco-nav-item.active {\n    background: rgba(10,132,255,0.16) !important;\n    border-color: rgba(10,132,255,0.38) !important;\n    color: #fff !important;\n    box-shadow: 0 0 0 0.5px rgba(10,132,255,0.4) !important;\n  }\n  .disco-hero-btn.primary {\n    background: var(--accent) !important;\n    color: #fff !important;\n    box-shadow: 0 4px 18px rgba(10,132,255,0.4) !important;\n  }\n  .disco-hero-btn.primary:hover {\n    background: #1a8fff !important;\n    box-shadow: 0 8px 28px rgba(10,132,255,0.55) !important;\n  }\n  .disco-card {\n    border-radius: 12px !important;\n  }\n  .disco-card-inner {\n    border-radius: 12px !important;\n  }\n  .disco-card-img {\n    border-radius: 12px !important;\n  }\n  .disco-card-rating {\n    color: rgba(255,200,50,0.85) !important;\n  }\n  ", document.head.appendChild(e);
-    const t = {
-        open: !1,
-        kbActive: !1,
-        rowIdx: 0,
-        cardIdx: 0,
-        rows: [],
-        hintTimer: null
-      },
-      n = document.createElement("div");
-
-    function o() {
-      clearTimeout(t.hintTimer), n.classList.remove("visible")
-    }
-
-    function i() {
-      return [...document.querySelectorAll("#discoBody .disco-row-scroll")].filter(e => e.querySelectorAll(".disco-card").length > 0)
-    }
-
-    function a(e) {
-      return [...e.querySelectorAll(".disco-card")]
-    }
-
-    function s() {
-      document.querySelectorAll(".mf-disco-kb-focus").forEach(e => e.classList.remove("mf-disco-kb-focus", "mf-disco-attention-play")), document.querySelectorAll(".mf-disco-row-active").forEach(e => e.classList.remove("mf-disco-row-active"))
-    }
-
-    function r(e, o) {
-      t.rowIdx = e, t.cardIdx = o, t.rows = i(), s();
-      const r = t.rows[e];
-      if (!r) return;
-      const l = r.closest(".disco-row");
-      l && l.classList.add("mf-disco-row-active");
-      const c = a(r);
-      t.cardIdx = Math.min(o, c.length - 1);
-      const d = c[t.cardIdx];
-      d && (d.classList.add("mf-disco-kb-focus"), d.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center"
-      }), r.closest(".disco-section")?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest"
-      }), clearTimeout(d._discoAttnTimer), d._discoAttnTimer = setTimeout(() => {
-        d.classList.add("mf-disco-attention-play"), d.addEventListener("animationend", () => d.classList.remove("mf-disco-attention-play"), {
-          once: !0
-        })
-      }, 520), n.classList.add("visible"), clearTimeout(t.hintTimer), t.hintTimer = setTimeout(() => n.classList.remove("visible"), 3500))
-    }
-    n.id = "mf-disco-kb-hint", n.innerHTML = "<kbd>&#8593;&#8595;</kbd> Radky &nbsp; <kbd>&#8592;&#8594;</kbd> Karty &nbsp; <kbd>Enter</kbd> Prehrat &nbsp; <kbd>Esc</kbd> Zpet", document.body.appendChild(n), document.addEventListener("keydown", function(e) {
-      if (!t.open) return;
-      const n = document.getElementById("universeOverlay");
-      if (!n?.classList.contains("open")) return;
-      if (document.activeElement?.matches("input,textarea,select")) return;
-      const l = e.key;
-      if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter", " "].includes(l)) return;
-      if ("Escape" === l) return;
-      if (e.preventDefault(), e.stopPropagation(), t.rows = i(), !t.rows.length) return;
-      if (!t.kbActive) return t.kbActive = !0, void r(0, 0);
-      const c = t.rows[t.rowIdx],
-        d = c ? a(c) : [];
-      if ("ArrowRight" === l)
-        if (t.cardIdx + 1 < d.length) r(t.rowIdx, t.cardIdx + 1);
-        else {
-          const e = c?.closest(".disco-row")?.querySelector(".disco-row-nav-btn:last-child");
-          e && (e.style.animation = "none", e.offsetWidth, e.style.animation = "mf-attention-bounce 0.38s cubic-bezier(0.34,1.5,0.64,1)", e.addEventListener("animationend", () => e.style.animation = "", {
-            once: !0
-          }))
-        }
-      else if ("ArrowLeft" === l)
-        if (t.cardIdx - 1 >= 0) r(t.rowIdx, t.cardIdx - 1);
-        else {
-          const e = c?.closest(".disco-row")?.querySelector(".disco-row-nav-btn:first-child");
-          e && (e.style.animation = "none", e.offsetWidth, e.style.animation = "mf-attention-bounce 0.38s cubic-bezier(0.34,1.5,0.64,1)", e.addEventListener("animationend", () => e.style.animation = "", {
-            once: !0
-          }))
-        }
-      else if ("ArrowDown" === l) {
-        if (t.rowIdx + 1 < t.rows.length) {
-          const e = a(t.rows[t.rowIdx + 1]);
-          r(t.rowIdx + 1, Math.min(t.cardIdx, e.length - 1))
-        }
-      } else if ("ArrowUp" === l)
-        if (t.rowIdx > 0) {
-          const e = a(t.rows[t.rowIdx - 1]);
-          r(t.rowIdx - 1, Math.min(t.cardIdx, e.length - 1))
-        } else t.kbActive = !1, s(), o(), "function" == typeof closeUniverse && closeUniverse();
-      else if ("Enter" === l || " " === l) {
-        const e = document.querySelector(".mf-disco-kb-focus");
-        e && (e.classList.remove("mf-disco-attention-play"), e.offsetWidth, e.classList.add("mf-disco-attention-play"), setTimeout(() => e.click(), 80))
-      }
-    }, {
-      capture: !0
-    });
-    const l = window.openUniverse,
-      c = window.closeUniverse;
-    "function" != typeof l || l._dFxOpen || (window.openUniverse = function() {
-      t.open = !0, t.kbActive = !1, t.rowIdx = 0, t.cardIdx = 0;
-      const e = l.apply(this, arguments);
-      return setTimeout(f, 120), e
-    }, window.openUniverse._dFxOpen = !0), "function" != typeof c || c._dFxClose || (window.closeUniverse = function() {
-      return t.open = !1, t.kbActive = !1, s(), o(), c.apply(this, arguments)
-    }, window.closeUniverse._dFxClose = !0);
-    const d = document.getElementById("universeOverlay");
-
-    function m(e) {
-      u(e), [
-        [8, !1],
-        [10, !0],
-        [10, !1]
-      ].forEach(([t, n], o) => {
-        const i = function(e, t) {
-          const n = document.createElement("div");
-          n.className = "mf-disco-skel-section", n.dataset.mfDiscoSkeleton = "1", n.innerHTML = '<div class="mf-disco-skel-hdr">\n      <div class="mf-disco-skel mf-disco-skel-title"></div>\n      <div class="mf-disco-skel mf-disco-skel-tag" style="animation-delay:.1s"></div>\n    </div>';
-          const o = document.createElement("div");
-          o.className = "mf-disco-skel-row";
-          for (let n = 0; n < e; n++) {
-            const e = document.createElement("div");
-            e.className = "mf-disco-skel " + (t ? "mf-disco-skel-wide" : "mf-disco-skel-card"), e.style.animationDelay = .05 * n + "s", o.appendChild(e)
-          }
-          return n.appendChild(o), n
-        }(t, n);
-        i.style.opacity = "0", e.appendChild(i), setTimeout(() => {
-          i.style.transition = "opacity 0.22s ease", i.style.opacity = "1", setTimeout(() => i.style.transition = "", 250)
-        }, 80 * o)
-      })
-    }
-
-    function u(e) {
-      e?.querySelectorAll("[data-mf-disco-skeleton]").forEach(e => {
-        e.style.transition = "opacity 0.15s ease", e.style.opacity = "0", setTimeout(() => e.remove(), 160)
-      })
-    }
-    d && new MutationObserver(() => {
-      !d.classList.contains("open") && t.open && (t.open = !1, t.kbActive = !1, s(), o())
-    }).observe(d, {
-      attributes: !0,
-      attributeFilter: ["class"]
-    });
-    const p = window.loadDiscoContent;
-    "function" != typeof p || p._dFxPatched || (window.loadDiscoContent = async function() {
-      const e = document.getElementById("discoBody");
-      let n;
-      e && (e.innerHTML = "", m(e)), window.MFProgress && MFProgress.start();
-      try {
-        n = await p.apply(this, arguments)
-      } catch (e) {
-        throw window.MFProgress && MFProgress.error(), e
-      }
-      return e && u(e), window.MFProgress && MFProgress.finish(), t.open && (t.kbActive = !1, s(), t.rows = []), requestAnimationFrame(() => {
-        e && (e.querySelectorAll(".disco-row-scroll").forEach((e, t) => {
-          [...e.querySelectorAll(".disco-card:not([data-dfx])")].forEach((e, n) => {
-            e.dataset.dfx = "1", e.style.opacity = "0", e.style.transform = "translateY(18px) scale(0.95)";
-            setTimeout(() => {
-              e.style.transition = "opacity 0.24s cubic-bezier(0.34,1.1,0.64,1), transform 0.26s cubic-bezier(0.34,1.12,0.64,1)", e.style.opacity = "1", e.style.transform = "none", setTimeout(() => e.style.transition = "", 280)
-            }, 60 * t + 50 * n)
-          })
-        }), e.querySelectorAll(".disco-section:not([data-dhdr])").forEach((e, t) => {
-          e.dataset.dhdr = "1";
-          const n = e.querySelector(".disco-row-header");
-          n && (n.style.opacity = "0", n.style.transform = "translateX(-12px)", setTimeout(() => {
-            n.style.transition = "opacity 0.22s cubic-bezier(0.34,1.1,0.64,1), transform 0.24s cubic-bezier(0.34,1.1,0.64,1)", n.style.opacity = "1", n.style.transform = "none", setTimeout(() => n.style.transition = "", 260)
-          }, 60 * t))
-        }))
-      }), n
-    }, window.loadDiscoContent._dFxPatched = !0);
-    const g = window.discoFilter;
-
-    function f() {
-      [...document.querySelectorAll(".disco-nav-item:not([data-chip-s])")].forEach((e, t) => {
-        e.dataset.chipS = "1", e.style.opacity = "0", e.style.transform = "translateX(-10px) scale(0.92)", setTimeout(() => {
-          e.style.transition = "opacity 0.2s cubic-bezier(0.34,1.1,0.64,1), transform 0.22s cubic-bezier(0.34,1.15,0.64,1)", e.style.opacity = "1", e.style.transform = "none", setTimeout(() => e.style.transition = "", 250)
-        }, 50 * t)
-      })
-    }
-    "function" != typeof g || g._dFxChip || (window.discoFilter = function(e) {
-      return document.querySelectorAll(".disco-nav-item").forEach(e => e.classList.remove("mf-chip-optimistic")), e.classList.add("mf-chip-optimistic"), e.style.transform = "scale(0.93)", setTimeout(() => {
-        e.style.transition = "transform 0.22s cubic-bezier(0.34,1.4,0.64,1)", e.style.transform = "", setTimeout(() => e.style.transition = "", 250)
-      }, 60), g.apply(this, arguments)
-    }, window.discoFilter._dFxChip = !0);
-    const y = document.getElementById("discoBody");
-    y && new MutationObserver(() => {
-      t.open && t.kbActive && (t.rows = i(), t.rows[t.rowIdx] || (t.rowIdx = 0, t.cardIdx = 0, t.rows.length && r(0, 0)))
-    }).observe(y, {
-      childList: !0
-    })
-  }(),
-  function() {
     let e = null,
       t = !1;
     document.addEventListener("mousemove", function(n) {
@@ -6542,39 +5633,7 @@ document.addEventListener("keydown", function(e) {
       }))
     })
   }();
-;(function _mfDiscoverClickFix() {
 
-  const _origOpen  = window.openUniverse;
-  const _origClose = window.closeUniverse;
-
-  window.openUniverse = function(...args) {
-    document.body.classList.add('disco-open');
-    return _origOpen?.apply(this, args);
-  };
-
-  window.closeUniverse = function(...args) {
-    document.body.classList.remove('disco-open');
-    return _origClose?.apply(this, args);
-  };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const overlay = document.getElementById('universeOverlay');
-    if (overlay?.classList.contains('open')) {
-      document.body.classList.add('disco-open');
-    }
-
-    if (overlay) {
-      new MutationObserver(() => {
-        if (overlay.classList.contains('open')) {
-          document.body.classList.add('disco-open');
-        } else {
-          document.body.classList.remove('disco-open');
-        }
-      }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
-    }
-  });
-
-})();
 
 const MF_CHANGELOG_KEY = 'mf_changelog_v1';
 const MF_CHANGELOG_SEEN_KEY = 'mf_changelog_seen_ts';
