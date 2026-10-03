@@ -54,7 +54,7 @@
     <link rel="stylesheet" href="styles.css?v=5" />
     <link rel="stylesheet" href="patches.css" />
     <link rel="stylesheet" href="discover.css?v=1" />
-    <link rel="stylesheet" href="netflix.css?v=3" />
+    <link rel="stylesheet" href="netflix.css?v=7" />
     <script>
       (function () {
         var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -180,6 +180,7 @@
     </div>
 
     <div id="mfProfileCreate">
+      <div class="pc-logo">Můj<span>Flix</span></div>
       <div class="pc-box">
         <div class="pc-heading">
           <div>
@@ -269,6 +270,7 @@
           </button>
         </div>
       </div>
+    </div>
 
       <div id="mfProfileWelcome" aria-hidden="true">
         <div class="pw-box">
@@ -282,7 +284,6 @@
           </div>
         </div>
       </div>
-    </div>
 
     <div class="adaptive-bg" id="adaptiveBg"></div>
     <div class="bg-glow"></div>
@@ -379,7 +380,7 @@
       <button type="button" class="nf-icon-btn" id="nfSearchBtn" aria-label="Hledat" title="Hledat (/)" onclick="openSearch()">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <button type="button" class="nf-icon-btn" id="nfBellBtn" aria-label="Nové epizody" title="Nové epizody" onclick="openNotifPanel()">
+      <button type="button" class="nf-icon-btn" id="nfBellBtn" aria-label="Novinky" title="Novinky" onclick="openNotifPanel()">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="nf-bell-dot" id="nfBellDot"></span>
       </button>
@@ -754,7 +755,7 @@
       class="notif-bell"
       id="notifBell"
       onclick="openNotifPanel()"
-      title="Aktualizace"
+      title="Novinky"
     >
       <svg
         viewBox="0 0 24 24"
@@ -774,7 +775,7 @@
     
     <div class="notif-panel" id="notifPanel">
       <div class="notif-panel-header">
-        <div class="notif-panel-title">Aktualizace</div>
+        <div class="notif-panel-title">Novinky</div>
         <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
       </div>
       <div class="notif-panel-list" id="notifPanelList">
@@ -2788,6 +2789,7 @@
     <script src="cinema.js" defer></script>
     <script src="home.js" defer></script>
     <script src="dock.js" defer></script>
+    <script src="news.js?v=1" defer></script>
 
 </body>
 </html>
