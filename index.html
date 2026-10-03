@@ -53,6 +53,7 @@
 
     <link rel="stylesheet" href="styles.css?v=5" />
     <link rel="stylesheet" href="patches.css" />
+    <link rel="stylesheet" href="discover.css?v=1" />
     <script>
       (function () {
         var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -63,7 +64,7 @@
     </script>
 
     <style>
-      .key-hint, #mf-disco-kb-hint { display: none !important; }
+      .key-hint { display: none !important; }
     </style>
 
     <style>
@@ -73,15 +74,13 @@
         -webkit-backdrop-filter: blur(28px) saturate(1.6) !important;
         backdrop-filter: blur(28px) saturate(1.6) !important;
       }
-      .universe-overlay,
+      #cinemaModal,
       #ratingOverlay,
       #watchlistOverlay {
         -webkit-backdrop-filter: blur(18px) !important;
         backdrop-filter: blur(18px) !important;
       }
-      .ps-tile,
-      .disco-card,
-      .sh-card {
+      .ps-tile {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
@@ -90,9 +89,6 @@
         backdrop-filter: blur(12px) !important;
       }
       .ps-tile-wrapper,
-      .disco-card,
-      .sh-card,
-      .disco-hero-btn,
       .pg-avatar {
         will-change: transform;
         transform: translateZ(0);
@@ -102,21 +98,6 @@
     </style>
   <style id="mf-disco-override">
     :root { --radius: 12px !important; --radius-lg: 18px !important; --radius-sm: 8px !important; }
-    .disco-card, .disco-card-inner { border-radius: 12px !important; }
-    .disco-card { background: rgba(255,255,255,0.025) !important; border: none !important; box-shadow: none !important; width: 154px !important; }
-    .disco-card:hover { transform: scale(1.07) translateY(-6px) !important; box-shadow: 0 22px 60px rgba(0,0,0,0.9), 0 0 0 0.5px rgba(255,255,255,0.15) !important; border-color: transparent !important; }
-    .disco-card-img { width: 154px !important; height: 231px !important; border-radius: 12px !important; }
-    .disco-card-inner { height: 231px !important; }
-    .disco-card-glow { display: none !important; }
-    .disco-card-rating { color: rgba(255,200,50,0.85) !important; }
-    .disco-nav-item { background: transparent !important; border: 0.5px solid rgba(255,255,255,0.09) !important; color: rgba(255,255,255,0.42) !important; overflow: visible !important; }
-    .disco-nav-item::before { display: none !important; }
-    .disco-nav-item.active { color: #fff !important; background: rgba(10,132,255,0.16) !important; border-color: rgba(10,132,255,0.38) !important; box-shadow: none !important; }
-    .disco-nav-item.mf-chip-optimistic { color: #fff !important; background: rgba(10,132,255,0.16) !important; border-color: rgba(10,132,255,0.38) !important; box-shadow: none !important; }
-    .disco-nav-item:hover { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.85) !important; }
-    .disco-header { background: rgba(6,6,9,0.92) !important; backdrop-filter: blur(44px) saturate(1.8) !important; -webkit-backdrop-filter: blur(44px) saturate(1.8) !important; border-bottom: 0.5px solid rgba(255,255,255,0.06) !important; position: sticky !important; top: 0 !important; z-index: 20 !important; }
-    .disco-hero-btn.primary { background: var(--accent) !important; color: #fff !important; box-shadow: 0 4px 18px rgba(10,132,255,0.4) !important; }
-    .disco-hero-btn.primary:hover { background: #1a8fff !important; }
   </style>
   
   <style id="mf-ai-redesign">
@@ -1421,58 +1402,32 @@
       </div>
     </div>
 
-    <div class="universe-overlay" id="universeOverlay" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
-      
-      <div class="mfd-header">
-        <div class="mfd-brand">Muj<span>Flix</span></div>
-        <div class="uni-search-wrap mfd-search-wrap">
-          <svg class="uni-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <label class="mf-search-label" for="searchTitleInput">Vyhledávání</label>
-          <input
-            id="searchTitleInput"
-            class="uni-input"
-            type="text"
-            placeholder="Vyhledávání"
-            aria-label="Vyhledávání"
-            onkeydown="handleSearchInputKey(event)"
-            oninput="onSearchInput(this.value)"
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <button class="uni-clear-btn" id="shClearBtn" onclick="clearSearch()" style="display: none">✕</button>
-          <div class="mf-search-history" id="mfSearchHistory"></div>
+    <div id="universeOverlay" role="dialog" aria-modal="true" aria-label="Objevovat">
+      <header class="dv-top">
+        <div class="dv-bar">
+          <div class="dv-brand">Muj<span>Flix</span></div>
+          <label class="dv-search">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="dvSearch" type="search" placeholder="Hledej film nebo seriál" aria-label="Hledat film nebo seriál" autocomplete="off" spellcheck="false" enterkeyhint="search" />
+            <button type="button" class="dv-clear" id="dvClear" aria-label="Smazat hledání" hidden>&#x2715;</button>
+          </label>
+          <button type="button" class="dv-close" id="dvClose" aria-label="Zavřít Objevovat" title="Zavřít (Esc)">&#x2715;</button>
         </div>
-        <button class="mfd-close" onclick="closeUniverse()" aria-label="Zavřít vyhledávání" title="Zavřít (Esc)">&#x2715;</button>
-      </div>
-
-      <div class="mfd-body" id="discoBody">
-        <h1 class="mfd-hero-title" id="searchTitle">Objevovat</h1>
-        <div class="disco-loading"><div class="disco-spinner"></div><span>Načítám...</span></div>
-      </div>
-
-      <div id="shPreviewEmpty" style="display: none"></div>
-      <div id="shPreviewContent" style="display: none">
-        <div id="shPreviewBackdrop"></div>
-        <div id="shPreviewTitle"></div>
-        <div id="shPreviewMeta"></div>
-        <div id="shPreviewDesc"></div>
-        <div id="shPreviewNames"></div>
-        <div id="uniHeroBadges"></div>
-        <div id="uniNameVariants" style="display: none">
-          <div id="uniNameVariantBtns"></div>
+        <div class="dv-filters">
+          <div class="dv-seg" id="dvType" role="group" aria-label="Typ">
+            <button type="button" class="dv-seg-btn active" data-type="all">Vše</button>
+            <button type="button" class="dv-seg-btn" data-type="movie">Filmy</button>
+            <button type="button" class="dv-seg-btn" data-type="tv">Seriály</button>
+          </div>
+          <div class="dv-selects">
+            <label class="dv-select"><span>Řadit</span><select id="dvSort" aria-label="Řadit podle"></select></label>
+            <label class="dv-select"><span>Rok</span><select id="dvYear" aria-label="Rok vydání"></select></label>
+            <button type="button" class="dv-reset" id="dvReset" hidden>Zrušit filtry</button>
+          </div>
         </div>
-        <button id="shPreviewOpenBtn" style="display: none"></button>
-        <button
-          id="shPreviewWlBtn"
-          onclick="shAddToWatchlist()"
-          style="display: none"
-        ></button>
-      </div>
-      <div id="searchResults" style="display: none"></div>
-      <div id="uniLoadMore" style="display: none"></div>
+        <div class="dv-chips" id="dvGenres" role="group" aria-label="Žánry"></div>
+      </header>
+      <main class="dv-body" id="dvBody"></main>
     </div>
 
     <div
@@ -2870,6 +2825,7 @@
 
     <script src="config.js"></script>
     <script src="app.js?v=6" defer></script>
+    <script src="discover.js?v=1" defer></script>
 
     <script id="mf-img-patch">
       (function () {
@@ -2879,7 +2835,7 @@
         function onScroll() {
           if (!scrollTimer) {
             styleEl.textContent =
-              ".ps-tile-wrapper,.disco-card,.sh-card{transition:none!important;pointer-events:none}";
+              ".ps-tile-wrapper{transition:none!important;pointer-events:none}";
           }
           clearTimeout(scrollTimer);
           scrollTimer = setTimeout(function () {
@@ -2889,7 +2845,7 @@
         }
         function attachScrollListeners() {
           document
-            .querySelectorAll(".ps-list,.disco-row-scroll")
+            .querySelectorAll(".ps-list")
             .forEach(function (el) {
               if (el._mfSP) return;
               el._mfSP = true;
@@ -2963,7 +2919,7 @@
         function onScroll() {
           if (!scrollTimer)
             styleEl.textContent =
-              ".ps-tile-wrapper,.disco-card,.sh-card{transition:none!important;pointer-events:none}";
+              ".ps-tile-wrapper{transition:none!important;pointer-events:none}";
           clearTimeout(scrollTimer);
           scrollTimer = setTimeout(function () {
             scrollTimer = null;
@@ -2972,7 +2928,7 @@
         }
         function attachScroll() {
           document
-            .querySelectorAll(".ps-list,.disco-row-scroll")
+            .querySelectorAll(".ps-list")
             .forEach(function (el) {
               if (el._sp) return;
               el._sp = true;
@@ -2991,8 +2947,6 @@
       (function () {
         var SELECTORS = [
           ".ps-tile-wrapper",
-          ".sh-card",
-          ".disco-hero-card",
         ];
         var MAX_TILT = 8;
         var SCALE_ON = 1.0;
@@ -3071,44 +3025,5 @@
     <script src="home.js" defer></script>
     <script src="dock.js" defer></script>
 
-  <script>
-  (function(){
-    var A='rgba(10,132,255,0.16)',B='rgba(10,132,255,0.38)';
-    function fix(){
-      document.querySelectorAll('.disco-nav-item').forEach(function(el){
-        var on=el.classList.contains('active')||el.classList.contains('mf-chip-optimistic');
-        el.style.setProperty('background', on?A:'transparent','important');
-        el.style.setProperty('border-color', on?B:'rgba(255,255,255,0.09)','important');
-        el.style.setProperty('color', on?'#fff':'rgba(255,255,255,0.42)','important');
-      });
-      document.querySelectorAll('.disco-header').forEach(function(el){
-        el.style.setProperty('position','sticky','important');
-        el.style.setProperty('top','0','important');
-        el.style.setProperty('z-index','20','important');
-        el.style.setProperty('background','rgba(6,6,9,0.92)','important');
-        el.style.setProperty('backdrop-filter','blur(44px) saturate(1.8)','important');
-        el.style.setProperty('-webkit-backdrop-filter','blur(44px) saturate(1.8)','important');
-      });
-      document.querySelectorAll('.disco-hero-btn.primary').forEach(function(el){
-        el.style.setProperty('background','var(--accent)','important');
-        el.style.setProperty('color','#fff','important');
-      });
-    }
-    function go(){
-      fix();
-      var nav=document.getElementById('discoNav');
-      if(nav) new MutationObserver(fix).observe(nav,{subtree:true,attributes:true,attributeFilter:['class','style']});
-      new MutationObserver(function(){
-        var fx=document.getElementById('mf-disco-fx');
-        if(fx&&!fx._p){fx._p=1;setTimeout(function(){
-          fx.textContent=fx.textContent.replace(/\.disco-nav-item\.mf-chip-optimistic\s*\{[^}]*\}/g,
-            '.disco-nav-item.mf-chip-optimistic{background:'+A+'!important;border-color:'+B+'!important;color:#fff!important}');
-        },0);}
-      }).observe(document.head,{childList:true});
-      [200,500,1000,2000].forEach(function(t){setTimeout(fix,t);});
-    }
-    document.readyState==='loading'?document.addEventListener('DOMContentLoaded',go):go();
-  })();
-  </script>
 </body>
 </html>
