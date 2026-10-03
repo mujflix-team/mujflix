@@ -1,3 +1,4 @@
+[README.md](https://github.com/user-attachments/files/32998882/README.md)
 # 🎬 MůjFlix
 
 **MůjFlix je osobní filmový a seriálový tracker, který ti pomůže najít, kde sledovat filmy a seriály z různých zdrojů** — ať už jde o legální streamingové služby (Netflix, Disney+, Max, Apple TV+…) nebo o české a slovenské weby s online filmy (Bombuj, SvetSerialu, Prehrajto). Sleduj, co jsi viděl, dostávej chytrá doporučení a měj vše na jednom místě.
@@ -138,7 +139,7 @@ Stačí upravit soubor a refreshnout prohlížeč. Cache verzuj přes `?v=` v `i
 <script src="app.js?v=6" defer></script>
 ```
 
-Při změně `app.js` (nebo `cinema.js`, `home.js`, `ui-patches.js`) **zvedni číslo verze** ve všech `<script>` a `<link>` v `index.html`, aby prohlížeč nestahoval starou verzi.
+Při změně `app.js` (nebo `cinema.js`, `home.js`, `discover.js`) **zvedni číslo verze** ve všech `<script>` a `<link>` v `index.html`, aby prohlížeč nestahoval starou verzi.
 
 ---
 
