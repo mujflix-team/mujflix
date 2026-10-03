@@ -1,3 +1,5 @@
+
+
 function safeLS(e, t) {
   try {
     return JSON.parse(localStorage.getItem(e) || String(t))
@@ -4209,6 +4211,8 @@ function _syncDockBadges() {
     const e = n && "" !== n.textContent.trim() && "none" !== n.style.display;
     o.textContent = e ? "!" : "", o.classList.toggle("visible", e)
   }
+  const d = document.getElementById("nfBellDot");
+  d && d.classList.toggle("visible", !!(n && "" !== n.textContent.trim() && "none" !== n.style.display))
 }
 document.addEventListener("keydown", function(e) {
     if ("INPUT" === e.target.tagName || "TEXTAREA" === e.target.tagName) return;
