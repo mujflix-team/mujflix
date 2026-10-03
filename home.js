@@ -468,6 +468,7 @@
         _lastContinue = cont;
         var recent = mfhRecentItems();
         var mine = mfhMyListItems();
+        try { if (mine.some(function (m) { return !m.image && m.fav && m.fav.tmdbId; }) && window.mfBackfillFavPosters) window.mfBackfillFavPosters(); } catch (e) {}
         var genres = mfhTopGenreIds();
 
         var sig = JSON.stringify([
