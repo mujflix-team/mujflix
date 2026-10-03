@@ -125,8 +125,8 @@
       if (!wasActive) return;
       setTimeout(function () {
         if (btn.id === "dockFilmy") {
-          var inp = document.getElementById("searchTitleInput");
-          var body = document.getElementById("discoBody");
+          var inp = document.getElementById("dvSearch");
+          var body = document.getElementById("dvBody");
           if (body) body.scrollTo({ top: 0, behavior: "smooth" });
           if (inp) inp.focus();
         } else if (btn.id === "dockHome") {
