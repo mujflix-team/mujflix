@@ -11,51 +11,6 @@
           .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
       }
 
-      function getRawUserName() {
-        try {
-          if (typeof getActiveProfile === 'function') {
-            var active = getActiveProfile();
-            if (active && active.name) return String(active.name).split(' ')[0];
-          }
-        } catch (e) {}
-        try {
-          var pid = localStorage.getItem('mf_active_pid');
-          if (pid) {
-            var profilesRaw = localStorage.getItem('mf_profiles_v2') || localStorage.getItem('mf_profiles');
-            if (profilesRaw) {
-              var profiles = JSON.parse(profilesRaw);
-              if (Array.isArray(profiles)) {
-                var found = profiles.find(function (p) { return p && p.id === pid; });
-                if (found && found.name) return String(found.name).split(' ')[0];
-              }
-            }
-          }
-        } catch (e) {}
-        try {
-          var legacyKeys = ['mf_active_profile', 'mf_profile_name', 'mf_current_profile'];
-          for (var i = 0; i < legacyKeys.length; i++) {
-            var v = localStorage.getItem(legacyKeys[i]);
-            if (!v) continue;
-            try {
-              var o = JSON.parse(v);
-              if (o && o.name) return String(o.name).split(' ')[0];
-            } catch (e2) {
-              if (typeof v === 'string' && v.length < 40) return v.split(' ')[0];
-            }
-          }
-        } catch (e) {}
-        return null;
-      }
-
-      function getUserName() {
-        var name = getRawUserName();
-        if (!name) return 'kamaráde';
-        try {
-          if (typeof window.czechVocative === 'function') return window.czechVocative(name);
-        } catch (e) {}
-        return name;
-      }
-
       var TMDB_BASE = 'https://api.themoviedb.org/3';
       var TMDB_IMG = 'https://image.tmdb.org/t/p';
       var _tmdbPromise = null;
@@ -186,88 +141,141 @@
         return null;
       }
 
-      function renderContinue(item) {
-        var card = document.getElementById('mfhContinueCard');
-        if (!card) return;
+      var GENRE_LABELS = {
+        28: 'Akční', 12: 'Dobrodružné', 16: 'Animované', 35: 'Komedie', 80: 'Krimi', 99: 'Dokumenty',
+        18: 'Drama', 10751: 'Rodinné', 14: 'Fantasy', 36: 'Historické', 27: 'Horor', 9648: 'Mysteriózní',
+        10749: 'Romantické', 878: 'Sci-Fi', 53: 'Thrillery', 10752: 'Válečné', 37: 'Westerny',
+        10759: 'Akční a dobrodružné', 10765: 'Sci-Fi a fantasy', 10768: 'Válka a politika'
+      };
+      var HEART_PATH = 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z';
+      var _nfRun = 0;
+      var _nfSig = '';
+      var _nfCache = {};
 
-        _lastContinue = item || null;
-
-        var inFav = false;
-        try {
-          inFav = item.slug && typeof getWatchlist === 'function' &&
-            getWatchlist().some(function (w) { return w.slug === item.slug; });
-        } catch (e) {}
-
-        card.innerHTML =
-          '<div class="mfh-cont-info">' +
-            '<div class="mfh-cont-eyebrow">Pokračovat ve sledování</div>' +
-            '<h3 class="mfh-cont-title">' + esc(item.title) + '</h3>' +
-            '<p class="mfh-cont-meta">' + esc(item.episode) + ' · ' + esc(item.timeLeft) + ' zbývá</p>' +
-            '<p class="mfh-cont-desc">' + esc(item.description) + '</p>' +
-            '<div class="mfh-cont-bar"><div class="mfh-cont-fill" style="width:' + item.progress + '%"></div></div>' +
-            '<div class="mfh-cont-actions">' +
-              '<button class="mfh-btn-primary" onclick="mfhResume()">▶ Pokračovat</button>' +
-              (item.slug ?
-                '<button class="mfh-btn-secondary" onclick="mfhToggleFav(\'' + esc(item.slug) + '\', this)">' +
-                  (inFav ? '✓ V oblíbených' : '+ Oblíbené') +
-                '</button>' : '') +
-            '</div>' +
-          '</div>' +
-          '<div class="mfh-cont-image">' +
-            '<img src="' + esc(item.image) + '" alt="' + esc(item.title) + '" ' +
-              'loading="lazy" class="mfh-poster-img mfh-skeleton" ' +
-              'onerror="this.onerror=null;this.style.display=\'none\';if(this.parentElement)this.parentElement.classList.add(\'mfh-skeleton\');">' +
-          '</div>';
-
-        var img = card.querySelector('.mfh-poster-img');
-        if (img) {
-          img.addEventListener('load', function () {
-            img.classList.remove('mfh-skeleton');
-          });
-        }
+      function nfJson(path) {
+        if (_nfCache[path]) return _nfCache[path];
+        var key = getTmdbKey();
+        if (!key) return Promise.resolve(null);
+        _nfCache[path] = fetch(TMDB_BASE + path + (path.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key) + '&language=cs-CZ')
+          .then(function (r) { return r.json(); })
+          .catch(function () { delete _nfCache[path]; return null; });
+        return _nfCache[path];
       }
 
-      function mfhCardHtml(it, cid, idx) {
-        var src = it.image ? esc(it.image) : '';
+      function nfItem(raw, type) {
+        type = type || raw.media_type || (raw.title ? 'movie' : 'tv');
+        return {
+          title: raw.title || raw.name || 'Neznámé',
+          image: getPosterUrl(raw.poster_path, 'w342'),
+          backdrop: getBackdropUrl(raw.backdrop_path, 'w1280'),
+          overview: raw.overview || '',
+          rating: raw.vote_average || 0,
+          ep: (raw.release_date || raw.first_air_date || '').substring(0, 4),
+          genreIds: raw.genre_ids || [],
+          tmdbId: raw.id,
+          mediaType: type
+        };
+      }
+
+      function nfItems(data, type) {
+        return ((data && data.results) || []).filter(function (r) { return r.media_type !== 'person'; })
+          .map(function (r) { return nfItem(r, type); })
+          .filter(function (it) { return it.image; });
+      }
+
+      function nfActiveProfile() {
+        try {
+          var pid = localStorage.getItem('mf_active_pid');
+          var list = JSON.parse(localStorage.getItem('mf_profiles_v2') || '[]');
+          return list.filter(function (p) { return p && p.id === pid; })[0] || null;
+        } catch (e) { return null; }
+      }
+
+      function nfRenderProfile() {
+        var b = document.getElementById('nfAvatar');
+        if (!b) return;
+        var p = nfActiveProfile();
+        b.textContent = (p && p.avatar) || '🙂';
+        b.title = p && p.name ? 'Profil: ' + p.name : 'Profil';
+        if (p && p.color) b.style.setProperty('--nf-avatar', p.color);
+      }
+
+      function mfhCardHtml(it, cid, idx, rank) {
+        var open = "mfhOpenIdx('" + cid + "'," + idx + ")";
         return (
-          '<div class="mfh-card" onclick="mfhOpenIdx(\'' + cid + '\',' + idx + ')">' +
-            '<img class="mfh-card-img mfh-skeleton" ' +
-              'src="' + src + '" ' +
-              'alt="' + esc(it.title) + '" ' +
-              'loading="lazy">' +
-            '<div class="mfh-card-body">' +
-              '<p class="mfh-card-title">' + esc(it.title) + '</p>' +
-              (it.ep ? '<p class="mfh-card-ep">' + esc(it.ep) + '</p>' : '') +
+          '<div class="nf-card' + (rank ? ' nf-ranked' : '') + '" tabindex="0" role="button" aria-label="' + esc(it.title) + '" ' +
+            'onclick="' + open + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + open + '}">' +
+            (rank ? '<span class="nf-rank" aria-hidden="true">' + rank + '</span>' : '') +
+            '<div class="nf-poster nf-skeleton">' +
+              '<img class="nf-img" src="' + (it.image ? esc(it.image) : '') + '" alt="" loading="lazy">' +
+            '</div>' +
+            '<div class="nf-card-info">' +
+              '<p class="nf-card-title">' + esc(it.title) + '</p>' +
+              (it.ep ? '<p class="nf-card-ep">' + esc(it.ep) + '</p>' : '') +
             '</div>' +
           '</div>'
         );
       }
 
       function mfhBindCardImages(el) {
-        el.querySelectorAll('.mfh-card-img').forEach(function (img) {
-          img.addEventListener('load', function () {
-            img.classList.remove('mfh-skeleton');
-          });
-          img.addEventListener('error', function () {
-            img.classList.remove('mfh-skeleton');
-            img.style.opacity = '0.3';
-          });
+        el.querySelectorAll('.nf-img').forEach(function (img) {
+          var poster = img.parentElement;
+          function done() { poster.classList.remove('nf-skeleton'); }
+          if (img.complete && img.naturalWidth) done();
+          img.addEventListener('load', done);
+          img.addEventListener('error', function () { done(); img.style.opacity = '0.25'; });
         });
       }
 
-      function renderCarousel(id, items) {
+      function renderCarousel(id, items, ranked) {
         var el = document.getElementById(id);
         if (!el) return;
         el._mfhItems = items || [];
-        el.innerHTML = items.map(function (it, i) { return mfhCardHtml(it, id, i); }).join('');
+        el.innerHTML = el._mfhItems.map(function (it, i) { return mfhCardHtml(it, id, i, ranked ? i + 1 : 0); }).join('');
         mfhBindCardImages(el);
+      }
+
+      function nfArrowSvg(left) {
+        return '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="' + (left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6') + '"/></svg>';
+      }
+
+      function nfRowShell(id, title, sub, ranked) {
+        var host = document.getElementById('nfRows');
+        if (!host) return;
+        var sec = document.createElement('section');
+        sec.className = 'nf-row' + (ranked ? ' nf-row-ranked' : '');
+        sec.id = id + 'Section';
+        sec.hidden = true;
+        sec.innerHTML =
+          '<div class="nf-row-head">' +
+            '<h2 class="nf-row-title">' + esc(title) + '</h2>' +
+            (sub ? '<span class="nf-row-sub">' + esc(sub) + '</span>' : '') +
+            '<a class="nf-see-all" href="#" onclick="event.preventDefault(); mfhSeeAll(\'' + id + '\');">Zobrazit vše ›</a>' +
+          '</div>' +
+          '<div class="nf-scroller">' +
+            '<div class="nf-track" id="' + id + '"></div>' +
+            '<button type="button" class="nf-arrow nf-arrow-l" aria-label="Posunout doleva">' + nfArrowSvg(true) + '</button>' +
+            '<button type="button" class="nf-arrow nf-arrow-r" aria-label="Posunout doprava">' + nfArrowSvg(false) + '</button>' +
+          '</div>';
+        host.appendChild(sec);
+        var track = sec.querySelector('.nf-track');
+        sec.querySelector('.nf-arrow-l').addEventListener('click', function () { track.scrollBy({ left: -track.clientWidth * 0.85, behavior: 'smooth' }); });
+        sec.querySelector('.nf-arrow-r').addEventListener('click', function () { track.scrollBy({ left: track.clientWidth * 0.85, behavior: 'smooth' }); });
+      }
+
+      function nfFillRow(id, items, ranked) {
+        var sec = document.getElementById(id + 'Section');
+        if (!sec) return;
+        if (!items || !items.length) { sec.remove(); return; }
+        renderCarousel(id, items, ranked);
+        sec.hidden = false;
       }
 
       window.mfhSeeAll = function (carouselId) {
         var carousel = document.getElementById(carouselId);
         var items = (carousel && carousel._mfhItems) || [];
         var section = carousel && carousel.closest('section');
-        var titleEl = section && section.querySelector('.mfh-h2');
+        var titleEl = section && section.querySelector('.nf-row-title');
         var modal = document.getElementById('mfhSeeAllModal');
         if (!modal) return;
         var titleTarget = document.getElementById('mfhSeeAllTitle');
@@ -275,7 +283,7 @@
         var grid = document.getElementById('mfhSeeAllGrid');
         if (grid) {
           grid.innerHTML = items.length
-            ? items.map(function (it, i) { return mfhCardHtml(it, carouselId, i); }).join('')
+            ? items.map(function (it, i) { return mfhCardHtml(it, carouselId, i, 0); }).join('')
             : '<p class="mfh-seeall-empty">Zatím tu nic není.</p>';
           mfhBindCardImages(grid);
         }
@@ -292,38 +300,78 @@
         setTimeout(function () { modal.classList.remove('open'); }, 250);
       };
 
-      function mfhApplyHomeLayout(hasContinueItem) {
-        var continueSection = document.getElementById('mfhContinue');
-        var forYouSection = document.getElementById('mfhForYouSection');
-        var forYouTitle = document.getElementById('mfhForYouTitle');
-        var forYouSub = document.getElementById('mfhForYouSub');
-        var wrap = document.querySelector('.mfh-wrap');
+      /* ---------- Hero banner ---------- */
 
-        if (continueSection) continueSection.style.display = hasContinueItem ? '' : 'none';
+      var _heroItem = null;
 
-        if (forYouTitle) forYouTitle.textContent = hasContinueItem ? '✨ Vybráno pro tebe' : '✨ Pro tebe — mohlo by se ti líbit';
-        if (forYouSub) forYouSub.textContent = hasContinueItem
-          ? 'Podle toho, co poslední dobou sleduješ.'
-          : 'Zatím jsi nic nesledoval/a — tohle by tě mohlo bavit.';
-
-        if (wrap && forYouSection) {
-          if (!hasContinueItem) {
-            var welcome = wrap.querySelector('.mfh-welcome');
-            if (welcome && welcome.nextSibling !== forYouSection) {
-              wrap.insertBefore(forYouSection, welcome.nextSibling);
-            }
-          } else {
-            var myListSection = document.getElementById('mfhMyList') && document.getElementById('mfhMyList').closest('section');
-            if (myListSection && forYouSection.nextSibling !== myListSection) {
-              wrap.insertBefore(forYouSection, myListSection);
-            }
-          }
-        }
+      function nfHeroSkeleton() {
+        var hero = document.getElementById('nfHero');
+        if (hero) { hero.className = 'nf-hero nf-hero-empty'; hero.innerHTML = ''; }
       }
 
-      function mfhSetSection(el, visible) {
-        var s = el && el.closest('section');
-        if (s) s.style.display = visible ? '' : 'none';
+      function nfHeroShow(h) {
+        var hero = document.getElementById('nfHero');
+        if (!hero) return;
+        var bg = h.image
+          ? '<img class="nf-hero-bg" src="' + esc(h.image) + '" alt="" decoding="async" onerror="this.style.display=\'none\'">'
+          : '';
+        var meta = [];
+        if (h.badge) meta.push('<span class="nf-hero-badge">' + esc(h.badge) + '</span>');
+        if (h.rating > 0) meta.push('<span class="nf-hero-rating">★ ' + h.rating.toFixed(1) + '</span>');
+        if (h.year) meta.push('<span>' + esc(h.year) + '</span>');
+        (h.genres || []).slice(0, 3).forEach(function (g) { meta.push('<span>' + esc(g) + '</span>'); });
+        if (h.episode) meta.push('<span>' + esc(h.episode) + '</span>');
+        hero.className = 'nf-hero';
+        hero.innerHTML =
+          bg + '<div class="nf-hero-shade"></div>' +
+          '<div class="nf-hero-body">' +
+            (h.eyebrow ? '<div class="nf-hero-eyebrow">' + esc(h.eyebrow) + '</div>' : '') +
+            '<h1 class="nf-hero-title">' + esc(h.title) + '</h1>' +
+            '<div class="nf-hero-meta">' + meta.join('') + '</div>' +
+            (h.progress != null ? '<div class="nf-hero-bar"><div style="width:' + Math.max(2, h.progress) + '%"></div></div>' : '') +
+            (h.overview ? '<p class="nf-hero-desc">' + esc(h.overview) + '</p>' : '') +
+            '<div class="nf-hero-actions">' +
+              '<button type="button" class="nf-btn nf-btn-primary" id="nfHeroPlay"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>' + esc(h.playLabel) + '</span></button>' +
+              '<button type="button" class="nf-btn nf-btn-ghost" id="nfHeroFav"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + HEART_PATH + '"/></svg><span></span></button>' +
+            '</div>' +
+          '</div>';
+        var play = document.getElementById('nfHeroPlay');
+        var fav = document.getElementById('nfHeroFav');
+        play.addEventListener('click', h.onPlay);
+        function paintFav() {
+          var on = !!h.isFav();
+          fav.classList.toggle('on', on);
+          fav.querySelector('span').textContent = on ? 'V oblíbených' : 'Do oblíbených';
+        }
+        fav.addEventListener('click', function () { h.onFav(); paintFav(); });
+        paintFav();
+      }
+
+      function nfHeroFromContinue(c) {
+        nfHeroShow({
+          image: c.image, title: c.title, eyebrow: 'Pokračovat ve sledování',
+          episode: c.episode + ' · ' + c.timeLeft + ' zbývá', progress: c.progress, playLabel: 'Pokračovat',
+          onPlay: function () { window.mfhResume(); },
+          isFav: function () {
+            try { return c.slug && getWatchlist().some(function (w) { return w.slug === c.slug; }); } catch (e) { return false; }
+          },
+          onFav: function () { if (c.slug && typeof toggleWatchlistItem === 'function') toggleWatchlistItem(c.slug); }
+        });
+      }
+
+      function nfHeroFromTmdb(it) {
+        _heroItem = it;
+        nfHeroShow({
+          image: it.backdrop, title: it.title, eyebrow: '', badge: it.mediaType === 'tv' ? 'Seriál' : 'Film',
+          rating: it.rating, year: it.ep, overview: it.overview,
+          genres: (it.genreIds || []).map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean),
+          playLabel: 'Otevřít',
+          onPlay: function () { mfhOpenCard(it.title, it.tmdbId, it.mediaType); },
+          isFav: function () { try { return isTmdbFavorite(it.tmdbId, it.mediaType); } catch (e) { return false; } },
+          onFav: function () {
+            if (typeof toggleTmdbFavorite === 'function') toggleTmdbFavorite(it.tmdbId, it.mediaType, it.title, it.image, null);
+          }
+        });
       }
 
       function mfhRecentItems() {
@@ -387,21 +435,15 @@
       function mfhFetchForYou(tmdb) {
         var genres = mfhTopGenreIds();
         var key = getTmdbKey();
-        var toItem = function (type) {
-          return function (item) {
-            return {
-              title: item.title || item.name || 'Neznámé',
-              image: getPosterUrl(item.poster_path, 'w300'),
-              ep: (item.release_date || item.first_air_date || '').substring(0, 4),
-              tmdbId: item.id,
-              mediaType: type
-            };
-          };
-        };
+        var toItem = function (type) { return function (item) { return nfItem(item, type); }; };
         if (!genres.length || !key) {
-          return Promise.resolve((tmdb && tmdb.trending ? tmdb.trending : []).map(function (item) {
-            return toItem(item.media_type || (item.title ? 'movie' : 'tv'))(item);
-          }));
+          var pop = [];
+          var tvs = (tmdb && tmdb.tv) || [], mvs = (tmdb && tmdb.movies) || [];
+          for (var i = 0; i < Math.max(tvs.length, mvs.length); i++) {
+            if (tvs[i]) pop.push(toItem('tv')(tvs[i]));
+            if (mvs[i]) pop.push(toItem('movie')(mvs[i]));
+          }
+          return Promise.resolve(pop);
         }
         var q = '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=100&with_genres=' + encodeURIComponent(genres.join('|'));
         return Promise.all(['tv', 'movie'].map(function (type) {
@@ -417,38 +459,97 @@
       }
 
       function renderHomepage() {
-        try {
-          var nameEl = document.getElementById('mfhUserName');
-          if (nameEl) nameEl.textContent = getUserName();
-        } catch (e) {
-          console.warn('[mfh] renderHomepage error:', e);
-        }
+        nfRenderProfile();
+        var host = document.getElementById('nfRows');
+        if (!host) return;
 
         var hasHistory = mfhHasWatchHistory();
-        var realContinueItem = hasHistory ? mfhGetRealContinueItem() : null;
-        mfhApplyHomeLayout(!!realContinueItem);
-        if (realContinueItem) renderContinue(realContinueItem);
-        else _lastContinue = null;
-
+        var cont = hasHistory ? mfhGetRealContinueItem() : null;
+        _lastContinue = cont;
         var recent = mfhRecentItems();
-        renderCarousel('mfhRecent', recent);
-        mfhSetSection(document.getElementById('mfhRecent'), recent.length > 0);
-
         var mine = mfhMyListItems();
-        renderCarousel('mfhMyList', mine);
-        mfhSetSection(document.getElementById('mfhMyList'), mine.length > 0);
+        var genres = mfhTopGenreIds();
+
+        var sig = JSON.stringify([
+          cont && [cont.slug, cont.progress, cont.episode],
+          recent.map(function (r) { return r.slug; }),
+          mine.map(function (m) { return m.title; }),
+          genres, !!getTmdbKey()
+        ]);
+        if (sig === _nfSig && host.children.length) return;
+        _nfSig = sig;
+        var myRun = ++_nfRun;
+        host.innerHTML = '';
+
+        if (cont) nfHeroFromContinue(cont); else nfHeroSkeleton();
+
+        nfRowShell('mfhRecent', 'Nedávno sledováno');
+        nfRowShell('mfhMyList', 'Oblíbené');
+        var forYouTitle = genres.length ? 'Vybráno pro tebe' : 'Populární právě teď';
+        var forYouSub = genres.length
+          ? genres.map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean).join(' · ')
+          : 'Čím víc budeš sledovat, tím přesnější to bude';
+        nfRowShell('mfhForYou', forYouTitle, forYouSub);
+        nfRowShell('mfhTop10', 'Top 10 tento týden', '', true);
+        var genreRows = genres.slice(0, 2).filter(function (g) { return GENRE_LABELS[g]; });
+        genreRows.forEach(function (g) { nfRowShell('mfhGenre' + g, GENRE_LABELS[g]); });
+        nfRowShell('mfhTopTv', 'Nejlépe hodnocené seriály');
+        nfRowShell('mfhTopMovie', 'Nejlépe hodnocené filmy');
+
+        nfFillRow('mfhRecent', recent);
+        nfFillRow('mfhMyList', mine);
+
+        if (!getTmdbKey()) {
+          ['mfhForYou', 'mfhTop10', 'mfhTopTv', 'mfhTopMovie'].forEach(function (id) { nfFillRow(id, []); });
+          genreRows.forEach(function (g) { nfFillRow('mfhGenre' + g, []); });
+          if (!cont) {
+            var h = document.getElementById('nfHero');
+            if (h) h.className = 'nf-hero nf-hero-none';
+          }
+          return;
+        }
+
+        var seen = mfhSeenTmdbIds();
+        var fresh = function (items) { return items.filter(function (it) { return !seen[it.tmdbId]; }); };
 
         fetchTmdbData().then(function (tmdb) {
           return mfhFetchForYou(tmdb);
         }).then(function (items) {
-          var seen = mfhSeenTmdbIds();
-          items = items.filter(function (it) { return it.image && !seen[it.tmdbId]; }).slice(0, 20);
-          renderCarousel('mfhForYou', items);
-          mfhSetSection(document.getElementById('mfhForYou'), items.length > 0);
-        }).catch(function (e) {
-          console.warn('[mfh] renderHomepage for-you error:', e);
-          renderCarousel('mfhForYou', []);
-          mfhSetSection(document.getElementById('mfhForYou'), false);
+          if (myRun !== _nfRun) return;
+          items = fresh(items.filter(function (it) { return it.image; })).slice(0, 20);
+          nfFillRow('mfhForYou', items);
+          if (!cont) {
+            var pick = items.filter(function (it) { return it.backdrop && it.overview; })[0];
+            if (pick) nfHeroFromTmdb(pick);
+            else { var hh = document.getElementById('nfHero'); if (hh) hh.className = 'nf-hero nf-hero-none'; }
+          }
+        }).catch(function () {
+          if (myRun !== _nfRun) return;
+          nfFillRow('mfhForYou', []);
+        });
+
+        nfJson('/trending/all/week').then(function (d) {
+          if (myRun !== _nfRun) return;
+          nfFillRow('mfhTop10', nfItems(d).slice(0, 10), true);
+        });
+        genreRows.forEach(function (g) {
+          Promise.all(['tv', 'movie'].map(function (t) {
+            return nfJson('/discover/' + t + '?sort_by=popularity.desc&vote_count.gte=100&with_genres=' + g)
+              .then(function (d) { return nfItems(d, t); });
+          })).then(function (l) {
+            if (myRun !== _nfRun) return;
+            var out = [], max = Math.max(l[0].length, l[1].length);
+            for (var i = 0; i < max; i++) { if (l[0][i]) out.push(l[0][i]); if (l[1][i]) out.push(l[1][i]); }
+            nfFillRow('mfhGenre' + g, fresh(out).slice(0, 20));
+          });
+        });
+        nfJson('/tv/top_rated').then(function (d) {
+          if (myRun !== _nfRun) return;
+          nfFillRow('mfhTopTv', fresh(nfItems(d, 'tv')).slice(0, 20));
+        });
+        nfJson('/movie/top_rated').then(function (d) {
+          if (myRun !== _nfRun) return;
+          nfFillRow('mfhTopMovie', fresh(nfItems(d, 'movie')).slice(0, 20));
         });
       }
 
@@ -705,6 +806,8 @@
         dock.style.setProperty('visibility', show ? 'visible' : 'hidden', 'important');
         dock.style.setProperty('pointer-events', show ? 'auto' : 'none', 'important');
         if (show) dock.style.setProperty('opacity', '1', 'important');
+        var top = document.getElementById('nfTop');
+        if (top) top.classList.toggle('nf-top-hidden', !show);
       }
       window.mfhUpdateDockVisibility = updateDockVisibility;
 
@@ -724,29 +827,17 @@
 
       function initHomeDockScrollFade() {
         var home = document.getElementById('mfSectionHome');
-        var dock = document.getElementById('mfDock');
-        if (!home || !dock || home._mfhDockFadeBound) return;
-        home._mfhDockFadeBound = true;
-
-        var MAX_SCROLL = 200;
-
-        dock.style.setProperty('transition', 'opacity 0.16s ease-out', 'important');
-
+        var top = document.getElementById('nfTop');
+        if (!home || !top || home._mfhTopBound) return;
+        home._mfhTopBound = true;
         var ticking = false;
-        function applyOpacity() {
-          ticking = false;
-          if (!document.body.classList.contains('mfh-home-on')) return;
-          var y = home.scrollTop;
-          var ratio = Math.min(1, Math.max(0, y / MAX_SCROLL));
-          var opacity = 1 - ratio;
-          dock.style.setProperty('opacity', opacity.toFixed(2), 'important');
-          dock.style.setProperty('pointer-events', ratio > 0.92 ? 'none' : 'auto', 'important');
-        }
-
         home.addEventListener('scroll', function () {
           if (ticking) return;
           ticking = true;
-          requestAnimationFrame(applyOpacity);
+          requestAnimationFrame(function () {
+            ticking = false;
+            top.classList.toggle('nf-top-solid', home.scrollTop > 24);
+          });
         }, { passive: true });
       }
 
