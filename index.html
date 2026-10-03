@@ -54,6 +54,7 @@
     <link rel="stylesheet" href="styles.css?v=5" />
     <link rel="stylesheet" href="patches.css" />
     <link rel="stylesheet" href="discover.css?v=1" />
+    <link rel="stylesheet" href="netflix.css?v=2" />
     <script>
       (function () {
         var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -115,7 +116,7 @@
   <body>
     
     <div id="mfProfileGate" style="display:flex;">
-      <div class="pg-logo">Muj<span>Flix</span></div>
+      <div class="pg-logo">Můj<span>Flix</span></div>
       <div class="pg-title">Kdo se dívá?</div>
       <div class="pg-subtitle">Vyber profil a pusť si svůj večer.</div>
       <div class="pg-profiles" id="pgProfilesList"></div>
@@ -371,6 +372,19 @@
       <div id="mfWelcomeNote" aria-live="polite"></div>
       
     </header>
+
+    <div class="nf-top" id="nfTop">
+      <button type="button" class="nf-logo" id="nfLogo" aria-label="MůjFlix – nahoru" onclick="var h=document.getElementById('mfSectionHome');if(h)h.scrollTo({top:0,behavior:'smooth'})">Můj<span>Flix</span></button>
+      <div class="nf-top-gap"></div>
+      <button type="button" class="nf-icon-btn" id="nfSearchBtn" aria-label="Hledat" title="Hledat (/)" onclick="openSearch()">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button type="button" class="nf-icon-btn" id="nfBellBtn" aria-label="Nové epizody" title="Nové epizody" onclick="openNotifPanel()">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="nf-bell-dot" id="nfBellDot"></span>
+      </button>
+      <button type="button" class="nf-avatar" id="nfAvatar" aria-label="Profil" onclick="document.getElementById('dockProfile').click()">🙂</button>
+    </div>
 
        <nav class="mf-dock" id="mfDock">
       
@@ -1405,7 +1419,7 @@
     <div id="universeOverlay" role="dialog" aria-modal="true" aria-label="Objevovat">
       <header class="dv-top">
         <div class="dv-bar">
-          <div class="dv-brand">Muj<span>Flix</span></div>
+          <div class="dv-brand">Můj<span>Flix</span></div>
           <label class="dv-search">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="dvSearch" type="search" placeholder="Hledej film nebo seriál" aria-label="Hledat film nebo seriál" autocomplete="off" spellcheck="false" enterkeyhint="search" />
@@ -1987,51 +2001,8 @@
     </div>
     
     <div id="mfSectionHome" style="display: none;">
-
-      <div class="mfh-ambient"></div>
-
-      <div class="mfh-wrap">
-
-        <section class="mfh-welcome">
-          <h1 class="mfh-greeting">
-            Ahoj, <span id="mfhUserName">Jakube</span> 👋
-          </h1>
-          <p class="mfh-sub">Co si dnes pustíš?</p>
-        </section>
-
-        <section class="mfh-continue" id="mfhContinue">
-          <h2 class="mfh-h2">Pokračovat ve sledování</h2>
-          <div class="mfh-continue-card" id="mfhContinueCard">
-            
-          </div>
-        </section>
-
-        <section class="mfh-row" id="mfhRecentSection">
-          <div class="mfh-row-head">
-            <h2 class="mfh-h2">Nedávno sledováno</h2>
-            <a class="mfh-see-all" href="#" onclick="event.preventDefault(); mfhSeeAll('mfhRecent');">Zobrazit vše →</a>
-          </div>
-          <div class="mfh-carousel" id="mfhRecent"></div>
-        </section>
-
-        <section class="mfh-row" id="mfhForYouSection">
-          <div class="mfh-row-head">
-            <h2 class="mfh-h2" id="mfhForYouTitle">✨ Vybráno pro tebe</h2>
-            <a class="mfh-see-all" href="#" onclick="event.preventDefault(); mfhSeeAll('mfhForYou');">Zobrazit vše →</a>
-          </div>
-          <p class="mfh-row-sub" id="mfhForYouSub">Podle toho, co poslední dobou sleduješ.</p>
-          <div class="mfh-carousel" id="mfhForYou"></div>
-        </section>
-
-        <section class="mfh-row" id="mfhMyListSection">
-          <div class="mfh-row-head">
-            <h2 class="mfh-h2">❤️ Můj seznam</h2>
-            <a class="mfh-see-all" href="#" onclick="event.preventDefault(); mfhSeeAll('mfhMyList');">Zobrazit vše →</a>
-          </div>
-          <div class="mfh-carousel" id="mfhMyList"></div>
-        </section>
-
-      </div>
+      <section class="nf-hero nf-hero-empty" id="nfHero" aria-live="polite"></section>
+      <div class="nf-rows" id="nfRows"></div>
     </div>
 
     <div class="mfh-seeall-overlay" id="mfhSeeAllModal">
@@ -2045,6 +2016,7 @@
     </div>
 
     <style id="mfh-styles">
+
       body.mfh-home-on .ps-menu-scene { display: none !important; }
       body.mfh-home-on .logo-progress { display: none !important; }
 
@@ -2052,10 +2024,10 @@
         position: fixed;
         inset: 0;
         z-index: 50;
-        background: #0b0b0b;
+        background: #141414;
         overflow-y: auto;
         overflow-x: hidden;
-        padding-top: max(88px, calc(env(safe-area-inset-top, 0px) + 78px));
+        padding-top: 0;
         padding-bottom: max(140px, calc(env(safe-area-inset-bottom, 0px) + 120px));
         -webkit-overflow-scrolling: touch;
         animation: mfhFade .35s ease;
@@ -2064,189 +2036,6 @@
       body:not(.mfh-home-on) #mfSectionHome { display: none !important; }
       @keyframes mfhFade { from{opacity:0} to{opacity:1} }
 
-      .mfh-ambient {
-        position: fixed; inset: 0; z-index: 0; pointer-events: none;
-        background:
-          radial-gradient(ellipse 55% 38% at 15% 8%, rgba(0,122,255,.08) 0%, transparent 65%),
-          radial-gradient(ellipse 50% 32% at 88% 82%, rgba(160,100,255,.06) 0%, transparent 65%);
-      }
-      .mfh-wrap {
-        position: relative; z-index: 1; max-width: 1280px;
-        margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px);
-      }
-      .mfh-welcome { margin-bottom: 26px; }
-      .mfh-greeting {
-        font-family: -apple-system,"SF Pro Display","Inter",sans-serif;
-        font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800;
-        letter-spacing: -.5px; color: #fff; margin: 0 0 6px; line-height: 1.15;
-      }
-      .mfh-sub { font-size: .92rem; color: rgba(255,255,255,.42); margin: 0; }
-      .mfh-h2 {
-        font-family: -apple-system,"SF Pro Display","Inter",sans-serif;
-        font-size: 1.15rem; font-weight: 700; letter-spacing: -.3px;
-        color: #fff; margin: 0;
-      }
-      .mfh-continue { margin-bottom: 38px; }
-      .mfh-continue > .mfh-h2 { margin-bottom: 14px; }
-      .mfh-continue-card {
-        display: flex;
-        background: linear-gradient(135deg,#141418 0%,#0f0f13 100%);
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 18px; overflow: hidden;
-        max-width: 900px;
-        box-shadow: 0 12px 40px rgba(0,0,0,.55);
-      }
-      .mfh-cont-info {
-        flex: 1; min-width: 0;
-        padding: clamp(18px,3vw,26px) clamp(20px,3vw,28px);
-        display: flex; flex-direction: column; justify-content: center;
-      }
-      .mfh-cont-eyebrow {
-        font-size: .6rem; font-weight: 800; letter-spacing: 2px;
-        text-transform: uppercase; color: rgba(255,255,255,.32);
-        margin-bottom: 10px;
-      }
-      .mfh-cont-title {
-        font-family: -apple-system,"SF Pro Display","Inter",sans-serif;
-        font-size: clamp(1.3rem,2.8vw,1.75rem); font-weight: 800;
-        letter-spacing: -.5px; color: #fff; margin: 0 0 8px;
-      }
-      .mfh-cont-meta { font-size: .82rem; color: rgba(255,255,255,.5); margin: 0 0 6px; }
-      .mfh-cont-desc {
-        font-size: .78rem; color: rgba(255,255,255,.38); margin: 0 0 14px;
-        line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical; overflow: hidden;
-      }
-      .mfh-cont-bar {
-        height: 4px; background: rgba(255,255,255,.08); border-radius: 2px;
-        overflow: hidden; margin-bottom: 16px; max-width: 340px;
-      }
-      .mfh-cont-fill {
-        height: 100%; background: #007aff; border-radius: 2px;
-        transition: width .6s ease;
-      }
-      .mfh-cont-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-      .mfh-btn-primary {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 11px 24px; border-radius: 11px;
-        background: #007aff; border: none; color: #fff;
-        font-size: .85rem; font-weight: 700; cursor: pointer;
-        box-shadow: 0 4px 16px rgba(0,122,255,.3);
-      }
-      .mfh-btn-primary:hover { background: #1a8fff; }
-      .mfh-btn-secondary {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 11px 20px; border-radius: 11px;
-        background: rgba(255,255,255,.07);
-        border: 1px solid rgba(255,255,255,.1);
-        color: rgba(255,255,255,.85);
-        font-size: .85rem; font-weight: 600; cursor: pointer;
-      }
-      .mfh-cont-image {
-        width: clamp(200px, 32%, 340px); flex-shrink: 0;
-        position: relative; overflow: hidden;
-      }
-      .mfh-cont-image img { width: 100%; height: 100%; object-fit: cover; display: block; background: #1c1c22; }
-      .mfh-cont-image::before {
-        content: ''; position: absolute; inset: 0;
-        background: linear-gradient(90deg,#141418 0%,transparent 40%);
-        z-index: 1; pointer-events: none;
-      }
-      .mfh-row { margin-bottom: 38px; }
-      .mfh-row-head {
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 14px; gap: 12px;
-      }
-      .mfh-row-sub {
-        font-size: .78rem; color: rgba(255,255,255,.35);
-        margin: -8px 0 14px;
-      }
-      .mfh-see-all {
-        font-size: .78rem; color: rgba(255,255,255,.5);
-        text-decoration: none; white-space: nowrap; flex-shrink: 0;
-      }
-      .mfh-see-all:hover { color: #fff; }
-      .mfh-carousel {
-        display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px;
-        scrollbar-width: none; scroll-snap-type: x proximity;
-      }
-      .mfh-carousel::-webkit-scrollbar { display: none; }
-      .mfh-card {
-        flex: 0 0 200px; background: #141418;
-        border: 1px solid rgba(255,255,255,.05);
-        border-radius: 12px; overflow: hidden; cursor: pointer;
-        transition: all .25s cubic-bezier(.16,1,.3,1);
-        scroll-snap-align: start;
-      }
-      .mfh-card:hover {
-        transform: translateY(-4px) scale(1.03);
-        border-color: rgba(255,255,255,.15);
-        box-shadow: 0 16px 36px rgba(0,0,0,.6);
-      }
-      .mfh-card-img {
-        width: 100%; height: 120px; object-fit: cover;
-        display: block; background: #1c1c22;
-      }
-      .mfh-card-body { padding: 10px 12px 12px; }
-      .mfh-card-title {
-        font-size: .82rem; font-weight: 600; color: #fff;
-        margin: 0 0 3px; white-space: nowrap;
-        overflow: hidden; text-overflow: ellipsis;
-      }
-      .mfh-card-ep { font-size: .68rem; color: rgba(255,255,255,.42); margin: 0; }
-      @media (max-width: 720px) {
-        .mfh-continue-card { flex-direction: column-reverse; }
-        .mfh-cont-image { width: 100%; height: 180px; }
-        .mfh-cont-image::before {
-          background: linear-gradient(180deg,transparent 30%,#141418 100%);
-        }
-        .mfh-card { flex: 0 0 150px; }
-        .mfh-card-img { height: 92px; }
-      }
-
-      .mfh-skeleton {
-        position: relative;
-        overflow: hidden;
-        background: #1c1c22;
-        border-radius: 12px;
-      }
-
-      .mfh-skeleton::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.06) 50%,
-          transparent 100%
-        );
-        animation: mfh-shimmer 1.5s infinite;
-      }
-
-      @keyframes mfh-shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-
-      .mfh-cont-image .mfh-skeleton {
-        width: 100%;
-        height: 100%;
-        min-height: 200px;
-        border-radius: 0;
-      }
-
-      .mfh-card-img.mfh-skeleton {
-        width: 100%;
-        height: 120px;
-        border-radius: 0;
-      }
-
-      @media (max-width: 720px) {
-        .mfh-card-img.mfh-skeleton {
-          height: 92px;
-        }
-      }
 
       #mfDock, .mf-dock {
         z-index: 10000 !important;
@@ -2264,31 +2053,6 @@
         visibility: visible !important;
         pointer-events: auto !important;
         display: flex !important;
-      }
-
-      .mfh-card {
-        transition: transform 0.25s cubic-bezier(0.16,1,0.3,1),
-                    box-shadow 0.25s cubic-bezier(0.16,1,0.3,1),
-                    border-color 0.25s ease !important;
-        will-change: transform;
-        pointer-events: auto;
-        cursor: pointer;
-      }
-
-      .mfh-card:hover {
-        transform: translateY(-6px) scale(1.05) !important;
-        border-color: rgba(255,255,255,0.25) !important;
-        box-shadow: 0 20px 44px rgba(0,0,0,0.7),
-                    0 0 0 1px rgba(255,255,255,0.1) !important;
-        z-index: 10;
-      }
-
-      .mfh-card:active {
-        transform: translateY(-2px) scale(1.02) !important;
-      }
-
-      .mfh-card * {
-        pointer-events: none;
       }
 
       #cinemaModal {
@@ -2355,10 +2119,10 @@
         display: grid; gap: 14px;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       }
-      .mfh-seeall-grid .mfh-card { width: 100%; }
       .mfh-seeall-empty {
         color: rgba(255,255,255,.4); font-size: .85rem; padding: 30px 0; text-align: center;
       }
+    
     </style>
 
     <div id="mfSectionFilmy" style="display: none"></div>
