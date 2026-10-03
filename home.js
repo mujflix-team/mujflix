@@ -687,8 +687,7 @@
         if (!document.documentElement.classList.contains('mfh-home-on')) return false;
         if (typeof window.mfDockTarget === 'function' && window.mfDockTarget() !== 'dockHome') return false;
         if (document.body.classList.contains('modal-open') ||
-            document.body.classList.contains('discover-open') ||
-            document.body.classList.contains('disco-open')) return false;
+            document.body.classList.contains('discover-open')) return false;
         for (var i = 0; i < DOCK_HIDE_OVERLAY_IDS.length; i++) {
           var el = document.getElementById(DOCK_HIDE_OVERLAY_IDS[i]);
           if (el && (el.classList.contains('open') || el.classList.contains('visible') || el.classList.contains('show'))) {
