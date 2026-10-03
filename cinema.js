@@ -233,24 +233,25 @@
     modal.id = "mfStandaloneCinema";
     modal.innerHTML =
       '<div class="mf-standalone-cinema-top">' +
+        '<button type="button" id="mfStandaloneCinemaClose" aria-label="Zpět" title="Zpět (Esc)">' +
+          '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>' +
+        '</button>' +
         '<strong id="mfStandaloneCinemaTitle"></strong>' +
-        '<span id="mfStandaloneCinemaSource"></span>' +
         '<span class="mf-cin-src-label" id="mfCinSrcLabel"></span>' +
         '<span class="mf-cin-src-counter" id="mfCinSrcCounter"></span>' +
 
         '<div class="mf-cin-tvbar" id="mfCinTvBar" style="display:none">' +
-          '<button type="button" class="mf-cin-ep-btn" id="mfCinPrevEp">⏮ Předchozí epizoda</button>' +
+          '<button type="button" class="mf-cin-ep-btn" id="mfCinPrevEp">‹ Předchozí</button>' +
           '<span class="mf-cin-ep-current" id="mfCinEpCurrent"></span>' +
-          '<button type="button" class="mf-cin-ep-btn" id="mfCinNextEp">Další epizoda ⏭</button>' +
-          '<button type="button" class="mf-cin-ep-btn mf-cin-ep-pick" id="mfCinPickEp">📺 Vybrat epizodu</button>' +
-          '<button type="button" class="mf-cin-ep-btn mf-cin-next-series" id="mfCinNextSeries">⏭⏭ Další seriál</button>' +
+          '<button type="button" class="mf-cin-ep-btn" id="mfCinNextEp">Další ›</button>' +
+          '<button type="button" class="mf-cin-ep-btn mf-cin-ep-pick" id="mfCinPickEp">Epizody</button>' +
+          '<button type="button" class="mf-cin-ep-btn mf-cin-next-series" id="mfCinNextSeries">Další seriál</button>' +
         "</div>" +
 
         '<button type="button" class="mf-cin-adtip-btn" id="mfCinAdTipBtn" aria-label="Zdroj může zobrazovat reklamy">⚠️</button>' +
-        '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených">🤍 Oblíbené</button>' +
-        '<button type="button" class="mf-cin-switch-btn" id="mfCinSwitchSrc">🔄 Zkusit jiný zdroj</button>' +
-        '<a class="mf-cin-external-btn" id="mfStandaloneCinemaExternal" target="_blank" rel="noopener">🔗 Otevřít v nové kartě</a>' +
-        '<button type="button" id="mfStandaloneCinemaClose" aria-label="Zavřít">×</button>' +
+        '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených">+ Oblíbené</button>' +
+        '<button type="button" class="mf-cin-switch-btn" id="mfCinSwitchSrc">Jiný zdroj</button>' +
+        '<a class="mf-cin-external-btn" id="mfStandaloneCinemaExternal" target="_blank" rel="noopener">Nová karta</a>' +
       "</div>" +
 
       '<div class="mf-cin-adtip-pop" id="mfCinAdTip" style="display:none">' +
@@ -320,7 +321,7 @@
     var remaining = total - used;
     sourceLabelNode.textContent = src.label + " (" + (current.sourceIdx + 1) + "/" + total + ")";
     sourceCounterNode.textContent =
-      "Vyzkoušeno " + used + " z " + total + (remaining > 0 ? " · zbývá ještě " + remaining : " · vyzkoušeny všechny");
+      "vyzkoušeno " + used + " z " + total;
   }
 
   function updateEpCurrentLabel() {
@@ -473,14 +474,13 @@
       ? window.isTmdbFavorite(current.tmdbId, current.type)
       : false;
     favBtn.classList.toggle("faved", !!faved);
-    favBtn.innerHTML = faved ? "❤️ V oblíbených" : "🤍 Oblíbené";
+    favBtn.textContent = faved ? "✓ V oblíbených" : "+ Oblíbené";
   }
 
   function renderCurrent() {
     var url = buildUrl();
     var sources = sourcesFor(current.type);
     var label = sources[current.sourceIdx].label;
-    modal.querySelector("#mfStandaloneCinemaSource").textContent = label;
     loadUrl(url, label);
     renderSourceBar();
     updateFavBtn();
