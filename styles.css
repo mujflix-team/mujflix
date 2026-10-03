@@ -648,110 +648,6 @@ body::after {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
-.mf-dock {
-  position: fixed;
-  bottom: max(16px, env(safe-area-inset-bottom, 16px));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  background: var(--plexi-bg);
-  backdrop-filter: var(--plexi-blur);
-  -webkit-backdrop-filter: var(--plexi-blur);
-  border: 1px solid var(--plexi-border);
-  border-top-color: var(--plexi-border-top);
-  border-radius: 28px;
-  padding: 6px 8px;
-  box-shadow: var(--plexi-shadow);
-}
-.mf-dock:hover {
-  padding: 6px 8px;
-}
-.dock-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 10px 16px;
-  border-radius: 22px;
-  border: none;
-  background: 0 0;
-  color: rgba(255, 255, 255, 0.32);
-  cursor: pointer;
-  transition: all 0.26s cubic-bezier(0.34, 1.4, 0.64, 1);
-  position: relative;
-  min-width: 56px;
-}
-.dock-btn svg {
-  width: 22px;
-  height: 22px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition:
-    transform 0.26s cubic-bezier(0.34, 1.5, 0.64, 1),
-    filter 0.2s,
-    stroke 0.2s;
-}
-.dock-btn .dock-label {
-  font-size: 0.56rem;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  transition: all 0.22s ease;
-  opacity: 0.8;
-}
-.dock-btn:hover {
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.07);
-}
-.dock-btn:hover svg {
-  transform: scale(1.16);
-}
-.dock-btn:active {
-  transform: scale(0.88);
-  transition-duration: 70ms;
-}
-.dock-btn.active {
-  color: #0a84ff;
-  background: rgba(10, 132, 255, 0.1);
-}
-.dock-btn.active svg {
-  stroke: #0a84ff;
-  filter: drop-shadow(0 0 8px rgba(10, 132, 255, 0.6));
-}
-.dock-btn.active .dock-label {
-  color: #0a84ff;
-  font-weight: 700;
-}
-.dock-badge {
-  position: absolute;
-  top: 3px;
-  right: 6px;
-  min-width: 15px;
-  height: 15px;
-  border-radius: 8px;
-  background: #ff3b30;
-  color: #fff;
-  font-size: 0.46rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-  box-shadow: 0 0 0 2px rgba(16, 16, 24, 0.8);
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
-}
-.dock-badge.visible {
-  opacity: 1;
-  transform: scale(1);
-}
 .mf-header {
   position: fixed;
   top: 0;
@@ -5920,44 +5816,6 @@ header.mf-header {
   height: 17px !important;
   stroke-width: 1.8px !important;
 }
-.mf-dock,
-nav.mf-dock {
-  background: var(--plexi-bg) !important;
-  backdrop-filter: var(--plexi-blur) !important;
-  -webkit-backdrop-filter: var(--plexi-blur) !important;
-  border: 1px solid var(--plexi-border) !important;
-  border-top-color: var(--plexi-border-top) !important;
-  border-radius: 32px !important;
-  box-shadow: var(--plexi-shadow) !important;
-}
-.dock-btn svg {
-  stroke: rgba(255, 255, 255, 0.38) !important;
-  width: 22px !important;
-  height: 22px !important;
-  transition:
-    transform 0.24s cubic-bezier(0.34, 1.5, 0.64, 1),
-    stroke 0.2s !important;
-}
-.dock-btn:hover {
-  color: rgba(255, 255, 255, 0.92) !important;
-  background: rgba(255, 255, 255, 0.09) !important;
-  transform: translateY(-4px) scale(1.06) !important;
-}
-.dock-btn:hover svg {
-  transform: scale(1.14) !important;
-}
-.dock-btn.active {
-  color: #007aff !important;
-  background: rgba(0, 122, 255, 0.13) !important;
-}
-.dock-btn.active svg {
-  stroke: #007aff !important;
-  filter: drop-shadow(0 0 7px rgba(0, 122, 255, 0.55)) !important;
-}
-.dock-btn:active {
-  transform: scale(0.88) translateY(0) !important;
-  transition-duration: 80ms !important;
-}
 #dockMoreSheet {
   background: var(--mat-thick) !important;
   backdrop-filter: var(--mat-blur-heavy) !important;
@@ -6473,50 +6331,6 @@ body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
 }
-.mf-dock {
-  will-change: transform;
-  transform: translateX(-50%) translateZ(0);
-  transition:
-    padding 0.4s cubic-bezier(0.34, 1.24, 0.64, 1),
-    gap 0.4s cubic-bezier(0.34, 1.24, 0.64, 1),
-    box-shadow 0.35s ease !important;
-}
-.mf-dock:hover {
-  box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
-    0 0 0 0.5px rgba(255, 255, 255, 0.07),
-    0 28px 80px rgba(0, 0, 0, 0.88),
-    0 10px 32px rgba(0, 0, 0, 0.6) !important;
-}
-.dock-btn {
-  transform: translateZ(0);
-  will-change: transform;
-  transition:
-    color 0.22s ease,
-    background 0.22s ease,
-    transform 0.32s cubic-bezier(0.34, 1.42, 0.64, 1) !important;
-}
-.dock-btn:hover {
-  transform: translateY(-6px) scale(1.1) translateZ(0) !important;
-}
-.dock-btn:active {
-  transform: scale(0.84) translateY(2px) translateZ(0) !important;
-  transition: transform 70ms ease !important;
-}
-.dock-btn svg {
-  transition:
-    transform 0.32s cubic-bezier(0.34, 1.55, 0.64, 1),
-    stroke 0.22s ease,
-    filter 0.22s ease !important;
-  will-change: transform;
-}
-.dock-btn:hover svg {
-  transform: scale(1.22) translateZ(0) !important;
-}
-.dock-btn.active svg {
-  filter: drop-shadow(0 0 9px rgba(0, 122, 255, 0.7)) !important;
-}
 .mf-header-btn {
   transform: translateZ(0);
   will-change: transform;
@@ -6719,11 +6533,6 @@ body {
 }
 .mood-btn:active {
   transform: scale(0.96) translateZ(0) !important;
-}
-.dock-badge {
-  transition:
-    opacity 0.28s ease,
-    transform 0.36s cubic-bezier(0.34, 1.5, 0.64, 1) !important;
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -6986,72 +6795,6 @@ html {
   background: rgba(255, 255, 255, 0.12) !important;
   border-color: rgba(255, 255, 255, 0.18) !important;
   transform: scale(1.08) !important;
-}
-.mf-dock {
-  background: rgba(12, 12, 18, 0.72) !important;
-  backdrop-filter: blur(70px) saturate(2.8) brightness(0.9) !important;
-  -webkit-backdrop-filter: blur(70px) saturate(2.8) brightness(0.9) !important;
-  border: 1px solid rgba(255, 255, 255, 0.13) !important;
-  border-radius: 32px !important;
-  padding: 7px 14px !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
-    0 24px 60px rgba(0, 0, 0, 0.72),
-    0 4px 16px rgba(0, 0, 0, 0.45),
-    0 0 0 0.5px rgba(255, 255, 255, 0.04) !important;
-  transition:
-    padding 0.3s cubic-bezier(0.34, 1.2, 0.64, 1),
-    border-radius 0.3s ease !important;
-}
-.mf-dock:hover {
-  padding: 10px 18px !important;
-  border-radius: 36px !important;
-}
-.dock-btn {
-  border-radius: 16px !important;
-  padding: 6px 12px !important;
-  min-width: 44px !important;
-  transition: all 0.22s cubic-bezier(0.34, 1.4, 0.64, 1) !important;
-}
-.dock-btn svg {
-  width: 18px !important;
-  height: 18px !important;
-  stroke-width: 1.7 !important;
-  transition:
-    transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
-    filter 0.2s !important;
-}
-.dock-btn .dock-label {
-  font-size: 0.5rem !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.05px !important;
-  transition: font-size 0.22s ease !important;
-}
-.mf-dock:hover .dock-btn svg {
-  width: 21px !important;
-  height: 21px !important;
-}
-.mf-dock:hover .dock-btn .dock-label {
-  font-size: 0.54rem !important;
-}
-.dock-btn:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  transform: translateY(-5px) scale(1.08) !important;
-}
-.dock-btn:hover svg {
-  transform: scale(1.15) !important;
-}
-.dock-btn:active {
-  transform: scale(0.88) !important;
-}
-.dock-btn.active {
-  color: var(--ios-blue) !important;
-  background: rgba(0, 122, 255, 0.14) !important;
-}
-.dock-btn.active svg {
-  stroke: var(--ios-blue) !important;
-  filter: drop-shadow(0 0 6px rgba(0, 122, 255, 0.5)) !important;
 }
 .ps-tile {
   border-radius: 18px !important;
@@ -8288,17 +8031,11 @@ body.mf-section-protebe #mfProfileBadge {
 #dockPlex.active svg {
   stroke: #e5a00d !important;
 }
-#dockPlex.active .dock-label {
-  color: #e5a00d !important;
-}
 #dockFilmy.active {
   background: rgba(0, 122, 255, 0.18) !important;
 }
 #dockFilmy.active svg {
   stroke: #007aff !important;
-}
-#dockFilmy.active .dock-label {
-  color: #007aff !important;
 }
 #dockProtebe.active {
   background: rgba(10, 132, 255, 0.15) !important;
@@ -8306,17 +8043,11 @@ body.mf-section-protebe #mfProfileBadge {
 #dockProtebe.active svg {
   stroke: #0a84ff !important;
 }
-#dockProtebe.active .dock-label {
-  color: #0a84ff !important;
-}
 #dockHome.active {
   background: rgba(50, 215, 75, 0.15) !important;
 }
 #dockHome.active svg {
   stroke: #32d74b !important;
-}
-#dockHome.active .dock-label {
-  color: #32d74b !important;
 }
 :root {
   --glass-bg: rgba(28, 28, 36, 0.72);
@@ -8347,27 +8078,6 @@ header.mf-header {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05),
     0 4px 24px rgba(0, 0, 0, 0.3) !important;
-}
-#mfDock,
-.mf-dock,
-nav.mf-dock {
-  background: var(--glass-bg) !important;
-  backdrop-filter: var(--glass-blur) !important;
-  -webkit-backdrop-filter: var(--glass-blur) !important;
-  border: 0.5px solid var(--glass-border) !important;
-  box-shadow:
-    var(--glass-shadow),
-    0 0 0 0.5px rgba(255, 255, 255, 0.04) inset !important;
-}
-.dock-btn {
-  transition:
-    transform 0.15s cubic-bezier(0.34, 1.4, 0.64, 1),
-    background 0.18s ease,
-    opacity 0.15s ease !important;
-}
-.dock-btn:active {
-  transform: scale(0.88) !important;
-  opacity: 0.7 !important;
 }
 .ps-tile {
   transition:
@@ -8874,56 +8584,6 @@ button:active {
   transition: outline-color 0.15s ease !important;
 }
 
-.mf-dock,
-nav.mf-dock {
-  padding: 8px 10px !important;
-  border-radius: 32px !important;
-  transition: none !important;
-}
-.mf-dock:hover {
-  padding: 8px 10px !important;
-  border-radius: 32px !important;
-  box-shadow: var(--plexi-shadow) !important;
-}
-.dock-btn {
-  padding: 10px 16px !important;
-  min-width: 58px !important;
-  border-radius: 22px !important;
-  transform: none !important;
-  transition: background 0.18s ease, color 0.18s ease !important;
-  will-change: unset !important;
-}
-.dock-btn:hover {
-  transform: none !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: rgba(255, 255, 255, 0.95) !important;
-}
-.dock-btn svg {
-  width: 22px !important;
-  height: 22px !important;
-  transition: none !important;
-  will-change: unset !important;
-}
-.dock-btn:hover svg {
-  transform: none !important;
-}
-.mf-dock:hover .dock-btn svg {
-  width: 22px !important;
-  height: 22px !important;
-}
-.dock-btn .dock-label {
-  font-size: 0.56rem !important;
-  font-weight: 600 !important;
-  transition: none !important;
-}
-.mf-dock:hover .dock-btn .dock-label {
-  font-size: 0.56rem !important;
-}
-.dock-btn:active {
-  transform: scale(0.92) !important;
-  transition: transform 70ms ease !important;
-}
-
 body:not(.tv-mode):not(.appletv-mode) .episode-card {
   flex-direction: row !important;
   align-items: center !important;
@@ -9324,9 +8984,6 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   }
 }
 
-body.modal-open #mfDock,
-body.modal-open .mf-dock,
-body.modal-open nav.mf-dock,
 body.modal-open [id*="Dock"],
 body.modal-open .dock {
   opacity: 0 !important;
@@ -9353,25 +9010,6 @@ body.modal-open #mfProfileBadge {
   pointer-events: none !important;
   transform: translateY(-10px) scale(0.9) !important;
   visibility: hidden !important;
-}
-
-body.modal-open #mfDock,
-body.modal-open .mf-dock,
-body.modal-open [class*="dock"]:not(.dock-btn) {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(100%) !important;
-  visibility: hidden !important;
-}
-
-body.modal-open #mfDock,
-body.modal-open .mf-dock,
-body.modal-open nav.mf-dock {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(110%) !important;
-  visibility: hidden !important;
-  transition: all 0.25s ease !important;
 }
 
 body.modal-open #mfProfileBadge,
@@ -9558,34 +9196,6 @@ body::after { display: none !important; }
   border-radius: 20px !important;
 }
 #hdrStreakDays { font-family: var(--font-ui) !important; font-weight: 800 !important; }
-
-.mf-dock {
-  background: var(--plexi-bg) !important;
-  backdrop-filter: var(--plexi-blur) !important;
-  -webkit-backdrop-filter: var(--plexi-blur) !important;
-  border: 1px solid var(--plexi-border) !important;
-  border-top-color: var(--plexi-border-top) !important;
-  border-radius: 36px !important;
-  box-shadow: var(--plexi-shadow) !important;
-  padding: 6px 10px !important;
-  transition: padding 0.38s var(--ease-spring) !important;
-}
-.mf-dock:hover { padding: 8px 13px !important; }
-.dock-btn {
-  border-radius: 28px !important;
-  padding: 8px 14px !important;
-  color: rgba(255,255,255,0.3) !important;
-  transition: color 200ms ease, background 200ms ease, transform 170ms var(--ease-spring) !important;
-}
-.dock-btn svg {
-  transition: transform 200ms var(--ease-spring) !important;
-}
-.dock-btn:hover { color: var(--accent) !important; }
-.dock-btn:hover svg { transform: scale(1.12) !important; }
-.dock-btn.active { color: var(--accent) !important; background: rgba(124,111,239,0.1) !important; }
-.dock-btn:active { transform: scale(0.83) !important; transition-duration: 50ms !important; }
-.dock-label { font-family: var(--font-ui) !important; font-weight: 500 !important; font-size: 0.575rem !important; letter-spacing: -0.1px !important; }
-.dock-badge { background: var(--accent-warm) !important; box-shadow: 0 0 8px rgba(240,98,146,0.55) !important; }
 
 #dockMoreSheet {
   background: rgba(9,9,18,0.97) !important;
@@ -9990,8 +9600,6 @@ body.disco-open #timerPanel {
 }
 
 @media (max-width: 480px) {
-  .mf-dock { border-radius: 30px !important; padding: 5px 8px !important; }
-  .dock-btn { padding: 7px 11px !important; }
   .ps-tile-wrapper:hover, .ps-tile-wrapper.kb-focus {
     transform: translateY(-8px) scale(1.03) translateZ(0) !important;
   }
@@ -10109,44 +9717,6 @@ body::before, body::after { display: none !important; }
   gap: 6px !important;
 }
 #hdrStreakDays { font-size: 17px !important; font-weight: 800 !important; color: #ff9f0a !important; font-family: var(--tv-font) !important; }
-
-.mf-dock {
-  background: rgba(8,8,16,0.92) !important;
-  backdrop-filter: blur(60px) saturate(1.8) !important;
-  -webkit-backdrop-filter: blur(60px) saturate(1.8) !important;
-  border: none !important;
-  border-top: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: 0 !important;
-  box-shadow: 0 -1px 0 rgba(255,255,255,0.04), 0 -20px 60px rgba(0,0,0,0.6) !important;
-  padding: 0 var(--tv-px) !important;
-  height: var(--tv-dock-h) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 4px !important;
-}
-
-.dock-btn {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 5px !important;
-  padding: 10px 20px !important;
-  border-radius: 14px !important;
-  color: var(--tv-text-muted) !important;
-  background: transparent !important;
-  border: none !important;
-  transition: color 0.2s var(--tv-ease), background 0.2s var(--tv-ease) !important;
-  cursor: pointer !important;
-}
-.dock-btn svg { width: 24px !important; height: 24px !important; stroke-width: 1.7px !important; transition: transform 0.25s var(--tv-ease-spring) !important; }
-.dock-btn:hover { color: var(--tv-text) !important; background: rgba(255,255,255,0.05) !important; }
-.dock-btn:hover svg { transform: translateY(-2px) !important; }
-.dock-btn.active { color: var(--tv-blue) !important; background: var(--tv-blue-dim) !important; }
-.dock-btn.active svg { transform: translateY(-2px) !important; }
-
-.dock-label { font-family: var(--tv-font) !important; font-size: 11px !important; font-weight: 600 !important; letter-spacing: 0.2px !important; }
-.dock-badge { background: #ff375f !important; box-shadow: 0 0 8px rgba(255,55,95,0.6) !important; border-radius: 50% !important; width: 8px !important; height: 8px !important; }
 
 #mfProfileGate {
   background: var(--tv-bg) !important;
@@ -10331,8 +9901,6 @@ body::before, body::after { display: none !important; }
   .mf-header-logo { font-size: 40px !important; }
   .pg-avatar { width: 180px !important; height: 180px !important; font-size: 80px !important; border-radius: 36px !important; }
   .pg-logo { font-size: 56px !important; }
-  .dock-btn svg { width: 34px !important; height: 34px !important; }
-  .dock-label { font-size: 15px !important; }
 }
 
 .season-pill {
@@ -10763,38 +10331,12 @@ body {
   box-shadow: var(--jg-shadow) !important;
 }
 
-#mfDock,
 .dock {
   background: rgba(10,10,10,0.92) !important;
   border-top: 0px solid var(--jg-border-d) !important;
   backdrop-filter: var(--jg-blur-lg) !important;
   -webkit-backdrop-filter: var(--jg-blur-lg) !important;
   box-shadow: 0 -8px 32px rgba(0,0,0,0.6) !important;
-}
-
-.dock-btn {
-  color: var(--jg-dim) !important;
-  border-radius: var(--jg-r-lg) !important;
-  transition: all 0.125s !important;
-}
-
-.dock-btn:hover {
-  background: var(--jg-active-a) !important;
-  color: var(--jg-text) !important;
-}
-
-.dock-btn.active {
-  color: var(--jg-active) !important;
-}
-
-.dock-btn.active .dock-label {
-  color: var(--jg-active) !important;
-}
-
-.dock-label {
-  color: var(--jg-dim) !important;
-  font-size: 0.6rem !important;
-  font-weight: 500 !important;
 }
 
 input[type="search"],
@@ -11080,7 +10622,6 @@ h2.title,
 }
 
 @media (max-width: 700px) {
-  #mfDock,
   .dock {
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
