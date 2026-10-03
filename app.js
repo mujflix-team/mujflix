@@ -1,5 +1,3 @@
-
-
 function safeLS(e, t) {
   try {
     return JSON.parse(localStorage.getItem(e) || String(t))
