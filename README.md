@@ -191,7 +191,7 @@ Při změně `app.js` (nebo `cinema.js`, `home.js`, `discover.js`) **zvedni čí
 **MůjFlix je osobní tracker** — neposkytuje obsah, jen tě naviguje na **externí weby**. Některé odkazy (Bombuj, SvetSerialu, Prehrajto) mohou odkazovat na obsah, který nemusí být v souladu s autorským právem ve tvé jurisdikci. **Za používání je zodpovědný uživatel.** Aplikace **nehostuje žádný obsah** a **nestahuje videa**.
 
 Pro legální sledování jsou v aplikaci integrované odkazy na **Netflix, Disney+, Max, Apple TV+, Prime Video, Voyo, Canal+** a další (přes TMDB Watch Providers).
-
+ 
 ---
 
 <p align="center">
