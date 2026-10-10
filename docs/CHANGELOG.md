@@ -1,7 +1,14 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33289466/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33289710/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
+
+- PIN: jen 5 pokusů. Po špatném pokusu se ukáže, kolik jich zbývá; po pátém se zadávání zablokuje s odpočtem a zámek se stupňuje (30 s → 2 min → 10 min → 30 min → 1 h → 4 h → 24 h). Stav se pamatuje po profilech (obnovení stránky ho neobejde), správný PIN ho vynuluje.
+
+- Odstraněn průhledný obdélník v levém horním rohu (starý odznak profilu).
+- PIN obrazovka: obrázkový avatar se vykreslí jako obrázek (dřív se vypsala jeho adresa jako text).
+- Kdo se dívá: obrázkový avatar vyplní celý čtverec, ne kruh.
+- Avatar: mnohem víc postav – řada za každé z nejpopulárnějších anime (AniList) a víc seriálů, Pán prstenů, Star Trek, Doctor Who apod. (Wikipedie).
 
 - Avatar: jen postavy (žádné záběry ani náhledy epizod). Výchozí nabídka: oblíbené anime postavy (AniList) a řady postav ze seriálů a filmů (Breaking Bad, Game of Thrones, Stranger Things, Marvel, DC, Star Wars, Harry Potter, animované…) z Wikipedie. Hledání najde i další postavy.
 - NajSerialy: u japonských seriálů se použije romaji název z AniList (Shuiro no Kamen) a zdroj se po doplnění názvu načte znovu; dřív se otevřela jen úvodní stránka webu.
