@@ -1,6 +1,12 @@
+[CHANGELOG.md](https://github.com/user-attachments/files/33289466/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
+
+- Avatar: jen postavy (žádné záběry ani náhledy epizod). Výchozí nabídka: oblíbené anime postavy (AniList) a řady postav ze seriálů a filmů (Breaking Bad, Game of Thrones, Stranger Things, Marvel, DC, Star Wars, Harry Potter, animované…) z Wikipedie. Hledání najde i další postavy.
+- NajSerialy: u japonských seriálů se použije romaji název z AniList (Shuiro no Kamen) a zdroj se po doplnění názvu načte znovu; dřív se otevřela jen úvodní stránka webu.
+- Novinky: víc anime (až 4 seriály a 2 filmy, delší období) pro profily se zapnutým Anime.
+- PIN obrazovka je na nízkých oknech (notebooky) menší.
 
 - Avatar: nahoře řady postav – AniList (oblíbené anime postavy, hledání postav z animí) a Wikipedie (postavy a obrázky ze seriálů a filmů); pod nimi řady titulů z TMDB. Hledání jména postavy (např. „Walter White“, „Naruto“) ukáže její obrázek.
 - Nový zdroj NajSerialy.io (seriály; varianta bez roku i s rokem v adrese, např. carrie-2026, a alternativní názvy).
