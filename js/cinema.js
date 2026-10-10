@@ -193,25 +193,45 @@
         return "";
       };
       var orig = info.original_title || info.original_name || "";
-      var ordered = kind === "movie"
-        ? [pick("SK"), pick("CZ"), cur.title, orig]
-        : [orig, cur.title, pick("SK"), pick("CZ")];
-      var seen = {}, list = [];
-      ordered.forEach(function (name) {
-        var slug = daslug(name);
-        if (name && slug && !seen[slug]) { seen[slug] = 1; list.push(name); }
-      });
-      var fy = String(info.first_air_date || "").slice(0, 4);
-      if (/^\d{4}$/.test(fy)) cur.firstYear = fy;
-      if (list.length < 2) return;
-      var before = sourcesFor(cur.type)[cur.sourceIdx];
-      cur.altTitles = list;
-      var after = sourcesFor(cur.type);
-      var keep = before ? after.findIndex(function (s) { return s.label === before.label; }) : -1;
-      if (keep >= 0) cur.sourceIdx = keep;
-      cur.tried = new Set();
-      renderSourceBar();
+      var en = kind === "movie" ? (info.title || "") : (info.name || "");
+      var finish = function (romaji) {
+        if (current !== cur) return;
+        var ordered = kind === "movie"
+          ? [pick("SK"), pick("CZ"), cur.title, en, orig]
+          : [romaji, en, orig, cur.title, pick("SK"), pick("CZ")];
+        applyAlts(cur, ordered, info);
+      };
+      // Anime weby (NajSerialy…) používají romaji název (Shuiro no Kamen) – TMDB ho nemá, vezme se z AniList
+      if (kind === "tv" && info.original_language === "ja" && (en || cur.title)) {
+        fetch("https://graphql.anilist.co", {
+          method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ query: "query($q:String){Media(search:$q,type:ANIME){title{romaji}}}", variables: { q: en || cur.title } })
+        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+          finish(d && d.data && d.data.Media && d.data.Media.title && d.data.Media.title.romaji || "");
+        }).catch(function () { finish(""); });
+      } else finish("");
     });
+  }
+
+  function applyAlts(cur, ordered, info) {
+    var seen = {}, list = [];
+    ordered.forEach(function (name) {
+      var slug = daslug(name);
+      if (name && slug && !seen[slug]) { seen[slug] = 1; list.push(name); }
+    });
+    var fy = String(info.first_air_date || "").slice(0, 4);
+    if (/^\d{4}$/.test(fy)) cur.firstYear = fy;
+    if (!list.length) return;
+    var before = sourcesFor(cur.type)[cur.sourceIdx];
+    cur.altTitles = list;
+    var after = sourcesFor(cur.type);
+    var keep = before ? after.findIndex(function (s) { return s.label === before.label; }) : -1;
+    if (keep < 0 && before) keep = after.findIndex(function (s) { return s.id === before.id; });
+    if (keep >= 0) cur.sourceIdx = keep;
+    cur.tried = new Set();
+    // zdroj načtený s nepoužitelným odkazem (např. japonský název bez latinky) se po doplnění názvů načte znovu
+    if (current === cur && cur._loadedUrl && buildUrl() !== cur._loadedUrl) renderCurrent();
+    else renderSourceBar();
   }
 
   function buildUrl() {
@@ -576,6 +596,7 @@
     var url = buildUrl();
     var sources = sourcesFor(current.type);
     var label = sources[current.sourceIdx].label;
+    current._loadedUrl = url;
     loadUrl(url, label, sources[current.sourceIdx].noEmbed);
     renderSourceBar();
     updateFavBtn();
