@@ -1,7 +1,9 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33289872/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33290058/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
+
+- Avatar, hledání: další zdroje obrázků postav – Fandom wiki (Marvel, DC, Star Wars, Harry Potter, Game of Thrones, Stranger Things, Breaking Bad, Disney) a Wikidata (fiktivní postavy). Výsledky se doplňují průběžně podle toho, jak který zdroj odpoví. TVmaze bere výhradně obrázek postavy (character.image), postavy bez něj přeskočí.
 
 - Avatar, výchozí nabídka: seriály, Marvel/DC, Star Wars, Harry Potter, animované a filmové postavy jsou první, anime je jen pár řad na konci.
 - Avatar, hledání: nové zdroje TVmaze (postavy z obsazení seriálu), superhrdinové (akabab/superhero-api) a Disney (disneyapi.dev) vedle Wikipedie a AniList. Hledání „Breaking Bad“ ukáže postavy seriálu, „Batman“ superhrdiny, „Elsa“ Disney postavy.
