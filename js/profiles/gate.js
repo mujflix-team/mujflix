@@ -254,6 +254,31 @@ const ProfileGate = {
     const d = await this._fetchJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=400&titles=" + encodeURIComponent(titles.join("|")));
     return Object.values((d && d.query && d.query.pages) || {}).filter(p => p.thumbnail && p.thumbnail.source).map(p => ({ name: String(p.title || "").replace(/ \(.*\)$/, ""), url: p.thumbnail.source }));
   },
+  /* TVmaze (zdarma, bez klíče): obsazení seriálu včetně obrázků POSTAV. Hledání názvu seriálu → řada postav za každý nalezený seriál. */
+  async _tvmazeRows(q) {
+    const found = await this._fetchJson("https://api.tvmaze.com/search/shows?q=" + encodeURIComponent(q));
+    const shows = (Array.isArray(found) ? found : []).slice(0, 3).map(x => x && x.show).filter(Boolean);
+    const rows = await Promise.all(shows.map(async sh => {
+      const cast = await this._fetchJson("https://api.tvmaze.com/shows/" + sh.id + "/cast"), seen = {};
+      const list = (Array.isArray(cast) ? cast : []).map(c => c && c.character).filter(c => c && c.image && (c.image.medium || c.image.original) && !seen[c.name] && (seen[c.name] = 1))
+        .map(c => ({ name: c.name || "", url: String(c.image.original || c.image.medium).replace(/^http:/, "https:") }));
+      return { title: "Postavy: " + (sh.name || ""), list };
+    }));
+    return rows.filter(r => r.list.length);
+  },
+  /* Superhrdinové (Marvel, DC …) ze statického souboru akabab/superhero-api */
+  async _heroCharacters(q) {
+    if (!this._heroes) { const all = await this._fetchJson("https://akabab.github.io/superhero-api/api/all.json"); this._heroes = Array.isArray(all) ? all : []; }
+    const n = q.toLowerCase();
+    return this._heroes.filter(h => h && h.name && h.images && h.images.md && h.name.toLowerCase().includes(n)).slice(0, 16)
+      .map(h => ({ name: h.name + (h.biography && h.biography.publisher ? " (" + h.biography.publisher + ")" : ""), url: h.images.md }));
+  },
+  /* Disney postavy */
+  async _disneyCharacters(q) {
+    const d = await this._fetchJson("https://api.disneyapi.dev/character?pageSize=16&name=" + encodeURIComponent(q));
+    const arr = d && d.data ? (Array.isArray(d.data) ? d.data : [d.data]) : [];
+    return arr.filter(c => c && c.imageUrl && c.name).map(c => ({ name: c.name, url: String(c.imageUrl).replace(/^http:/, "https:") }));
+  },
   /* Nejoblíbenější anime: řada postav za každé anime (název + jeho hlavní postavy). */
   async _anilistByAnime() {
     const d = await this._fetchJson("https://graphql.anilist.co", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -294,7 +319,7 @@ const ProfileGate = {
     try {
       const [ani, byAnime, ...wiki] = await Promise.all([this._anilistCharacters(""), this._anilistByAnime(), ...groups.map(g => this._wikiByTitles(g[1]))]);
       if (run !== this._avRun) return;
-      const html = this._charRowHtml("Oblíbené anime postavy", ani) + byAnime.map(m => this._charRowHtml(m.title, m.list)).join("") + groups.map((g, i) => this._charRowHtml(g[0], wiki[i])).join("");
+      const html = groups.map((g, i) => this._charRowHtml(g[0], wiki[i])).join("") + this._charRowHtml("Anime postavy", ani) + byAnime.slice(0, 3).map(m => this._charRowHtml(m.title, m.list)).join("");
       grid.innerHTML = html || '<div class="pc-avatar-loading">Postavy se nepodařilo načíst. Zkus je vyhledat jménem.</div>';
     } catch (err) {
       grid.innerHTML = '<div class="pc-avatar-loading">Postavy se nepodařilo načíst.</div>';
@@ -311,9 +336,9 @@ const ProfileGate = {
     if (!grid) return;
     grid.innerHTML = '<div class="pc-avatar-loading">Hledám…</div>';
     const run = this._avRun = (this._avRun || 0) + 1;
-    const [ani, wiki] = await Promise.all([this._anilistCharacters(q), this._wikiCharacters(q)]);
+    const [tv, heroes, disney, ani, wiki] = await Promise.all([this._tvmazeRows(q), this._heroCharacters(q), this._disneyCharacters(q), this._anilistCharacters(q), this._wikiCharacters(q)]);
     if (run !== this._avRun) return;
-    grid.innerHTML = this._charRowHtml("Anime postavy", ani) + this._charRowHtml("Postavy ze seriálů a filmů (Wikipedie)", wiki) || '<div class="pc-avatar-loading">Nic jsme nenašli. Zkus anglické jméno postavy nebo názvu.</div>';
+    grid.innerHTML = tv.map(r => this._charRowHtml(r.title, r.list)).join("") + this._charRowHtml("Superhrdinové (Marvel, DC …)", heroes) + this._charRowHtml("Disney", disney) + this._charRowHtml("Postavy ze seriálů a filmů (Wikipedie)", wiki) + this._charRowHtml("Anime postavy", ani) || '<div class="pc-avatar-loading">Nic jsme nenašli. Zkus anglické jméno postavy nebo seriálu.</div>';
   },
   pickAvatarEl(el) {
     if (/^https:\/\//i.test(el.dataset.url || "")) this.pickAvatar(el.dataset.url, el.dataset.name, el);
