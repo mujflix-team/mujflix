@@ -305,7 +305,7 @@ const avt = await page.evaluate(async () => {
   window.__xss = 0;
   const mk = (id, tag = "div") => { let e = document.getElementById(id); if (!e) { e = document.createElement(tag); e.id = id; document.body.appendChild(e); } return e; };
   const grid = mk("pcAvatarGrid"); mk("pcAvatarPreview"); mk("pcAvatarPickerLabel");
-  await ProfileGate._renderAvatarRows([{ id: 1, title: '<img src=x onerror="window.__xss=1">"' }]);
+  grid.innerHTML = ProfileGate._charRowHtml('<i>t</i>', [{ name: '<img src=x onerror="window.__xss=1">"', url: "https://x.test/a.jpg" }]);
   const injected = !!grid.querySelector('img[src="x"]');
   return { injected, xss: window.__xss };
 });
@@ -534,17 +534,21 @@ check("PIN: klávesnice (číslice, Backspace, Esc)", pk.filled2 === 2 && pk.fil
 check("PIN pole: jen číslice a vložení ze schránky", pk.letter === "7" && pk.pasted === "1234", JSON.stringify(pk));
 
 const av2 = await page.evaluate(async () => {
-  const orig = window.tmdbGet;
-  window.tmdbGet = async () => ({ posters: [{ file_path: "/p1.jpg" }, { file_path: '/x"onerror="1.jpg' }], backdrops: [{ file_path: "/b1.jpg" }] });
+  const orig = window.fetch;
+  window.fetch = async (u) => {
+    u = String(u);
+    const body = /anilist/.test(u) ? { data: { Page: { characters: [{ name: { full: "Gojo" }, image: { large: "https://s4.anilist.co/g.png" } }] } } }
+      : { query: { pages: { 1: { title: "Batman", thumbnail: { source: "https://upload.wikimedia.org/b.jpg" } } } } };
+    return { ok: true, json: async () => body };
+  };
   ProfileGate.openCreate();
-  await new Promise(r => setTimeout(r, 80));
-  await ProfileGate._renderAvatarRows([{ id: 1, title: "Film", _type: "movie" }]);
+  for (let i = 0; i < 20 && !document.querySelector("#pcAvatarGrid .pc-character-option"); i++) await new Promise(r => setTimeout(r, 100));
   const opts = [...document.querySelectorAll("#pcAvatarGrid .pc-character-option")];
-  const out = { n: opts.length, rows: document.querySelectorAll("#pcAvatarGrid .pc-av-row:not([hidden])").length, bad: !!document.querySelector("#pcAvatarGrid img[onerror]") };
+  const out = { n: opts.length, rows: document.querySelectorAll("#pcAvatarGrid .pc-av-row").length, titles: !!document.querySelector("#pcAvatarGrid .pc-av-row h4") };
   opts[0].click(); out.picked = ProfileGate._selectedAvatar;
-  window.tmdbGet = orig; return out;
+  window.fetch = orig; return out;
 });
-check("avatar: nabízí plakáty/záběry (ne herce), vybraný obrázek se uloží, bez XSS", av2.n === 3 && av2.rows === 1 && !av2.bad && /image\.tmdb\.org\/t\/p\/w500\/b1\.jpg$/.test(av2.picked || ""), JSON.stringify(av2));
+check("avatar: výchozí nabídka jsou postavy (anime + seriály, Marvel/DC, filmy), výběr se uloží", av2.n >= 2 && av2.rows >= 2 && /anilist\.co\/g\.png$/.test(av2.picked || ""), JSON.stringify(av2));
 
 const dd = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
@@ -704,9 +708,8 @@ const charT = await page.evaluate(async () => {
       : { query: { pages: { 1: { index: 1, title: "Walter White", thumbnail: { source: "https://upload.wikimedia.org/w.jpg" } } } } };
     return { ok: true, json: async () => body };
   };
-  window.tmdbGet = async () => ({ results: [] });
   ProfileGate.openCreate();
-  await new Promise(r => setTimeout(r, 60));
+  for (let i = 0; i < 20 && !document.querySelector("#pcAvatarGrid .pc-character-option"); i++) await new Promise(r => setTimeout(r, 100));
   await ProfileGate._searchAvatarTitles("walter");
   const opts = [...document.querySelectorAll("#pcAvatarGrid .pc-character-option")];
   const names = opts.map(o => o.dataset.name);
