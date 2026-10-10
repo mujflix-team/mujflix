@@ -719,6 +719,42 @@ const charT = await page.evaluate(async () => {
 });
 check("avatar: hledání nabídne postavy z AniList a Wikipedie a vybere je", charT.names.includes("Naruto Uzumaki") && charT.names.includes("Walter White") && /anilist\.co\/n\.png$/.test(charT.picked || ""), JSON.stringify(charT));
 
+const pinAv = await page.evaluate(() => {
+  ProfileGate._setPinAvatar("https://s4.anilist.co/x.png");
+  const a = document.querySelector("#pmAvatar img");
+  const ok1 = !!a && a.getAttribute("src") === "https://s4.anilist.co/x.png" && document.getElementById("pmAvatar").textContent === "";
+  ProfileGate._setPinAvatar("🦊");
+  const ok2 = !document.querySelector("#pmAvatar img") && document.getElementById("pmAvatar").textContent === "🦊";
+  ProfileGate._setPinAvatar("🎬");
+  return { ok1, ok2, badge: getComputedStyle(document.getElementById("mfProfileBadge") || document.body).display };
+});
+check("PIN: obrázkový avatar se vykreslí jako obrázek, emoji jako text; starý odznak je skrytý", pinAv.ok1 && pinAv.ok2 && pinAv.badge === "none", JSON.stringify(pinAv));
+
+const lockT = await page.evaluate(() => {
+  const id = ProfileGate.createProfile({ name: "LockT", avatar: "🎬", color: "#007aff", pin: "1234" });
+  const prof = _getProfiles().find(p => p.id === id);
+  localStorage.removeItem("mf_pin_lock");
+  ProfileGate.openPin(prof);
+  const wrong = () => { ProfileGate._pinBuffer = "0000"; ProfileGate._checkPin(); return document.getElementById("pmMsg").textContent; };
+  const m1 = wrong(), m4 = (wrong(), wrong(), wrong());
+  const m5 = wrong();
+  const st1 = ProfileGate._pinState(); const left1 = ProfileGate._pinLockLeft();
+  ProfileGate._pinBuffer = ""; ProfileGate.pinInput("1");
+  const blocked = ProfileGate._pinBuffer === "";
+  // vypršení zámku → znovu 5 pokusů, další zámek je delší
+  ProfileGate._pinSave({ ...st1, until: Date.now() - 1000 });
+  for (let i = 0; i < 4; i++) wrong();
+  wrong();
+  const st2 = ProfileGate._pinState(); const left2 = ProfileGate._pinLockLeft();
+  ProfileGate._pinSave({ ...st2, until: 0 });
+  ProfileGate._pinBuffer = "1234"; ProfileGate._checkPin();
+  const reset = ProfileGate._pinState();
+  ProfileGate.closePin(); localStorage.removeItem("mf_pin_lock");
+  const all = _getProfiles().filter(p => p.id !== id); _saveProfiles(all);
+  return { m1, m4, m5, level1: st1.level, left1, blocked, level2: st2.level, longer: left2 > left1, resetOk: reset.level === 0 && reset.fails === 0 };
+});
+check("PIN: po špatném pokusu zbývající počet, po 5. zámek, který se stupňuje; správný PIN ho nuluje", /Zbývá 4 pokusy/.test(lockT.m1) && /Zbývá 1 pokus$/.test(lockT.m4) && /Zkus to znovu za 0:\d\d/.test(lockT.m5) && lockT.level1 === 1 && lockT.left1 > 0 && lockT.blocked && lockT.level2 === 2 && lockT.longer && lockT.resetOk, JSON.stringify(lockT));
+
 const nextT = await page.evaluate(() => {
   const slug = "the-simpsons"; const w = getWatched();
   Object.keys(w).filter(k => k.startsWith(slug + "-S")).forEach(k => delete w[k]);
