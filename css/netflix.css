@@ -839,3 +839,17 @@ html body #mfProfileCreate .pc-av-cap { display: block; font-size: 0.72rem; colo
 #mfStandaloneCinema .mf-cin-noembed strong { font-size: 1.2rem; }
 #mfStandaloneCinema .mf-cin-noembed span { color: #b3b3b3; max-width: 420px; }
 #mfStandaloneCinema .mf-cin-noembed-btn { margin-top: 8px; background: #fff; color: #000; border-radius: 4px; padding: 11px 22px; font-weight: 700; text-decoration: none; }
+
+/* PIN obrazovka: na notebookech (nízké okno) menší, ať se vejde bez scrollu */
+@media (max-height: 820px) {
+  html body #mfPinModal .pm-box { padding: 12px 20px !important; }
+  html body #mfPinModal .pm-avatar { width: 76px !important; height: 76px !important; font-size: 2.3rem !important; }
+  html body #mfPinModal .pm-title { font-size: 1.05rem !important; margin-top: 8px; }
+  html body #mfPinModal .pm-sub { font-size: 1.15rem !important; margin: 10px 0 10px !important; }
+  html body #mfPinModal .pm-dots { gap: 8px; margin-bottom: 14px; }
+  html body #mfPinModal .pm-dot { width: 42px !important; height: 50px !important; }
+  html body #mfPinModal .pm-dot.filled::after, html body #mfPinModal .pm-dot.error::after { font-size: 1.8rem; }
+  html body #mfPinModal .pm-numpad { grid-template-columns: repeat(3, 60px); gap: 8px; }
+  html body #mfPinModal .pm-num { width: 60px !important; height: 42px !important; font-size: 1.1rem !important; }
+  html body #mfPinModal .pm-cancel { margin-top: 14px; padding: 7px 22px !important; font-size: 0.88rem !important; }
+}
