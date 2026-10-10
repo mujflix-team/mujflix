@@ -185,17 +185,22 @@ const ProfileGate = {
     try { const r = await fetch(url, { ...(opts || {}), signal: ctl.signal }); return r.ok ? await r.json() : null; } catch (e) { return null; } finally { clearTimeout(t); }
   },
   async _anilistCharacters(q) {
-    const args = q ? "search:$q" : "sort:FAVOURITES_DESC",
-      query = `query(${q ? "$q:String" : ""}){Page(perPage:16){characters(${args}){name{full} image{large} media(perPage:1){nodes{title{romaji english}}}}}}`,
-      d = await this._fetchJson("https://graphql.anilist.co", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ query, variables: q ? { q } : {} }) });
-    return ((d && d.data && d.data.Page && d.data.Page.characters) || []).filter(c => c && c.image && c.image.large && !/default\.jpg/.test(c.image.large)).map(c => {
-      const m = c.media && c.media.nodes && c.media.nodes[0];
-      return { name: c.name && c.name.full || "", sub: m && m.title ? (m.title.english || m.title.romaji || "") : "", url: c.image.large };
-    });
+    const nm = "name{full} image{large}",
+      query = q
+        ? `query($q:String){Page(perPage:16){characters(search:$q){${nm}}} Media(search:$q,type:ANIME){characters(perPage:14,sort:FAVOURITES_DESC){nodes{${nm}}}}}`
+        : `query{Page(perPage:20){characters(sort:FAVOURITES_DESC){${nm}}}}`,
+      d = await this._fetchJson("https://graphql.anilist.co", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ query, variables: q ? { q } : {} }) }),
+      raw = [...((d && d.data && d.data.Media && d.data.Media.characters && d.data.Media.characters.nodes) || []), ...((d && d.data && d.data.Page && d.data.Page.characters) || [])], seen = {};
+    return raw.filter(c => c && c.image && c.image.large && !/default\.jpg/.test(c.image.large) && !seen[c.image.large] && (seen[c.image.large] = 1)).map(c => ({ name: c.name && c.name.full || "", url: c.image.large }));
   },
   async _wikiCharacters(q) {
     const d = await this._fetchJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=12&prop=pageimages&piprop=thumbnail&pithumbsize=400&gsrsearch=" + encodeURIComponent(q));
     return Object.values((d && d.query && d.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0)).filter(p => p.thumbnail && p.thumbnail.source).map(p => ({ name: p.title || "", sub: "", url: p.thumbnail.source }));
+  },
+  /* Známé postavy: Wikipedie vrátí hlavní obrázek stránky postavy (jedním dotazem pro celou skupinu). */
+  async _wikiByTitles(titles) {
+    const d = await this._fetchJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=400&titles=" + encodeURIComponent(titles.join("|")));
+    return Object.values((d && d.query && d.query.pages) || {}).filter(p => p.thumbnail && p.thumbnail.source).map(p => ({ name: String(p.title || "").replace(/ \(.*\)$/, ""), url: p.thumbnail.source }));
   },
   _charRowHtml(title, list) {
     if (!list.length) return "";
@@ -208,15 +213,28 @@ const ProfileGate = {
   async loadAvatarPicker() {
     const grid = document.getElementById("pcAvatarGrid");
     if (!grid) return;
-    grid.innerHTML = '<div class="pc-avatar-loading">Načítám obrázky…</div>';
+    grid.innerHTML = '<div class="pc-avatar-loading">Načítám postavy…</div>';
+    const run = this._avRun = (this._avRun || 0) + 1;
+    const groups = [
+      ["Breaking Bad", ["Walter White (Breaking Bad)", "Jesse Pinkman", "Saul Goodman", "Skyler White", "Hank Schrader", "Gus Fring", "Mike Ehrmantraut"]],
+      ["Game of Thrones", ["Daenerys Targaryen", "Jon Snow (character)", "Tyrion Lannister", "Arya Stark", "Cersei Lannister", "Sansa Stark", "Jaime Lannister", "Bran Stark", "Petyr Baelish"]],
+      ["Stranger Things", ["Eleven (Stranger Things)", "Mike Wheeler", "Dustin Henderson", "Lucas Sinclair", "Will Byers", "Max Mayfield", "Steve Harrington", "Jim Hopper", "Joyce Byers", "Eddie Munson", "Vecna (Stranger Things)"]],
+      ["Další seriály", ["Wednesday Addams", "Sherlock Holmes", "Tommy Shelby", "Dexter Morgan", "Michael Scott (The Office)", "Geralt of Rivia", "Yennefer of Vengerberg", "Joel Miller", "Ellie (The Last of Us)", "Billy Butcher", "Homelander", "Din Djarin", "Grogu"]],
+      ["Přátelé", ["Rachel Green", "Ross Geller", "Monica Geller", "Chandler Bing", "Joey Tribbiani", "Phoebe Buffay"]],
+      ["Marvel", ["Spider-Man", "Iron Man", "Captain America", "Thor (Marvel Comics)", "Deadpool", "Wolverine (character)", "Venom (character)", "Loki (Marvel Cinematic Universe)", "Black Panther (character)", "Doctor Strange", "Groot", "Thanos"]],
+      ["DC", ["Batman", "Joker (character)", "Superman", "Wonder Woman", "Harley Quinn", "Aquaman", "The Flash", "Catwoman", "Robin (character)"]],
+      ["Star Wars", ["Darth Vader", "Yoda", "Luke Skywalker", "Princess Leia", "Han Solo", "Obi-Wan Kenobi", "Ahsoka Tano", "Kylo Ren", "Chewbacca", "R2-D2"]],
+      ["Harry Potter", ["Harry Potter (character)", "Hermione Granger", "Ron Weasley", "Albus Dumbledore", "Severus Snape", "Draco Malfoy", "Rubeus Hagrid", "Sirius Black", "Luna Lovegood"]],
+      ["Animované", ["Homer Simpson", "Bart Simpson", "Lisa Simpson", "Marge Simpson", "Rick Sanchez", "Morty Smith", "Peter Griffin", "Eric Cartman", "SpongeBob SquarePants", "Elsa (Frozen)", "Simba", "Woody (Toy Story)", "Buzz Lightyear", "Shrek (character)", "Stitch (Lilo & Stitch)", "Mickey Mouse"]],
+      ["Filmové postavy", ["Gandalf", "Jack Sparrow", "Indiana Jones (character)", "John Wick (character)", "Forrest Gump (character)", "Neo (The Matrix)", "Terminator (character)", "Mario", "Hannibal Lecter", "James Bond", "Ellen Ripley", "Jason Bourne"]]
+    ];
     try {
-      const [m, t, fav] = await Promise.all([tmdbGet("/trending/movie/week?language=cs"), tmdbGet("/trending/tv/week?language=cs"), this._anilistCharacters("")]);
-      const mv = (m?.results || []).slice(0, 5).map(x => ({ ...x, _type: "movie" })), tv = (t?.results || []).slice(0, 5).map(x => ({ ...x, _type: "tv" })), items = [];
-      for (let i = 0; i < 5; i++) { mv[i] && items.push(mv[i]); tv[i] && items.push(tv[i]) }
-      await this._renderAvatarRows(items, this._charRowHtml("Oblíbené anime postavy", fav));
+      const [ani, ...wiki] = await Promise.all([this._anilistCharacters(""), ...groups.map(g => this._wikiByTitles(g[1]))]);
+      if (run !== this._avRun) return;
+      const html = this._charRowHtml("Oblíbené anime postavy", ani) + groups.map((g, i) => this._charRowHtml(g[0], wiki[i])).join("");
+      grid.innerHTML = html || '<div class="pc-avatar-loading">Postavy se nepodařilo načíst. Zkus je vyhledat jménem.</div>';
     } catch (err) {
-      grid.innerHTML = '<div class="pc-avatar-loading">Tituly se nepodařilo načíst.</div>';
-      console.warn("[ProfileGate] Avatar picker", err);
+      grid.innerHTML = '<div class="pc-avatar-loading">Postavy se nepodařilo načíst.</div>';
     }
   },
   searchAvatarTitles(e) {
@@ -229,35 +247,10 @@ const ProfileGate = {
     const grid = document.getElementById("pcAvatarGrid");
     if (!grid) return;
     grid.innerHTML = '<div class="pc-avatar-loading">Hledám…</div>';
-    try {
-      const [m, t, ani, wiki] = await Promise.all([...["movie", "tv"].map(ty => tmdbGet(`/search/${ty}?query=${encodeURIComponent(q)}&language=cs`)), this._anilistCharacters(q), this._wikiCharacters(q)]);
-      const items = [...(m?.results || []).slice(0, 3).map(x => ({ ...x, _type: "movie" })), ...(t?.results || []).slice(0, 3).map(x => ({ ...x, _type: "tv" }))];
-      await this._renderAvatarRows(items, this._charRowHtml("Postavy z animí", ani) + this._charRowHtml("Postavy a obrázky z Wikipedie", wiki));
-    } catch (err) {
-      grid.innerHTML = '<div class="pc-avatar-loading">Vyhledávání se nepodařilo.</div>';
-    }
-  },
-  async _renderAvatarRows(items, pre) {
-    const grid = document.getElementById("pcAvatarGrid");
-    if (!grid) return;
-    const rows = (items || []).filter(t => t && t.id);
-    grid.innerHTML = (pre || "") + (rows.length ? rows.map((t, i) => `<section class="pc-av-row" data-row="${i}" hidden><h4>${escapeHTML(t.title || t.name || "")}</h4><div class="pc-av-strip"></div></section>`).join("") : (pre ? "" : '<div class="pc-avatar-loading">Nic jsme nenašli.</div>'));
-    await Promise.all(rows.map(async (t, i) => {
-      const strip = grid.querySelector(`[data-row="${i}"] .pc-av-strip`);
-      if (!strip) return;
-      try {
-        const data = await tmdbGet(`/${t._type || "movie"}/${t.id}/images?include_image_language=cs,en,null`);
-        const pick = (arr, size, n) => (arr || []).filter(x => x && x.file_path).slice(0, n).map(x => ({ path: x.file_path, size }));
-        const imgs = [...pick(data?.backdrops, "w500", 8), ...pick(data?.posters, "w342", 6)];
-        if (!imgs.length) return;
-        strip.innerHTML = imgs.map(x => `
-          <button type="button" class="pc-avatar-option pc-character-option" onclick="window.ProfileGate?.pickAvatar('https://image.tmdb.org/t/p/${x.size}${escapeHTML(x.path)}','Vybraný obrázek',this)">
-            <img src="https://image.tmdb.org/t/p/w185${escapeHTML(x.path)}" alt="" loading="lazy">
-          </button>`).join("");
-        strip.parentElement.hidden = false;
-      } catch (err) { /* řada bez obrázků zůstane skrytá */ }
-    }));
-    if (!grid.querySelector(".pc-av-row:not([hidden])")) grid.innerHTML = '<div class="pc-avatar-loading">Obrázky se nepodařilo načíst.</div>';
+    const run = this._avRun = (this._avRun || 0) + 1;
+    const [ani, wiki] = await Promise.all([this._anilistCharacters(q), this._wikiCharacters(q)]);
+    if (run !== this._avRun) return;
+    grid.innerHTML = this._charRowHtml("Anime postavy", ani) + this._charRowHtml("Postavy ze seriálů a filmů (Wikipedie)", wiki) || '<div class="pc-avatar-loading">Nic jsme nenašli. Zkus anglické jméno postavy nebo názvu.</div>';
   },
   pickAvatarEl(el) {
     if (/^https:\/\//i.test(el.dataset.url || "")) this.pickAvatar(el.dataset.url, el.dataset.name, el);
