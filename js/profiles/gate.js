@@ -266,6 +266,25 @@ const ProfileGate = {
     }));
     return rows.filter(r => r.list.length);
   },
+  /* Fandom wiki: hlavní obrázek stránky postavy je záběr/ilustrace postavy (psáno „z pohledu vesmíru“), ne fotka herce. */
+  FANDOM_WIKIS: [["Marvel", "marvel"], ["DC", "dc"], ["Star Wars", "starwars"], ["Harry Potter", "harrypotter"], ["Game of Thrones", "gameofthrones"], ["Stranger Things", "strangerthings"], ["Breaking Bad", "breakingbad"], ["Disney", "disney"]],
+  async _fandomRow(label, wiki, q) {
+    const base = "https://" + wiki + ".fandom.com/api/v1/";
+    const found = await this._fetchJson(base + "Search/List?limit=8&namespaces=0&query=" + encodeURIComponent(q));
+    const ids = ((found && found.items) || []).map(i => i && i.id).filter(Boolean);
+    if (!ids.length) return [];
+    const det = await this._fetchJson(base + "Articles/Details?width=300&height=300&abstract=0&ids=" + ids.join(","));
+    return Object.values((det && det.items) || {}).filter(i => i && i.thumbnail && i.title).map(i => ({ name: i.title, url: String(i.thumbnail).replace(/^http:/, "https:") }));
+  },
+  /* Wikidata: fiktivní postavy (Q95074) s obrázkem – jedna SPARQL otázka */
+  async _wikidataCharacters(q) {
+    const esc = q.replace(/["\\]/g, "");
+    const sparql = `SELECT ?itemLabel ?image WHERE { SERVICE wikibase:mwapi { bd:serviceParam wikibase:api "EntitySearch"; wikibase:endpoint "www.wikidata.org"; mwapi:search "${esc}"; mwapi:language "en"; ?item wikibase:apiOutputItem mwapi:item. } ?item wdt:P31/wdt:P279* wd:Q95074; wdt:P18 ?image. SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } } LIMIT 16`;
+    const d = await this._fetchJson("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(sparql));
+    return ((d && d.results && d.results.bindings) || []).filter(b => b.image && b.itemLabel).map(b => ({
+      name: b.itemLabel.value, url: String(b.image.value).replace(/^http:/, "https:") + (/\?/.test(b.image.value) ? "&" : "?") + "width=400"
+    }));
+  },
   /* Superhrdinové (Marvel, DC …) ze statického souboru akabab/superhero-api */
   async _heroCharacters(q) {
     if (!this._heroes) { const all = await this._fetchJson("https://akabab.github.io/superhero-api/api/all.json"); this._heroes = Array.isArray(all) ? all : []; }
@@ -336,9 +355,26 @@ const ProfileGate = {
     if (!grid) return;
     grid.innerHTML = '<div class="pc-avatar-loading">Hledám…</div>';
     const run = this._avRun = (this._avRun || 0) + 1;
-    const [tv, heroes, disney, ani, wiki] = await Promise.all([this._tvmazeRows(q), this._heroCharacters(q), this._disneyCharacters(q), this._anilistCharacters(q), this._wikiCharacters(q)]);
-    if (run !== this._avRun) return;
-    grid.innerHTML = tv.map(r => this._charRowHtml(r.title, r.list)).join("") + this._charRowHtml("Superhrdinové (Marvel, DC …)", heroes) + this._charRowHtml("Disney", disney) + this._charRowHtml("Postavy ze seriálů a filmů (Wikipedie)", wiki) + this._charRowHtml("Anime postavy", ani) || '<div class="pc-avatar-loading">Nic jsme nenašli. Zkus anglické jméno postavy nebo seriálu.</div>';
+    // výsledky se průběžně doplňují podle toho, jak který zdroj odpoví (pomalý zdroj nezdržuje ostatní)
+    const keys = ["tv", "fandom", "heroes", "disney", "wikidata", "wiki", "ani"], res = {};
+    const paint = done => {
+      if (run !== this._avRun) return;
+      const html = keys.map(k => res[k] || "").join("");
+      grid.innerHTML = html || (done ? '<div class="pc-avatar-loading">Nic jsme nenašli. Zkus anglické jméno postavy nebo seriálu.</div>' : '<div class="pc-avatar-loading">Hledám…</div>');
+    };
+    const rows = (title, list) => this._charRowHtml(title, list);
+    const jobs = [
+      this._tvmazeRows(q).then(r => { res.tv = r.map(x => rows(x.title, x.list)).join(""); }),
+      Promise.all(this.FANDOM_WIKIS.map(w => this._fandomRow(w[0], w[1], q).then(l => rows("Fandom · " + w[0], l)))).then(r => { res.fandom = r.join(""); }),
+      this._heroCharacters(q).then(l => { res.heroes = rows("Superhrdinové (Marvel, DC …)", l); }),
+      this._disneyCharacters(q).then(l => { res.disney = rows("Disney", l); }),
+      this._wikidataCharacters(q).then(l => { res.wikidata = rows("Fiktivní postavy (Wikidata)", l); }),
+      this._wikiCharacters(q).then(l => { res.wiki = rows("Wikipedie", l); }),
+      this._anilistCharacters(q).then(l => { res.ani = rows("Anime postavy", l); })
+    ];
+    jobs.forEach(j => j.then(() => paint(!1), () => {}));
+    await Promise.allSettled(jobs);
+    paint(!0);
   },
   pickAvatarEl(el) {
     if (/^https:\/\//i.test(el.dataset.url || "")) this.pickAvatar(el.dataset.url, el.dataset.name, el);
