@@ -113,7 +113,7 @@ const ProfileGate = {
   openPin(e) {
     this._pinBuffer = "", this._pinTargetId = e.id;
     const t = document.getElementById("mfPinModal");
-    t && (this._setPinAvatar(e.avatar), document.getElementById("pmTitle").textContent = e.name, t.classList.add("show"), this._renderPinDots())
+    t && (this._setPinAvatar(e.avatar), document.getElementById("pmTitle").textContent = e.name, t.classList.add("show"), this._renderPinDots(), this._pinStatus())
   },
   _setPinAvatar(av) {
     const el = document.getElementById("pmAvatar");
@@ -122,11 +122,12 @@ const ProfileGate = {
     else el.textContent = av || "🎬";
   },
   closePin() {
-    this._pinBuffer = "", this._pinTargetId = null;
+    this._pinBuffer = "", this._pinTargetId = null, clearInterval(this._pinTick);
     const e = document.getElementById("mfPinModal");
     e && e.classList.remove("show"), this._renderPinDots()
   },
   pinInput(e) {
+    if (this._pinLockLeft() > 0) return;
     "back" === e ? this._pinBuffer = this._pinBuffer.slice(0, -1) : this._pinBuffer.length < 4 && (this._pinBuffer += e), this._renderPinDots(), 4 === this._pinBuffer.length && setTimeout(() => this._checkPin(), 120)
   },
   _renderPinDots(e) {
@@ -135,11 +136,56 @@ const ProfileGate = {
       n && (n.className = "pm-dot", t < this._pinBuffer.length && n.classList.add("filled"), "error" === e && n.classList.add("error"))
     }
   },
+  /* Zámek PINu: 5 pokusů, pak blokace, která se stupňuje (30 s → 2 min → 10 min → 30 min → 1 h → 4 h → 24 h).
+     Stav je v localStorage po profilech, takže ho nejde obejít obnovením stránky. Správný PIN ho vynuluje. */
+  PIN_MAX: 5,
+  PIN_LOCKS: [30, 120, 600, 1800, 3600, 14400, 86400],
+  _pinState(id) {
+    try { return JSON.parse(localStorage.getItem("mf_pin_lock") || "{}")[id || this._pinTargetId] || { fails: 0, level: 0, until: 0 }; } catch (e) { return { fails: 0, level: 0, until: 0 }; }
+  },
+  _pinSave(st, id) {
+    try { const all = JSON.parse(localStorage.getItem("mf_pin_lock") || "{}"); all[id || this._pinTargetId] = st; localStorage.setItem("mf_pin_lock", JSON.stringify(all)); } catch (e) {}
+  },
+  _pinLockLeft() {
+    return Math.max(0, Math.ceil((this._pinState().until - Date.now()) / 1000));
+  },
+  _pinFmt(sec) {
+    const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    return h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+  },
+  _pinStatus(wrong) {
+    const el = document.getElementById("pmMsg");
+    if (!el) return;
+    clearInterval(this._pinTick);
+    const left = this._pinLockLeft(), pad = document.querySelector("#mfPinModal .pm-numpad");
+    if (left > 0) {
+      const tick = () => {
+        const l = this._pinLockLeft();
+        if (l <= 0) { clearInterval(this._pinTick); this._pinStatus(); return; }
+        el.textContent = "Příliš mnoho pokusů. Zkus to znovu za " + this._pinFmt(l);
+      };
+      el.className = "pm-msg lock", pad && pad.classList.add("locked"), tick(), this._pinTick = setInterval(tick, 1000);
+      return;
+    }
+    pad && pad.classList.remove("locked");
+    const used = this._pinState().fails, rest = this.PIN_MAX - used;
+    if (wrong && used > 0) el.className = "pm-msg err", el.textContent = "Špatný PIN. Zbývá " + rest + (rest === 1 ? " pokus" : rest < 5 ? " pokusy" : " pokusů");
+    else if (used > 0) el.className = "pm-msg", el.textContent = "Zbývá " + rest + (rest === 1 ? " pokus" : rest < 5 ? " pokusy" : " pokusů");
+    else el.className = "pm-msg", el.textContent = "";
+  },
   _checkPin() {
     const e = _getProfiles().find(e => e.id === this._pinTargetId);
-    e && (this._pinBuffer === e.pin ? this.activateProfile(e.id) : (this._renderPinDots("error"), setTimeout(() => {
+    if (!e || this._pinLockLeft() > 0) return;
+    if (this._pinBuffer === e.pin) { this._pinSave({ fails: 0, level: 0, until: 0 }); return this.activateProfile(e.id); }
+    const st = this._pinState();
+    st.fails += 1;
+    if (st.fails >= this.PIN_MAX) {
+      st.until = Date.now() + this.PIN_LOCKS[Math.min(st.level, this.PIN_LOCKS.length - 1)] * 1000, st.level += 1, st.fails = 0;
+    }
+    this._pinSave(st);
+    this._renderPinDots("error"), this._pinStatus(!0), setTimeout(() => {
       this._pinBuffer = "", this._renderPinDots()
-    }, 700)))
+    }, 700)
   },
   openCreate(e) {
     this._editingId = e || null, this._selectedEmoji = PROFILE_EMOJIS[0], this._selectedColor = PROFILE_COLORS[0], this._selectedAvatar = PROFILE_EMOJIS[0];
