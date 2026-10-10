@@ -1,0 +1,823 @@
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Th.woff2") format("woff2"); font-weight: 100; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Lt.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Rg.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Md.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Bd.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Blk.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
+/* MůjFlix — domovská stránka a navigace ve stylu streamovací služby */
+:root {
+  --nf-bg: #141414;
+  --nf-pad: clamp(16px, 4vw, 56px);
+  --nf-accent: var(--accent, #0a84ff);
+  --nf-text: #fff;
+  --nf-dim: #b3b3b3;
+  --nf-bar-h: 68px;
+}
+
+/* ───────── Horní lišta ───────── */
+#nfTop {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9990;
+  height: calc(var(--nf-bar-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--nf-pad) 0;
+  display: none; align-items: center; gap: 4px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+  transition: background-color 0.3s ease;
+}
+html.mfh-home-on #nfTop { display: flex; }
+html.mfh-home-on #nfTop.nf-top-hidden,
+body.modal-open #nfTop,
+body.discover-open #nfTop { display: none; }
+#nfTop.nf-top-solid { background: var(--nf-bg); }
+html.mfh-home-on #mfHeader { display: none !important; }
+
+#nfTop .nf-logo {
+  background: none; border: 0; padding: 0; margin: 0 8px 0 0; cursor: pointer; color: var(--nf-text);
+  font: 900 clamp(1.45rem, 2.4vw, 1.9rem)/1 -apple-system, "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -1.2px; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+#nfTop .nf-logo span { color: var(--nf-accent); }
+#nfTop .nf-top-gap { flex: 1; }
+#nfTop .nf-icon-btn {
+  position: relative; width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer; padding: 0;
+  background: none;  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+#nfTop .nf-icon-btn { color: #fff !important; }
+#nfTop .nf-icon-btn svg { stroke: currentColor !important; fill: none !important; }
+#nfTop .nf-icon-btn:hover { background: rgba(255, 255, 255, 0.12); }
+#nfTop .nf-icon-btn:active { transform: scale(0.92); }
+#nfTop .nf-bell-dot {
+  position: absolute; top: 9px; right: 10px; width: 9px; height: 9px; border-radius: 50%;
+  background: #ff453a; border: 2px solid #141414; display: none;
+}
+#nfTop .nf-bell-dot.visible { display: block; }
+#nfTop .nf-avatar {
+  width: 34px; height: 34px; margin-left: 8px; border: 0; border-radius: 6px; cursor: pointer; padding: 0;
+  background: var(--nf-avatar, #0a84ff); font-size: 1.15rem; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 2px transparent; transition: box-shadow 0.15s;
+}
+#nfTop .nf-avatar:hover { box-shadow: 0 0 0 2px #fff; }
+
+/* ───────── Dock (odkazy navigace) ───────── */
+html body #mfDock.mf-dock {
+  position: fixed !important; z-index: 10000 !important; margin: 0 !important; transform: none !important;
+  display: flex; align-items: center; flex-direction: row;
+  background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important; overflow: visible;
+}
+html body #mfDock .mf-dock-pill { display: none !important; }
+html body #mfDock .dock-btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+  min-width: 0; margin: 0; font-family: inherit; color: var(--nf-dim) !important; transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+html body #mfDock .dock-btn::before, html body #mfDock .dock-btn::after { display: none !important; }
+html body #mfDock .dock-btn svg { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+html body #mfDock .dock-btn.active { color: var(--nf-text) !important; }
+html body #mfDock .dock-btn svg, html body #mfDock .dock-btn.active svg { stroke: currentColor !important; filter: none !important; }
+html body #mfDock .dock-label { opacity: 1 !important; transform: none !important; color: inherit !important; letter-spacing: 0; }
+html body #mfDock .dock-badge { display: none !important; }
+
+/* počítač: odkazy v horní liště */
+@media (min-width: 900px) {
+  html body #mfDock.mf-dock {
+    top: 0 !important; bottom: auto !important; right: auto !important;
+    left: calc(var(--nf-pad) + clamp(112px, 9vw, 150px)) !important;
+    width: auto !important; height: calc(var(--nf-bar-h) + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 0 0 !important; gap: 2px !important;
+  }
+  html body #mfDock .dock-btn { padding: 10px 14px; font-size: 0.95rem; font-weight: 500; }
+  html body #mfDock .dock-btn svg { display: none; }
+  html body #mfDock .dock-label { font-size: 0.95rem; font-weight: inherit; display: inline; }
+  html body #mfDock .dock-btn:hover { color: #e5e5e5; }
+  html body #mfDock .dock-btn.active { font-weight: 700; }
+  html body #mfDock #dockProfile { display: none !important; }
+}
+
+/* telefon: spodní lišta záložek */
+@media (max-width: 899px) {
+  html body #mfDock.mf-dock {
+    left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important; width: 100% !important;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) !important; gap: 0 !important;
+    justify-content: space-around;
+    background: rgba(18, 18, 18, 0.97) !important; border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  html body #mfDock .dock-btn { flex: 1 1 0; flex-direction: column; gap: 3px; padding: 6px 0; }
+  html body #mfDock .dock-btn svg { width: 24px; height: 24px; }
+  html body #mfDock .dock-label { font-size: 0.66rem; font-weight: 600; }
+  #nfTop .nf-avatar { display: none; }
+  #nfTop { --nf-bar-h: 56px; }
+}
+html body.discover-open #mfDock { display: none !important; }
+
+/* ───────── Domovská stránka ───────── */
+#mfSectionHome { overscroll-behavior: contain; }
+.nf-hero {
+  position: relative; height: clamp(440px, 80vh, 780px); display: flex; align-items: flex-end; overflow: hidden;
+  background: var(--nf-bg);
+}
+.nf-hero-empty { background: linear-gradient(180deg, #1d1d22, var(--nf-bg)); }
+.nf-hero-none { height: calc(var(--nf-bar-h) + 40px + env(safe-area-inset-top, 0px)); }
+.nf-hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 18%;
+  animation: nfHeroIn 0.9s ease both;
+}
+@keyframes nfHeroIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
+.nf-hero-shade {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(0deg, var(--nf-bg) 2%, rgba(20, 20, 20, 0) 40%),
+    linear-gradient(77deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 24%);
+}
+.nf-hero-body { position: relative; z-index: 1; width: min(660px, 100%); padding: 0 var(--nf-pad) clamp(90px, 15vh, 170px); }
+.nf-hero-eyebrow { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--nf-dim); margin-bottom: 8px; }
+.nf-hero-title {
+  margin: 0 0 12px; font: 800 clamp(2rem, 5.2vw, 4.2rem)/1.02 -apple-system, "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -0.04em; color: var(--nf-text); text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+}
+.nf-hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 14px; font-size: 0.95rem; color: #d2d2d2; font-weight: 500; }
+.nf-hero-badge { padding: 2px 8px; border-radius: 4px; background: var(--nf-accent); color: #fff; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.nf-hero-rating { color: #ffd60a; font-weight: 700; }
+.nf-hero-bar { height: 4px; width: min(320px, 70%); border-radius: 2px; background: rgba(255, 255, 255, 0.28); margin-bottom: 14px; overflow: hidden; }
+.nf-hero-bar > div { height: 100%; background: var(--nf-accent); border-radius: 2px; }
+.nf-hero-desc {
+  margin: 0 0 20px; font-size: clamp(0.95rem, 1.25vw, 1.15rem); line-height: 1.45; color: #f0f0f0; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nf-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.nf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 48px; padding: 0 28px;
+  border: 0; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 1.05rem; font-weight: 700; line-height: 1;
+  transition: background 0.15s, transform 0.1s;
+}
+.nf-btn:active { transform: scale(0.97); }
+.nf-btn-primary { background: #fff; color: #000; }
+.nf-btn-primary:hover { background: rgba(255, 255, 255, 0.78); }
+.nf-btn-ghost { background: rgba(109, 109, 110, 0.7); color: #fff; }
+.nf-btn-ghost:hover { background: rgba(109, 109, 110, 0.45); }
+.nf-btn-ghost.on svg { fill: #ff453a; stroke: #ff453a; }
+
+/* řady */
+.nf-rows { position: relative; z-index: 2; margin-top: -70px; padding-bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
+.nf-hero-empty + .nf-rows, .nf-hero-none + .nf-rows { margin-top: 0; }
+.nf-row { margin: 0 0 clamp(14px, 2.4vw, 32px); }
+.nf-row[hidden] { display: none; }
+.nf-row-head { display: flex; align-items: baseline; gap: 12px; padding: 0 var(--nf-pad); margin-bottom: 4px; }
+.nf-row-title { margin: 0; font: 700 clamp(1.05rem, 1.5vw, 1.4rem)/1.2 -apple-system, "SF Pro Display", "Inter", sans-serif; color: #e5e5e5; letter-spacing: -0.01em; }
+.nf-row-sub { font-size: 0.82rem; color: #808080; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nf-see-all { margin-left: auto; flex: none; font-size: 0.85rem; font-weight: 600; color: var(--nf-accent); text-decoration: none; opacity: 0; transition: opacity 0.2s; }
+.nf-row:hover .nf-see-all, .nf-see-all:focus-visible { opacity: 1; }
+@media (hover: none) { .nf-see-all { opacity: 1; } }
+.nf-scroller { position: relative; }
+.nf-track {
+  display: flex; gap: clamp(6px, 0.7vw, 10px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity;
+  padding: 16px var(--nf-pad) 22px; scroll-padding-left: var(--nf-pad); scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.nf-track::-webkit-scrollbar { display: none; }
+.nf-arrow {
+  position: absolute; top: 16px; bottom: 22px; width: clamp(36px, 3.4vw, 56px); border: 0; padding: 0; cursor: pointer; z-index: 3;
+  display: flex; align-items: center; justify-content: center; color: #fff; opacity: 0; transition: opacity 0.2s, background 0.2s;
+}
+.nf-arrow-l { left: 0; background: rgba(20, 20, 20, 0.6); border-radius: 0 6px 6px 0; }
+.nf-arrow-r { right: 0; background: rgba(20, 20, 20, 0.6); border-radius: 6px 0 0 6px; }
+.nf-arrow:hover { background: rgba(20, 20, 20, 0.88); }
+.nf-scroller:hover .nf-arrow { opacity: 1; }
+@media (hover: none) { .nf-arrow { display: none; } }
+
+/* karta */
+.nf-card { position: relative; flex: none; width: clamp(118px, 12.5vw, 196px); scroll-snap-align: start; cursor: pointer; outline: none; min-width: 0; }
+.nf-poster {
+  position: relative; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: #222;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.nf-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.nf-card:hover { z-index: 4; }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(1.08); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
+.nf-card:focus-visible .nf-poster { outline: 2px solid #fff; outline-offset: 2px; }
+.nf-card-info { padding: 8px 2px 0; }
+.nf-card-title {
+  margin: 0; font-size: 0.82rem; font-weight: 600; line-height: 1.25; color: #e5e5e5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nf-card-ep { margin: 2px 0 0; font-size: 0.72rem; color: #808080; }
+.nf-skeleton { background: linear-gradient(100deg, #1f1f1f 30%, #2c2c2c 50%, #1f1f1f 70%); background-size: 200% 100%; animation: nfShimmer 1.3s linear infinite; }
+@keyframes nfShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Top 10 s velkými čísly */
+.nf-row-ranked .nf-card { width: clamp(190px, 21vw, 300px); }
+.nf-row-ranked .nf-poster { margin-left: 42%; }
+.nf-row-ranked .nf-card-info { display: none; }
+.nf-rank {
+  position: absolute; left: 0; bottom: -6px; font: 900 clamp(100px, 11vw, 170px)/0.8 -apple-system, "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -0.09em; color: var(--nf-bg); -webkit-text-stroke: 3px #6a6a6a; pointer-events: none; user-select: none;
+  padding-right: 0.06em;
+}
+
+/* „Zobrazit vše“ */
+.mfh-h2 { margin: 0; font: 700 1.2rem/1.2 -apple-system, "SF Pro Display", "Inter", sans-serif; color: #fff; }
+.mfh-seeall-grid .nf-card { width: 100%; }
+.mfh-seeall-grid { gap: 18px 12px; }
+
+/* telefon */
+@media (max-width: 899px) {
+  .nf-hero { height: clamp(420px, 72vh, 640px); }
+  .nf-hero-body { padding-bottom: 64px; }
+  .nf-hero-title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+  .nf-hero-desc { -webkit-line-clamp: 2; }
+  .nf-hero-actions { gap: 10px; }
+  .nf-btn { height: 44px; padding: 0 20px; font-size: 0.98rem; flex: 1 1 0; }
+  .nf-hero-body { width: 100%; }
+  .nf-rows { margin-top: -48px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }
+  .nf-card { width: 108px; }
+  .nf-row-ranked .nf-card { width: 168px; }
+  .nf-rank { font-size: 110px; }
+  .nf-card-title { font-size: 0.74rem; }
+  .nf-row-title { font-size: 1.05rem; white-space: nowrap; }
+  .nf-row-sub { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nf-hero-bg, .nf-skeleton { animation: none !important; }
+  .nf-poster { transition: none !important; }
+}
+
+/* ═════════ Společný vzhled ostatních obrazovek ═════════ */
+html body { background: var(--nf-bg); }
+.adaptive-bg, .bg-glow, #particles { display: none !important; }
+
+/* výběr profilu */
+html body #mfProfileGate { background: var(--nf-bg) !important; }
+#mfProfileGate .pg-logo {
+  position: absolute; top: 22px; left: var(--nf-pad); margin: 0 !important;
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem) !important; letter-spacing: -1.2px;
+}
+#mfProfileGate .pg-title { font-size: clamp(2rem, 3.6vw, 3.4rem) !important; font-weight: 500 !important; letter-spacing: -0.01em !important; margin-bottom: 0.5em !important; }
+#mfProfileGate .pg-subtitle { display: none !important; }
+#mfProfileGate .pg-profiles { gap: clamp(14px, 2.4vw, 32px) !important; }
+#mfProfileGate .pg-avatar {
+  width: clamp(84px, 10vw, 150px) !important; height: clamp(84px, 10vw, 150px) !important; border-radius: 6px !important;
+  background: var(--pg-color, #0a84ff) !important; border: 3px solid transparent !important; box-shadow: none !important;
+  font-size: clamp(2.4rem, 4.2vw, 4.2rem) !important; transition: border-color 0.15s ease;
+}
+#mfProfileGate .pg-profile-item:hover .pg-avatar { border-color: #fff !important; transform: none !important; }
+#mfProfileGate .pg-name { color: #808080 !important; font-size: clamp(0.9rem, 1.2vw, 1.15rem) !important; font-weight: 500 !important; transition: color 0.15s; }
+#mfProfileGate .pg-profile-item:hover .pg-name { color: #fff !important; }
+#mfProfileGate .pg-add-btn { border-radius: 6px !important; border: 0 !important; background: #2a2a2a !important; color: #b3b3b3 !important; width: clamp(84px, 10vw, 150px) !important; height: clamp(84px, 10vw, 150px) !important; font-size: 2.6rem !important; }
+#mfProfileGate .pg-profile-item:hover .pg-add-btn { background: #fff !important; color: #141414 !important; }
+#mfProfileGate .pg-manage-btn {
+  margin-top: 40px !important; padding: 0.75em 1.8em !important; border: 1px solid #808080 !important; border-radius: 0 !important; background: none !important;
+  color: #808080 !important; text-decoration: none !important; letter-spacing: 0.18em; text-transform: uppercase; font-size: clamp(0.78rem, 1vw, 1rem) !important; font-weight: 500 !important;
+}
+#mfProfileGate .pg-manage-btn:hover, #mfProfileGate .pg-manage-btn.active { border-color: #fff !important; color: #fff !important; }
+
+/* detail seriálu */
+html body #seriesModal .modal-content { background: var(--nf-bg) !important; border-radius: 0 !important; box-shadow: none !important; border: 0 !important; }
+html body #seriesModal .modal-hero { min-height: clamp(300px, 50vh, 520px); }
+html body #seriesModal .modal-hero-overlay {
+  background: linear-gradient(0deg, var(--nf-bg) 2%, rgba(20, 20, 20, 0) 55%), linear-gradient(77deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 65%) !important;
+}
+html body #seriesModal .modal-hero-left h2 { font-size: clamp(2rem, 4.6vw, 3.6rem) !important; font-weight: 800 !important; letter-spacing: -0.04em !important; line-height: 1.02 !important; color: #fff !important; }
+html body #seriesModal .modal-meta-text { color: #d2d2d2 !important; font-size: 0.95rem !important; }
+html body #seriesModal .tmdb-badge { background: none !important; border: 1px solid #808080 !important; color: #d2d2d2 !important; border-radius: 3px !important; font-size: 0.7rem !important; }
+html body #seriesModal .panel-progress-bar { height: 4px !important; background: rgba(255, 255, 255, 0.28) !important; border-radius: 2px !important; }
+html body #seriesModal .panel-progress-fill { background: var(--nf-accent) !important; box-shadow: none !important; }
+html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle {
+  height: 44px; padding: 0 22px !important; border: 0 !important; border-radius: 6px !important; box-shadow: none !important;
+  font-size: 0.98rem !important; font-weight: 700 !important; text-shadow: none !important; filter: none !important; transform: none;
+}
+html body #seriesModal .btn-continue { background: #fff !important; color: #000 !important; }
+html body #seriesModal .btn-continue:hover { background: rgba(255, 255, 255, 0.78) !important; }
+html body #seriesModal .btn-shuffle { background: rgba(109, 109, 110, 0.7) !important; color: #fff !important; }
+html body #seriesModal .btn-shuffle:hover { background: rgba(109, 109, 110, 0.45) !important; }
+html body #seriesModal #modalFindBtn { color: #fff !important; }
+html body #seriesModal .close-btn { background: #181818 !important; border: 0 !important; box-shadow: none !important; color: #fff !important; }
+html body #seriesModal .ssv-label { font-size: 1.4rem !important; font-weight: 700 !important; border: 0 !important; padding-left: 0 !important; letter-spacing: -0.01em !important; text-transform: none !important; color: #fff !important; }
+html body #seriesModal .ssv-label::before { display: none !important; }
+html body #seriesModal .ssv-help { color: #808080 !important; }
+html body #seriesModal .ssv-card { border: 0 !important; border-radius: 6px !important; box-shadow: none !important; background: #2a2a2a !important; transition: transform 0.2s ease !important; }
+html body #seriesModal .ssv-card:hover { transform: scale(1.05) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important; }
+html body #seriesModal .ssv-card.ssv-active { outline: 2px solid #fff; outline-offset: 0; box-shadow: none !important; }
+html body #seriesModal .ep-view-bar { background: var(--nf-bg) !important; border: 0 !important; box-shadow: none !important; }
+html body #seriesModal .ep-view-back, html body #seriesModal .season-all-btn, html body #seriesModal .ep-view-season-badge {
+  background: rgba(109, 109, 110, 0.4) !important; border: 0 !important; border-radius: 4px !important; color: #fff !important; box-shadow: none !important;
+}
+html body #seriesModal .ep-view-season-badge-dot { background: var(--nf-accent) !important; box-shadow: none !important; }
+html body #seriesModal .episode-card {
+  background: transparent !important; border: 0 !important; border-bottom: 1px solid #333 !important; border-radius: 0 !important;
+  box-shadow: none !important; transition: background 0.15s !important;
+}
+html body #seriesModal .episode-card:hover { background: #1f1f1f !important; transform: none !important; }
+html body #seriesModal .episode-card.next-ep { background: #2a2a2a !important; }
+html body #seriesModal .ep-thumb { border-radius: 4px !important; overflow: hidden; }
+html body #seriesModal .ep-num { color: #b3b3b3 !important; }
+html body #seriesModal .ep-title { color: #fff !important; font-weight: 600 !important; }
+html body #seriesModal .ep-btn-play-hbo {
+  background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important;
+}
+html body #seriesModal .ep-btn-play-hbo:hover { background: rgba(255, 255, 255, 0.78) !important; }
+html body #seriesModal .ep-btn-mark { background: transparent !important; border: 1px solid #808080 !important; color: #fff !important; box-shadow: none !important; }
+html body #seriesModal .ep-next-tag { background: var(--nf-accent) !important; color: #fff !important; border-radius: 3px !important; }
+
+/* Můj seznam (oblíbené) – celá obrazovka */
+html body .watchlist-overlay { background: var(--nf-bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; padding: 0 !important; align-items: stretch !important; justify-content: stretch !important; }
+html body .watchlist-box {
+  width: 100% !important; max-width: none !important; height: 100% !important; max-height: none !important; border-radius: 0 !important;
+  background: var(--nf-bg) !important; border: 0 !important; box-shadow: none !important; padding: 28px var(--nf-pad) 100px !important; overflow-y: auto !important;
+}
+html body .wl-title { font-size: clamp(1.7rem, 3.2vw, 2.6rem) !important; font-weight: 800 !important; letter-spacing: -0.03em !important; color: #fff !important; }
+html body .wl-count { color: #808080 !important; }
+html body .wl-close { background: #2a2a2a !important; border: 0 !important; color: #fff !important; }
+html body .wl-search { background: #2a2a2a !important; border: 0 !important; border-radius: 4px !important; color: #fff !important; box-shadow: none !important; }
+html body .wl-tab { background: transparent !important; border: 1px solid #404040 !important; border-radius: 4px !important; color: #d2d2d2 !important; box-shadow: none !important; }
+html body .wl-tab.active { background: #fff !important; border-color: #fff !important; color: #000 !important; }
+html body .wl-empty-btn { background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; }
+
+/* oznámení, nastavení a další okna */
+html body .notif-panel {
+  top: calc(var(--nf-bar-h) + 6px + env(safe-area-inset-top, 0px)) !important; right: var(--nf-pad) !important; left: auto !important;
+   background: #181818 !important; border: 1px solid #333 !important; border-radius: 6px !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8) !important; backdrop-filter: none !important;
+}
+html body .notif-panel-header { border-bottom: 1px solid #333 !important; }
+html body .customize-box { background: #181818 !important; border: 1px solid #333 !important; border-radius: 8px !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85) !important; backdrop-filter: none !important; }
+html body .customize-section-title { font-size: 0.8rem !important; letter-spacing: 0.08em; color: #b3b3b3 !important; }
+html body .customize-tab.active { color: #fff !important; border-bottom-color: #fff !important; }
+html body .genre-editor-box, html body .pm-box { background: #181818 !important; border: 1px solid #333 !important; border-radius: 8px !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85) !important; backdrop-filter: none !important; }
+html body #mf-toast { background: #333 !important; border: 0 !important; border-radius: 4px !important; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6) !important; backdrop-filter: none !important; font-weight: 600 !important; }
+
+@media (max-width: 899px) {
+  html body .notif-panel { right: 8px !important; top: calc(56px + env(safe-area-inset-top, 0px)) !important; }
+  html body .watchlist-box { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 100px) !important; }
+  #mfProfileGate .pg-logo { top: 16px; }
+  html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle { height: 40px; padding: 0 14px !important; font-size: 0.88rem !important; }
+}
+html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchlistOverlay .watchlist-box {
+  width: 100% !important; max-width: none !important; height: 100% !important; max-height: none !important; margin: 0 !important;
+  border-radius: 0 !important; background: var(--nf-bg) !important; border: 0 !important; box-shadow: none !important; transform: none !important;
+}
+html body #seriesModal .ssv-help { padding-left: 0 !important; margin-left: 0 !important; }
+#mfProfileGate .pg-avatar::before, #mfProfileGate .pg-avatar::after { display: none !important; }
+
+/* ═════════ Cinema mode (přehrávač) ═════════ */
+#mfStandaloneCinema {
+  display: none; position: fixed; inset: 0; z-index: 1000000; flex-direction: column;
+  background: #000; color: #fff; font-family: inherit;
+}
+#mfStandaloneCinema.open { display: flex; }
+#mfStandaloneCinema .mf-standalone-cinema-top {
+  position: relative; z-index: 3; flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) clamp(12px, 2vw, 28px) 10px;
+  background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.92) 100%);
+}
+#mfStandaloneCinemaClose {
+  flex: none; width: 44px; height: 44px; margin: 0 2px 0 -8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: none; color: #fff; display: inline-flex; align-items: center; justify-content: center; transition: background 0.15s, transform 0.1s;
+}
+#mfStandaloneCinemaClose:hover { background: rgba(255, 255, 255, 0.14); }
+#mfStandaloneCinemaClose:active { transform: scale(0.92); }
+#mfStandaloneCinema .mf-standalone-cinema-top strong {
+  font-size: clamp(1rem, 1.4vw, 1.25rem); font-weight: 700; letter-spacing: -0.01em; color: #fff;
+  max-width: min(36vw, 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#mfStandaloneCinema .mf-cin-src-label { font-size: 0.78rem; color: #b3b3b3; font-weight: 600; white-space: nowrap; }
+#mfStandaloneCinema .mf-cin-src-counter { font-size: 0.72rem; color: #808080; white-space: nowrap; }
+
+/* tlačítka v liště */
+#mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn,
+#mfStandaloneCinema .mf-cin-external-btn {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border: 0; border-radius: 4px;
+  background: rgba(109, 109, 110, 0.55); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; text-decoration: none; white-space: nowrap;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+}
+#mfStandaloneCinema .mf-cin-ep-btn:hover, #mfStandaloneCinema .mf-cin-fav-btn:hover, #mfStandaloneCinema .mf-cin-switch-btn:hover,
+#mfStandaloneCinema .mf-cin-external-btn:hover { background: rgba(109, 109, 110, 0.85); }
+#mfStandaloneCinema .mf-cin-ep-btn:active, #mfStandaloneCinema .mf-cin-fav-btn:active, #mfStandaloneCinema .mf-cin-switch-btn:active { transform: scale(0.97); }
+#mfStandaloneCinema .mf-cin-ep-pick, #mfStandaloneCinema #mfCinNextEp { background: #fff; color: #000; }
+#mfStandaloneCinema .mf-cin-ep-pick:hover, #mfStandaloneCinema #mfCinNextEp:hover { background: rgba(255, 255, 255, 0.78); }
+#mfStandaloneCinema .mf-cin-fav-btn.faved { background: rgba(255, 255, 255, 0.16); color: #fff; }
+#mfStandaloneCinema .mf-cin-tvbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: 4px; padding-left: 14px; border-left: 1px solid #333; }
+#mfStandaloneCinema .mf-cin-ep-current { font-size: 0.9rem; font-weight: 700; color: #fff; padding: 0 2px; white-space: nowrap; }
+#mfStandaloneCinema .mf-cin-ep-btn.mf-cin-next-series { margin-left: 0; }
+
+/* výběr epizod */
+#mfStandaloneCinema .mf-cin-epgrid {
+  position: relative; z-index: 3; flex: none; display: flex; flex-direction: column; gap: 14px; max-height: 44vh; overflow-y: auto;
+  padding: 16px clamp(12px, 2vw, 28px) 20px; background: #141414; border-top: 1px solid #262626; border-bottom: 1px solid #262626;
+}
+#mfStandaloneCinema .mf-cin-epgrid-seasons { display: flex; gap: 4px; flex-wrap: wrap; }
+#mfStandaloneCinema .mf-cin-season-chip {
+  box-shadow: none !important;
+  padding: 8px 14px; border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: #b3b3b3;
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: color 0.15s;
+}
+#mfStandaloneCinema .mf-cin-season-chip:hover { color: #fff; }
+#mfStandaloneCinema .mf-cin-season-chip.active { color: #fff; background: none !important; border-bottom-color: var(--nf-accent); }
+#mfStandaloneCinema .mf-cin-epgrid-body { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+#mfStandaloneCinema .mf-cin-ep-chip {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 52px; border: 0; border-radius: 4px;
+  background: #2a2a2a; color: #d2d2d2; font: inherit; font-size: 0.85rem; cursor: pointer; transition: background 0.15s, transform 0.1s;
+}
+#mfStandaloneCinema .mf-cin-ep-chip:hover { background: #3a3a3a; }
+#mfStandaloneCinema .mf-cin-ep-chip.watched { background: #1f1f1f; color: #808080; }
+#mfStandaloneCinema .mf-cin-ep-chip.current { background: #fff; color: #000; }
+#mfStandaloneCinema .mf-cin-ep-chip-num { font-weight: 700; }
+#mfStandaloneCinema .mf-cin-ep-chip-mark { font-size: 0.75rem; color: inherit; min-height: 0.9em; line-height: 1; }
+
+/* přehrávač */
+#mfStandaloneCinema .mf-standalone-cinema-frame { flex: 1; min-height: 0; }
+#mfStandaloneCinemaFrame, #mfStandaloneCinemaFrame iframe { width: 100%; height: 100%; border: 0; }
+#mfStandaloneCinemaFrame { position: relative; overflow: hidden; background: #000; }
+#mfStandaloneCinemaFrame iframe { position: relative; z-index: 1; display: block; opacity: 0; transition: opacity 0.3s ease; }
+#mfStandaloneCinemaFrame.mf-cinema-ready iframe { opacity: 1; }
+.mf-cinema-skeleton {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: #000; color: #b3b3b3; font-size: 0.9rem; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.mf-cinema-skeleton[aria-hidden="true"] { opacity: 0; visibility: hidden; }
+.mf-cinema-skeleton-mark {
+  width: 56px; height: 56px; border-radius: 50%; border: 4px solid #2a2a2a; border-top-color: var(--nf-accent); font-size: 0;
+  animation: nfSpin 0.9s linear infinite;
+}
+.mf-cinema-skeleton-line { display: none; }
+@keyframes nfSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .mf-cinema-skeleton-mark { animation: none; } }
+
+@media (max-width: 700px) {
+  #mfStandaloneCinema .mf-standalone-cinema-top { gap: 8px; }
+  #mfStandaloneCinema .mf-standalone-cinema-top strong { max-width: calc(100vw - 90px); font-size: 1rem; }
+  #mfStandaloneCinema .mf-cin-src-label { order: 5; }
+  #mfStandaloneCinema .mf-cin-src-counter { display: none; }
+  #mfStandaloneCinema .mf-cin-tvbar { order: 6; flex: 1 0 100%; margin: 0; padding: 0; border: 0; gap: 6px; }
+  #mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn,
+  #mfStandaloneCinema .mf-cin-external-btn { height: 34px; padding: 0 11px; font-size: 0.78rem; }
+    #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn, #mfStandaloneCinema .mf-cin-external-btn { order: 7; }
+  #mfStandaloneCinema .mf-cin-epgrid { max-height: 50vh; }
+  #mfStandaloneCinema .mf-cin-epgrid-body { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
+}
+
+/* ============================================================
+   Nový profil + úvodní výběr žánrů (styl Netflix "Přidat profil")
+   ============================================================ */
+html body #mfProfileCreate { background: #141414 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; align-items: flex-start !important; overflow-y: auto; padding: 0 !important; }
+html body #mfProfileCreate .pc-logo { position: absolute; left: var(--nf-pad); top: 18px; font-weight: 900; font-size: clamp(1.5rem, 2.4vw, 2rem); letter-spacing: -0.04em; color: #fff; }
+html body #mfProfileCreate .pc-logo span { color: var(--nf-accent); }
+html body #mfProfileCreate::after { content: none; }
+html body #mfProfileCreate .pc-box {
+  background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; animation: none !important;
+  width: min(620px, 100%) !important; max-height: none !important; overflow: visible !important; margin: 0 auto; padding: clamp(84px, 14vh, 140px) 20px 60px !important;
+}
+html body #mfProfileCreate .pc-heading { display: block; position: relative; }
+html body #mfProfileCreate .pc-eyebrow { display: none !important; }
+html body #mfProfileCreate .pc-title { font-size: clamp(2rem, 5vw, 3.4rem) !important; font-weight: 500 !important; letter-spacing: -0.02em !important; color: #fff !important; line-height: 1.1; }
+html body #mfProfileCreate .pc-subtitle { color: #808080 !important; font-size: 1.15rem !important; margin: 10px 0 8px !important; padding-bottom: 22px; border-bottom: 1px solid #333; }
+html body #mfProfileCreate .pc-close { position: fixed; top: 14px; right: var(--nf-pad); background: transparent !important; border: 0 !important; color: #b3b3b3 !important; font-size: 2rem !important; width: 44px; height: 44px; }
+html body #mfProfileCreate .pc-close:hover { color: #fff !important; }
+html body #mfProfileCreate .pc-label { color: #b3b3b3 !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.95rem !important; font-weight: 600 !important; margin-top: 26px !important; }
+html body #mfProfileCreate .pc-label-note { color: #666 !important; font-weight: 400; text-transform: none; }
+html body #mfProfileCreate .pc-hint { color: #808080 !important; text-align: left !important; font-size: 0.85rem !important; }
+html body #mfProfileCreate .pc-input, html body #mfProfileCreate .pc-avatar-search {
+  background: #666 !important; border: 1px solid transparent !important; border-radius: 4px !important; box-shadow: none !important; color: #fff !important; font-size: 1.05rem !important; height: 48px; padding: 0 14px !important;
+}
+html body #mfProfileCreate .pc-input::placeholder, html body #mfProfileCreate .pc-avatar-search::placeholder { color: #d0d0d0; }
+html body #mfProfileCreate .pc-input:focus, html body #mfProfileCreate .pc-avatar-search:focus { outline: 2px solid #fff !important; outline-offset: 0; border-color: transparent !important; }
+html body #mfProfileCreate .pc-avatar-picker-toggle { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; gap: 18px !important; }
+html body #mfProfileCreate .pc-avatar-preview { width: 104px !important; height: 104px !important; border-radius: 4px !important; background: #333 !important; font-size: 3rem !important; overflow: hidden; display: grid; place-items: center; box-shadow: none !important; }
+html body #mfProfileCreate .pc-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+html body #mfProfileCreate .pc-avatar-picker-toggle strong { color: #fff !important; font-size: 1.05rem; }
+html body #mfProfileCreate .pc-avatar-picker-toggle small { color: #808080 !important; }
+html body #mfProfileCreate .pc-avatar-picker-arrow { margin-left: auto; color: #b3b3b3 !important; }
+html body #mfProfileCreate .pc-avatar-picker { background: #181818 !important; border: 1px solid #333 !important; border-radius: 4px !important; box-shadow: none !important; padding: 14px !important; }
+html body #mfProfileCreate .pc-avatar-tabs button { background: transparent !important; border: 1px solid #404040 !important; border-radius: 4px !important; color: #d2d2d2 !important; box-shadow: none !important; }
+html body #mfProfileCreate .pc-avatar-tabs button.active { background: #fff !important; border-color: #fff !important; color: #000 !important; }
+html body #mfProfileCreate .pc-avatar-option { background: transparent !important; border: 2px solid transparent !important; border-radius: 4px !important; box-shadow: none !important; color: #b3b3b3 !important; }
+html body #mfProfileCreate .pc-avatar-option img { border-radius: 4px !important; }
+html body #mfProfileCreate .pc-avatar-option:hover { color: #fff !important; }
+html body #mfProfileCreate .pc-avatar-option.selected { border-color: #fff !important; color: #fff !important; }
+html body #mfProfileCreate .pc-avatar-back { background: transparent !important; border: 0 !important; color: #b3b3b3 !important; }
+html body #mfProfileCreate .pc-pin-row { justify-content: flex-start !important; gap: 10px !important; }
+html body #mfProfileCreate .pc-pin-digit { background: #666 !important; border: 1px solid transparent !important; border-radius: 4px !important; box-shadow: none !important; color: #fff !important; width: 52px !important; height: 52px !important; }
+html body #mfProfileCreate .pc-pin-digit:focus { outline: 2px solid #fff !important; }
+html body #mfProfileCreate .pc-btn-row { display: flex !important; flex-direction: row-reverse; justify-content: flex-end; gap: 14px !important; margin-top: 34px !important; padding-top: 22px; border-top: 1px solid #333; }
+html body #mfProfileCreate .pc-btn-save { flex: 0 0 auto !important; background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; font-size: 1.05rem !important; padding: 0 28px !important; height: 46px; letter-spacing: 0.02em; }
+html body #mfProfileCreate .pc-btn-save:hover { background: #e50914 !important; color: #fff !important; }
+html body #mfProfileCreate .pc-btn-cancel { flex: 0 0 auto !important; background: transparent !important; color: #808080 !important; border: 1px solid #808080 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; padding: 0 24px !important; height: 46px; font-size: 1.05rem !important; text-transform: none; }
+html body #mfProfileCreate .pc-btn-cancel:hover { color: #fff !important; border-color: #fff !important; }
+
+html body #mfProfileWelcome { background: #141414 !important; backdrop-filter: none !important; align-items: flex-start !important; overflow-y: auto; padding: 0 !important; }
+html body #mfProfileWelcome .pw-box { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; width: min(720px, 100%) !important; max-width: none !important; margin: 0 auto; padding: clamp(84px, 14vh, 140px) 20px 60px !important; }
+html body #mfProfileWelcome .pw-kicker { color: var(--nf-accent) !important; font-weight: 900; letter-spacing: 0.02em; text-transform: none; font-size: 1.2rem; }
+html body #mfProfileWelcome .pw-title { font-size: clamp(2rem, 5vw, 3.2rem) !important; font-weight: 500 !important; letter-spacing: -0.02em; }
+html body #mfProfileWelcome .pw-subtitle { color: #808080 !important; font-size: 1.1rem !important; margin-bottom: 28px !important; }
+html body #mfProfileWelcome .pw-genre { background: transparent !important; border: 1px solid #595959 !important; border-radius: 4px !important; color: #d2d2d2 !important; font-size: 1rem !important; padding: 12px 18px !important; box-shadow: none !important; }
+html body #mfProfileWelcome .pw-genre:hover { border-color: #fff !important; color: #fff !important; background: transparent !important; }
+html body #mfProfileWelcome .pw-genre.selected { background: #fff !important; border-color: #fff !important; color: #000 !important; font-weight: 700; }
+html body #mfProfileWelcome .pw-actions { justify-content: flex-end !important; flex-direction: row-reverse; gap: 14px !important; margin-top: 36px !important; padding-top: 22px; border-top: 1px solid #333; }
+html body #mfProfileWelcome .pw-save { background: #fff !important; color: #000 !important; border-radius: 4px !important; padding: 0 28px; height: 46px; font-weight: 700 !important; font-size: 1.05rem; }
+html body #mfProfileWelcome .pw-skip { border: 1px solid #808080 !important; border-radius: 4px !important; color: #808080 !important; padding: 0 24px; height: 46px; font-size: 1.05rem; }
+html body #mfProfileWelcome .pw-skip:hover { color: #fff !important; border-color: #fff !important; }
+@media (max-width: 699px) {
+  html body #mfProfileCreate .pc-avatar-preview { width: 84px !important; height: 84px !important; }
+  html body #mfProfileCreate .pc-btn-row, html body #mfProfileWelcome .pw-actions { flex-direction: column-reverse; }
+  html body #mfProfileCreate .pc-btn-save, html body #mfProfileCreate .pc-btn-cancel, html body #mfProfileWelcome .pw-save, html body #mfProfileWelcome .pw-skip { width: 100%; }
+}
+
+/* ============================================================
+   Novinky (zvonek)
+   ============================================================ */
+html body .notif-panel { width: min(420px, calc(100vw - 24px)) !important; max-height: min(640px, calc(100vh - var(--nf-bar-h) - 24px)) !important; display: none; flex-direction: column; overflow: hidden; padding: 0 !important; }
+html body .notif-panel.open { display: flex !important; }
+html body .notif-panel-title { font-size: 1.05rem !important; font-weight: 700 !important; color: #fff !important; letter-spacing: 0 !important; text-transform: none !important; }
+html body .notif-panel-list { flex: 1 1 auto; overflow-y: auto; padding: 4px 8px 10px !important; max-height: none !important; }
+
+/* ============================================================
+   Notebooky (13–15", cca 1024–1600 px) – nic se nepřekrývá
+   ============================================================ */
+@media (min-width: 900px) and (max-width: 1599px) {
+  html body #seriesModal .modal-hero-content { flex-direction: column !important; align-items: flex-start !important; justify-content: flex-end !important; gap: 14px !important; }
+  html body #seriesModal .modal-hero-left { flex: 0 0 auto !important; width: 100%; }
+  html body #seriesModal .panel-btns { flex-wrap: wrap !important; width: 100%; gap: 8px !important; }
+  html body #seriesModal .panel-btns > * { white-space: nowrap; }
+}
+@media (min-width: 900px) and (max-height: 860px) {
+  .nf-hero { height: clamp(400px, 70vh, 600px); }
+  .nf-hero-body { padding-bottom: clamp(84px, 14vh, 120px); }
+  .nf-hero-title { font-size: clamp(2rem, 4.2vw, 3.4rem); }
+  html body #seriesModal .modal-hero { min-height: clamp(250px, 42vh, 380px); }
+  .nf-row { margin-bottom: 18px; }
+}
+@media (min-width: 900px) and (max-width: 1099px) {
+  html body #mfDock .dock-btn { padding: 10px 10px; font-size: 0.9rem; }
+  .nf-hero-body { width: min(560px, 100%); }
+}
+html body .mf-cin-season-chip.active, html body .mf-cin-season-chip.active:hover { color: #fff !important; }
+
+/* Scroll-hide docku (js/dock.js přepíná třídu mf-dock-hidden) */
+html body #mfDock.mf-dock { transition: transform .3s ease; }
+html body #mfDock.mf-dock.mf-dock-hidden { transform: translateY(130%); }
+
+/* Cinema: tlačítko Oblíbené je jen srdíčko, drží se vpravo (dřív tam tlačilo odsazení tlačítko s varováním) */
+#mfStandaloneCinema .mf-cin-fav-btn { margin-left: auto; width: 40px; padding: 0; font-size: 1.25rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+#mfStandaloneCinema .mf-cin-fav-btn.faved { color: #ff375f; }
+
+/* ═════════ Okno seriálu – výběr epizod v Netflix stylu (seznam řádků + výběr sezóny) ═════════ */
+#seriesModal .ep-view-bar {
+  display: flex !important; align-items: center !important; gap: 14px !important;
+  padding: 18px clamp(16px, 3vw, 40px) 10px !important; background: transparent !important; border: 0 !important;
+}
+#seriesModal .ep-view-title { display: none !important; }
+#seriesModal .ep-view-back {
+  background: transparent !important; border: 0 !important; color: #bcbcbc !important; font-size: 0.85rem !important;
+  display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px 6px 0 !important; cursor: pointer;
+}
+#seriesModal .ep-view-back:hover { color: #fff !important; }
+#seriesModal .ep-view-back svg { width: 16px; height: 16px; }
+#seriesModal .nfx-season-select {
+  margin-left: auto; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background: #242424 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23fff' stroke-width='2'/></svg>") no-repeat right 12px center;
+  color: #fff; border: 1px solid #4d4d4d; border-radius: 4px; padding: 9px 34px 9px 14px; font: 600 0.95rem/1 inherit; font-family: inherit;
+}
+#seriesModal .nfx-season-select:hover, #seriesModal .nfx-season-select:focus-visible { border-color: #fff; outline: 0; }
+#seriesModal .nfx-season-select:disabled { opacity: 0.45; cursor: default; }
+#seriesModal .season-all-btn {
+  background: transparent !important; border: 0 !important; color: #bcbcbc !important; font-size: 0.82rem !important; padding: 6px 4px !important; cursor: pointer;
+}
+#seriesModal .season-all-btn:hover { color: #fff !important; }
+
+#seriesModal #episodesGrid.episode-grid {
+  display: flex !important; flex-direction: column; gap: 0 !important; padding: 0 clamp(8px, 3vw, 40px) 90px !important; background: transparent !important;
+}
+#seriesModal #episodesGrid .episode-card {
+  position: relative; display: grid !important; grid-template-columns: 44px 168px minmax(0, 1fr); align-items: center; column-gap: 18px;
+  width: auto !important; max-width: none !important; min-height: 0 !important; height: auto !important; margin: 0 !important;
+  padding: 18px 16px !important; background: transparent !important; border: 0 !important; border-bottom: 1px solid #404040 !important;
+  border-radius: 6px !important; box-shadow: none !important; transform: none !important; cursor: pointer; transition: background 0.15s;
+  counter-increment: none;
+}
+#seriesModal #episodesGrid .episode-card:last-child { border-bottom: 0 !important; }
+#seriesModal #episodesGrid .episode-card:hover { background: #333 !important; }
+#seriesModal #episodesGrid .episode-card::before,
+#seriesModal #episodesGrid .episode-card.next-ep::before {
+  position: static !important; inset: auto !important; width: auto !important; height: auto !important; background: none !important; border: 0 !important; box-shadow: none !important; transform: none !important; border-radius: 0 !important; opacity: 1 !important; animation: none !important; display: block;
+  content: attr(data-n); grid-column: 1; font-size: 1.5rem; font-weight: 500; color: #d2d2d2; text-align: center;
+}
+#seriesModal #episodesGrid .ep-thumb {
+  grid-column: 2; position: relative; width: 168px !important; height: 94px !important; aspect-ratio: 16 / 9; border-radius: 4px !important; overflow: hidden; background: #1a1a1a;
+}
+#seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#seriesModal #episodesGrid .ep-body { grid-column: 3; min-width: 0; padding: 0 !important; background: transparent !important; display: flex; flex-direction: column; gap: 6px; }
+#seriesModal #episodesGrid .ep-meta-row { order: 2; display: flex; gap: 10px; font-size: 0.78rem; color: #a3a3a3; align-items: center; }
+#seriesModal #episodesGrid .ep-num { display: none; }
+#seriesModal #episodesGrid .ep-title { order: 1; font-size: 1.05rem !important; font-weight: 600 !important; color: #fff !important; letter-spacing: 0; }
+#seriesModal #episodesGrid .ep-desc {
+  order: 3; font-size: 0.88rem !important; line-height: 1.45; color: #d2d2d2 !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+#seriesModal #episodesGrid .ep-actions { order: 4; display: flex; gap: 10px; align-items: center; margin-top: 4px; }
+#seriesModal #episodesGrid .ep-btn-play-hbo {
+  display: inline-flex; align-items: center; gap: 8px; background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important;
+  padding: 7px 16px !important; font-weight: 700 !important; font-size: 0.82rem !important; cursor: pointer;
+}
+#seriesModal #episodesGrid .ep-btn-play-hbo:hover { background: rgba(255, 255, 255, 0.78) !important; }
+#seriesModal #episodesGrid .ep-btn-mark {
+  width: 34px; height: 34px; border-radius: 50% !important; border: 1px solid #808080 !important; background: rgba(42, 42, 42, 0.6) !important; color: #fff !important; cursor: pointer; font-size: 0.95rem;
+}
+#seriesModal #episodesGrid .ep-btn-mark:hover { border-color: #fff !important; }
+#seriesModal #episodesGrid .episode-card.watched .ep-title,
+#seriesModal #episodesGrid .episode-card.watched .ep-desc { opacity: 0.55; }
+#seriesModal #episodesGrid .episode-card.next-ep { background: rgba(255, 255, 255, 0.07) !important; }
+#seriesModal #episodesGrid .ep-next-tag { position: absolute; left: 6px; top: 6px; background: var(--accent); color: #fff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+#seriesModal #episodesGrid .ep-hover-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; background: rgba(0, 0, 0, 0.35); transition: opacity 0.15s; cursor: pointer; }
+#seriesModal #episodesGrid .episode-card:hover .ep-hover-play { opacity: 1; }
+#seriesModal #episodesGrid .ep-play-ring { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); }
+#seriesModal #episodesGrid .ep-play-ring svg { width: 12px; height: 14px; fill: #fff; margin-left: 3px; }
+#seriesModal #episodesGrid .ep-seen-dot { display: none; }
+#seriesModal #episodesGrid .episode-card.watched .ep-seen-dot { display: flex; position: absolute; right: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%; background: #46d369; color: #000; font-size: 0.72rem; font-weight: 800; align-items: center; justify-content: center; }
+#seriesModal #episodesGrid .ep-progress-bar-wrap { height: 3px; background: #4d4d4d; border-radius: 2px; overflow: hidden; }
+#seriesModal #episodesGrid .ep-progress-bar-fill { height: 100%; background: var(--accent); }
+@media (max-width: 700px) {
+  #seriesModal #episodesGrid .episode-card { grid-template-columns: 112px minmax(0, 1fr); column-gap: 12px; padding: 14px 6px !important; }
+  #seriesModal #episodesGrid .episode-card::before, #seriesModal #episodesGrid .episode-card.next-ep::before { display: none !important; }
+  #seriesModal #episodesGrid .ep-thumb { grid-column: 1; width: 112px !important; height: 63px !important; }
+  #seriesModal #episodesGrid .ep-body { grid-column: 2; }
+  #seriesModal #episodesGrid .ep-desc { -webkit-line-clamp: 2; font-size: 0.8rem !important; }
+  #seriesModal #episodesGrid .ep-btn-play-hbo { padding: 6px 12px !important; }
+}
+
+/* Epizody: číslo vlevo, bez šipek ze starého stylu */
+html body #seriesModal #episodesGrid .episode-card::after,
+html body #seriesModal #episodesGrid .episode-card .ep-actions::after { display: none !important; content: none !important; }
+
+/* Vytvoření profilu – avatar vedle jmen, výběr avatara na celou obrazovku (styl Netflix "Přidat profil") */
+html body #mfProfileCreate .pc-box { width: min(760px, 100%) !important; }
+html body #mfProfileCreate .pc-edit-row { display: flex; gap: 28px; align-items: flex-start; margin-top: 8px; }
+html body #mfProfileCreate .pc-fields { flex: 1; min-width: 0; }
+html body #mfProfileCreate .pc-fields .pc-label:first-child { margin-top: 0 !important; }
+html body #mfProfileCreate .pc-avatar-picker-toggle { position: relative; flex: none; margin-top: 4px; cursor: pointer; }
+html body #mfProfileCreate .pc-avatar-picker-toggle:hover .pc-avatar-preview { outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-avatar-edit {
+  position: absolute; right: -8px; bottom: -8px; width: 34px; height: 34px; border-radius: 50%; background: #141414; border: 2px solid #fff;
+  color: #fff; display: grid; place-items: center; font-size: 0.95rem;
+}
+html body #mfProfileCreate .pc-avatar-picker {
+  position: fixed !important; inset: 0 !important; z-index: 20; background: #141414 !important; border: 0 !important; border-radius: 0 !important;
+  padding: 0 var(--nf-pad) 40px !important; overflow-y: auto; display: block;
+}
+html body #mfProfileCreate .pc-avatar-picker[hidden] { display: none !important; }
+html body #mfProfileCreate .pc-picker-head { display: flex; align-items: center; gap: 14px; padding: 22px 0 18px; font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 600; color: #fff; }
+html body #mfProfileCreate .pc-picker-back { background: transparent; border: 0; color: #fff; font-size: 2.4rem; line-height: 1; cursor: pointer; padding: 0 8px; }
+html body #mfProfileCreate .pc-avatar-tabs { max-width: 420px; margin-bottom: 14px; }
+html body #mfProfileCreate .pc-avatar-search { max-width: 420px; margin-bottom: 18px; }
+html body #mfProfileCreate .pc-avatar-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 16px; max-height: none !important; overflow: visible !important; }
+html body #mfProfileCreate .pc-avatar-option { padding: 0 !important; display: flex; flex-direction: column; gap: 8px; text-align: left; font-size: 0.85rem; cursor: pointer; }
+html body #mfProfileCreate .pc-avatar-option img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; }
+html body #mfProfileCreate .pc-avatar-option.pc-character-option img { aspect-ratio: 1; }
+html body #mfProfileCreate .pc-avatar-option:hover img, html body #mfProfileCreate .pc-avatar-option:focus-visible img { outline: 3px solid #fff; }
+@media (max-width: 640px) {
+  html body #mfProfileCreate .pc-edit-row { flex-direction: column; gap: 22px; }
+  html body #mfProfileCreate .pc-avatar-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+}
+
+/* Zadání PIN profilu – celá obrazovka, čtyři políčka */
+html body #mfPinModal { background: #141414 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html body #mfPinModal .pm-box {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; width: min(380px, 100%) !important;
+  padding: 24px 20px !important; display: flex; flex-direction: column; align-items: center; animation: none !important;
+}
+html body #mfPinModal .pm-avatar {
+  width: 112px !important; height: 112px !important; border-radius: 6px !important; background: #333 !important; border: 0 !important; box-shadow: none !important;
+  font-size: 3.4rem !important; display: grid; place-items: center; overflow: hidden;
+}
+html body #mfPinModal .pm-title { font-size: 1.3rem !important; font-weight: 600 !important; color: #fff !important; margin-top: 14px; }
+html body #mfPinModal .pm-sub { font-size: 1.55rem !important; font-weight: 500; color: #fff !important; margin: 18px 0 14px !important; }
+html body #mfPinModal .pm-dots { display: flex; gap: 10px; margin-bottom: 22px; }
+html body #mfPinModal .pm-dot {
+  width: 54px !important; height: 64px !important; border-radius: 4px !important; border: 2px solid #808080 !important; background: transparent !important; box-shadow: none !important;
+  display: grid; place-items: center; transition: border-color 0.15s;
+}
+html body #mfPinModal .pm-dot.filled { border-color: #fff !important; }
+html body #mfPinModal .pm-dot.filled::after { content: "•"; color: #fff; font-size: 2.2rem; line-height: 1; }
+html body #mfPinModal .pm-dot.error { border-color: #e50914 !important; animation: nfPinShake 0.35s; }
+html body #mfPinModal .pm-dot.error::after { content: "•"; color: #e50914; font-size: 2.2rem; line-height: 1; }
+@keyframes nfPinShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+html body #mfPinModal .pm-numpad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; justify-content: center; }
+html body #mfPinModal .pm-num {
+  width: 72px !important; height: 52px !important; border-radius: 4px !important; background: #2a2a2a !important; border: 0 !important; box-shadow: none !important;
+  color: #fff !important; font-size: 1.3rem !important; font-weight: 600 !important; transform: none !important;
+}
+html body #mfPinModal .pm-num:hover { background: #3a3a3a !important; }
+html body #mfPinModal .pm-num:active { background: #555 !important; }
+html body #mfPinModal .pm-cancel { margin-top: 22px; background: transparent !important; border: 1px solid #808080 !important; color: #b3b3b3 !important; border-radius: 4px !important; padding: 9px 26px !important; font-size: 0.95rem !important; cursor: pointer; }
+html body #mfPinModal .pm-cancel:hover { color: #fff !important; border-color: #fff !important; }
+html body #mfProfileCreate .pc-avatar-picker-toggle { width: auto !important; max-width: none !important; display: block !important; }
+html body #mfProfileCreate .pc-avatar-picker { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; z-index: 50 !important; box-sizing: border-box; }
+html body #mfProfileCreate .pc-picker-head { padding-top: 84px; }
+
+/* Výběr série – mřížka plakátů ve stylu Netflix */
+html body #seriesModal #ssvGrid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: 14px !important; padding: 0 var(--nf-pad, 24px) 32px !important; }
+html body #seriesModal #ssvGrid .ssv-card {
+  position: relative; aspect-ratio: 2 / 3; width: auto !important; height: auto !important; min-width: 0 !important; border: 0 !important; border-radius: 6px !important;
+  background: #2a2a2a !important; box-shadow: none !important; overflow: hidden; cursor: pointer; outline: none; transition: transform 0.2s !important;
+}
+html body #seriesModal #ssvGrid .ssv-card::after { display: none !important; content: none !important; }
+html body #seriesModal #ssvGrid .ssv-card img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important; filter: none !important; transform: none !important; }
+html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(1.04) !important; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important; z-index: 2; }
+html body #seriesModal #ssvGrid .ssv-card.ssv-active { outline: 2px solid #fff !important; outline-offset: -2px; }
+html body #seriesModal #ssvGrid .ssv-info {
+  position: absolute !important; left: 0; right: 0; bottom: 0; padding: 36px 12px 12px !important; background: linear-gradient(to top, rgba(0, 0, 0, 0.88), transparent) !important; text-align: left;
+}
+html body #seriesModal #ssvGrid .ssv-num { color: #fff !important; font-size: 1rem !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; }
+html body #seriesModal #ssvGrid .ssv-name { display: none !important; }
+html body #seriesModal #ssvGrid .ssv-ep-count { color: #b3b3b3 !important; font-size: 0.78rem !important; font-weight: 400 !important; margin-top: 2px; }
+html body #seriesModal #ssvGrid .ssv-play-overlay { position: absolute !important; inset: 0 !important; display: flex !important; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.35) !important; opacity: 0; transition: opacity 0.2s; }
+html body #seriesModal #ssvGrid .ssv-card:hover .ssv-play-overlay, html body #seriesModal #ssvGrid .ssv-card:focus-visible .ssv-play-overlay { opacity: 1; }
+html body #seriesModal #ssvGrid .ssv-play-btn {
+  width: 52px !important; height: 52px !important; padding: 0 !important; border-radius: 50% !important; border: 2px solid #fff !important; background: rgba(0, 0, 0, 0.55) !important;
+  box-shadow: none !important; display: grid !important; place-items: center; font-size: 0 !important; transform: none !important; min-width: 0 !important;
+}
+html body #seriesModal #ssvGrid .ssv-play-btn svg { width: 20px !important; height: 20px !important; fill: #fff !important; margin: 0 0 0 3px !important; }
+html body #seriesModal #ssvGrid .ssv-active-badge {
+  top: 8px !important; right: 8px !important; left: auto !important; width: 24px !important; height: 24px !important; border-radius: 50% !important;
+  background: #46d369 !important; box-shadow: none !important; border: 0 !important;
+}
+html body #seriesModal #ssvGrid .ssv-active-badge svg { width: 14px !important; height: 14px !important; stroke: #fff !important; }
+@media (max-width: 640px) { html body #seriesModal #ssvGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; } }
+html body #seriesModal #ssvGrid .ssv-info { z-index: 3 !important; }
+html body #mfProfileCreate.picker-open .pc-logo, html body #mfProfileCreate.picker-open .pc-close { display: none !important; }
+
+/* Hvězdička v kině a okno hodnocení nad kinem */
+#mfStandaloneCinema .mf-cin-rate-btn { margin-left: 0; opacity: 0.6; }
+#mfStandaloneCinema .mf-cin-rate-btn:hover { opacity: 1; }
+#mfStandaloneCinema .mf-cin-rate-btn:hover { color: #ffd60a; }
+html body #epRatingOverlay { z-index: 1000002 !important; }
+
+/* Písmo Netflix Sans (složka fonts/); když chybí, nastoupí systémové */
+:root { --nf-font: "Netflix Sans", "Helvetica Neue", Helvetica, "Segoe UI", Roboto, Arial, sans-serif; }
+html body, html body button, html body input, html body select, html body textarea,
+html body *:not(svg):not(svg *):not(code):not(pre) { font-family: var(--nf-font) !important; }
+
+/* Mobil: tlačítko zavřít okno seriálu níž (pod výřez/notch) */
+@media (max-width: 899px) {
+  html body #seriesModal .close-btn { top: calc(env(safe-area-inset-top, 0px) + 46px) !important; right: 14px !important; }
+}
+
+/* Hover méně rušivý: na dotykových zařízeních vůbec, na myši jen jemně a bez zachytávání kliků */
+#seriesModal .ssv-play-overlay, #seriesModal .ep-hover-play { pointer-events: none; }
+@media (hover: none), (pointer: coarse) {
+  html body #seriesModal #ssvGrid .ssv-card:hover { transform: none !important; box-shadow: none !important; }
+  html body #seriesModal #ssvGrid .ssv-card:hover .ssv-play-overlay, html body #seriesModal #episodesGrid .episode-card:hover .ep-hover-play { opacity: 0 !important; }
+  html body #seriesModal #episodesGrid .episode-card:hover { background: transparent !important; }
+}
+@media (hover: hover) and (pointer: fine) {
+  html body #seriesModal #ssvGrid .ssv-card:hover { transform: scale(1.02) !important; }
+  html body #seriesModal #ssvGrid .ssv-play-overlay { background: rgba(0, 0, 0, 0.18) !important; }
+}
+
+/* Výkon: dlouhé seznamy se vykreslují až při zobrazení, rozmazání pozadí (drahé na GPU) jen na stolním počítači */
+#seriesModal #episodesGrid .episode-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+@media (max-width: 899px), (pointer: coarse) {
+  html body *, html body *::before, html body *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body *, html body *::before, html body *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Okno seriálu: nižší hlavička v klidu, při scrollování seznamu se ještě zmenší (třída nf-compact) */
+html body #seriesModal .modal-hero { min-height: clamp(220px, 34vh, 360px) !important; transition: min-height 0.25s ease; }
+html body #seriesModal.nf-compact .modal-hero { min-height: 0 !important; height: 112px !important; }
+html body #seriesModal.nf-compact .modal-hero-content { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important; padding-top: 0 !important; padding-bottom: 12px !important; }
+html body #seriesModal.nf-compact .modal-hero-left h2 { font-size: clamp(1.1rem, 2.4vw, 1.6rem) !important; margin: 0 !important; }
+html body #seriesModal.nf-compact .modal-meta-row, html body #seriesModal.nf-compact .panel-progress-wrap { display: none !important; }
+html body #seriesModal.nf-compact .panel-btns { width: auto !important; flex-wrap: nowrap !important; }
+html body #seriesModal.nf-compact .panel-btns > * { padding: 6px 12px !important; font-size: 0.8rem !important; }
+html body #seriesModal.nf-compact .btn-shuffle { display: none !important; }
+@media (max-width: 899px) { html body #seriesModal .modal-hero { min-height: clamp(200px, 30vh, 300px) !important; } html body #seriesModal.nf-compact .modal-hero { height: 96px !important; } }
+html body #seriesModal.nf-compact .modal-hero-content { padding-right: 64px !important; box-sizing: border-box !important; width: 100% !important; }
+html body #seriesModal.nf-compact .modal-hero-left { min-width: 0 !important; flex: 1 1 auto !important; width: auto !important; }
+html body #seriesModal.nf-compact .modal-hero-left h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html body #seriesModal.nf-compact .panel-btns { flex: none !important; }
+
+/* Hodnocení epizody: malý popover, nic nezakrývá a neblokuje klikání (overlay propouští kliky, jen bublina je klikací) */
+html body #epRatingOverlay.er-pop { pointer-events: none !important; background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; align-items: flex-start !important; }
+html body #epRatingOverlay.er-pop #epRatingSheet {
+  pointer-events: auto; position: absolute !important; max-width: none !important; border-radius: 12px !important; padding: 12px 16px 12px !important; background: #181818 !important;
+  border: 1px solid #333; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65); opacity: 0; transform: scale(0.6) !important;
+  transition: transform 0.25s cubic-bezier(0.2, 1.15, 0.4, 1), opacity 0.2s ease !important;
+}
+html body #epRatingOverlay.er-pop.er-corner #epRatingSheet { right: 16px; bottom: calc(92px + env(safe-area-inset-bottom)); top: auto !important; left: auto !important; width: min(300px, calc(100vw - 32px)); transform-origin: 100% 100%; }
+html body #epRatingOverlay.er-pop.open #epRatingSheet { opacity: 1; transform: scale(1) !important; }
+html body #epRatingOverlay.er-pop .er-handle, html body #epRatingOverlay.er-pop .er-label, html body #epRatingOverlay.er-pop .er-actions { display: none !important; }
+html body #epRatingOverlay.er-pop .er-ep-name { margin-bottom: 8px; font-size: 0.9rem; }
+html body #epRatingOverlay.er-pop .er-series-name { font-size: 0.64rem; }
+html body #epRatingOverlay.er-pop .er-star { font-size: 1.5rem; }
+
+/* Dlouhé názvy nesmí zasahovat do horní lišty: max. 2 řádky, menší písmo */
+html body .nf-hero-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: clamp(1.8rem, 4.4vw, 3.6rem) !important; }
+html body .nf-hero-title.nf-long { font-size: clamp(1.5rem, 3.2vw, 2.6rem) !important; line-height: 1.08; }
+html body .nf-hero-body { max-height: calc(100% - var(--nf-bar-h, 64px) - 24px); }
+
+/* Průvodce novým profilem se objeví hned a celý neprůhledný – pod ním nesmí problikávat domovská stránka */
+html body #mfProfileWelcome.show { animation: none !important; }
+
+/* Výkon: Netflix vzhled nepotřebuje rozmazání pozadí (drahé na GPU, zejména ve Firefoxu a na monitorech s vysokým Hz) */
+html body *, html body *::before, html body *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
