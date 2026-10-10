@@ -1875,7 +1875,7 @@ async function fetchRecommendedNews() {
   const anime = window.mfLikesAnime && window.mfLikesAnime();
   const qa = async type => {
     const dateKey = "tv" === type ? "first_air_date" : "primary_release_date";
-    const d = await tmdbGet(`/discover/${type}?language=cs-CZ&sort_by=popularity.desc&vote_count.gte=5&${dateKey}.gte=${iso(from)}&${dateKey}.lte=${iso(today)}${window.MF_ANIME_QUERY}`);
+    const d = await tmdbGet(`/discover/${type}?language=cs-CZ&sort_by=popularity.desc&vote_count.gte=0&${dateKey}.gte=${iso(new Date(Date.now() - 150 * 864e5))}&${dateKey}.lte=${iso(today)}${window.MF_ANIME_QUERY}`);
     return ((d && d.results) || []).filter(r => r && r.id && !seen.has(String(r.id)) && r.poster_path).map(r => ({
       id: r.id, type, title: r.title || r.name || "", poster: r.poster_path,
       year: String(r.release_date || r.first_air_date || "").slice(0, 4), rating: r.vote_average ? r.vote_average.toFixed(1) : ""
@@ -1889,7 +1889,7 @@ async function fetchRecommendedNews() {
   if (anime && !(window.mfOnlyAnime && window.mfOnlyAnime())) {
     const [am, at] = await Promise.all([qa("movie"), qa("tv")]);
     const ids = new Set([...movies, ...shows].map(r => r.id));
-    shows = [...at.filter(r => !ids.has(r.id)).slice(0, 2), ...shows], movies = [...am.filter(r => !ids.has(r.id)).slice(0, 1), ...movies]
+    shows = [...at.filter(r => !ids.has(r.id)).slice(0, 4), ...shows], movies = [...am.filter(r => !ids.has(r.id)).slice(0, 2), ...movies]
   }
   if (movies.length + shows.length < 4 && !(window.mfOnlyAnime && window.mfOnlyAnime())) [movies, shows] = await Promise.all([q("movie", !1), q("tv", !1)]);
   const out = [];
