@@ -1,7 +1,11 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33289710/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33289872/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
+
+- Avatar, výchozí nabídka: seriály, Marvel/DC, Star Wars, Harry Potter, animované a filmové postavy jsou první, anime je jen pár řad na konci.
+- Avatar, hledání: nové zdroje TVmaze (postavy z obsazení seriálu), superhrdinové (akabab/superhero-api) a Disney (disneyapi.dev) vedle Wikipedie a AniList. Hledání „Breaking Bad“ ukáže postavy seriálu, „Batman“ superhrdiny, „Elsa“ Disney postavy.
+- Uvítací „Ahoj, …“ a odznak profilu se už nezobrazují (pojistka proti prázdnému rámečku v rohu).
 
 - PIN: jen 5 pokusů. Po špatném pokusu se ukáže, kolik jich zbývá; po pátém se zadávání zablokuje s odpočtem a zámek se stupňuje (30 s → 2 min → 10 min → 30 min → 1 h → 4 h → 24 h). Stav se pamatuje po profilech (obnovení stránky ho neobejde), správný PIN ho vynuluje.
 
