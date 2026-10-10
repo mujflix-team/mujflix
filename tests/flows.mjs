@@ -548,7 +548,7 @@ const av2 = await page.evaluate(async () => {
   opts[0].click(); out.picked = ProfileGate._selectedAvatar;
   window.fetch = orig; return out;
 });
-check("avatar: výchozí nabídka jsou postavy (anime + seriály, Marvel/DC, filmy), výběr se uloží", av2.n >= 2 && av2.rows >= 2 && /anilist\.co\/g\.png$/.test(av2.picked || ""), JSON.stringify(av2));
+check("avatar: výchozí nabídka jsou postavy (anime + seriály, Marvel/DC, filmy), výběr se uloží", av2.n >= 2 && av2.rows >= 2 && /wikimedia\.org\/b\.jpg$/.test(av2.picked || ""), JSON.stringify(av2));
 
 const dd = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
@@ -704,7 +704,11 @@ const charT = await page.evaluate(async () => {
   const orig = window.fetch;
   window.fetch = async (u) => {
     u = String(u);
-    const body = /anilist/.test(u) ? { data: { Page: { characters: [{ name: { full: "Naruto Uzumaki" }, image: { large: "https://s4.anilist.co/n.png" }, media: { nodes: [{ title: { english: "Naruto" } }] } }] } } }
+    const body = /tvmaze\.com\/search/.test(u) ? [{ show: { id: 5, name: "Breaking Bad" } }]
+      : /tvmaze\.com\/shows/.test(u) ? [{ character: { name: "Walter White", image: { medium: "http://static.tvmaze.com/w.jpg" } } }]
+      : /superhero/.test(u) ? [{ name: "Walter Kovacs", biography: { publisher: "DC Comics" }, images: { md: "https://cdn.x/b.jpg" } }]
+      : /disneyapi/.test(u) ? { data: [{ name: "Elsa", imageUrl: "https://static.wikia.nocookie.net/e.png" }] }
+      : /anilist/.test(u) ? { data: { Page: { characters: [{ name: { full: "Naruto Uzumaki" }, image: { large: "https://s4.anilist.co/n.png" }, media: { nodes: [{ title: { english: "Naruto" } }] } }] } } }
       : { query: { pages: { 1: { index: 1, title: "Walter White", thumbnail: { source: "https://upload.wikimedia.org/w.jpg" } } } } };
     return { ok: true, json: async () => body };
   };
@@ -717,7 +721,7 @@ const charT = await page.evaluate(async () => {
   const out = { names, picked: ProfileGate._selectedAvatar };
   window.fetch = orig; ProfileGate.closeCreate(); return out;
 });
-check("avatar: hledání nabídne postavy z AniList a Wikipedie a vybere je", charT.names.includes("Naruto Uzumaki") && charT.names.includes("Walter White") && /anilist\.co\/n\.png$/.test(charT.picked || ""), JSON.stringify(charT));
+check("avatar: hledání nabídne postavy z AniList a Wikipedie a vybere je", ["Naruto Uzumaki", "Walter White", "Elsa"].every(n => charT.names.includes(n)) && charT.names.some(n => /^Walter Kovacs/.test(n)) && /tvmaze\.com\/w\.jpg$/.test(charT.picked || ""), JSON.stringify(charT));
 
 const pinAv = await page.evaluate(() => {
   ProfileGate._setPinAvatar("https://s4.anilist.co/x.png");
