@@ -866,3 +866,7 @@ html body #mfPinModal .pm-msg { min-height: 1.4em; margin: -8px 0 12px; font-siz
 html body #mfPinModal .pm-msg.err { color: #ff6b6b; }
 html body #mfPinModal .pm-msg.lock { color: #ffb84d; font-weight: 600; }
 html body #mfPinModal .pm-numpad.locked { opacity: 0.35; pointer-events: none; }
+
+/* Pojistka proti prázdnému rámečku v rohu: uvítací poznámka a odznak se na obrazovkách profilu nikdy nezobrazí */
+html body #mfWelcomeNote { display: none !important; }
+html body #mfWelcomeNote:empty, html body #mfProfileCreate.show ~ #mfWelcomeNote { display: none !important; }
