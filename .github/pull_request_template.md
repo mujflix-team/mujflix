@@ -1,4 +1,3 @@
-[pull_request_template.md](https://github.com/user-attachments/files/33306958/pull_request_template.md)
 ## Co se změnilo
 -
 
