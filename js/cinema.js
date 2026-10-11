@@ -351,8 +351,8 @@
           '<button type="button" class="mf-cin-ep-btn mf-cin-next-series" id="mfCinNextSeries">Další seriál</button>' +
         "</div>" +
 
-        '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených" title="Přidat do Oblíbených">♡</button>' +
         '<button type="button" class="mf-cin-fav-btn mf-cin-rate-btn" id="mfCinRateBtn" aria-label="Ohodnotit" title="Ohodnotit" style="display:none">☆</button>' +
+        '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených" title="Přidat do Oblíbených">♡</button>' +
         '<button type="button" class="mf-cin-switch-btn" id="mfCinSwitchSrc">Jiný zdroj</button>' +
       "</div>" +
 
@@ -938,8 +938,8 @@
       white-space: nowrap;
     `;
     badge.innerHTML = `
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M9 20h6M12 17v3"/><path d="M10.5 8.2v5.6l4.6-2.8z" fill="currentColor"/>
       </svg>
       <span id="legalBadgeText">Kde sledovat?</span>
     `;
