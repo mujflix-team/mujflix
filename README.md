@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/33299271/README.md)
 # 🎬 MůjFlix
 
 **MůjFlix je osobní filmový a seriálový tracker, který ti pomůže najít, kde sledovat filmy a seriály z různých zdrojů** — ať už jde o legální streamingové služby (Netflix, Disney+, Max, Apple TV+…) nebo o české a slovenské weby s online filmy (Bombuj, SvetSerialu, Prehrajto). Sleduj, co jsi viděl, dostávej chytrá doporučení a měj vše na jednom místě.
