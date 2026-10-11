@@ -269,6 +269,56 @@
         if (p && p.color) b.style.setProperty('--nf-avatar', p.color);
       }
 
+      /* Menu profilu vpravo nahoře (jako Netflix): rychlé přepnutí, Upravit profil, Spravovat profily */
+      function mfCloseProfileMenu() {
+        var m = document.getElementById('nfProfileMenu');
+        if (m) m.remove();
+        document.removeEventListener('pointerdown', mfProfileMenuOutside, true);
+        document.removeEventListener('keydown', mfProfileMenuKey, true);
+      }
+      function mfProfileMenuOutside(e) {
+        var m = document.getElementById('nfProfileMenu');
+        if (m && !m.contains(e.target) && !(e.target.closest && e.target.closest('#nfAvatar'))) mfCloseProfileMenu();
+      }
+      function mfProfileMenuKey(e) { if (e.key === 'Escape') mfCloseProfileMenu(); }
+      window.mfToggleProfileMenu = function (btn) {
+        if (document.getElementById('nfProfileMenu')) return mfCloseProfileMenu();
+        var cur = nfActiveProfile(), list = [];
+        try { list = JSON.parse(localStorage.getItem('mf_profiles_v2') || '[]'); } catch (e) {}
+        var avatarHtml = function (p) {
+          var av = p.avatar || '🙂';
+          return /^https?:\/\//i.test(av) ? '<img src="' + esc(av) + '" alt="" referrerpolicy="no-referrer">' : esc(av);
+        };
+        var others = list.filter(function (p) { return !cur || p.id !== cur.id; });
+        var m = document.createElement('div');
+        m.id = 'nfProfileMenu'; m.setAttribute('role', 'menu');
+        m.innerHTML =
+          (others.length ? others.map(function (p) {
+            return '<button type="button" role="menuitem" class="nf-pm-item" data-pid="' + esc(p.id) + '"><span class="nf-pm-av" style="--c:' + esc(p.color || '#0a84ff') + '">' + avatarHtml(p) + '</span><span>' + esc(p.name || 'Profil') + '</span></button>';
+          }).join('') + '<div class="nf-pm-sep"></div>' : '') +
+          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="edit"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Upravit profil</span></button>' +
+          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="manage"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M17 5v6M14 8h6"/></svg><span>Spravovat profily</span></button>' +
+          '<div class="nf-pm-sep"></div>' +
+          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="sync"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/></svg><span>Propojit zařízení</span></button>';
+        document.body.appendChild(m);
+        var r = btn.getBoundingClientRect();
+        m.style.top = Math.round(r.bottom + 12) + 'px';
+        m.style.right = Math.max(12, Math.round(window.innerWidth - r.right)) + 'px';
+        m.addEventListener('click', function (e) {
+          var it = e.target.closest && e.target.closest('.nf-pm-item');
+          if (!it) return;
+          mfCloseProfileMenu();
+          if (it.dataset.pid) { if (window.ProfileGate) ProfileGate.selectProfile(it.dataset.pid); }
+          else if (it.dataset.act === 'edit' && cur && window.ProfileGate) ProfileGate.openCreate(cur.id);
+          else if (it.dataset.act === 'manage' && window.ProfileGate) { ProfileGate.show(); ProfileGate.toggleManageMode(); }
+          else if (it.dataset.act === 'sync' && window.MFSyncUI) MFSyncUI.open('home');
+        });
+        setTimeout(function () {
+          document.addEventListener('pointerdown', mfProfileMenuOutside, true);
+          document.addEventListener('keydown', mfProfileMenuKey, true);
+        }, 0);
+      };
+
       window.nfRenderProfile = nfRenderProfile;
       window.renderHomepage = function () { return renderHomepage.apply(this, arguments); };
       // Po přepnutí/vytvoření profilu překresli doporučení až poté, co se načte paměť AI daného profilu
