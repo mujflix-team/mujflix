@@ -762,6 +762,47 @@ const lockT = await page.evaluate(() => {
 });
 check("PIN: po špatném pokusu zbývající počet, po 5. zámek, který se stupňuje; správný PIN ho nuluje", /Zbývá 4 pokusy/.test(lockT.m1) && /Zbývá 1 pokus$/.test(lockT.m4) && /Zkus to znovu za 0:\d\d/.test(lockT.m5) && lockT.level1 === 1 && lockT.left1 > 0 && lockT.blocked && lockT.level2 === 2 && lockT.longer && lockT.resetOk, JSON.stringify(lockT));
 
+const menuT = await page.evaluate(() => {
+  const a = ProfileGate.createProfile({ name: "MenuA", avatar: "🎬", color: "#007aff", pin: null });
+  const b = ProfileGate.createProfile({ name: "MenuB", avatar: "🦊", color: "#ff6b6b", pin: null });
+  localStorage.setItem("mf_active_pid", a);
+  document.getElementById("mfProfileGate").style.display = "none";
+  mfToggleProfileMenu(document.getElementById("nfAvatar"));
+  const m = document.getElementById("nfProfileMenu");
+  const out = { open: !!m, others: [...m.querySelectorAll("[data-pid]")].map(x => x.dataset.pid), acts: [...m.querySelectorAll("[data-act]")].map(x => x.dataset.act) };
+  m.querySelector("[data-act=edit]").click();
+  out.menuClosed = !document.getElementById("nfProfileMenu");
+  out.title = document.getElementById("pcModalTitle").textContent;
+  out.save = document.querySelector("#mfProfileCreate .pc-btn-save").textContent;
+  out.name = document.getElementById("pcName").value;
+  out.del = document.getElementById("pcDeleteBtn").style.display !== "none";
+  ProfileGate.closeCreate();
+  // správa profilů: bez třesení, klik na avatar otevře úpravu
+  ProfileGate.show(); ProfileGate.toggleManageMode();
+  const item = document.querySelector('.pg-profile-item[data-profile-id="' + b + '"]');
+  const av = item.querySelector(".pg-avatar");
+  out.anim = getComputedStyle(av).animationName;
+  out.overlay = !!item.querySelector(".pg-edit-overlay");
+  const rm = item.querySelector(".pg-remove-btn");
+  out.rmSize = rm.offsetWidth;
+  item.click();
+  out.editTitle = document.getElementById("pcModalTitle").textContent;
+  out.editName = document.getElementById("pcName").value;
+  ProfileGate.closeCreate(); ProfileGate._manageMode = false;
+  document.getElementById("mfProfileGate").style.display = "none";
+  _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
+  return out;
+});
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "edit,manage,sync" && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("Kdo se dívá → Upravit: bez třesení, tužka na avataru, velké červené mínus, klik otevře úpravu", menuT.anim === "none" && menuT.overlay && menuT.rmSize >= 36 && menuT.editTitle === "Uprav si svůj profil" && menuT.editName === "MenuB", JSON.stringify(menuT));
+
+const cinOrder = await page.evaluate(() => {
+  MFCinemaPlayer.open(1, "X", "tv", { season: 1, episode: 1 });
+  const ids = [...document.querySelectorAll("#mfStandaloneCinema .mf-standalone-cinema-top > button")].map(b => b.id).filter(Boolean);
+  MFCinemaPlayer.close(); return ids;
+});
+check("kino: srdce je až za hvězdou", cinOrder.indexOf("mfCinRateBtn") > -1 && cinOrder.indexOf("mfCinFavBtn") === cinOrder.indexOf("mfCinRateBtn") + 1, JSON.stringify(cinOrder));
+
 const nextT = await page.evaluate(() => {
   const slug = "the-simpsons"; const w = getWatched();
   Object.keys(w).filter(k => k.startsWith(slug + "-S")).forEach(k => delete w[k]);
@@ -790,6 +831,126 @@ const contT = await page.evaluate(() => {
   return { first: first && first.kind + ":" + first.title, second: second && second.kind + ":" + second.episode, left: second && second.left, third };
 });
 check("pokračování: film z kina, pak seriál po poslední epizodě; Dokoukal jsem je schová", contT.first === "movie:Matrix" && contT.second === "series:S1 E02" && /^zbývá \d+ (epizod|epizody|epizoda|série|sérií)$/.test(contT.left || "") && !/min/.test(contT.left) && contT.third === null, JSON.stringify(contT));
+
+
+// --- Propojení zařízení (Worker podvržen v paměti)
+await page.evaluate(() => {
+  window.TMDB_PROXY_URL = "https://w.test";
+  const kv = window.__kv = { codes: {}, data: {}, n: 0 };
+  const nativeFetch = window.fetch;
+  window.fetch = async (url, init) => {
+    if (typeof url !== "string" || !url.startsWith("https://w.test/sync/")) return nativeFetch(url, init);
+    const body = JSON.parse(init.body), route = url.slice("https://w.test".length);
+    const out = (o, st = 200) => new Response(JSON.stringify(o), { status: st });
+    if (route === "/sync/code") { const c = "K7M4QX"; kv.codes[c] = body.id; return out({ code: c, ttl: 600 }); }
+    if (route === "/sync/join") { const id = kv.codes[body.code]; if (!id) return out({ error: "Unknown code" }, 404); delete kv.codes[body.code]; return out({ id }); }
+    if (route === "/sync/pull") return out({ data: kv.data[body.id] ? JSON.parse(kv.data[body.id]) : null });
+    if (route === "/sync/push") { kv.n++; kv.data[body.id] = JSON.stringify(body.data); return out({ ok: true }); }
+    return out({}, 404);
+  };
+});
+const sy = await page.evaluate(async () => {
+  const out = {};
+  const PK = "mf_profiles_v2";
+  const clear = () => { Object.keys(localStorage).filter(k => k.startsWith("mf_")).forEach(k => localStorage.removeItem(k)); };
+  clear();
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_A", name: "Anna", created: 1000 }]));
+  localStorage.setItem("mf_watched_p_A", JSON.stringify({ "x-S1-E1": true }));
+  localStorage.setItem("mf_tmdb_key", "SECRET");
+  localStorage.setItem("mf_pin_lock", "{}");
+  const r = await MFSync.createCode();
+  out.code = r.code; out.linkedA = MFSync.isLinked();
+  const blob = JSON.parse(Object.values(__kv.data)[0]);
+  out.keys = Object.keys(blob.keys).sort();
+  const snapA = Object.assign({}, localStorage);
+  // zařízení B
+  clear(); localStorage.removeItem("mf_sync_id");
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_B", name: "Bob", created: 2000 }]));
+  localStorage.setItem("mf_watched_p_B", JSON.stringify({ "y-S1-E1": true }));
+  const bad = await MFSync.join("ZZZZZZ").then(() => "ok", e => e.code);
+  out.badCode = bad;
+  const j = await MFSync.join(r.code);
+  out.changedB = j.changed;
+  out.profilesB = JSON.parse(localStorage.getItem(PK)).map(p => p.id).sort();
+  out.watchedAB = !!localStorage.getItem("mf_watched_p_A") && !!localStorage.getItem("mf_watched_p_B");
+  // B změní data a smaže profil Anna
+  localStorage.setItem("mf_watched_p_B", JSON.stringify({ "y-S1-E1": true, "y-S1-E2": true }));
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_B", name: "Bob", created: 2000 }]));
+  await new Promise(r => setTimeout(r, 20));
+  await MFSync.syncNow({ reload: false });
+  const remote = JSON.parse(Object.values(__kv.data)[0]);
+  out.remoteWatchedB = remote.keys["mf_watched_p_B"] && remote.keys["mf_watched_p_B"].v.includes("E2");
+  out.tomb = !!remote.del["p_A"];
+  // zpět na A: stáhne změny z B
+  clear(); Object.entries(snapA).forEach(([k, v]) => { if (k.startsWith("mf_")) localStorage.setItem(k, v); });
+  const back = await MFSync.syncNow({ reload: false });
+  out.changedA = back.changed;
+  out.profilesA = JSON.parse(localStorage.getItem(PK)).map(p => p.id).sort();
+  out.watchedBonA = (localStorage.getItem("mf_watched_p_B") || "").includes("E2");
+  out.secretKept = localStorage.getItem("mf_tmdb_key") === "SECRET";
+  out.nsync = { key: MFSync._syncable("mf_tmdb_key"), anthropic: MFSync._syncable("mf_anthropic_key"), pin: MFSync._syncable("mf_pin_lock"), active: MFSync._syncable("mf_active_pid"), ok: MFSync._syncable("mf_watched_p_A") };
+  return out;
+});
+check("sync: kód a ID vzniknou, klíče se nahrají bez tajných věcí", /^[A-Z0-9]{6}$/.test(sy.code) && sy.linkedA && sy.keys.includes("mf_watched_p_A") && !sy.keys.includes("mf_tmdb_key") && !sy.keys.includes("mf_pin_lock"), JSON.stringify(sy.keys));
+check("sync: špatný kód se odmítne", sy.badCode === "unknown", String(sy.badCode));
+check("sync: druhé zařízení má profily a data obou stran", sy.profilesB.join() === "p_A,p_B" && sy.watchedAB && sy.changedB, JSON.stringify(sy));
+check("sync: změna a smazání profilu se pošle dál", sy.remoteWatchedB && sy.tomb);
+check("sync: první zařízení dostane změny, smazaný profil zmizí, tajný klíč zůstane", sy.changedA && sy.profilesA.join() === "p_B" && sy.watchedBonA && sy.secretKept, JSON.stringify(sy));
+check("sync: filtr klíčů", sy.nsync.ok && !sy.nsync.key && !sy.nsync.anthropic && !sy.nsync.pin && !sy.nsync.active, JSON.stringify(sy.nsync));
+
+// UI propojení
+await page.evaluate(() => { MFSync.unlink(); MFSyncUI.close(); });
+const syUi = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  MFSyncUI.open("home");
+  const m = document.getElementById("mfSyncModal");
+  out.homeShown = m.classList.contains("show") && m.querySelectorAll(".sy-choice").length === 2 && /Zobrazit kód/.test(m.textContent) && /Mám kód/.test(m.textContent);
+  m.querySelector('[data-sa="show"]').click(); await wait(200);
+  out.code = (document.getElementById("syCode") || {}).textContent;
+  out.qr = !!document.querySelector("#syQr svg");
+  out.timer = /platí ještě/.test((document.getElementById("syTimer") || {}).textContent || "");
+  document.querySelector('[data-sa="home"]').click();
+  out.linkedHome = /propojené/.test(m.textContent) && !!m.querySelector('[data-sa="unlink"]');
+  MFSync.unlink(); MFSyncUI.open("enter");
+  const inp = document.getElementById("mfSyncInput"); inp.value = "abcdef"; inp.dispatchEvent(new Event("input"));
+  out.fmt = inp.value;
+  inp.value = "QQQ QQQ"; document.getElementById("syJoin").click(); await wait(200);
+  out.err = (document.getElementById("syMsg") || {}).textContent;
+  MFSyncUI.close();
+  out.closed = !m.classList.contains("show");
+  return out;
+});
+check("sync UI: úvodní volby, kód + QR + odpočet, propojený stav", syUi.homeShown && /^[A-Z0-9]{3} [A-Z0-9]{3}$/.test(syUi.code) && syUi.qr && syUi.timer && syUi.linkedHome, JSON.stringify(syUi));
+check("sync UI: zadání kódu formátuje a hlásí neplatný kód, zavře se", syUi.fmt === "ABC DEF" && /neplatí/.test(syUi.err) && syUi.closed, JSON.stringify(syUi));
+
+// vstupy a kroky onboardingu
+const syEnt = await page.evaluate(() => {
+  const out = {};
+  out.gateBtn = !!document.getElementById("profileSyncBtn");
+  MFSync.unlink();
+  ProfileGate.openOnboarding("p_x");
+  out.k3 = document.querySelector('#mfProfileWelcome [data-ob-step="1"]').textContent;
+  ProfileGate.finishOnboarding();
+  out.btn2 = document.getElementById("pwStep2Btn").textContent;
+  ProfileGate.onboardingNext();
+  out.step3 = document.getElementById("pwStep3").style.display !== "none" && /jinde/.test(document.getElementById("pwStep3").textContent);
+  ProfileGate.closeOnboarding();
+  // už propojeno → 2 kroky
+  localStorage.setItem("mf_sync_id", "x".repeat(32));
+  ProfileGate.openOnboarding("p_x");
+  out.k2 = document.querySelector('#mfProfileWelcome [data-ob-step="1"]').textContent;
+  ProfileGate.finishOnboarding();
+  out.btn2b = document.getElementById("pwStep2Btn").textContent;
+  ProfileGate.onboardingNext();
+  out.closed = !document.getElementById("mfProfileWelcome").classList.contains("show");
+  MFSync.unlink();
+  return out;
+});
+check("onboarding: nepropojeno = 3 kroky s krokem Propojení", syEnt.k3.endsWith("1/3") && syEnt.btn2 === "Pokračovat" && syEnt.step3, JSON.stringify(syEnt));
+check("onboarding: propojeno = 2 kroky", syEnt.k2.endsWith("1/2") && syEnt.btn2b === "Začít sledovat" && syEnt.closed, JSON.stringify(syEnt));
+check("sync: tlačítko v Kdo se dívá", syEnt.gateBtn);
+const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); const it = document.querySelector('#nfProfileMenu [data-act="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
+check("sync: položka v menu profilu otevře obrazovku", syMenu.ok && syMenu.shown, JSON.stringify(syMenu));
 
 check("žádné JS chyby", errors.length === 0, errors.join(" | "));
 await close();
