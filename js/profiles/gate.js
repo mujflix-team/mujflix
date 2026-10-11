@@ -36,12 +36,13 @@ const ProfileGate = {
             <div class="pg-avatar-wrap">
               <div class="pg-avatar" style="--pg-color:${escapeHTML(t.color||"#007AFF")};${getActiveProfileId()===t.id?"border-color:"+escapeHTML(t.color)+";box-shadow:0 0 0 1px "+escapeHTML(t.color)+",0 8px 40px rgba(0,0,0,0.6);":""}">
                 ${avatar}
+                ${this._manageMode ? '<span class="pg-edit-overlay" aria-hidden="true"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>' : ""}
               </div>
               ${this._manageMode ? `<button class="pg-remove-btn" type="button" aria-label="Odebrat profil ${escapeHTML(t.name)}" onclick="event.stopPropagation(); window.ProfileGate?.removeProfile('${escapeHTML(t.id)}')">−</button>` : ""}
             </div>
             <div class="pg-name">${escapeHTML(t.name)}</div>
           `;
-      n.onclick = () => this._manageMode ? void 0 : ProfileGate.selectProfile(t.id);
+      n.onclick = () => this._manageMode ? ProfileGate.openCreate(t.id) : ProfileGate.selectProfile(t.id);
       e.appendChild(n);
     });
     const n = document.createElement("div");
@@ -193,7 +194,11 @@ const ProfileGate = {
     if (!t) return;
     const _gate = document.getElementById("mfProfileGate");
     if (_gate) _gate.style.pointerEvents = "none";
-    document.getElementById("pcModalTitle").textContent = e ? "Upravit profil" : "Vytvoř si svůj profil";
+    document.getElementById("pcModalTitle").textContent = e ? "Uprav si svůj profil" : "Vytvoř si svůj profil";
+    const _set = (sel, txt) => { const x = t.querySelector(sel); x && (x.textContent = txt) };
+    _set(".pc-eyebrow", e ? "Upravit profil" : "Nový profil"), _set(".pc-subtitle", e ? "Změň si jméno, avatar nebo PIN." : "Vyber si jméno, avatar a barvu. Hotovo za chvilku."), _set(".pc-btn-save", e ? "Uložit změny →" : "Vytvořit profil →");
+    const _del = document.getElementById("pcDeleteBtn");
+    _del && (_del.style.display = e && _getProfiles().length > 1 ? "" : "none");
     const n = document.getElementById("pcName");
     if (e) {
       const t = _getProfiles().find(t => t.id === e);
@@ -212,6 +217,13 @@ const ProfileGate = {
     _pinChk && (_pinChk.checked = !1);
     _pinRow && (_pinRow.style.display = e && _getProfiles().find(t => t.id === e)?.pin ? "flex" : "none");
     t.classList.add("show"), setTimeout(() => n.focus(), 100)
+  },
+  deleteFromEdit() {
+    const id = this._editingId, p = id && _getProfiles().find(x => x.id === id);
+    if (!p || _getProfiles().length < 2) return;
+    if (!confirm("Opravdu smazat profil „" + p.name + "“? Smaže se i jeho sledování a hodnocení.")) return;
+    this.closeCreate(), this.removeProfile(id);
+    if (document.getElementById("mfProfileGate")?.style.display === "none" || getActiveProfileId() !== id) { try { window.nfRenderProfile && window.nfRenderProfile() } catch (e) {} }
   },
   closeCreate() {
     const e = document.getElementById("mfProfileCreate");
@@ -469,16 +481,33 @@ const ProfileGate = {
     n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" onclick="this.classList.toggle('selected')">${t}</button>`).join("");
     t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");
   },
+  /** 3 kroky, pokud jde propojení nabídnout (je nastavené a zařízení ještě není propojené); jinak 2. */
+  _obTotal() {
+    return window.MFSync && window.MFSync.available() && !window.MFSync.isLinked() ? 3 : 2;
+  },
   _onboardingStep(n) {
-    const a = document.getElementById("pwStep1"), b = document.getElementById("pwStep2");
-    if (a) a.style.display = 1 === n ? "" : "none";
-    if (b) b.style.display = 2 === n ? "" : "none";
+    const total = this._obTotal();
+    [1, 2, 3].forEach(i => {
+      const st = document.getElementById("pwStep" + i);
+      if (st) st.style.display = i === n ? "" : "none";
+    });
+    document.querySelectorAll("#mfProfileWelcome [data-ob-step]").forEach(k => {
+      k.textContent = "MůjFlix · " + k.dataset.obStep + "/" + total;
+    });
+    const btn = document.getElementById("pwStep2Btn");
+    if (btn) btn.textContent = total === 3 ? "Pokračovat" : "Začít sledovat";
     if (2 === n) {
       const l = document.getElementById("pwAdblockLink");
       if (l && window.mfAdblock) l.innerHTML = window.mfAdblock.linkHtml();
     }
     const w = document.getElementById("mfProfileWelcome");
     w && w.scrollTo && w.scrollTo(0, 0);
+  },
+  onboardingNext() {
+    this._obTotal() === 3 ? this._onboardingStep(3) : this.closeOnboarding();
+  },
+  onboardingLink(screen) {
+    window.MFSyncUI && window.MFSyncUI.open(screen);
   },
   skipOnboardingGenres() {
     const e = document.getElementById("mfProfileWelcome");
@@ -504,6 +533,7 @@ const ProfileGate = {
     this._onboardingStep(2);
   },
   renderBadge() {
+    try { window.nfRenderProfile && window.nfRenderProfile() } catch (e) {}
     const e = getActiveProfile(),
       t = document.getElementById("_mfUserBadge");
     t && t.remove();
