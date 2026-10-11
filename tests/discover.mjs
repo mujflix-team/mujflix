@@ -29,7 +29,7 @@ async function scenario(tmdbOk) {
   await page.route(/^(?!http:\/\/localhost)/, r => {
     const u = r.request().url();
     if (u.endsWith(".js")) return r.fulfill({ contentType: "text/javascript", body: STUB });
-    if (u.includes("api.themoviedb.org")) return tmdbOk
+    if (u.includes("api.themoviedb.org") || u.includes(".workers.dev")) return tmdbOk
       ? r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ results: hostile, page: 1, total_pages: 1 }) })
       : r.abort();
     return r.abort();
