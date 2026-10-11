@@ -2,7 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 
 export default [
-  { ignores: ["node_modules/**", "worker/**"] },
+  { ignores: ["node_modules/**", "worker/**", "js/core/qr.js"] },
   js.configs.recommended,
   {
     files: ["**/*.js"],
