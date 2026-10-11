@@ -1560,9 +1560,12 @@ async function getTrailerKey(e, t = "tv", n = null) {
 async function loadTileTrailer(e, t, n = "tv", o = null) {
   if (!window.gsap) return; // CDN s gsap nedostupná (výpadek / blokátor): trailer se nezobrazí, ale nic nespadne
   if (!(o && HARDCODED_TRAILERS[o]) && !t) return;
+  // Starý přehled dlaždic je v Netflix vzhledu skrytý. Na neviditelné dlaždici se trailer nespouští (jinak hraje jen zvuk bez obrazu).
+  if (!e || !e.isConnected || !e.offsetParent || e.getBoundingClientRect().width < 2) return;
   if (_activeTrailerWrapper && _activeTrailerWrapper !== e && removeTileTrailer(_activeTrailerWrapper), e.querySelector(".tile-trailer")) return;
   const i = await getTrailerKey(t, n, o);
   if (!i) return;
+  if (!e.offsetParent) return;
   if (!e.classList.contains("focused") && !e.classList.contains("kb-focus")) return;
   _activeTrailerWrapper = e, _activeTrailerWrapper = e;
   const a = document.createElement("div");
