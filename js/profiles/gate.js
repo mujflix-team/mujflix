@@ -394,7 +394,7 @@ const ProfileGate = {
   pickAvatar(e, t, n) {
     this._selectedAvatar = e;
     const preview = document.getElementById("pcAvatarPreview");
-    preview && (preview.innerHTML = `<img src="${e}" alt="">`);
+    preview && (preview.innerHTML = `<img src="${escapeHTML(e)}" alt="">`);
     const label = document.getElementById("pcAvatarPickerLabel");
     label && (label.textContent = t || "Vybraný obrázek");
     document.querySelectorAll(".pc-avatar-option").forEach(e => e.classList.remove("selected"));
