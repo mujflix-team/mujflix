@@ -967,3 +967,5 @@ html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margi
 #mfSyncModal .sy-link { border: 0; color: #808080; font-weight: 500; font-size: 0.95rem; height: auto; padding: 10px; margin-top: 14px; }
 #mfSyncModal .sy-link:hover { color: #ff6b6b; }
 @media (max-height: 640px) { #mfSyncModal .sy-qr { width: 120px; height: 120px; } #mfSyncModal .sy-ico svg { width: 40px; height: 40px; } }
+#mfSyncBanner { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000005; display: flex; align-items: center; gap: 14px; padding: 11px 14px 11px 18px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #fff; font: 600 0.95rem var(--nf-font, sans-serif); box-shadow: 0 10px 34px rgba(0, 0, 0, 0.7); max-width: calc(100vw - 24px); }
+#mfSyncBanner button { background: #fff; color: #000; border: 0; border-radius: 4px; padding: 8px 14px; font: 700 0.9rem var(--nf-font, sans-serif); cursor: pointer; white-space: nowrap; }
