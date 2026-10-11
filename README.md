@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/32998882/README.md)
+[README.md](https://github.com/user-attachments/files/33299271/README.md)
 # 🎬 MůjFlix
 
 **MůjFlix je osobní filmový a seriálový tracker, který ti pomůže najít, kde sledovat filmy a seriály z různých zdrojů** — ať už jde o legální streamingové služby (Netflix, Disney+, Max, Apple TV+…) nebo o české a slovenské weby s online filmy (Bombuj, SvetSerialu, Prehrajto). Sleduj, co jsi viděl, dostávej chytrá doporučení a měj vše na jednom místě.
@@ -22,12 +22,29 @@ Hlavní funkce MůjFlixu — **propojení s více zdroji** a jejich chytré vyhl
   - **Bombuj.si** — filmy i seriály (český dabing / titulky)
   - **SvetSerialu.to** — seriály s českými titulky
   - **Prehrajto.cz** — filmy i seriály (sdílený obsah)
-  - **Uzi.la** — alternativa
+  - **NajSerialy.io** — seriály (URL se skládá z anglického názvu, roku a epizody; u japonských titulů se použije romaji z AniList)
+  - **Uzi.la** — alternativa; web odmítá vložení do iframe, proto se v Cinema módu zobrazí tlačítko „Otevřít“ místo přehrávače
 - **Legální streamingové služby** — přes TMDB Watch Providers aplikace zobrazí, kde je film/seriál legálně dostupný v ČR/SK:
   - Netflix, Disney+, Max (HBO), Apple TV+, Prime Video, SkyShowtime, Voyo, Canal+, O2 TV, Mall.TV, Crunchyroll a další
 - **Více zdrojů na jedno kliknutí** — pokud jeden zdroj nefunguje, aplikace ti nabídne další
 - **Cinema mód** — vestavěný přehrávač s výběrem sezóny a epizody, auto-next na další epizodu, přepínání zdrojů během přehrávání
 - **Sandbox iframe** — blokuje popup reklamy ze zdrojů, tip na uBlock Origin
+- **Alternativní názvy** — při hledání se zkouší anglický, původní i český/slovenský název (z TMDB)
+
+### 🎨 Vzhled a ovládání
+
+- **Netflix styl** — hero banner, řádky „Pokračovat ve sledování“ (s textem „zbývá N epizod“), Pro tebe, Top 10 a další
+- **Hodnocení epizod / filmů** — nenápadná hvězdička v Cinema módu (hned vedle srdce), hodnocení se ukládá do doporučení
+- **Žánr anime** — pokud máš vybrané jen anime, doporučení i oznámení o novinkách jsou jen anime
+- **Legální služby** — ikona TV v Cinema módu ukáže, kde je titul legálně dostupný
+
+### 👤 Profily
+
+- **Výběr profilu „Kdo se dívá?“**, přepínání profilů z menu v pravém horním rohu (avatar → Přepnout / Upravit profil / Spravovat profily)
+- **Úprava a mazání profilu** na jedné obrazovce „Uprav si svůj profil“
+- **Avatary — oblíbená postava ze seriálu či filmu**: nabídka je předvyplněná (Breaking Bad, Game of Thrones, Marvel, DC, Star Wars, anime…) a ve vyhledávání najdeš další postavy. Zdroje obrázků: Wikipedie, AniList, TVmaze, Fandom, Wikidata, superhero-api, Disney API
+- **Propojení zařízení** — stejné profily, seznamy a hodnocení na telefonu, tabletu i počítači. Bez hesla a e-mailu: na prvním zařízení zvolíš *Propojit zařízení → Zobrazit kód*, na druhém *Mám kód* a opíšeš 6 znaků (nebo naskenuješ QR). Najdeš to v menu profilu vpravo nahoře a na obrazovce „Kdo se dívá?“; při vytváření nového profilu na to průvodce upozorní třetím krokem. Vyžaduje nastavený Worker s úložištěm KV (viz níže)
+- **PIN zámek** — 5 pokusů, po špatném zadání se ukáže počet zbývajících pokusů, pak následuje zablokování (30 s → 2 min → 10 min → 30 min → 1 h → 4 h → 24 h), které se stupňuje. Jde o dětskou pojistku, ne o skutečné zabezpečení
   
 ---
 
@@ -85,6 +102,19 @@ window.TMDB_PROXY_URL = "https://mujflix-tmdb-proxy.<ucet>.workers.dev";
 
 `js/core/tmdb-proxy-shim.js` (prohlížečová část; Worker je v `worker/tmdb-proxy.js`) pak automaticky přesměruje všechna volání TMDB přes Worker a odstraní `api_key`. Worker povoluje jen GET, jen známé TMDB cesty, kontroluje Origin a cachuje odpovědi 1 hodinu.
 
+### 🔗 Propojení zařízení (volitelné)
+
+Využívá stejný Worker jako TMDB proxy, jen přidá úložiště KV (zdarma, limit 1000 zápisů denně – appka proto odesílá změny nejvýš jednou za 5 minut a při odchodu z karty):
+
+```bash
+cd worker
+npx wrangler kv namespace create SYNC     # vypíše id úložiště
+```
+
+V `worker/wrangler.toml` odkomentuj blok `[[kv_namespaces]]`, vlož `id` a znovu nasaď (`npx wrangler deploy`). Adresa Workeru musí být v `config.js` jako `TMDB_PROXY_URL` (stejná jako pro TMDB). Bez toho se nabídka propojení v appce nezobrazí.
+
+Jak to funguje: první zařízení si vytvoří náhodné dlouhé ID a nahraje data (profily a osobní údaje z localStorage; **ne** API klíče, aktivní profil ani stav PIN zámku). Jednorázový kód (platí 10 minut) slouží jen k výměně za toto ID. Při sloučení vyhrává u každého záznamu novější změna a profily se spojují podle ID, takže se nic nepřepisuje celé. PIN profilu se přenáší spolu s profilem – je to jen dětská pojistka.
+
 ### Nasazení na Cloudflare Pages (doporučeno)
 
 1. Push na GitHub
@@ -140,10 +170,11 @@ Vše se **učí per profil** a má **decay** — preference postupně vyprcháva
 
 ## 🛡 Soukromí
 
-- **Žádný backend**. Celá aplikace je statická.
-- **Vše se ukládá do localStorage** tvého prohlížeče.
+- **Žádný vlastní backend ani účty**. Aplikace je statická; jediný server je tvůj Cloudflare Worker (TMDB proxy a volitelně propojení zařízení).
+- **Vše se ukládá do localStorage** tvého prohlížeče; při propojení zařízení se kopie dat uloží do tvého vlastního Cloudflare KV.
 - **API klíče nikdy neopouští tvůj prohlížeč** — volání jdou přímo z klienta (nebo přes tvou Cloudflare proxy).
 - **Profily jsou lokální** — PIN není skutečné zabezpečení, jen dětská pojistka.
+- **Obrázky avatarů** se stahují z veřejných služeb (viz výše); posílá se jen hledaný název postavy.
 
 ---
 
@@ -152,10 +183,13 @@ Vše se **učí per profil** a má **decay** — preference postupně vyprcháva
 ```
 index.html, sw.js, manifest.webmanifest   vstup aplikace
 config.example.js (→ config.js)           konfigurace (config.js je v .gitignore)
-css/        styles.css, patches.css, discover.css, netflix.css
+css/        styles.css, patches.css, discover.css, netflix.css (Netflix vzhled, přepisuje ostatní)
 js/         app.js, home.js, discover.js, cinema.js, dock.js
-js/ai js/core js/finder js/profiles     menší moduly (načítají se před js/app.js)
-worker/     proxy Worker pro TMDB klíč
+js/ai       brain.js (doporučovací algoritmus)
+js/core     tmdb-proxy-shim.js, version.js, adblock.js, genres.js, sync.js + sync-ui.js (propojení zařízení), qr.js (generátor QR)
+js/finder   finder.js (sestavení URL zdrojů)
+js/profiles gate.js (profily, avatary, PIN zámek)
+worker/     proxy Worker pro TMDB klíč + propojení zařízení (KV)
 docs/       CHANGELOG.md, css-vars.md
 fonts/      Netflix Sans (woff2)
 tests/ scripts/ icons/
@@ -209,6 +243,8 @@ Testy běží offline – externí požadavky se blokují, TMDB data se podvrhuj
 ## 🙏 Poděkování
 
 - **[TMDB](https://www.themoviedb.org/)** — metadata filmů a seriálů
+- **AniList, Wikipedie, TVmaze, Fandom, Wikidata** — obrázky postav pro avatary
+- **[qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator)** (MIT) — QR kódy
 - **[Cloudflare Pages](https://pages.cloudflare.com/)** — hosting a API proxy
 - **AI Agents** — programing
 
@@ -229,4 +265,4 @@ Pro legální sledování jsou v aplikaci integrované odkazy na **Netflix, Disn
 
 ## Content-Security-Policy
 
-`index.html` obsahuje CSP (meta tag). Pokud nasadíš TMDB proxy na vlastní doméně (mimo `*.workers.dev` / `*.pages.dev`) nebo přidáš nový externí zdroj dat, doplň jeho doménu do `connect-src`, jinak ji prohlížeč zablokuje (v konzoli uvidíš „Refused to connect"). Hlavička `frame-ancestors` se v meta tagu nedá nastavit – případně ji přidej na hostingu.
+`index.html` obsahuje CSP (meta tag). Kromě TMDB proxy obsahuje `connect-src` i služby pro avatary (AniList, Wikipedie, TVmaze, akabab.github.io, disneyapi.dev, Fandom, Wikidata) a uzi.la. Pokud nasadíš TMDB proxy na vlastní doméně (mimo `*.workers.dev` / `*.pages.dev`) nebo přidáš nový externí zdroj dat, doplň jeho doménu do `connect-src`, jinak ji prohlížeč zablokuje (v konzoli uvidíš „Refused to connect"). Hlavička `frame-ancestors` se v meta tagu nedá nastavit – případně ji přidej na hostingu.
