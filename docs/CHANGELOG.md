@@ -2,6 +2,8 @@
 
 ## 2.3.4
 
+- Opraveno: v kině „Další epizoda“ spadla (`epCountFn is not a function`), když byl TMDB nedostupný; teď se použije záložní počet epizod. Tím padal i test v GitHub Actions.
+- Spolupráce ve dvou: `CLAUDE.md` (pravidla pro Clauda), `docs/TASKS.md`, `docs/SPOLUPRACE.md`, šablona Pull Requestu; `config.js` už není v `.gitignore`.
 - Opraveno: v pozadí hrála znělka Simpsonových bez obrazu (starý trailer na skryté dlaždici). Trailer se na neviditelné dlaždici už nespouští.
 - Propojení zařízení: změny se posílají rychle (profily a hodnocení do ~10 s), druhé zařízení je stahuje každých 45 s a při návratu na kartu. Nový profil se objeví bez obnovení, ostatní změny nabídnou „Načíst změny“.
 - Propojení zařízení: 6znakový kód nebo QR, data (profily, seznamy, hodnocení) se sdílejí přes Worker + Cloudflare KV; tajné klíče a PIN zámek se nesdílí. Vstupy: menu profilu vpravo nahoře, „Kdo se dívá?“ (pod Upravit) a nový 3. krok při vytvoření profilu (jen když není propojeno). Soubory: `js/core/sync.js`, `sync-ui.js`, `qr.js`, `worker/tmdb-proxy.js`.
