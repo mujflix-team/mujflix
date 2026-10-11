@@ -287,6 +287,13 @@
     return !!w[current.localSlug + "-S" + season + "-E" + episode];
   }
 
+  /** Vždy vrátí funkci počtu epizod v sérii (záložní hodnota 20), takže se nikdy nevolá null. */
+  function getEpCountFn() {
+    if (!current) return function () { return 20; };
+    if (typeof current.epCountFn !== "function") current.epCountFn = function () { return 20; };
+    return current.epCountFn;
+  }
+
   function ensureEpCounts(cb) {
     if (current.localSlug && appDb() && appDb()[current.localSlug]) {
       current.totalSeasonsCount = appTotalSeasons(current.localSlug);
@@ -307,9 +314,15 @@
             });
             current.epCountFn = function (s) { return current.totalEps[s] || 20; };
           }
+          // TMDB nedostupné (offline, blokátor, výpadek): ať je vždy nějaká funkce, jinak „Další epizoda“ spadne
+          current.epCountFn = current.epCountFn || function () { return 20; };
           cb && cb();
         })
-        .catch(function () { cb && cb(); });
+        .catch(function () {
+          current.totalSeasonsCount = current.totalSeasonsCount || 20;
+          current.epCountFn = current.epCountFn || function () { return 20; };
+          cb && cb();
+        });
     } else {
       current.totalSeasonsCount = current.totalSeasonsCount || 20;
       current.epCountFn = current.epCountFn || function () { return 20; };
@@ -415,13 +428,14 @@
 
   function stepEpisode(dir) {
     ensureEpCounts(function () {
-      var epsInThis = current.epCountFn(current.season);
+      var countFn = getEpCountFn();
+      var epsInThis = countFn(current.season);
       var newEp = current.episode + dir;
       var newSeason = current.season;
       if (newEp < 1) {
         if (newSeason > 1) {
           newSeason -= 1;
-          newEp = current.epCountFn(newSeason);
+          newEp = countFn(newSeason);
         } else {
           newEp = 1;
         }
@@ -493,7 +507,7 @@
       })(s);
     }
 
-    var epsCount = current.epCountFn ? current.epCountFn(current.season) : 20;
+    var epsCount = getEpCountFn()(current.season);
     epGridBody.innerHTML = "";
     for (var e = 1; e <= epsCount; e++) {
       (function (e) {
