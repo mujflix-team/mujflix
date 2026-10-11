@@ -1,8 +1,12 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33305389/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33308496/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
 
+- Opraveno: výběr avataru vkládal adresu obrázku do HTML bez escapování (`js/profiles/gate.js`). Propojení zařízení: pojistka proti nekonečnému obnovování stránky po synchronizaci (`js/core/sync.js`).
+- Test „Objevovat“ už nezávisí na `config.js` (s adresou Workeru se TMDB volalo přes `workers.dev` a test to blokoval, takže CI padalo).
+- Opraveno: v kině „Další epizoda“ spadla (`epCountFn is not a function`), když byl TMDB nedostupný; teď se použije záložní počet epizod. Tím padal i test v GitHub Actions.
+- Spolupráce ve dvou: `CLAUDE.md` (pravidla pro Clauda), `docs/TASKS.md`, `docs/SPOLUPRACE.md`, šablona Pull Requestu; `config.js` už není v `.gitignore`.
 - Opraveno: v pozadí hrála znělka Simpsonových bez obrazu (starý trailer na skryté dlaždici). Trailer se na neviditelné dlaždici už nespouští.
 - Propojení zařízení: změny se posílají rychle (profily a hodnocení do ~10 s), druhé zařízení je stahuje každých 45 s a při návratu na kartu. Nový profil se objeví bez obnovení, ostatní změny nabídnou „Načíst změny“.
 - Propojení zařízení: 6znakový kód nebo QR, data (profily, seznamy, hodnocení) se sdílejí přes Worker + Cloudflare KV; tajné klíče a PIN zámek se nesdílí. Vstupy: menu profilu vpravo nahoře, „Kdo se dívá?“ (pod Upravit) a nový 3. krok při vytvoření profilu (jen když není propojeno). Soubory: `js/core/sync.js`, `sync-ui.js`, `qr.js`, `worker/tmdb-proxy.js`.
