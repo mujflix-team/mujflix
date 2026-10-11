@@ -1,8 +1,10 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33299282/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33305389/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
 
+- Opraveno: v pozadí hrála znělka Simpsonových bez obrazu (starý trailer na skryté dlaždici). Trailer se na neviditelné dlaždici už nespouští.
+- Propojení zařízení: změny se posílají rychle (profily a hodnocení do ~10 s), druhé zařízení je stahuje každých 45 s a při návratu na kartu. Nový profil se objeví bez obnovení, ostatní změny nabídnou „Načíst změny“.
 - Propojení zařízení: 6znakový kód nebo QR, data (profily, seznamy, hodnocení) se sdílejí přes Worker + Cloudflare KV; tajné klíče a PIN zámek se nesdílí. Vstupy: menu profilu vpravo nahoře, „Kdo se dívá?“ (pod Upravit) a nový 3. krok při vytvoření profilu (jen když není propojeno). Soubory: `js/core/sync.js`, `sync-ui.js`, `qr.js`, `worker/tmdb-proxy.js`.
 - README přepsáno: aktuální struktura, profily, PIN zámek, avatary, NajSerialy/Uzi.la.
 
