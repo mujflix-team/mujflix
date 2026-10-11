@@ -952,6 +952,56 @@ check("sync: tlačítko v Kdo se dívá", syEnt.gateBtn);
 const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); const it = document.querySelector('#nfProfileMenu [data-act="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
 check("sync: položka v menu profilu otevře obrazovku", syMenu.ok && syMenu.shown, JSON.stringify(syMenu));
 
+
+// --- Průběžná synchronizace: nový profil z jiného zařízení se objeví bez obnovení, ostatní změny nabídnou „Načíst změny“
+const sy2 = await page.evaluate(async () => {
+  const out = {}, PK = "mf_profiles_v2";
+  Object.keys(localStorage).filter(k => k.startsWith("mf_")).forEach(k => localStorage.removeItem(k));
+  __kv.codes = {}; __kv.data = {};
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_A", name: "Anna", created: 1000 }]));
+  localStorage.setItem("mf_watched_p_A", JSON.stringify({ a: true }));
+  localStorage.setItem("mf_active_pid", "p_A");
+  await MFSync.createCode();
+  const id = localStorage.getItem("mf_sync_id");
+  const edit = fn => { const b = JSON.parse(__kv.data[id]); fn(b); __kv.data[id] = JSON.stringify(b); };
+  // jiné zařízení přidalo profil
+  await new Promise(r => setTimeout(r, 30));
+  edit(b => { b.keys[PK] = { v: JSON.stringify([{ id: "p_A", name: "Anna", created: 1000 }, { id: "p_C", name: "Cyril", created: 3000 }]), t: Date.now() }; });
+  ProfileGate.show();
+  await MFSync.syncNow({ mode: "poll" });
+  out.names = [...document.querySelectorAll("#pgProfilesList .pg-name")].map(x => x.textContent);
+  out.noBanner1 = !document.getElementById("mfSyncBanner");
+  // jiné zařízení změnilo data aktivního profilu
+  edit(b => { b.keys["mf_watched_p_A"] = { v: JSON.stringify({ a: true, b: true }), t: Date.now() }; });
+  await MFSync.syncNow({ mode: "poll" });
+  out.banner = !!document.getElementById("mfSyncBanner");
+  out.applied = (localStorage.getItem("mf_watched_p_A") || "").includes('"b"');
+  // změna profilů se posílá rychle (do ~6 s + rezerva), ne až po minutách
+  const before = __kv.n;
+  await new Promise(r => setTimeout(r, 30));
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_A", name: "Anna2", created: 1000 }, { id: "p_C", name: "Cyril", created: 3000 }]));
+  await new Promise(r => setTimeout(r, 11500));
+  out.fastPush = __kv.n > before;
+  document.getElementById("mfSyncBanner")?.remove();
+  MFSync.unlink();
+  return out;
+});
+check("sync: nový profil z jiného zařízení se objeví hned (bez obnovení)", sy2.names.includes("Cyril") && sy2.noBanner1, JSON.stringify(sy2));
+check("sync: ostatní změny se načtou a nabídne se „Načíst změny“", sy2.banner && sy2.applied, JSON.stringify(sy2));
+check("sync: změna profilu se odešle do ~10 s", sy2.fastPush, JSON.stringify(sy2));
+
+// Starý trailer (Simpsonovi) se na skryté dlaždici nespouští
+const trl = await page.evaluate(async () => {
+  const tile = document.querySelector('[data-slug="the-simpsons"]');
+  if (!tile) return { skip: true };
+  tile.classList.add("focused");
+  await loadTileTrailer(tile, null, "tv", "the-simpsons");
+  const r = { hidden: !tile.offsetParent, trailer: !!document.querySelector(".tile-trailer iframe") };
+  tile.classList.remove("focused");
+  return r;
+});
+check("trailer: skrytá dlaždice nespouští video se zvukem", trl.skip || (trl.hidden && !trl.trailer), JSON.stringify(trl));
+
 check("žádné JS chyby", errors.length === 0, errors.join(" | "));
 await close();
 finish();
