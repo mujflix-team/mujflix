@@ -271,7 +271,10 @@
       try { if (window.nfRenderProfile) nfRenderProfile(); } catch (e) {}
       return r;
     }
-    if (mode === "poll") { banner(); return r; }
+    // pojistka proti nekonečnému obnovování: když se stránka před chvílí kvůli synchronizaci už obnovila, jen nabídni tlačítko
+    var lastReload = 0;
+    try { lastReload = parseInt(sessionStorage.getItem("mf_sync_reloaded") || "0", 10) || 0; } catch (e) {}
+    if (mode === "poll" || now() - lastReload < 15000) { banner(); return r; }
     try { sessionStorage.setItem("mf_sync_reloaded", String(now())); } catch (e) {}
     if (typeof showToast === "function") showToast("Načtena data z jiného zařízení", 1800);
     setTimeout(function () { location.reload(); }, 900);
