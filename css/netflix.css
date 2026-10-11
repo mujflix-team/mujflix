@@ -745,7 +745,8 @@ html body #seriesModal #ssvGrid .ssv-info { z-index: 3 !important; }
 html body #mfProfileCreate.picker-open .pc-logo, html body #mfProfileCreate.picker-open .pc-close { display: none !important; }
 
 /* Hvězdička v kině a okno hodnocení nad kinem */
-#mfStandaloneCinema .mf-cin-rate-btn { margin-left: 0; opacity: 0.6; }
+#mfStandaloneCinema .mf-cin-rate-btn { margin-left: auto; opacity: 0.6; }
+#mfStandaloneCinema #mfCinFavBtn { margin-left: 0; }
 #mfStandaloneCinema .mf-cin-rate-btn:hover { opacity: 1; }
 #mfStandaloneCinema .mf-cin-rate-btn:hover { color: #ffd60a; }
 html body #epRatingOverlay { z-index: 1000002 !important; }
@@ -870,3 +871,99 @@ html body #mfPinModal .pm-numpad.locked { opacity: 0.35; pointer-events: none; }
 /* Pojistka proti prázdnému rámečku v rohu: uvítací poznámka a odznak se na obrazovkách profilu nikdy nezobrazí */
 html body #mfWelcomeNote { display: none !important; }
 html body #mfWelcomeNote:empty, html body #mfProfileCreate.show ~ #mfWelcomeNote { display: none !important; }
+
+/* ===== Správa profilů ===== */
+/* Kdo se dívá → Upravit: bez třesení, avatar má tmavý překryv s tužkou, červené „−“ je větší */
+html body #mfProfileGate .pg-profile-item.pg-manage-mode .pg-avatar, html body #mfProfileGate .pg-manage-mode .pg-avatar { animation: none !important; transform: none !important; }
+html body #mfProfileGate .pg-avatar-wrap { position: relative; }
+html body #mfProfileGate .pg-edit-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.5); color: #fff; border-radius: inherit; pointer-events: none; }
+html body #mfProfileGate .pg-profile-item.pg-manage-mode { cursor: pointer; }
+html body #mfProfileGate .pg-profile-item.pg-manage-mode:hover .pg-avatar { border-color: #fff !important; }
+html body #mfProfileGate .pg-remove-btn {
+  width: 40px !important; height: 40px !important; top: -14px !important; right: -14px !important; border-radius: 50% !important;
+  background: #e50914 !important; color: #fff !important; border: 3px solid #141414 !important; font-size: 1.9rem !important; line-height: 32px !important; padding: 0 !important;
+  display: grid; place-items: center; cursor: pointer; z-index: 5; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+}
+html body #mfProfileGate .pg-remove-btn:hover { background: #ff2a35 !important; transform: scale(1.08); }
+@media (max-width: 640px) { html body #mfProfileGate .pg-remove-btn { width: 44px !important; height: 44px !important; top: -16px !important; right: -16px !important; } }
+/* Smazat profil v úpravě */
+html body #mfProfileCreate .pc-btn-delete { background: transparent !important; border: 1px solid #5a1a1f !important; color: #ff6b6b !important; border-radius: 4px !important; padding: 0 22px; height: 46px; font-size: 1rem; cursor: pointer; margin-right: auto; }
+html body #mfProfileCreate .pc-btn-delete:hover { background: #3a1014 !important; border-color: #e50914 !important; }
+/* Menu profilu vpravo nahoře */
+#nfProfileMenu {
+  position: fixed; z-index: 10050; min-width: 230px; padding: 8px 0; background: rgba(20, 20, 20, 0.97); border: 1px solid #333; border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7); animation: nfPmIn 0.14s ease both;
+}
+#nfProfileMenu::before { content: ""; position: absolute; top: -7px; right: 18px; width: 12px; height: 12px; background: rgba(20, 20, 20, 0.97); border-left: 1px solid #333; border-top: 1px solid #333; transform: rotate(45deg); }
+@keyframes nfPmIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+#nfProfileMenu .nf-pm-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 16px; background: none; border: 0; color: #e5e5e5; font: inherit; font-size: 0.95rem; text-align: left; cursor: pointer; }
+#nfProfileMenu .nf-pm-item:hover { text-decoration: underline; color: #fff; }
+#nfProfileMenu .nf-pm-av { width: 32px; height: 32px; border-radius: 4px; background: var(--c, #0a84ff); display: grid; place-items: center; overflow: hidden; font-size: 1.2rem; flex: none; }
+#nfProfileMenu .nf-pm-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#nfProfileMenu .nf-pm-act svg { flex: none; width: 24px; }
+#nfProfileMenu .nf-pm-sep { height: 1px; background: #333; margin: 6px 0; }
+
+/* Kde legálně sledovat – Netflix vzhled (tlačítko vpravo dole + panel) */
+html body #legalProvidersBadge {
+  background: rgba(42, 42, 42, 0.9) !important; border: 0 !important; border-radius: 4px !important; padding: 9px 16px 9px 12px !important; gap: 9px !important;
+  color: #fff !important; font: 700 0.9rem/1 var(--nf-font, sans-serif) !important; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html body #legalProvidersBadge:hover { background: rgba(70, 70, 70, 0.95) !important; }
+html body #legalProvidersBadge svg { stroke: #fff !important; width: 20px !important; height: 20px !important; }
+html body #legalProvidersPanel {
+  background: #181818 !important; border: 1px solid #333 !important; border-radius: 4px !important; padding: 16px 18px !important; gap: 10px !important; max-width: min(340px, 86vw) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html body #legalProvidersPanel > div:first-child { font: 700 1rem/1.2 var(--nf-font, sans-serif) !important; letter-spacing: 0 !important; text-transform: none !important; color: #fff !important; }
+html body #legalProvidersPanel > div:nth-child(2) { justify-content: flex-start !important; gap: 8px !important; }
+html body #legalProvidersPanel > div:nth-child(2) > div { text-align: left !important; font: 700 0.78rem/1 var(--nf-font, sans-serif) !important; letter-spacing: 0 !important; text-transform: none !important; color: #b3b3b3 !important; margin-top: 8px !important; }
+html body #legalProvidersPanel a { background: #2a2a2a !important; border: 0 !important; border-radius: 4px !important; padding: 8px 12px !important; gap: 9px !important; }
+html body #legalProvidersPanel a:hover { background: #3a3a3a !important; }
+html body #legalProvidersPanel a img { width: 28px !important; height: 28px !important; border-radius: 6px !important; }
+html body #legalProvidersPanel a span { font: 600 0.88rem/1 var(--nf-font, sans-serif) !important; color: #fff !important; }
+
+/* Propojení zařízení */
+#mfProfileGate .pg-sync-btn {
+  display: inline-flex; align-items: center; gap: 9px; margin-top: 18px !important; padding: 0.55em 1.1em !important; background: none !important; border: 0 !important;
+  color: #808080 !important; font: 500 clamp(0.85rem, 1vw, 1rem) var(--nf-font, sans-serif) !important; cursor: pointer;
+}
+#mfProfileGate .pg-sync-btn:hover { color: #fff !important; }
+html body #mfProfileWelcome .pw-actions.pw-actions-col { flex-direction: column !important; align-items: stretch; border-top: 0; margin-top: 24px !important; padding-top: 0; }
+html body #mfProfileWelcome .pw-actions.pw-actions-col button { width: 100%; }
+html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margin-top: 18px; }
+#mfSyncModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+#mfSyncModal.show { display: flex; }
+#mfSyncModal .sy-box { position: relative; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: auto; background: #181818; border: 1px solid #333; border-radius: 6px; padding: 34px 28px 28px; text-align: center; color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8); }
+#mfSyncModal .sy-x { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: #b3b3b3; font-size: 1.9rem; line-height: 1; cursor: pointer; padding: 6px 10px; }
+#mfSyncModal .sy-x:hover { color: #fff; }
+#mfSyncModal .sy-back { position: absolute; top: 12px; left: 14px; background: none; border: 0; color: #b3b3b3; font: 600 0.95rem var(--nf-font, sans-serif); cursor: pointer; padding: 6px; }
+#mfSyncModal .sy-back:hover { color: #fff; }
+#mfSyncModal .sy-ico { color: #e50914; margin: 0 auto 10px; display: grid; place-items: center; }
+#mfSyncModal .sy-ico.sy-ok { color: #46d369; }
+#mfSyncModal .sy-title { font-size: 1.6rem; font-weight: 700; margin: 6px 0 10px; letter-spacing: -0.01em; }
+#mfSyncModal .sy-text { color: #b3b3b3; font-size: 1rem; line-height: 1.5; margin: 0 0 20px; }
+#mfSyncModal .sy-choices { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+#mfSyncModal .sy-choice { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 14px 18px; background: #2a2a2a; border: 1px solid transparent; border-radius: 4px; color: #fff; font: inherit; cursor: pointer; }
+#mfSyncModal .sy-choice strong { font-size: 1.08rem; }
+#mfSyncModal .sy-choice span { color: #b3b3b3; font-size: 0.9rem; }
+#mfSyncModal .sy-choice:hover, #mfSyncModal .sy-choice:focus-visible { background: #3a3a3a; border-color: #fff; outline: 0; }
+#mfSyncModal .sy-code { font: 800 clamp(2.4rem, 11vw, 3.4rem)/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.12em; margin: 14px 0 16px; color: #fff; }
+#mfSyncModal .sy-qr { width: 170px; height: 170px; margin: 0 auto 16px; padding: 8px; background: #fff; border-radius: 4px; }
+#mfSyncModal .sy-qr svg { width: 100%; height: 100%; display: block; }
+#mfSyncModal .sy-steps { text-align: left; color: #b3b3b3; font-size: 0.95rem; line-height: 1.55; margin: 0 0 12px; padding-left: 22px; }
+#mfSyncModal .sy-steps b { color: #fff; }
+#mfSyncModal .sy-timer { color: #808080; font-size: 0.9rem; margin: 4px 0 14px; }
+#mfSyncModal .sy-msg { min-height: 1.3em; margin: 8px 0; font-size: 0.95rem; color: #b3b3b3; }
+#mfSyncModal .sy-msg.sy-err { color: #ff6b6b; }
+#mfSyncModal .sy-msg.sy-ok { color: #46d369; }
+#mfSyncModal .sy-input { width: 100%; box-sizing: border-box; text-align: center; background: #333; border: 1px solid #555; border-radius: 4px; color: #fff; font: 800 2rem ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.2em; padding: 14px 10px; text-transform: uppercase; }
+#mfSyncModal .sy-input:focus { outline: 0; border-color: #fff; }
+#mfSyncModal .sy-btn { display: block; width: 100%; height: 46px; margin-top: 10px; border-radius: 4px; border: 1px solid #808080; background: none; color: #fff; font: 700 1.05rem var(--nf-font, sans-serif); cursor: pointer; }
+#mfSyncModal .sy-btn:hover { border-color: #fff; }
+#mfSyncModal .sy-primary { background: #fff; color: #000; border-color: #fff; }
+#mfSyncModal .sy-primary:hover { background: #e6e6e6; }
+#mfSyncModal .sy-primary:disabled { opacity: 0.6; cursor: default; }
+#mfSyncModal .sy-ghost { color: #b3b3b3; }
+#mfSyncModal .sy-link { border: 0; color: #808080; font-weight: 500; font-size: 0.95rem; height: auto; padding: 10px; margin-top: 14px; }
+#mfSyncModal .sy-link:hover { color: #ff6b6b; }
+@media (max-height: 640px) { #mfSyncModal .sy-qr { width: 120px; height: 120px; } #mfSyncModal .sy-ico svg { width: 40px; height: 40px; } }
