@@ -124,6 +124,10 @@
       >
         Upravit
       </button>
+      <button id="profileSyncBtn" class="pg-sync-btn" type="button" onclick="window.MFSyncUI?.open('home')">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/></svg>
+        <span>Propojit zařízení</span>
+      </button>
     </div>
 
     <div id="mfPinModal">
@@ -245,6 +249,7 @@
           <button class="pc-btn-cancel" onclick="window.ProfileGate?.closeCreate()">
             Zrušit
           </button>
+          <button class="pc-btn-delete" id="pcDeleteBtn" type="button" style="display:none" onclick="window.ProfileGate?.deleteFromEdit()">Smazat profil</button>
           <button class="pc-btn-save" onclick="window.ProfileGate?.saveProfile()">
             Vytvořit profil →
           </button>
@@ -255,7 +260,7 @@
       <div id="mfProfileWelcome" aria-hidden="true">
         <div class="pw-box">
           <div class="pw-step" id="pwStep1">
-            <div class="pw-kicker">MůjFlix · 1/2</div>
+            <div class="pw-kicker" data-ob-step="1">MůjFlix · 1/2</div>
             <div class="pw-title">Ještě jedna maličkost</div>
             <div class="pw-subtitle">Co tě baví? Vyber pár žánrů a my ti připravíme lepší start.</div>
             <div class="pw-genres" id="pwGenres"></div>
@@ -265,7 +270,7 @@
             </div>
           </div>
           <div class="pw-step" id="pwStep2" style="display:none">
-            <div class="pw-kicker">MůjFlix · 2/2</div>
+            <div class="pw-kicker" data-ob-step="2">MůjFlix · 2/2</div>
             <div class="pw-title">Jak to funguje</div>
             <div class="pw-subtitle">Pár rychlých tipů, ať si první film užiješ bez zbytečných starostí.</div>
             <ul class="pw-tips">
@@ -279,8 +284,19 @@
               <p>Zdroje filmů mohou zobrazovat reklamy nebo vyskakovací okna. Doporučujeme si nainstalovat blokátor reklam: <span id="pwAdblockLink"></span></p>
             </div>
             <div class="pw-actions">
-              <button class="pw-save" onclick="window.ProfileGate?.closeOnboarding()">Začít sledovat</button>
+              <button class="pw-save" id="pwStep2Btn" onclick="window.ProfileGate?.onboardingNext()">Začít sledovat</button>
             </div>
+          </div>
+          <div class="pw-step" id="pwStep3" style="display:none">
+            <div class="pw-kicker" data-ob-step="3">MůjFlix · 3/3</div>
+            <div class="pw-title">Používáš MůjFlix i jinde?</div>
+            <div class="pw-subtitle">Propoj telefon, tablet a počítač. Profily, seznamy a hodnocení budou všude stejné – bez hesla a bez e-mailu, stačí opsat krátký kód.</div>
+            <div class="pw-actions pw-actions-col">
+              <button class="pw-save" onclick="window.ProfileGate?.onboardingLink('show')">Propojit teď</button>
+              <button class="pw-skip" onclick="window.ProfileGate?.onboardingLink('enter')">Už mám profil na jiném zařízení</button>
+              <button class="pw-skip" onclick="window.ProfileGate?.closeOnboarding()">Teď ne</button>
+            </div>
+            <p class="pw-note">Propojit můžeš kdykoli později: profil vpravo nahoře → Propojit zařízení.</p>
           </div>
         </div>
       </div>
@@ -384,7 +400,7 @@
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="nf-bell-dot" id="nfBellDot"></span>
       </button>
-      <button type="button" class="nf-avatar" id="nfAvatar" aria-label="Profil" onclick="document.getElementById('dockProfile').click()">🙂</button>
+      <button type="button" class="nf-avatar" id="nfAvatar" aria-label="Profil" aria-haspopup="menu" onclick="window.mfToggleProfileMenu && window.mfToggleProfileMenu(this)">🙂</button>
     </div>
 
        <nav class="mf-dock" id="mfDock">
@@ -2533,6 +2549,9 @@
     <script src="js/core/version.js"></script>
     <script src="js/core/adblock.js"></script>
     <script src="js/core/genres.js"></script>
+    <script src="js/core/sync.js"></script>
+    <script src="js/core/qr.js" defer></script>
+    <script src="js/core/sync-ui.js" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
     <script src="js/profiles/gate.js?v=1" defer></script>
     <script src="js/finder/finder.js?v=1" defer></script>
