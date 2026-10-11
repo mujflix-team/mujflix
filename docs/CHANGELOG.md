@@ -1,4 +1,4 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33299133/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33299282/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
