@@ -5,7 +5,73 @@
  * Proměnná (volitelné): ALLOWED_ORIGINS  (čárkou oddělené, např. "https://mujflix.pages.dev,http://localhost:8080")
  *
  * Volání: GET https://<worker>/3/trending/all/week?language=cs-CZ
+ *
+ * Propojení zařízení (volitelné; vyžaduje KV namespace s vazbou SYNC, viz wrangler.toml):
+ *   POST /sync/code  {id}    → {code}   jednorázový 6znakový kód (platí 10 min), který odkazuje na ID sady dat
+ *   POST /sync/join  {code}  → {id}     výměna kódu za ID (kód se hned smaže; max 10 pokusů / 10 min na IP)
+ *   POST /sync/pull  {id}    → {data}   načtení sady dat
+ *   POST /sync/push  {id, data}  → {ok} uložení sady dat (max 4 MB)
  */
+const SYNC_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // bez 0/O/1/I
+const SYNC_CODE_TTL = 600;
+const SYNC_DATA_TTL = 60 * 60 * 24 * 365;
+const SYNC_MAX_BYTES = 4 * 1024 * 1024;
+const SYNC_ID_RE = /^[A-Za-z0-9_-]{32,64}$/;
+
+function makeCode() {
+  const b = crypto.getRandomValues(new Uint8Array(6));
+  let c = "";
+  for (const x of b) c += SYNC_ALPHABET[x % SYNC_ALPHABET.length];
+  return c;
+}
+
+async function handleSync(request, env, cors, url) {
+  if (!env.SYNC) return json({ error: "Sync is not configured" }, 501, cors);
+  let body;
+  try { body = JSON.parse(await request.text()); } catch { return json({ error: "Bad JSON" }, 400, cors); }
+  if (!body || typeof body !== "object") return json({ error: "Bad body" }, 400, cors);
+  const route = url.pathname;
+
+  if (route === "/sync/code") {
+    if (!SYNC_ID_RE.test(body.id || "")) return json({ error: "Bad id" }, 400, cors);
+    for (let i = 0; i < 5; i++) {
+      const code = makeCode();
+      if (await env.SYNC.get("c:" + code)) continue;
+      await env.SYNC.put("c:" + code, body.id, { expirationTtl: SYNC_CODE_TTL });
+      return json({ code, ttl: SYNC_CODE_TTL }, 200, cors);
+    }
+    return json({ error: "Try again" }, 503, cors);
+  }
+
+  if (route === "/sync/join") {
+    const ip = request.headers.get("CF-Connecting-IP") || "x";
+    const rk = "r:" + ip;
+    const tries = parseInt((await env.SYNC.get(rk)) || "0", 10);
+    if (tries >= 10) return json({ error: "Too many attempts" }, 429, cors);
+    await env.SYNC.put(rk, String(tries + 1), { expirationTtl: 600 });
+    const code = String(body.code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (code.length !== 6) return json({ error: "Bad code" }, 400, cors);
+    const id = await env.SYNC.get("c:" + code);
+    if (!id) return json({ error: "Unknown code" }, 404, cors);
+    await env.SYNC.delete("c:" + code);
+    return json({ id }, 200, cors);
+  }
+
+  if (route === "/sync/pull" || route === "/sync/push") {
+    if (!SYNC_ID_RE.test(body.id || "")) return json({ error: "Bad id" }, 400, cors);
+    const key = "d:" + body.id;
+    if (route === "/sync/pull") {
+      const raw = await env.SYNC.get(key);
+      return json({ data: raw ? JSON.parse(raw) : null }, 200, cors);
+    }
+    const raw = JSON.stringify(body.data || {});
+    if (raw.length > SYNC_MAX_BYTES) return json({ error: "Too large" }, 413, cors);
+    await env.SYNC.put(key, raw, { expirationTtl: SYNC_DATA_TTL });
+    return json({ ok: true }, 200, cors);
+  }
+  return json({ error: "Not found" }, 404, cors);
+}
+
 const ALLOWED_PATHS = /^\/3\/(trending\/(all|movie|tv|person)\/(day|week)|(tv|movie)\/(popular|top_rated|now_playing|upcoming|on_the_air|airing_today|\d+(\/(season\/\d+|videos|translations|watch\/providers|credits|similar|recommendations|external_ids|images))?)|search\/(multi|movie|tv|person)|discover\/(movie|tv)|genre\/(movie|tv)\/list|person\/\d+(\/(combined_credits|tv_credits|movie_credits))?|configuration)$/;
 
 const CACHE_TTL = 3600; // sekund
@@ -15,7 +81,7 @@ function corsHeaders(request, env) {
   const allowed = (env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
   const ok = allowed.length === 0 ? "*" : (allowed.includes(origin) ? origin : "");
   const h = {
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
@@ -36,8 +102,13 @@ export default {
     const cors = corsHeaders(request, env);
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
-    if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, cors);
     if (!cors["Access-Control-Allow-Origin"]) return json({ error: "Origin not allowed" }, 403, cors);
+    const reqUrl = new URL(request.url);
+    if (reqUrl.pathname.startsWith("/sync/")) {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405, cors);
+      return handleSync(request, env, cors, reqUrl);
+    }
+    if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, cors);
     if (!env.TMDB_API_KEY && !env.TMDB_READ_TOKEN) return json({ error: "Proxy is not configured" }, 500, cors);
 
     const url = new URL(request.url);
