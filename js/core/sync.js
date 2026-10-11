@@ -9,12 +9,15 @@
   var ID_KEY = "mf_sync_id", META_KEY = "mf_sync_meta", LAST_KEY = "mf_sync_last";
   var PROFILES_KEY = "mf_profiles_v2";
   var MAX_VALUE = 1024 * 1024; // jednotlivý klíč nad 1 MB se nesynchronizuje
-  var PUSH_DELAY = 5 * 60 * 1000; // zápisů do KV je na free tarifu 1000 denně, proto push nejvýš jednou za 5 min
+  // Zápisů do KV je na free tarifu 1000 denně. Důležité změny (profily, hodnocení, seznamy…) se posílají rychle,
+  // časté drobnosti (průběh sledování, historie hledání, paměť AI…) až po delší době, a nikdy častěji než MIN_GAP.
+  var FAST_DELAY = 6 * 1000, SLOW_DELAY = 3 * 60 * 1000, MIN_GAP = 10 * 1000, POLL_MS = 45 * 1000;
+  var NOISY = /^mf_(watch_timeline|partial_watched|recent_views|search_history|cin_ai_stats|streak|ai_brain|cont_)/;
   var nativeSet = Storage.prototype.setItem;
   var nativeRemove = Storage.prototype.removeItem;
   var nativeGet = Storage.prototype.getItem;
   var applying = false;
-  var pushTimer = null, lastPush = 0, busy = null;
+  var pushTimer = null, pushDue = 0, lastPush = 0, busy = null;
 
   function now() { return Date.now(); }
   function get(k) { try { return nativeGet.call(localStorage, k); } catch (e) { return null; } }
@@ -76,7 +79,7 @@
     if (removed) { m.g[k] = t; delete m.t[k]; } else { m.t[k] = t; delete m.g[k]; }
     if (k === PROFILES_KEY) trackDeletedProfiles(m);
     saveMeta(m);
-    schedulePush();
+    schedulePush(NOISY.test(k) ? SLOW_DELAY : FAST_DELAY);
   }
   var lastProfileIds = null;
   function profileIds(raw) {
@@ -113,10 +116,15 @@
     return nativeRemove.call(this, k);
   };
 
-  function schedulePush() {
-    if (pushTimer || !isLinked()) return;
-    var wait = Math.max(3000, PUSH_DELAY - (now() - lastPush));
-    pushTimer = setTimeout(function () { pushTimer = null; run(false).catch(function () {}); }, wait);
+  function schedulePush(delay) {
+    if (!isLinked()) return;
+    var due = Math.max(now() + delay, lastPush + MIN_GAP);
+    if (pushTimer) {
+      if (due >= pushDue) return; // už je naplánováno dřív
+      clearTimeout(pushTimer);
+    }
+    pushDue = due;
+    pushTimer = setTimeout(function () { pushTimer = null; run(false).catch(function () {}); }, Math.max(1000, due - now()));
   }
 
   /* ── Sloučení ──────────────────────────────────────────────────────────────────────────────── */
@@ -151,7 +159,7 @@
       Object.keys(meta.d).forEach(function (id) { if (!blob.del[id] || blob.del[id] < meta.d[id]) blob.del[id] = meta.d[id]; });
       Object.keys(blob.del).forEach(function (id) { if (!(meta.d[id] > blob.del[id])) meta.d[id] = blob.del[id]; });
       Object.keys(remote.keys).forEach(function (k) { blob.keys[k] = remote.keys[k]; });
-      var changed = false, keys = localKeys(), seen = {};
+      var changed = false, changedKeys = [], keys = localKeys(), seen = {};
       if (apply) applying = true;
       try {
         keys.forEach(function (k) {
@@ -162,9 +170,9 @@
           if (k === PROFILES_KEY) return; // řeší se zvlášť níže
           if (rt < 0 || lt > rt) { blob.keys[k] = { v: v, t: lt }; }
           else if (r && rt > lt && apply) {
-            if (r.v === null) { del(k); } else if (r.v !== v) { set(k, r.v); changed = true; }
+            if (r.v === null) { del(k); } else if (r.v !== v) { set(k, r.v); changed = true; changedKeys.push(k); }
             meta.t[k] = rt;
-            if (r.v === null) { delete meta.t[k]; changed = true; }
+            if (r.v === null) { delete meta.t[k]; changed = true; changedKeys.push(k); }
           }
         });
         // tombstony lokálních smazání
@@ -177,7 +185,7 @@
           if (seen[k] || k === PROFILES_KEY || !syncable(k)) return;
           var r = remote.keys[k];
           if (r.v === null || meta.g[k] >= (r.t || 0)) return;
-          set(k, r.v); meta.t[k] = r.t || 1; changed = true;
+          set(k, r.v); meta.t[k] = r.t || 1; changed = true; changedKeys.push(k);
         });
         // profily: spojení podle ID
         var lRaw = get(PROFILES_KEY), rRaw = remote.keys[PROFILES_KEY] ? remote.keys[PROFILES_KEY].v : null;
@@ -185,7 +193,7 @@
         var merged = mergeProfiles(lRaw, rRaw, rt2 > lt2, blob.del);
         if (merged !== rRaw) blob.keys[PROFILES_KEY] = { v: merged, t: merged === lRaw ? lt2 : Math.max(now(), lt2, rt2 + 1) };
         if (merged !== lRaw && apply) {
-          set(PROFILES_KEY, merged); changed = true;
+          set(PROFILES_KEY, merged); changed = true; changedKeys.push(PROFILES_KEY);
           meta.t[PROFILES_KEY] = blob.keys[PROFILES_KEY] ? blob.keys[PROFILES_KEY].t : rt2;
         }
         lastProfileIds = profileIds(get(PROFILES_KEY));
@@ -195,7 +203,7 @@
       var done = function () {
         lastPush = now();
         set(LAST_KEY, String(now()));
-        return { changed: changed };
+        return { changed: changed, keys: changedKeys };
       };
       return needPush ? api("/sync/push", { id: syncId(), data: blob }).then(done) : Promise.resolve(done());
     }).then(function (r) { busy = null; return r; }, function (e) { busy = null; throw e; });
@@ -236,17 +244,49 @@
     return !!(c && c.classList.contains("open")) || !!document.querySelector(".mf-cin-modal.open");
   }
 
-  /** Synchronizace s uplatněním cizích změn; při změně dat načte stránku znovu, ať appka ukazuje aktuální stav. */
+  function banner() {
+    if (document.getElementById("mfSyncBanner")) return;
+    var b = document.createElement("div");
+    b.id = "mfSyncBanner";
+    b.innerHTML = '<span>Na jiném zařízení se něco změnilo.</span><button type="button">Načíst změny</button>';
+    b.querySelector("button").onclick = function () { location.reload(); };
+    document.body.appendChild(b);
+  }
+
+  function activeProfileGone() {
+    try {
+      var id = get("mf_active_pid");
+      return !!id && profileIds(get(PROFILES_KEY)).indexOf(id) < 0;
+    } catch (e) { return false; }
+  }
+
+  /** Po uplatnění cizích změn: jen nový/odebraný profil = překreslí se seznamy bez načtení; ostatní změny stránku obnoví
+   *  (při startu hned, při průběžné kontrole jen nabídkou „Načíst změny“, ať to člověka neruší). */
+  function afterApply(r, mode) {
+    if (!r || !r.changed) return r;
+    var keys = r.keys || [], onlyProfiles = keys.every(function (k) { return k === PROFILES_KEY; });
+    if (onlyProfiles && !activeProfileGone()) {
+      try { window.dispatchEvent(new Event("mf:sync-applied")); } catch (e) {}
+      try { if (window.ProfileGate) ProfileGate.renderGate(); } catch (e) {}
+      try { if (window.nfRenderProfile) nfRenderProfile(); } catch (e) {}
+      return r;
+    }
+    if (mode === "poll") { banner(); return r; }
+    try { sessionStorage.setItem("mf_sync_reloaded", String(now())); } catch (e) {}
+    if (typeof showToast === "function") showToast("Načtena data z jiného zařízení", 1800);
+    setTimeout(function () { location.reload(); }, 900);
+    return r;
+  }
+
+  /** Synchronizace s uplatněním cizích změn. opts.reload === false = jen vrátí výsledek (ruční tlačítko si to řeší samo). */
   function syncNow(opts) {
     opts = opts || {};
-    return run(true).then(function (r) {
-      if (r.changed && opts.reload !== false) {
-        try { sessionStorage.setItem("mf_sync_reloaded", String(now())); } catch (e) {}
-        if (typeof showToast === "function") showToast("Načtena data z jiného zařízení", 1800);
-        setTimeout(function () { location.reload(); }, 900);
-      }
-      return r;
-    });
+    return run(true).then(function (r) { return opts.reload === false ? r : afterApply(r, opts.mode); });
+  }
+
+  function poll() {
+    if (!isLinked() || !available() || document.visibilityState !== "visible" || cinemaOpen() || busy) return;
+    syncNow({ mode: "poll" }).catch(function () {});
   }
 
   var hiddenAt = 0;
@@ -255,15 +295,17 @@
     if (document.visibilityState === "hidden") {
       hiddenAt = now();
       if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; run(false).catch(function () {}); }
-    } else if (hiddenAt && now() - hiddenAt > 2 * 60 * 1000 && !cinemaOpen()) {
-      syncNow().catch(function () {});
+    } else if (hiddenAt && now() - hiddenAt > 20 * 1000 && !cinemaOpen()) {
+      syncNow({ mode: "poll" }).catch(function () {});
     }
   });
+  window.addEventListener("online", function () { poll(); });
 
   window.addEventListener("DOMContentLoaded", function () {
     lastProfileIds = profileIds(get(PROFILES_KEY));
     if (!isLinked() || !available()) return;
     setTimeout(function () { syncNow().catch(function () {}); }, 1200);
+    setInterval(poll, POLL_MS);
   });
 
   window.MFSync = {
@@ -273,6 +315,7 @@
     join: join,
     unlink: unlink,
     syncNow: syncNow,
+    _poll: poll,
     lastSync: function () { return parseInt(get(LAST_KEY) || "0", 10) || 0; },
     _syncable: syncable,
     _mergeProfiles: mergeProfiles
