@@ -1,7 +1,15 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33290058/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33299133/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
+
+- Propojení zařízení: 6znakový kód nebo QR, data (profily, seznamy, hodnocení) se sdílejí přes Worker + Cloudflare KV; tajné klíče a PIN zámek se nesdílí. Vstupy: menu profilu vpravo nahoře, „Kdo se dívá?“ (pod Upravit) a nový 3. krok při vytvoření profilu (jen když není propojeno). Soubory: `js/core/sync.js`, `sync-ui.js`, `qr.js`, `worker/tmdb-proxy.js`.
+- README přepsáno: aktuální struktura, profily, PIN zámek, avatary, NajSerialy/Uzi.la.
+
+- Menu profilu vpravo nahoře (jako Netflix): rychlé přepnutí na jiný profil, „Upravit profil“, „Spravovat profily“.
+- Úprava profilu používá stejnou obrazovku jako tvorba (1:1), jen s textem „Uprav si svůj profil“, tlačítkem „Uložit změny“ a „Smazat profil“.
+- Kdo se dívá → Upravit: avatary se netřesou (tužka na tmavém překryvu), klik na avatar otevře úpravu, červené „−“ je větší.
+- Kino: srdce je až za hvězdou; „Kde legálně sledovat“ má nový vzhled (ikona TV, panel a tlačítka ve stylu Netflixu).
 
 - Avatar, hledání: další zdroje obrázků postav – Fandom wiki (Marvel, DC, Star Wars, Harry Potter, Game of Thrones, Stranger Things, Breaking Bad, Disney) a Wikidata (fiktivní postavy). Výsledky se doplňují průběžně podle toho, jak který zdroj odpoví. TVmaze bere výhradně obrázek postavy (character.image), postavy bez něj přeskočí.
 
