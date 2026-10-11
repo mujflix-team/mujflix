@@ -8,3 +8,9 @@ ALLOWED_ORIGINS = "https://mujflix.pages.dev,http://localhost:8080"
 
 # Tajný klíč nastav příkazem (nedávej ho sem):
 #   npx wrangler secret put TMDB_API_KEY
+
+# Propojení zařízení (volitelné). Vytvoř úložiště a vlož jeho id:
+#   npx wrangler kv namespace create SYNC
+# [[kv_namespaces]]
+# binding = "SYNC"
+# id = "<id z předchozího příkazu>"
