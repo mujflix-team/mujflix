@@ -1,3 +1,4 @@
+[TASKS.md](https://github.com/user-attachments/files/33337642/TASKS.md)
 # Úkoly a rozdělená práce
 
 Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončení přesuň do „Hotovo“ a dopiš do `CHANGELOG.md`.
