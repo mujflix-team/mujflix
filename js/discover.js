@@ -392,6 +392,8 @@
     } catch (e) { return []; }
   }
 
+  function onlyAnime() { return !!(window.mfOnlyAnime && window.mfOnlyAnime()); }
+
   function discoverUrl(type, page, o) {
     var q = ['language=cs-CZ', 'include_adult=false', 'page=' + page];
     if (o.sort === 'rating') {
@@ -402,7 +404,11 @@
     } else {
       q.push('sort_by=popularity.desc', 'vote_count.gte=25');
     }
-    if (o.genres) q.push('with_genres=' + encodeURIComponent(o.genres));
+    if (onlyAnime()) {
+      // „Jen anime“: animace (16) japonského původu; vybraný žánr se přidá jako další podmínka (čárka = a zároveň)
+      var extra = o.genres ? String(o.genres).split('|')[0] : '';
+      q.push('with_genres=' + encodeURIComponent(extra && extra !== '16' ? '16,' + extra : '16'), 'with_original_language=ja');
+    } else if (o.genres) q.push('with_genres=' + encodeURIComponent(o.genres));
     if (o.year) q.push((type === 'movie' ? 'primary_release_year=' : 'first_air_date_year=') + o.year);
     return '/discover/' + type + '?' + q.join('&');
   }
@@ -428,9 +434,24 @@
     body.appendChild(heroSlot);
     renderHistoryChips(body);
 
-    var prefs = topGenreIds();
+    var prefs = onlyAnime() ? [] : topGenreIds();
     var seen = seenIds();
     var rows = [];
+
+    if (onlyAnime()) {
+      var animeRow = function (title, sub, sort, hero) {
+        return {
+          title: title, sub: sub, showType: true, hero: !!hero,
+          load: function () {
+            return Promise.all([fetchDiscover('tv', 1, { sort: sort }), fetchDiscover('movie', 1, { sort: sort })])
+              .then(function (r) { return interleave(r[0].items, r[1].items); });
+          }
+        };
+      };
+      rows.push(animeRow('🔥 Populární anime', 'Máš zapnuto „Jen anime“ (změníš v menu profilu → Zaměření a žánry)', 'popular', true));
+      rows.push(animeRow('⭐ Nejlépe hodnocené anime', '', 'rating'));
+      rows.push(animeRow('🆕 Nově vydané anime', '', 'newest'));
+    }
 
     if (prefs.length) {
       var names = prefs.map(function (id) { return GENRE_NAMES[id]; }).filter(Boolean);
@@ -451,43 +472,45 @@
       });
     }
 
-    rows.push({
-      title: '🔥 Trendy tento týden', showType: true, hero: true,
-      load: function () { return api('/trending/all/week?language=cs-CZ').then(function (d) { return normList(d && d.results); }); }
-    });
-
-    var genreRows = [];
-    prefs.slice(0, 2).forEach(function (id) { var g = genreForId(id); if (g && genreRows.indexOf(g) < 0) genreRows.push(g); });
-    ['kom', 'akcni', 'drama'].forEach(function (k) {
-      var g = genreByKey(k);
-      if (genreRows.length < 2 && genreRows.indexOf(g) < 0) genreRows.push(g);
-    });
-    genreRows.forEach(function (g) {
+    if (!onlyAnime()) {
       rows.push({
-        title: g.name, sub: 'Filmy i seriály jednoho žánru', showType: true, more: g.key,
-        load: function () {
-          return Promise.all([
-            g.tv ? fetchDiscover('tv', 1, { genres: g.tv }) : Promise.resolve({ items: [] }),
-            g.movie ? fetchDiscover('movie', 1, { genres: g.movie }) : Promise.resolve({ items: [] })
-          ]).then(function (r) {
-            var list = interleave(r[0].items, r[1].items);
-            return g.key === 'anim' ? list.filter(function (it) { return !it.anime; }) : list;
-          });
-        }
+        title: '🔥 Trendy tento týden', showType: true, hero: true,
+        load: function () { return api('/trending/all/week?language=cs-CZ').then(function (d) { return normList(d && d.results); }); }
       });
-    });
 
-    rows.push({ title: '🎬 Nejlépe hodnocené filmy', load: function () {
-      return api('/movie/top_rated?language=cs-CZ').then(function (d) { return normList(d && d.results, 'movie'); });
-    } });
-    rows.push({ title: '📺 Nejlépe hodnocené seriály', load: function () {
-      return api('/tv/top_rated?language=cs-CZ').then(function (d) { return normList(d && d.results, 'tv'); });
-    } });
-    rows.push({ title: '🆕 Nově v kinech a v televizi', showType: true, load: function () {
-      return Promise.all([api('/movie/now_playing?language=cs-CZ'), api('/tv/on_the_air?language=cs-CZ')]).then(function (r) {
-        return interleave(normList(r[0] && r[0].results, 'movie'), normList(r[1] && r[1].results, 'tv'));
+      var genreRows = [];
+      prefs.slice(0, 2).forEach(function (id) { var g = genreForId(id); if (g && genreRows.indexOf(g) < 0) genreRows.push(g); });
+      ['kom', 'akcni', 'drama'].forEach(function (k) {
+        var g = genreByKey(k);
+        if (genreRows.length < 2 && genreRows.indexOf(g) < 0) genreRows.push(g);
       });
-    } });
+      genreRows.forEach(function (g) {
+        rows.push({
+          title: g.name, sub: 'Filmy i seriály jednoho žánru', showType: true, more: g.key,
+          load: function () {
+            return Promise.all([
+              g.tv ? fetchDiscover('tv', 1, { genres: g.tv }) : Promise.resolve({ items: [] }),
+              g.movie ? fetchDiscover('movie', 1, { genres: g.movie }) : Promise.resolve({ items: [] })
+            ]).then(function (r) {
+              var list = interleave(r[0].items, r[1].items);
+              return g.key === 'anim' ? list.filter(function (it) { return !it.anime; }) : list;
+            });
+          }
+        });
+      });
+
+      rows.push({ title: '🎬 Nejlépe hodnocené filmy', load: function () {
+        return api('/movie/top_rated?language=cs-CZ').then(function (d) { return normList(d && d.results, 'movie'); });
+      } });
+      rows.push({ title: '📺 Nejlépe hodnocené seriály', load: function () {
+        return api('/tv/top_rated?language=cs-CZ').then(function (d) { return normList(d && d.results, 'tv'); });
+      } });
+      rows.push({ title: '🆕 Nově v kinech a v televizi', showType: true, load: function () {
+        return Promise.all([api('/movie/now_playing?language=cs-CZ'), api('/tv/on_the_air?language=cs-CZ')]).then(function (r) {
+          return interleave(normList(r[0] && r[0].results, 'movie'), normList(r[1] && r[1].results, 'tv'));
+        });
+      } });
+    }
 
     var heroDone = false, rowsLeft = rows.length, rowsKept = 0;
     rows.forEach(function (r) {
@@ -606,7 +629,7 @@
     var page = ctx.page + 1;
     if (ctx.mode === 'search') {
       return api('/search/multi?language=cs-CZ&include_adult=false&page=' + page + '&query=' + encodeURIComponent(state.query)).then(function (d) {
-        var items = normList(d && d.results).filter(matchesFilters);
+        var items = normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
         return { items: items, pages: (d && d.total_pages) || 0 };
       });
@@ -624,7 +647,7 @@
       var pages = 0, lists = [];
       r.forEach(function (x) { pages = Math.max(pages, x.pages); lists.push(x.items); });
       var merged = lists.length === 2 ? mergeBy(state.sort, lists[0], lists[1]) : lists[0];
-      if (g && g.key === 'anim') merged = merged.filter(function (it) { return !it.anime; });
+      if (g && g.key === 'anim' && !onlyAnime()) merged = merged.filter(function (it) { return !it.anime; });
       return { items: merged, pages: pages };
     });
   }
