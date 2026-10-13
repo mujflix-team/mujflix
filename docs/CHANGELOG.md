@@ -1,7 +1,9 @@
+[CHANGELOG.md](https://github.com/user-attachments/files/33405634/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
 - Úklid: z `index.html` odstraněno staré dlaždicové menu (`.ps-menu-scene`, ~230 řádků), které bylo na nové domovské stránce vždy skryté. Vzhled beze změny (31 ze 32 snímků pixel po pixelu shodných, zbylý se liší jen načasováním tečky u zvonku); data `db` a `mf_db_custom` zůstávají.
+- Nové: **Zaměření a žánry** v menu profilu (avatar vpravo nahoře): přepínač **Všechno / Jen anime** a výběr oblíbených žánrů (až 5), vše se ukládá do profilu a synchronizuje mezi zařízeními. „Jen anime“ filtruje doporučení, Objevovat (řady i hledání) a novinky; při zakládání profilu je v prvním kroku stejný přepínač. Pokryto testy.
 - Sdílená paměť zdrojů: Worker má `/src/get` a `/src/report` (KV, jen počty hlášení názvu zdroje pro titul, omezení 20 hlášení / 10 min na IP, vypnutí `SRC_SHARE=off`). Kino hlásí funkční zdroj jednou za titul a zařízení a na začátku použije zdroj od ostatních, pokud nemá vlastní zkušenost. **Vyžaduje nasazení nového kódu Workeru** (bez něj appka funguje jako dřív). Pokryto testy ve Workeru i v kině.
 - Rychlost: service worker bere písma (`/fonts/*.woff2`) rovnou z cache bez dotazu na síť (ověřeno, funguje i offline). Zbytek zůstává „nejdřív síť“, aby po nasazení opravy nehrozil starý kód.
 - Úklid 3: z CSS odstraněno 159 mrtvých pravidel starých dlaždic (`.ps-tile*`, `.ps-menu*`, `.tile-*`, `.tsi-*`); `styles.css` 187 → 164 kB. Vzhled beze změny (snímky shodné), testy prošly.
