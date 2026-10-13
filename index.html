@@ -264,6 +264,10 @@
             <div class="pw-title">Ještě jedna maličkost</div>
             <div class="pw-subtitle">Co tě baví? Vyber pár žánrů a my ti připravíme lepší start.</div>
             <div class="pw-genres" id="pwGenres"></div>
+            <label class="pw-only-anime" for="pwAnimeOnly">
+              <input type="checkbox" id="pwAnimeOnly">
+              <span><strong>Jen anime</strong><small>Doporučení i Objevovat ukážou jen anime. Půjde změnit v menu profilu.</small></span>
+            </label>
             <div class="pw-actions">
               <button class="pw-skip" onclick="window.ProfileGate?.skipOnboardingGenres()">Přeskočit</button>
               <button class="pw-save" onclick="window.ProfileGate?.finishOnboarding()">Pokračovat</button>
@@ -2323,6 +2327,7 @@
     <script src="js/core/sync-ui.js" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
     <script src="js/profiles/gate.js?v=1" defer></script>
+    <script src="js/profiles/prefs.js" defer></script>
     <script src="js/finder/finder.js?v=1" defer></script>
     <script src="js/app.js?v=9" defer></script>
     <script src="js/discover.js?v=1" defer></script>
