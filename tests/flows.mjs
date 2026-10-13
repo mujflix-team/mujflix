@@ -780,7 +780,7 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "edit,manage,sync,backup" && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "edit,prefs,manage,sync,backup" && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 check("Kdo se dívá → Upravit: bez třesení, tužka na avataru, velké červené mínus, klik otevře úpravu", menuT.anim === "none" && menuT.overlay && menuT.rmSize >= 36 && menuT.editTitle === "Uprav si svůj profil" && menuT.editName === "MenuB", JSON.stringify(menuT));
 
 const cinOrder = await page.evaluate(() => {
@@ -1105,6 +1105,60 @@ check("sdílené zdroje: zdroj od ostatních se použije na začátku i z cache 
 check("sdílené zdroje: vlastní zkušenost má přednost", shr.ownWins, JSON.stringify(shr));
 check("sdílené zdroje: funkční zdroj se nahlásí jen jednou (titul + název zdroje)", shr.reports === 1 && shr.repKey === "movie:777006" && !!shr.repLabel, JSON.stringify(shr));
 check("sdílené zdroje: po vypnutí se nic neposílá, výpadek Workeru nic nerozbije", shr.offCalls === 0 && shr.offlineOk, JSON.stringify(shr));
+
+
+// --- Zaměření a žánry (menu profilu) a „Jen anime“ při zakládání profilu
+const pfT = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  const id = getActiveProfileId(), ps0 = _getProfiles(), bak = JSON.stringify(ps0.find(x => x.id === id));
+  const prof = () => _getProfiles().find(x => x.id === id);
+  const reset = () => { const ps = _getProfiles(), p = ps.find(x => x.id === id); p.prefs = { ...p.prefs }; delete p.prefs.animeOnly; p.prefs.likesAnime = false; p.likedGenres = []; _saveProfiles(ps); };
+  const click = (a, v) => document.querySelector('#mfPrefsModal [data-pf="' + a + '"]' + (v ? '[data-v="' + v + '"]' : "")).click();
+  try {
+    reset();
+    mfToggleProfileMenu(document.getElementById("nfAvatar")); await wait(50);
+    out.menuItem = !!document.querySelector('#nfProfileMenu [data-act="prefs"]');
+    document.querySelector('#nfProfileMenu [data-act="prefs"]').click(); await wait(50);
+    out.opened = document.getElementById("mfPrefsModal").classList.contains("show");
+    out.startAll = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "all";
+    click("mode", "only"); click("genre", "28"); click("genre", "35"); click("save"); await wait(50);
+    let p = prof();
+    out.only = p.prefs.animeOnly === true && p.prefs.likesAnime === true && window.mfOnlyAnime() === true;
+    out.genres = JSON.stringify(p.likedGenres) === "[28,35]";
+    out.closed = !document.getElementById("mfPrefsModal").classList.contains("show");
+    // znovu otevřít: nastavení je vidět; zpět na „Všechno“ + přimíchávání
+    MFPrefs.open();
+    out.reopenOnly = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "only" && document.querySelectorAll('#mfPrefsModal .pf-chip.pf-on').length === 2;
+    click("mode", "all"); document.getElementById("mfPrefsMix").checked = true; document.getElementById("mfPrefsMix").dispatchEvent(new Event("change", { bubbles: true })); click("save"); await wait(50);
+    p = prof(); out.backAll = p.prefs.animeOnly === false && p.prefs.likesAnime === true && window.mfOnlyAnime() === false && JSON.stringify(p.likedGenres) === "[28,35]";
+    // nejvýš 5 žánrů
+    MFPrefs.open(); ["80", "12", "878"].forEach(g => click("genre", g)); click("genre", "14");
+    out.max5 = document.querySelectorAll('#mfPrefsModal .pf-chip.pf-on').length === 5 && /nejvýš 5/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
+    MFPrefs.close();
+    // zakládání profilu: přepínač „Jen anime“
+    reset();
+    ProfileGate.openOnboarding(id); await wait(30);
+    out.obBox = !!document.getElementById("pwAnimeOnly");
+    document.getElementById("pwAnimeOnly").checked = true;
+    document.querySelector('#pwGenres [data-genre="35"]').classList.add("selected");
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    p = prof(); out.obOnly = p.prefs.animeOnly === true && p.prefs.likesAnime === true && window.mfOnlyAnime() === true && JSON.stringify(p.likedGenres) === "[35]";
+    reset();
+    ProfileGate.openOnboarding(id); await wait(30);
+    out.obReset = document.getElementById("pwAnimeOnly").checked === false;
+    document.querySelector('#pwGenres [data-genre="35"]').classList.add("selected");
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    p = prof(); out.obAll = !("animeOnly" in p.prefs) && window.mfOnlyAnime() === false;
+  } finally {
+    const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
+    try { MFPrefs.close(); ProfileGate.closeOnboarding(); mfCloseProfileMenu(); } catch { /* nic */ }
+  }
+  return out;
+});
+check("zaměření: v menu profilu je „Zaměření a žánry“ a okno se otevře", pfT.menuItem && pfT.opened && pfT.startAll, JSON.stringify(pfT));
+check("zaměření: Jen anime + žánry se uloží do profilu a po otevření jsou vidět; zpět na Všechno funguje", pfT.only && pfT.genres && pfT.closed && pfT.reopenOnly && pfT.backAll, JSON.stringify(pfT));
+check("zaměření: nejvýš 5 žánrů", pfT.max5, JSON.stringify(pfT));
+check("zakládání profilu: přepínač Jen anime se uloží, bez něj zůstane běžný režim", pfT.obBox && pfT.obOnly && pfT.obReset && pfT.obAll, JSON.stringify(pfT));
 
 
 // --- Záloha dat do souboru
