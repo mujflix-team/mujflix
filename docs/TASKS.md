@@ -1,3 +1,4 @@
+[TASKS.md](https://github.com/user-attachments/files/33405649/TASKS.md)
 # Úkoly a rozdělená práce
 
 Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončení přesuň do „Hotovo“ a dopiš do `CHANGELOG.md`.
@@ -18,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - Sdílená paměť zdrojů mezi uživateli (Worker `/src/*`).
+- Zaměření a žánry v menu profilu, přepínač „Jen anime“ (i při zakládání profilu).
 - Úklid 1–3: odstraněno staré dlaždicové menu (HTML, JS i CSS); vzhled beze změny.
 - Paměť zdrojů a „Nefunguje to“ v kině, záloha dat do souboru, rychlejší start (defer CDN skriptů, lazy QR).
 - Propojení zařízení (kód/QR, Worker + KV), třetí krok onboardingu, menu profilu, PIN zámek s eskalací, výběr avatarů z postav.
