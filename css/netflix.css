@@ -1013,3 +1013,15 @@ html body #mfProfileWelcome .pw-only-anime small { display: block; color: #b3b3b
 #mfSettingsModal .pf-row-txt strong { font-size: 1.05rem; }
 #mfSettingsModal .pf-row-txt small { color: #b3b3b3; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #mfSettingsModal .pf-row-go { flex: none; color: #808080; font-size: 1.6rem; line-height: 1; }
+#mfPrefsModal .pf-seg4 { grid-template-columns: repeat(4, 1fr); }
+#mfPrefsModal .pf-seg4 .pf-segbtn { font-size: 0.92rem; padding: 12px 4px; }
+#mfPrefsModal .pf-pin { display: block; width: 100%; box-sizing: border-box; margin: 10px 0 0; text-align: center; background: #333; border: 1px solid #555; border-radius: 4px; color: #fff; font: 700 1.1rem var(--nf-font, sans-serif); letter-spacing: 0.3em; padding: 12px; }
+#mfPrefsModal .pf-pin:focus { outline: 0; border-color: #fff; }
+
+html body #mfProfileWelcome .pw-age { margin: 14px 0 4px; text-align: left; }
+html body #mfProfileWelcome .pw-age-t strong { color: #fff; }
+html body #mfProfileWelcome .pw-age-t small { color: #b3b3b3; font-size: 0.85rem; }
+html body #mfProfileWelcome .pw-age-row { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 8px; border: 1px solid #595959; border-radius: 4px; overflow: hidden; }
+html body #mfProfileWelcome .pw-agebtn { background: transparent; border: 0; color: #d2d2d2; font: 700 0.95rem var(--nf-font, sans-serif); padding: 11px 4px; cursor: pointer; }
+html body #mfProfileWelcome .pw-agebtn + .pw-agebtn { border-left: 1px solid #595959; }
+html body #mfProfileWelcome .pw-agebtn.pw-on { background: #fff; color: #000; }
