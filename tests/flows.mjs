@@ -537,6 +537,23 @@ const av2 = await page.evaluate(async () => {
 });
 check("avatar: výchozí nabídka jsou postavy (anime + seriály, Marvel/DC, filmy), výběr se uloží", av2.n >= 2 && av2.rows >= 2 && /wikimedia\.org\/b\.jpg$/.test(av2.picked || ""), JSON.stringify(av2));
 
+const avOrd = await page.evaluate(async () => {
+  const orig = window.fetch, mk = n => ({ query: { pages: Object.fromEntries(Array.from({ length: n }, (_, i) => [i + 1, { title: "P" + i, index: i, thumbnail: { source: "https://upload.wikimedia.org/p" + n + "_" + i + ".jpg" } }])) } });
+  window.fetch = async u => {
+    u = String(u);
+    const body = /anilist/.test(u) ? { data: { Page: { characters: [], media: [] } } }
+      : /Stranger/.test(decodeURIComponent(u)) ? mk(2) : /Marvel|Spider/.test(decodeURIComponent(u)) ? mk(9) : mk(6);
+    return { ok: true, json: async () => body };
+  };
+  ProfileGate.openCreate();
+  for (let i = 0; i < 30 && !document.querySelector("#pcAvatarGrid .pc-av-row"); i++) await new Promise(r => setTimeout(r, 100));
+  const titles = [...document.querySelectorAll("#pcAvatarGrid .pc-av-row h4")].map(h => h.textContent);
+  window.fetch = orig; ProfileGate.closeCreate && ProfileGate.closeCreate();
+  return { titles, ver: document.getElementById("pgVersion").textContent, mv: window.MF_VERSION };
+});
+check("avatar: nejdřív řady s nejvíc obrázky, řada s 2 obrázky (Stranger Things) se nezobrazí", avOrd.titles[0] === "Marvel" && !avOrd.titles.includes("Stranger Things") && avOrd.titles.length >= 5, JSON.stringify(avOrd));
+check("verze aplikace je vpravo dole na obrazovce Kdo se dívá", avOrd.ver === "v" + avOrd.mv && /^\d+\.\d+\.\d+$/.test(avOrd.mv), JSON.stringify(avOrd));
+
 const dd = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
   openSeries(slug); renderSeasons();
