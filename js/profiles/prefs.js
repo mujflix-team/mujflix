@@ -4,6 +4,7 @@
   "use strict";
   var el = null, state = null;
   var MAX_GENRES = 5;
+  var AGES = [[0, "Bez omezení", ""], [7, "Do 7", "do 7 let"], [12, "Do 12", "do 12 let"], [15, "Do 15", "do 15 let"]];
   var GENRES = [
     ["28", "Akce"], ["12", "Dobrodružný"], ["35", "Komedie"], ["18", "Drama"], ["80", "Krimi"], ["9648", "Mysteriózní"],
     ["878", "Sci-Fi"], ["14", "Fantasy"], ["27", "Horor"], ["53", "Thriller"], ["10749", "Romantika"], ["16", "Animované"],
@@ -28,6 +29,7 @@
       else if (a === "save") save();
       else if (a === "mode") { state.only = b.getAttribute("data-v") === "only"; render(); }
       else if (a === "genre") toggleGenre(b.getAttribute("data-v"));
+      else if (a === "age") { state.age = Number(b.getAttribute("data-v")); render(); }
     });
     el.addEventListener("change", function (e) {
       if (e.target && e.target.id === "mfPrefsMix") { state.mix = !!e.target.checked; }
@@ -52,6 +54,7 @@
 
   function render() {
     ensure();
+    var oldPin = el.querySelector("#mfPrefsPin"), oldPinVal = oldPin ? oldPin.value : "";
     var chips = GENRES.map(function (g) {
       var on = state.genres.indexOf(g[0]) > -1;
       return '<button type="button" class="pf-chip' + (on ? " pf-on" : "") + '" data-pf="genre" data-v="' + g[0] + '" aria-pressed="' + on + '">' + g[1] + "</button>";
@@ -69,12 +72,19 @@
         (state.only
           ? '<div class="pf-note">Doporučení, Objevovat i hledání ukážou jen anime. Žánry níže zůstanou uložené a použijí se po přepnutí zpět na „Všechno“.</div>'
           : '<label class="pf-mix"><input type="checkbox" id="mfPrefsMix"' + (state.mix ? " checked" : "") + '><span>Přimíchávat anime do doporučení</span></label>') +
+        '<div class="pf-label">Věkové omezení</div>' +
+        '<div class="pf-seg pf-seg4" role="group" aria-label="Věkové omezení">' + AGES.map(function (a) {
+          return '<button type="button" class="pf-segbtn' + (state.age === a[0] ? " pf-on" : "") + '" data-pf="age" data-v="' + a[0] + '" aria-pressed="' + (state.age === a[0]) + '">' + a[1] + "</button>";
+        }).join("") + "</div>" +
+        '<div class="pf-note">' + (state.age ? "Doporučení, Objevovat i hledání ukážou jen tituly vhodné " + AGES.filter(function (a) { return a[0] === state.age; })[0][2] + ". Hodnocení bere z TMDB (americká škála); titul bez hodnocení se skryje." : "Bez omezení: ukáže se všechno.") + "</div>" +
+        (state.pin && state.age !== state.age0 ? '<input type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="pf-pin" id="mfPrefsPin" placeholder="PIN profilu pro změnu věku" aria-label="PIN profilu">' : "") +
         '<div class="pf-label">Oblíbené žánry <span class="pf-count">' + state.genres.length + "/" + MAX_GENRES + "</span></div>" +
         '<div class="pf-chips' + (state.only ? " pf-dim" : "") + '">' + chips + "</div>" +
         '<div class="pf-msg" role="status"></div>' +
         '<button type="button" class="pf-save" data-pf="save">Uložit</button>' +
         '<button type="button" class="pf-cancel" data-pf="close">Zrušit</button>' +
       "</div>";
+    var np = el.querySelector("#mfPrefsPin"); if (np && oldPinVal) np.value = oldPinVal;
   }
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -88,8 +98,12 @@
       name: p.name || "Profil",
       only: anime,
       mix: !!(p.prefs && p.prefs.likesAnime),
+      age: (window.MFAge && MFAge.levels.indexOf(Number(p.prefs && p.prefs.maxAge)) > 0) ? Number(p.prefs.maxAge) : 0,
+      age0: 0,
+      pin: p.pin ? String(p.pin) : "",
       genres: (p.likedGenres || []).map(String).filter(function (g) { return GENRES.some(function (x) { return x[0] === g; }); }).slice(0, MAX_GENRES)
     };
+    state.age0 = state.age;
     render();
     el.classList.add("show");
     var f = el.querySelector(".pf-segbtn.pf-on"); if (f) f.focus();
@@ -100,9 +114,13 @@
   function save() {
     var all = _getProfiles(), p = all.find(function (x) { return x.id === state.id; });
     if (!p) return close();
+    if (state.pin && state.age !== state.age0) {
+      var pinEl = el.querySelector("#mfPrefsPin");
+      if (!pinEl || pinEl.value !== state.pin) { msg("Pro změnu věku zadej správný PIN profilu.", true); if (pinEl) pinEl.focus(); return; }
+    }
     var old = (p.likedGenres || []).map(String);
     p.likedGenres = state.genres.map(Number);
-    p.prefs = Object.assign({}, p.prefs, { animeOnly: state.only, likesAnime: state.only ? true : state.mix });
+    p.prefs = Object.assign({}, p.prefs, { animeOnly: state.only, likesAnime: state.only ? true : state.mix, maxAge: state.age });
     _saveProfiles(all);
     // nově přidané žánry se hned zohlední v učení doporučení
     try {
@@ -123,9 +141,8 @@
     var ic = function (d) { return '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>"; };
     return [
       ["profile", ic('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'), "Upravit profil", (p.name || "Profil") + " · jméno, avatar, PIN"],
-      ["prefs", ic('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'), "Zaměření a žánry", (only ? "Jen anime" : "Všechno") + " · " + (n ? n + " oblíbených žánrů" : "žánry nevybrány")],
-      ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", linked ? "Propojeno" : "Zatím nepropojeno"],
-      ["backup", ic('<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/>'), "Záloha dat", "Uložit do souboru nebo načíst ze zálohy"]
+      ["prefs", ic('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'), "Zaměření a žánry", (only ? "Jen anime" : "Všechno") + " · " + (n ? n + " oblíbených žánrů" : "žánry nevybrány") + ((window.MFAge && MFAge.limit()) ? " · do " + MFAge.limit() + " let" : "")],
+      ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno") + " · záloha dat"]
     ];
   }
   function hubOpen() {
