@@ -757,7 +757,11 @@ const menuT = await page.evaluate(() => {
   mfToggleProfileMenu(document.getElementById("nfAvatar"));
   const m = document.getElementById("nfProfileMenu");
   const out = { open: !!m, others: [...m.querySelectorAll("[data-pid]")].map(x => x.dataset.pid), acts: [...m.querySelectorAll("[data-act]")].map(x => x.dataset.act) };
-  m.querySelector("[data-act=edit]").click();
+  m.querySelector("[data-act=settings]").click();
+  out.hubRows = [...document.querySelectorAll("#mfSettingsModal [data-st]")].map(x => x.dataset.st).filter(x => x !== "close").join();
+  out.hubSub = document.querySelector('#mfSettingsModal [data-st="sync"] small').textContent;
+  document.querySelector('#mfSettingsModal [data-st="profile"]').click();
+  out.hubClosed = !document.getElementById("mfSettingsModal").classList.contains("show");
   out.menuClosed = !document.getElementById("nfProfileMenu");
   out.title = document.getElementById("pcModalTitle").textContent;
   out.save = document.querySelector("#mfProfileCreate .pc-btn-save").textContent;
@@ -780,7 +784,7 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "edit,prefs,manage,sync,backup" && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings" && menuT.hubRows === "profile,prefs,sync,backup" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 check("Kdo se dívá → Upravit: bez třesení, tužka na avataru, velké červené mínus, klik otevře úpravu", menuT.anim === "none" && menuT.overlay && menuT.rmSize >= 36 && menuT.editTitle === "Uprav si svůj profil" && menuT.editName === "MenuB", JSON.stringify(menuT));
 
 const cinOrder = await page.evaluate(() => {
@@ -937,7 +941,7 @@ const syEnt = await page.evaluate(() => {
 check("onboarding: nepropojeno = 3 kroky s krokem Propojení", syEnt.k3.endsWith("1/3") && syEnt.btn2 === "Pokračovat" && syEnt.step3, JSON.stringify(syEnt));
 check("onboarding: propojeno = 2 kroky", syEnt.k2.endsWith("1/2") && syEnt.btn2b === "Začít sledovat" && syEnt.closed, JSON.stringify(syEnt));
 check("sync: tlačítko v Kdo se dívá", syEnt.gateBtn);
-const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); const it = document.querySelector('#nfProfileMenu [data-act="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
+const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); document.querySelector('#nfProfileMenu [data-act="settings"]').click(); const it = document.querySelector('#mfSettingsModal [data-st="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
 check("sync: položka v menu profilu otevře obrazovku", syMenu.ok && syMenu.shown, JSON.stringify(syMenu));
 
 
@@ -1117,8 +1121,10 @@ const pfT = await page.evaluate(async () => {
   try {
     reset();
     mfToggleProfileMenu(document.getElementById("nfAvatar")); await wait(50);
-    out.menuItem = !!document.querySelector('#nfProfileMenu [data-act="prefs"]');
-    document.querySelector('#nfProfileMenu [data-act="prefs"]').click(); await wait(50);
+    out.menuItem = !!document.querySelector('#nfProfileMenu [data-act="settings"]');
+    document.querySelector('#nfProfileMenu [data-act="settings"]').click(); await wait(30);
+    out.hubSub = document.querySelector('#mfSettingsModal [data-st="prefs"] small').textContent;
+    document.querySelector('#mfSettingsModal [data-st="prefs"]').click(); await wait(50);
     out.opened = document.getElementById("mfPrefsModal").classList.contains("show");
     out.startAll = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "all";
     click("mode", "only"); click("genre", "28"); click("genre", "35"); click("save"); await wait(50);
@@ -1155,7 +1161,7 @@ const pfT = await page.evaluate(async () => {
   }
   return out;
 });
-check("zaměření: v menu profilu je „Zaměření a žánry“ a okno se otevře", pfT.menuItem && pfT.opened && pfT.startAll, JSON.stringify(pfT));
+check("zaměření: Nastavení v menu profilu → Zaměření a žánry otevře okno (s popiskem aktuální volby)", pfT.menuItem && pfT.opened && pfT.startAll && /Všechno/.test(pfT.hubSub), JSON.stringify(pfT));
 check("zaměření: Jen anime + žánry se uloží do profilu a po otevření jsou vidět; zpět na Všechno funguje", pfT.only && pfT.genres && pfT.closed && pfT.reopenOnly && pfT.backAll, JSON.stringify(pfT));
 check("zaměření: nejvýš 5 žánrů", pfT.max5, JSON.stringify(pfT));
 check("zakládání profilu: přepínač Jen anime se uloží, bez něj zůstane běžný režim", pfT.obBox && pfT.obOnly && pfT.obReset && pfT.obAll, JSON.stringify(pfT));
