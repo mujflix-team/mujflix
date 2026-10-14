@@ -298,12 +298,8 @@
           (others.length ? others.map(function (p) {
             return '<button type="button" role="menuitem" class="nf-pm-item" data-pid="' + esc(p.id) + '"><span class="nf-pm-av" style="--c:' + esc(p.color || '#0a84ff') + '">' + avatarHtml(p) + '</span><span>' + esc(p.name || 'Profil') + '</span></button>';
           }).join('') + '<div class="nf-pm-sep"></div>' : '') +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="edit"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Upravit profil</span></button>' +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="prefs"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Zaměření a žánry</span></button>' +
           '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="manage"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M17 5v6M14 8h6"/></svg><span>Spravovat profily</span></button>' +
-          '<div class="nf-pm-sep"></div>' +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="sync"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/></svg><span>Propojit zařízení</span></button>' +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="backup"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg><span>Záloha dat</span></button>';
+          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="settings"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Nastavení</span></button>';
         document.body.appendChild(m);
         var r = btn.getBoundingClientRect();
         m.style.top = Math.round(r.bottom + 12) + 'px';
@@ -313,11 +309,8 @@
           if (!it) return;
           mfCloseProfileMenu();
           if (it.dataset.pid) { if (window.ProfileGate) ProfileGate.selectProfile(it.dataset.pid); }
-          else if (it.dataset.act === 'edit' && cur && window.ProfileGate) ProfileGate.openCreate(cur.id);
-          else if (it.dataset.act === 'prefs' && window.MFPrefs) MFPrefs.open();
           else if (it.dataset.act === 'manage' && window.ProfileGate) { ProfileGate.show(); ProfileGate.toggleManageMode(); }
-          else if (it.dataset.act === 'sync' && window.MFSyncUI) MFSyncUI.open('home');
-          else if (it.dataset.act === 'backup' && window.MFSyncUI) MFSyncUI.open('backup');
+          else if (it.dataset.act === 'settings' && window.MFProfileSettings) MFProfileSettings.open();
         });
         setTimeout(function () {
           document.addEventListener('pointerdown', mfProfileMenuOutside, true);
