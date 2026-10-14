@@ -621,6 +621,6 @@ document.addEventListener("keydown", e => {
 
 /* Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová) */
 (function () {
-  function show() { var v = document.getElementById("pgVersion"); if (v) v.textContent = "v" + (window.MF_VERSION || "?"); }
+  function show() { var v = document.getElementById("pgVersion"); if (v) v.textContent = "v" + (window.MF_VERSION || "?") + (window.MF_BUILD ? " · " + window.MF_BUILD : ""), v.title = window.MF_BUILD_DATE ? "Sestaveno " + window.MF_BUILD_DATE : ""; }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", show); else show();
 })();
