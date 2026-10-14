@@ -113,5 +113,55 @@
     try { if (typeof showToast === "function") showToast(state.only ? "Zobrazuje se jen anime" : "Žánry a zaměření uloženy", 2200); } catch (e) { /* nic */ }
   }
 
+  /* ── Nastavení (jedna položka v menu profilu, pod ní profil, zaměření, propojení a záloha) ─────────────────── */
+  var hub = null;
+  function hubClose() { if (hub) hub.classList.remove("show"); }
+  function hubRows() {
+    var p = profile() || {}, only = !!(window.mfOnlyAnime && window.mfOnlyAnime());
+    var n = (p.likedGenres || []).length;
+    var linked = !!(window.MFSync && window.MFSync.isLinked && window.MFSync.isLinked());
+    var ic = function (d) { return '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>"; };
+    return [
+      ["profile", ic('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'), "Upravit profil", (p.name || "Profil") + " · jméno, avatar, PIN"],
+      ["prefs", ic('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'), "Zaměření a žánry", (only ? "Jen anime" : "Všechno") + " · " + (n ? n + " oblíbených žánrů" : "žánry nevybrány")],
+      ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", linked ? "Propojeno" : "Zatím nepropojeno"],
+      ["backup", ic('<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/>'), "Záloha dat", "Uložit do souboru nebo načíst ze zálohy"]
+    ];
+  }
+  function hubOpen() {
+    if (!hub) {
+      hub = document.createElement("div");
+      hub.id = "mfSettingsModal";
+      hub.setAttribute("role", "dialog");
+      hub.setAttribute("aria-modal", "true");
+      hub.setAttribute("aria-label", "Nastavení");
+      hub.addEventListener("click", function (e) {
+        if (e.target === hub) return hubClose();
+        var b = e.target.closest && e.target.closest("[data-st]");
+        if (!b) return;
+        var a = b.getAttribute("data-st");
+        hubClose();
+        if (a === "close") return;
+        if (a === "profile") { var pr = profile(); if (pr && window.ProfileGate) ProfileGate.openCreate(pr.id); }
+        else if (a === "prefs") open();
+        else if (a === "sync" && window.MFSyncUI) MFSyncUI.open("home");
+        else if (a === "backup" && window.MFSyncUI) MFSyncUI.open("backup");
+      });
+      hub.addEventListener("keydown", function (e) { if (e.key === "Escape") hubClose(); });
+      document.body.appendChild(hub);
+    }
+    hub.innerHTML = '<div class="pf-box">' +
+      '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
+      '<div class="pf-title">Nastavení</div>' +
+      '<div class="pf-text">Profil <b>' + esc((profile() || {}).name || "") + "</b></div>" +
+      '<div class="pf-rows">' + hubRows().map(function (r) {
+        return '<button type="button" class="pf-row" data-st="' + r[0] + '"><span class="pf-row-ico">' + r[1] + '</span><span class="pf-row-txt"><strong>' + r[2] + "</strong><small>" + esc(r[3]) + '</small></span><span class="pf-row-go" aria-hidden="true">›</span></button>';
+      }).join("") + "</div></div>";
+    hub.classList.add("show");
+    var f = hub.querySelector(".pf-row"); if (f) f.focus();
+  }
+
+  window.MFProfileSettings = { open: hubOpen, close: hubClose };
+
   window.MFPrefs = { open: open, close: close, _genres: GENRES };
 })();
