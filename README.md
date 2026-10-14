@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/33417303/README.md)
+[README.md](https://github.com/user-attachments/files/33417887/README.md)
 # 🎬 MůjFlix
 
 **MůjFlix je osobní filmový a seriálový tracker, který ti pomůže najít, kde sledovat filmy a seriály z různých zdrojů** — ať už jde o legální streamingové služby (Netflix, Disney+, Max, Apple TV+…) nebo o české a slovenské weby s online filmy (Bombuj, SvetSerialu, Prehrajto). Sleduj, co jsi viděl, dostávej chytrá doporučení a měj vše na jednom místě.
@@ -30,6 +30,7 @@ Hlavní funkce MůjFlixu — **propojení s více zdroji** a jejich chytré vyhl
 - **Cinema mód** — vestavěný přehrávač s výběrem sezóny a epizody, auto-next na další epizodu, přepínání zdrojů během přehrávání
 - **Sandbox iframe** — blokuje popup reklamy ze zdrojů, tip na uBlock Origin
 - **Zaměření a žánry** — v menu profilu (avatar vpravo nahoře → Nastavení) přepneš profil na „Jen anime“ (doporučení, Objevovat i hledání ukážou jen anime) nebo zpět na „Všechno“ a nastavíš si až 5 oblíbených žánrů
+- **Věkové omezení** — v Nastavení → Zaměření a žánry zvolíš Bez omezení / Do 7 / Do 12 / Do 15; doporučení, Objevovat, hledání a novinky pak ukážou jen tituly s odpovídajícím hodnocením z TMDB (americká škála). Titul bez hodnocení se skryje. Není to rodičovský zámek; u profilu s PINem jde věk změnit jen s PINem.
 - **Paměť zdrojů** — appka si pamatuje, který zdroj pro titul fungoval, a tlačítko „Nefunguje to“ zdroj označí a zkusí další
   - **Sdílená paměť zdrojů** (volitelná, potřebuje KV z propojení zařízení): zdroj, který fungoval ostatním, se zkusí jako první. Posílá se jen „titul + název zdroje“, nic o uživateli. Jde vypnout ve Workeru (`SRC_SHARE=off`) nebo na zařízení (`localStorage.mfx_src_share_off = "1"`).
 - **Alternativní názvy** — při hledání se zkouší anglický, původní i český/slovenský název (z TMDB)
