@@ -1304,6 +1304,20 @@ check("záloha: export obsahuje data bez API klíčů", bk.hasData && bk.noSecre
 check("záloha: import vrátí data a spojí profily, špatný soubor a cizí klíče odmítne", bk.imported && bk.profiles === "p_A,p_B" && bk.badFile === "badfile" && bk.evilKey, JSON.stringify(bk));
 check("záloha: obrazovka s tlačítky Stáhnout / Načíst", bk.ui);
 
+
+// --- Kino: „Další epizoda“ nespadne, když je TMDB nedostupné
+const nxt = await page.evaluate(async () => {
+  const nf = window.fetch;
+  window.fetch = (u, i) => (typeof u === "string" && u.includes("api.themoviedb.org")) ? Promise.reject(new Error("offline")) : nf(u, i);
+  try {
+    MFCinemaPlayer.open("424242", "Nějaký seriál", "tv_ep", { season: 1, episode: 1 });
+    document.getElementById("mfCinNextEp").click();
+    await new Promise(r => setTimeout(r, 300));
+    return document.getElementById("mfCinEpCurrent").textContent;
+  } finally { window.fetch = nf; MFCinemaPlayer.close(); }
+});
+check("kino: Další epizoda funguje i bez TMDB", /S01 · E02/.test(nxt), nxt);
+
 check("žádné JS chyby", errors.length === 0, errors.join(" | "));
 await close();
 finish();

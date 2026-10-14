@@ -6,6 +6,7 @@
 - Verze se hlídá sama: na Cloudflare Pages se při sestavení k verzi z `package.json` přidá krátké ID commitu (např. „v2.3.5 · abc1234“, datum sestavení je v nápovědě po najetí myší). Vyžaduje v Cloudflare Pages nastavit Build command `node scripts/version.mjs` a Build output directory `.`; bez toho se zobrazí jen číslo verze.
 - Výběr avatara: nahoře jsou řady s nejvíc obrázky; řady, kde se našly jen 1–4 obrázky (třeba Stranger Things), se nezobrazí.
 
+ Jablkooo
 ## 2.3.4
 - Oprava: s věkovým omezením zbývalo v řádcích jen pár titulů, protože se filtrovala jedna stránka (20 titulů). Omezený profil teď dotáhne 3 stránky seznamů (`MFAge.wide`) a základní seznam doporučení bere 40 titulů místo 10.
 - Oprava: dock se někdy sám schoval, když se stránka přesunula sama (načtení řádků, filtrování). Teď se schová jen při posouvání uživatelem (kolečko, prst, klávesy).
@@ -24,6 +25,8 @@
 - Kino: appka si pamatuje zdroj, který pro titul fungoval (začne jím příště i u dalších epizod), a nově je tu tlačítko „Nefunguje to“ (označí zdroj na 14 dní a zkusí další). Rychlé přepnutí „Jiný zdroj“ do 25 s označí zdroj jako podezřelý na 3 dny. Paměť se synchronizuje mezi zařízeními.
 - Záloha dat do souboru (menu profilu → Záloha dat): export / import profilů, seznamů a hodnocení bez API klíčů.
 - Rychlejší start: GSAP a confetti se z CDN načítají s `defer` (neblokují vykreslení) a QR knihovna (56 kB) se stahuje až při zobrazení kódu.
+
+ main
 - Test „Objevovat“ už nezávisí na `config.js` (s adresou Workeru se TMDB volalo přes `workers.dev` a test to blokoval, takže CI padalo).
 - Opraveno: v kině „Další epizoda“ spadla (`epCountFn is not a function`), když byl TMDB nedostupný; teď se použije záložní počet epizod. Tím padal i test v GitHub Actions.
 - Spolupráce ve dvou: `CLAUDE.md` (pravidla pro Clauda), `docs/TASKS.md`, `docs/SPOLUPRACE.md`, šablona Pull Requestu; `config.js` už není v `.gitignore`.
