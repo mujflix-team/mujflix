@@ -75,5 +75,19 @@
     return Promise.all(ws).then(function () { return items.filter(function (_, k) { return out[k]; }); });
   }
 
-  window.MFAge = { limit: limit, filter: filter, levels: LEVELS, _rating: rating, _allowed: allowed, _certOf: certOf };
+  /** Omezený profil: seznamy z TMDB (trending, discover, top rated…) mají jen 20 titulů a po odfiltrování by jich zbylo pár.
+      Proto se u nich dotáhnou další 2 stránky a výsledky se spojí. get(path) vrací Promise s {results:[…]}. */
+  function wide(path, get) {
+    if (!limit() || /^\/(movie|tv)\/\d+/.test(String(path).replace(/^https?:\/\/[^/]+(\/3)?/, "")) || /[?&]page=/.test(path)) return get(path);
+    var sep = String(path).indexOf("?") < 0 ? "?" : "&";
+    return Promise.all([get(path), get(path + sep + "page=2"), get(path + sep + "page=3")]).then(function (r) {
+      var first = r[0];
+      if (!first || !Array.isArray(first.results)) return first;
+      var seen = {}, all = [];
+      r.forEach(function (d) { ((d && d.results) || []).forEach(function (x) { var k = (x && x.media_type || "") + ":" + (x && x.id); if (!seen[k]) { seen[k] = 1; all.push(x); } }); });
+      return Object.assign({}, first, { results: all });
+    });
+  }
+
+  window.MFAge = { wide: wide, limit: limit, filter: filter, levels: LEVELS, _rating: rating, _allowed: allowed, _certOf: certOf };
 })();
