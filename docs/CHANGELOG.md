@@ -1,5 +1,10 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33436279/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33436765/CHANGELOG.md)
 # Changelog
+
+## 2.3.5
+### Nově
+- Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová).
+- Výběr avatara: nahoře jsou řady s nejvíc obrázky; řady, kde se našly jen 1–4 obrázky (třeba Stranger Things), se nezobrazí.
 
 ## 2.3.4
 - Oprava: s věkovým omezením zbývalo v řádcích jen pár titulů, protože se filtrovala jedna stránka (20 titulů). Omezený profil teď dotáhne 3 stránky seznamů (`MFAge.wide`) a základní seznam doporučení bere 40 titulů místo 10.
