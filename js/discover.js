@@ -392,6 +392,8 @@
     } catch (e) { return []; }
   }
 
+  function ageFilter(items) { return window.MFAge ? window.MFAge.filter(items) : Promise.resolve(items); }
+
   function onlyAnime() { return !!(window.mfOnlyAnime && window.mfOnlyAnime()); }
 
   function discoverUrl(type, page, o) {
@@ -523,7 +525,7 @@
       }
       sec.appendChild(rowSkeleton());
       body.appendChild(sec);
-      r.load().then(function (items) {
+      r.load().then(ageFilter).then(function (items) {
         if (myRun !== run) return;
         if (!items.length) { sec.remove(); return; }
         fillRow(sec, items.slice(0, 20), r.showType);
@@ -626,6 +628,12 @@
   }
 
   function fetchPage(ctx) {
+    return fetchPageRaw(ctx).then(function (res) {
+      return ageFilter(res.items).then(function (items) { res.items = items; return res; });
+    });
+  }
+
+  function fetchPageRaw(ctx) {
     var page = ctx.page + 1;
     if (ctx.mode === 'search') {
       return api('/search/multi?language=cs-CZ&include_adult=false&page=' + page + '&query=' + encodeURIComponent(state.query)).then(function (d) {
