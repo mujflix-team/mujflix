@@ -481,6 +481,8 @@ const ProfileGate = {
     n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" onclick="this.classList.toggle('selected')">${t}</button>`).join("");
     const ao = document.getElementById("pwAnimeOnly");
     ao && (ao.checked = !1);
+    const ag = document.getElementById("pwAge");
+    ag && (ag.onclick = ev => { const b = ev.target.closest(".pw-agebtn"); b && (ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x === b))); }, ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x.dataset.age === "0")));
     t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");
   },
   /** 3 kroky, pokud jde propojení nabídnout (je nastavené a zařízení ještě není propojené); jinak 2. */
@@ -525,11 +527,13 @@ const ProfileGate = {
     const t = e.dataset.profileId || getActiveProfileId(),
       sel = [...e.querySelectorAll(".pw-genre.selected")].map(e => e.dataset.genre),
       animeOnlyBox = !!(document.getElementById("pwAnimeOnly") && document.getElementById("pwAnimeOnly").checked),
+      ageBtn = e.querySelector("#pwAge .pw-agebtn.pw-on"),
+      maxAge = ageBtn ? Number(ageBtn.dataset.age) || 0 : 0,
       likesAnime = sel.includes("anime") || animeOnlyBox,
       n = [...new Set(sel.map(Number).filter(Number.isFinite))];
     if (t) {
       const o = _getProfiles(), i = o.find(e => e.id === t);
-      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, animeOnlyBox || (likesAnime && !n.length) ? i.prefs.animeOnly = !0 : delete i.prefs.animeOnly, _saveProfiles(o));
+      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, maxAge ? i.prefs.maxAge = maxAge : delete i.prefs.maxAge, animeOnlyBox || (likesAnime && !n.length) ? i.prefs.animeOnly = !0 : delete i.prefs.animeOnly, _saveProfiles(o));
       if (getActiveProfileId() === t && void 0 !== aiBrain) n.forEach(e => aiBrain.boostGenreIds([e], .12));
       try { if (typeof window.renderHomepage === "function") window.renderHomepage(); } catch (e) {}
     }
