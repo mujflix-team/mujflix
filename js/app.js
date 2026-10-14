@@ -1646,6 +1646,7 @@ async function fetchRecommendedNews() {
     shows = [...at.filter(r => !ids.has(r.id)).slice(0, 4), ...shows], movies = [...am.filter(r => !ids.has(r.id)).slice(0, 2), ...movies]
   }
   if (movies.length + shows.length < 4 && !(window.mfOnlyAnime && window.mfOnlyAnime())) [movies, shows] = await Promise.all([q("movie", !1), q("tv", !1)]);
+  if (window.MFAge && window.MFAge.limit()) [movies, shows] = await Promise.all([window.MFAge.filter(movies), window.MFAge.filter(shows)]);
   const out = [];
   for (let i = 0; out.length < 8 && (i < movies.length || i < shows.length); i++) {
     movies[i] && out.push(movies[i]), out.length < 8 && shows[i] && out.push(shows[i])
