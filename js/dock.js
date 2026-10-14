@@ -116,6 +116,9 @@
       dock.classList.toggle("mf-dock-hidden", h);
     }
 
+    var lastInput = 0;
+    function onInput() { lastInput = Date.now(); }
+
     function onScroll(e) {
       var t = e.target === document ? document.scrollingElement : e.target;
       if (!t || t.nodeType !== 1) return;
@@ -130,7 +133,7 @@
       requestAnimationFrame(function () {
         ticking = false;
         if (y < 80) setHidden(false);
-        else if (d > 14) setHidden(true);
+        else if (d > 14) { if (Date.now() - lastInput < 900) setHidden(true); }
         else if (d < -10) setHidden(false);
       });
     }
@@ -193,6 +196,8 @@
         var el = document.getElementById(id);
         if (el) new MutationObserver(function () { setHidden(false); }).observe(el, { attributes: true, attributeFilter: ["class"] });
       });
+      // Dock se schová jen při skutečném posouvání uživatelem (kolečko, prst, klávesy), ne když se stránka sama přesune (načtení řádků, filtrování)
+      ["wheel", "touchmove", "keydown", "pointerdown"].forEach(function (ev) { document.addEventListener(ev, onInput, { capture: true, passive: true }); });
       document.addEventListener("scroll", onScroll, { capture: true, passive: true });
       document.addEventListener("click", onDockClick, true);
       document.addEventListener("mousemove", function (e) {
