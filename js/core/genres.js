@@ -37,9 +37,15 @@
     var ids = r.genre_ids || r.genreIds || [];
     return (r.original_language || r.lang) === "ja" && ids.indexOf(16) > -1;
   };
-  // Profil si vybral jen Anime (žádný jiný žánr) → doporučení mají být čistě anime.
+  // Profil má zapnuto „Jen anime“ → doporučení, Objevovat i hledání jsou čistě anime.
+  // prefs.animeOnly je výslovná volba (true/false); když chybí (starší profily), platí dřívější pravidlo: vybráno jen Anime a žádný jiný žánr.
   window.mfOnlyAnime = function () {
-    try { var p = typeof getActiveProfile === "function" ? getActiveProfile() : null; return !!(p && p.prefs && p.prefs.likesAnime && !(p.likedGenres || []).length); } catch (e) { return false; }
+    try {
+      var p = typeof getActiveProfile === "function" ? getActiveProfile() : null;
+      if (!p || !p.prefs) return false;
+      if (typeof p.prefs.animeOnly === "boolean") return p.prefs.animeOnly;
+      return !!(p.prefs.likesAnime && !(p.likedGenres || []).length);
+    } catch (e) { return false; }
   };
   window.MF_ANIME_QUERY = "&with_genres=16&with_original_language=ja";
 })();

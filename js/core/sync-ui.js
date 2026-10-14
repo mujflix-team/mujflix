@@ -19,6 +19,14 @@
       var b = e.target.closest && e.target.closest("[data-sa]");
       if (b) act(b.getAttribute("data-sa"));
     });
+    el.addEventListener("change", function (e) {
+      var t = e.target;
+      if (!t || t.id !== "mfBackupFile" || !t.files || !t.files[0]) return;
+      var rd = new FileReader();
+      rd.onload = function () { doImportText(String(rd.result || "")); };
+      rd.onerror = function () { msg("Soubor se nepodařilo přečíst.", "err"); };
+      rd.readAsText(t.files[0]);
+    });
     el.addEventListener("keydown", function (e) {
       if (e.key === "Escape") close();
       if (e.key === "Enter" && e.target && e.target.id === "mfSyncInput") act("join");
@@ -64,14 +72,15 @@
           '<div class="sy-choices">' +
           '<button type="button" class="sy-choice" data-sa="sync"><strong>Synchronizovat teď</strong><span>Stáhne změny z ostatních zařízení</span></button>' +
           '<button type="button" class="sy-choice" data-sa="show"><strong>Přidat další zařízení</strong><span>Zobrazí kód, který zadáš na druhém zařízení</span></button>' +
-          '</div><button type="button" class="sy-btn sy-link" data-sa="unlink">Odpojit toto zařízení</button>');
+          '</div><button type="button" class="sy-btn sy-link" data-sa="backup">Záloha dat do souboru</button>' +
+          '<button type="button" class="sy-btn sy-link" data-sa="unlink">Odpojit toto zařízení</button>');
       } else {
         html = frame('<div class="sy-ico">' + ICON + '</div><h2 class="sy-title">Propojit zařízení</h2>' +
           '<p class="sy-text">Měj stejné profily, seznamy a hodnocení na telefonu, tabletu i počítači. Bez hesla a bez e-mailu – stačí opsat krátký kód.</p>' +
           '<div class="sy-choices">' +
           '<button type="button" class="sy-choice" data-sa="show"><strong>Zobrazit kód</strong><span>Moje data jsou tady a chci je dostat na jiné zařízení</span></button>' +
           '<button type="button" class="sy-choice" data-sa="enter"><strong>Mám kód</strong><span>Chci sem načíst data z jiného zařízení</span></button>' +
-          '</div>');
+          '</div><button type="button" class="sy-btn sy-link" data-sa="backup">Záloha dat do souboru</button>');
       }
     } else if (screen === "show") {
       html = frame('<h2 class="sy-title">Tvůj kód</h2><div class="sy-code" id="syCode" aria-live="polite">…</div>' +
@@ -84,6 +93,13 @@
         '<input id="mfSyncInput" class="sy-input" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="7" placeholder="ABC DEF" value="' + esc(data.code || "") + '" aria-label="Kód">' +
         '<div class="sy-msg" id="syMsg" role="status"></div>' +
         '<button type="button" class="sy-btn sy-primary" id="syJoin" data-sa="join">Připojit</button>', true);
+    } else if (screen === "backup") {
+      html = frame('<h2 class="sy-title">Záloha dat</h2><p class="sy-text">Ulož si profily, seznamy, hodnocení a historii do souboru, nebo je z něj načti zpátky. API klíče se do zálohy nedávají.</p>' +
+        '<div class="sy-choices">' +
+        '<button type="button" class="sy-choice" data-sa="export"><strong>Stáhnout zálohu</strong><span>Uloží soubor .json do tvého zařízení</span></button>' +
+        '<button type="button" class="sy-choice" data-sa="import"><strong>Načíst ze souboru</strong><span>Obnoví data ze zálohy (stejné profily se přepíšou)</span></button>' +
+        '</div><input type="file" id="mfBackupFile" accept=".json,application/json" hidden>' +
+        '<div class="sy-msg" id="syMsg" role="status"></div>', true);
     } else if (screen === "done") {
       html = frame('<div class="sy-ico sy-ok">' + ICON + '</div><h2 class="sy-title">Hotovo ✓</h2><p class="sy-text">Zařízení je propojené. Načítám tvoje profily…</p>');
     }
@@ -118,6 +134,16 @@
     return "Něco se nepovedlo. Zkus to prosím znovu.";
   }
 
+  /** QR knihovna (56 kB) se stahuje až ve chvíli, kdy je potřeba, ne při každém startu appky. */
+  function loadQr(cb) {
+    if (window.qrcode) return cb();
+    var sc = document.createElement("script");
+    sc.src = "js/core/qr.js";
+    sc.onload = function () { cb(); };
+    sc.onerror = function () { cb(); };
+    document.head.appendChild(sc);
+  }
+
   function showCode() {
     render("show");
     msg("Vytvářím kód…");
@@ -128,13 +154,16 @@
       c.textContent = code.slice(0, 3) + " " + code.slice(3);
       msg("");
       expiresAt = Date.now() + (r.ttl || 600) * 1000;
-      var qr = document.getElementById("syQr");
-      try {
-        var url = location.origin + location.pathname + "?link=" + code;
-        var q = window.qrcode(0, "M");
-        q.addData(url); q.make();
-        qr.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-      } catch (e) { if (qr) qr.style.display = "none"; }
+      loadQr(function () {
+        var qr = document.getElementById("syQr");
+        if (!qr) return;
+        try {
+          var url = location.origin + location.pathname + "?link=" + code;
+          var q = window.qrcode(0, "M");
+          q.addData(url); q.make();
+          qr.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+        } catch (e) { qr.style.display = "none"; }
+      });
       var timer = document.getElementById("syTimer");
       var upd = function () {
         var left = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
@@ -161,6 +190,31 @@
     });
   }
 
+  function doExport() {
+    try {
+      var json = JSON.stringify(window.MFSync.exportData());
+      var blob = new Blob([json], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "mujflix-zaloha-" + new Date().toISOString().slice(0, 10) + ".json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      msg("Záloha stažena ✓", "ok");
+    } catch (e) { msg("Zálohu se nepodařilo vytvořit.", "err"); }
+  }
+
+  function doImportText(text) {
+    var obj;
+    try { obj = JSON.parse(text); } catch (e) { return msg("Soubor není platná záloha MůjFlixu.", "err"); }
+    if (!window.confirm("Načíst data ze zálohy? Profily a data se stejným názvem se přepíšou daty ze zálohy.")) return;
+    try {
+      var n = window.MFSync.importData(obj);
+      if (!n) return msg("V záloze nic k načtení nebylo.", "err");
+      msg("Načteno ✓ Obnovuji appku…", "ok");
+      setTimeout(function () { location.reload(); }, 900);
+    } catch (e) { msg("Soubor není platná záloha MůjFlixu.", "err"); }
+  }
+
   function act(a) {
     var S = window.MFSync;
     if (a === "close") return close();
@@ -168,6 +222,9 @@
     if (a === "show") return showCode();
     if (a === "enter") return render("enter");
     if (a === "join") return doJoin();
+    if (a === "backup") return render("backup");
+    if (a === "export") return doExport();
+    if (a === "import") { var fi = document.getElementById("mfBackupFile"); if (fi) { fi.value = ""; fi.click(); } return; }
     if (a === "sync") {
       msg("Synchronizuji…");
       return S.syncNow({ reload: false }).then(function (r) {

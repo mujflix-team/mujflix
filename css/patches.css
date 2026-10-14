@@ -284,7 +284,7 @@
   color: #ff375f !important;
 }
 
-.nf-card, .nf-card *, .ps-tile-wrapper *, .universe-overlay * {
+.nf-card, .nf-card *, .universe-overlay * {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }

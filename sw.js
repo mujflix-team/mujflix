@@ -1,6 +1,6 @@
 /* MůjFlix service worker — „nejdřív síť, pak cache“.
    Vždy se snaží vzít čerstvou verzi, takže po nasazení opravy nehrozí starý kód.
-   Cache slouží jen jako záloha, když je člověk offline. Cizí domény (TMDB, CDN) se nikdy nezasahují. */
+   Cache slouží jen jako záloha, když je člověk offline. Výjimka: písma (`/fonts/*.woff2`) jdou nejdřív z cache. Cizí domény (TMDB, CDN) se nikdy nezasahují. */
 const CACHE = "mujflix-shell-v1";
 
 self.addEventListener("install", () => self.skipWaiting());
@@ -19,6 +19,13 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.endsWith("/config.js")) return; // konfigurace se nikdy necachuje
+  if (/\/fonts\/[^/]+\.woff2$/.test(url.pathname)) { // písma se nemění: nejdřív cache, bez zbytečného dotazu na síť
+    event.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+      if (res && res.ok && res.type === "basic") { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); }
+      return res;
+    })));
+    return;
+  }
   event.respondWith(
     fetch(req, { cache: "no-cache" }) // vždy zrevaliduj – jinak prohlížeč může ještě 10 min servírovat starý kód
       .then((res) => {

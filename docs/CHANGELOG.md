@@ -1,7 +1,32 @@
 # Changelog
 
-## 2.3.4
+## 2.3.5
+### Nově
+- Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová).
+- Verze se hlídá sama: na Cloudflare Pages se při sestavení k verzi z `package.json` přidá krátké ID commitu (např. „v2.3.5 · abc1234“, datum sestavení je v nápovědě po najetí myší). Vyžaduje v Cloudflare Pages nastavit Build command `node scripts/version.mjs` a Build output directory `.`; bez toho se zobrazí jen číslo verze.
+- Výběr avatara: nahoře jsou řady s nejvíc obrázky; řady, kde se našly jen 1–4 obrázky (třeba Stranger Things), se nezobrazí.
 
+ Jablkooo
+## 2.3.4
+- Oprava: s věkovým omezením zbývalo v řádcích jen pár titulů, protože se filtrovala jedna stránka (20 titulů). Omezený profil teď dotáhne 3 stránky seznamů (`MFAge.wide`) a základní seznam doporučení bere 40 titulů místo 10.
+- Oprava: dock se někdy sám schoval, když se stránka přesunula sama (načtení řádků, filtrování). Teď se schová jen při posouvání uživatelem (kolečko, prst, klávesy).
+- Věk jde nepovinně zvolit už při zakládání profilu (výchozí Bez omezení). Z Nastavení v menu profilu zmizela duplicitní položka Záloha dat; zůstává v Propojení zařízení.
+- Nové: **Věkové omezení profilu** (Nastavení → Zaměření a žánry → Bez omezení / Do 7 / Do 12 / Do 15). Hodnocení se bere z TMDB (americká škála G/PG/PG-13, TV-Y…TV-14), filtruje Pro tebe, Objevovat, hledání i novinky; titul bez hodnocení se u omezeného profilu skryje. Hodnocení se pamatuje jen na zařízení (`mfx_age_cache`). Není to zámek: u profilu s PINem jde věk změnit jen s PINem. Nový `js/core/age.js`.
+- Úklid: z `index.html` odstraněno staré dlaždicové menu (`.ps-menu-scene`, ~230 řádků), které bylo na nové domovské stránce vždy skryté. Vzhled beze změny (31 ze 32 snímků pixel po pixelu shodných, zbylý se liší jen načasováním tečky u zvonku); data `db` a `mf_db_custom` zůstávají.
+- Menu profilu (avatar vpravo nahoře) je úklidnější: zbyly jen přepnutí profilu, **Spravovat profily** a **Nastavení**. Pod Nastavením je Upravit profil, Zaměření a žánry, Propojení zařízení a Záloha dat (u každé položky je vidět aktuální stav).
+- Nové: **Zaměření a žánry** v menu profilu (avatar vpravo nahoře): přepínač **Všechno / Jen anime** a výběr oblíbených žánrů (až 5), vše se ukládá do profilu a synchronizuje mezi zařízeními. „Jen anime“ filtruje doporučení, Objevovat (řady i hledání) a novinky; při zakládání profilu je v prvním kroku stejný přepínač. Pokryto testy.
+- Sdílená paměť zdrojů: Worker má `/src/get` a `/src/report` (KV, jen počty hlášení názvu zdroje pro titul, omezení 20 hlášení / 10 min na IP, vypnutí `SRC_SHARE=off`). Kino hlásí funkční zdroj jednou za titul a zařízení a na začátku použije zdroj od ostatních, pokud nemá vlastní zkušenost. **Vyžaduje nasazení nového kódu Workeru** (bez něj appka funguje jako dřív). Pokryto testy ve Workeru i v kině.
+- Rychlost: service worker bere písma (`/fonts/*.woff2`) rovnou z cache bez dotazu na síť (ověřeno, funguje i offline). Zbytek zůstává „nejdřív síť“, aby po nasazení opravy nehrozil starý kód.
+- Úklid 3: z CSS odstraněno 159 mrtvých pravidel starých dlaždic (`.ps-tile*`, `.ps-menu*`, `.tile-*`, `.tsi-*`); `styles.css` 187 → 164 kB. Vzhled beze změny (snímky shodné), testy prošly.
+- Úklid 2: z `js/app.js` odstraněn mrtvý kód starých dlaždic (efekty, trailery, klávesová navigace dlaždic, animace načtení). Doplnění obrázků, hodnocení a žánrů vestavěným seriálům z TMDB zůstalo (`loadTmdbDbData`) a je pokryté testem. Opraveno: po odstranění dlaždic se tato data jinak přestala doplňovat.
+
+- Worker (propojení): kód jde vytvořit jen pro existující sadu dat a do KV se při zadání kódu zapisuje jen při chybě (ochrana limitu 1000 zápisů denně před zneužitím). Nový test `tests/worker.mjs`.
+- Propojení: první zařízení bez dat se nahraje i prázdné, aby šel vytvořit kód.
+- Kino: appka si pamatuje zdroj, který pro titul fungoval (začne jím příště i u dalších epizod), a nově je tu tlačítko „Nefunguje to“ (označí zdroj na 14 dní a zkusí další). Rychlé přepnutí „Jiný zdroj“ do 25 s označí zdroj jako podezřelý na 3 dny. Paměť se synchronizuje mezi zařízeními.
+- Záloha dat do souboru (menu profilu → Záloha dat): export / import profilů, seznamů a hodnocení bez API klíčů.
+- Rychlejší start: GSAP a confetti se z CDN načítají s `defer` (neblokují vykreslení) a QR knihovna (56 kB) se stahuje až při zobrazení kódu.
+
+ main
 - Test „Objevovat“ už nezávisí na `config.js` (s adresou Workeru se TMDB volalo přes `workers.dev` a test to blokoval, takže CI padalo).
 - Opraveno: v kině „Další epizoda“ spadla (`epCountFn is not a function`), když byl TMDB nedostupný; teď se použije záložní počet epizod. Tím padal i test v GitHub Actions.
 - Spolupráce ve dvou: `CLAUDE.md` (pravidla pro Clauda), `docs/TASKS.md`, `docs/SPOLUPRACE.md`, šablona Pull Requestu; `config.js` už není v `.gitignore`.

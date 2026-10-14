@@ -199,7 +199,7 @@
         lastProfileIds = profileIds(get(PROFILES_KEY));
       } finally { applying = false; }
       saveMeta(meta);
-      var needPush = JSON.stringify(blob) !== JSON.stringify({ v: remote.v || 1, keys: remote.keys, del: remote.del || {} });
+      var needPush = !(res && res.data) || JSON.stringify(blob) !== JSON.stringify({ v: remote.v || 1, keys: remote.keys, del: remote.del || {} });
       var done = function () {
         lastPush = now();
         set(LAST_KEY, String(now()));
@@ -308,7 +308,35 @@
     setInterval(poll, POLL_MS);
   });
 
+  /* ── Záloha do souboru ─────────────────────────────────────────────────────────────────────── */
+  function exportData() {
+    var data = {};
+    localKeys().forEach(function (k) {
+      var v = get(k);
+      if (v !== null && v.length <= MAX_VALUE) data[k] = v;
+    });
+    return { app: "mujflix", v: 1, exported: new Date().toISOString(), data: data };
+  }
+
+  /** Načte zálohu: platné klíče přepíšou lokální, profily se spojí podle ID. Vrací počet načtených klíčů. */
+  function importData(obj) {
+    if (!obj || obj.app !== "mujflix" || !obj.data || typeof obj.data !== "object") throw Object.assign(new Error("bad file"), { code: "badfile" });
+    var n = 0;
+    Object.keys(obj.data).forEach(function (k) {
+      var v = obj.data[k];
+      if (!syncable(k) || typeof v !== "string" || v.length > MAX_VALUE) return;
+      if (k === PROFILES_KEY) {
+        try { JSON.parse(v); } catch (e) { return; }
+        v = mergeProfiles(get(PROFILES_KEY), v, true, {});
+      }
+      try { localStorage.setItem(k, v); n++; } catch (e) {}
+    });
+    return n;
+  }
+
   window.MFSync = {
+    exportData: exportData,
+    importData: importData,
     available: available,
     isLinked: isLinked,
     createCode: createCode,

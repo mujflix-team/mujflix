@@ -28,6 +28,10 @@ Hlavní funkce MůjFlixu — **propojení s více zdroji** a jejich chytré vyhl
 - **Více zdrojů na jedno kliknutí** — pokud jeden zdroj nefunguje, aplikace ti nabídne další
 - **Cinema mód** — vestavěný přehrávač s výběrem sezóny a epizody, auto-next na další epizodu, přepínání zdrojů během přehrávání
 - **Sandbox iframe** — blokuje popup reklamy ze zdrojů, tip na uBlock Origin
+- **Zaměření a žánry** — v menu profilu (avatar vpravo nahoře → Nastavení) přepneš profil na „Jen anime“ (doporučení, Objevovat i hledání ukážou jen anime) nebo zpět na „Všechno“ a nastavíš si až 5 oblíbených žánrů
+- **Věkové omezení** — v Nastavení → Zaměření a žánry zvolíš Bez omezení / Do 7 / Do 12 / Do 15; doporučení, Objevovat, hledání a novinky pak ukážou jen tituly s odpovídajícím hodnocením z TMDB (americká škála). Titul bez hodnocení se skryje. Není to rodičovský zámek; u profilu s PINem jde věk změnit jen s PINem.
+- **Paměť zdrojů** — appka si pamatuje, který zdroj pro titul fungoval, a tlačítko „Nefunguje to“ zdroj označí a zkusí další
+  - **Sdílená paměť zdrojů** (volitelná, potřebuje KV z propojení zařízení): zdroj, který fungoval ostatním, se zkusí jako první. Posílá se jen „titul + název zdroje“, nic o uživateli. Jde vypnout ve Workeru (`SRC_SHARE=off`) nebo na zařízení (`localStorage.mfx_src_share_off = "1"`).
 - **Alternativní názvy** — při hledání se zkouší anglický, původní i český/slovenský název (z TMDB)
 
 ### 🎨 Vzhled a ovládání
@@ -43,6 +47,7 @@ Hlavní funkce MůjFlixu — **propojení s více zdroji** a jejich chytré vyhl
 - **Úprava a mazání profilu** na jedné obrazovce „Uprav si svůj profil“
 - **Avatary — oblíbená postava ze seriálu či filmu**: nabídka je předvyplněná (Breaking Bad, Game of Thrones, Marvel, DC, Star Wars, anime…) a ve vyhledávání najdeš další postavy. Zdroje obrázků: Wikipedie, AniList, TVmaze, Fandom, Wikidata, superhero-api, Disney API
 - **Propojení zařízení** — stejné profily, seznamy a hodnocení na telefonu, tabletu i počítači. Bez hesla a e-mailu: na prvním zařízení zvolíš *Propojit zařízení → Zobrazit kód*, na druhém *Mám kód* a opíšeš 6 znaků (nebo naskenuješ QR). Najdeš to v menu profilu vpravo nahoře a na obrazovce „Kdo se dívá?“; při vytváření nového profilu na to průvodce upozorní třetím krokem. Vyžaduje nastavený Worker s úložištěm KV (viz níže)
+- **Záloha dat** — export a import do souboru .json (menu profilu → Záloha dat), bez API klíčů
 - **PIN zámek** — 5 pokusů, po špatném zadání se ukáže počet zbývajících pokusů, pak následuje zablokování (30 s → 2 min → 10 min → 30 min → 1 h → 4 h → 24 h), které se stupňuje. Jde o dětskou pojistku, ne o skutečné zabezpečení
   
 ---
@@ -103,7 +108,7 @@ window.TMDB_PROXY_URL = "https://mujflix-tmdb-proxy.<ucet>.workers.dev";
 
 ### 🔗 Propojení zařízení (volitelné)
 
-Využívá stejný Worker jako TMDB proxy, jen přidá úložiště KV (zdarma, limit 1000 zápisů denně – appka proto odesílá změny nejvýš jednou za 5 minut a při odchodu z karty):
+Využívá stejný Worker jako TMDB proxy, jen přidá úložiště KV (zdarma, limit 1000 zápisů denně – appka proto odesílá důležité změny (profily, hodnocení, seznamy) do ~10 s, drobnosti jako průběh sledování až po pár minutách a vždy nejvýš jednou za 10 s; stahuje změny každých 45 s a při návratu na kartu):
 
 ```bash
 cd worker
@@ -111,6 +116,8 @@ npx wrangler kv namespace create SYNC     # vypíše id úložiště
 ```
 
 V `worker/wrangler.toml` odkomentuj blok `[[kv_namespaces]]`, vlož `id` a znovu nasaď (`npx wrangler deploy`). Adresa Workeru musí být v `config.js` jako `TMDB_PROXY_URL` (stejná jako pro TMDB). Bez toho se nabídka propojení v appce nezobrazí.
+
+Počet propojených zařízení není omezený (notebook, PC, telefon, tablet… všechna sdílejí stejné ID). Nový profil z jiného zařízení se objeví sám; ostatní změny nabídnou tlačítko „Načíst změny“.
 
 Jak to funguje: první zařízení si vytvoří náhodné dlouhé ID a nahraje data (profily a osobní údaje z localStorage; **ne** API klíče, aktivní profil ani stav PIN zámku). Jednorázový kód (platí 10 minut) slouží jen k výměně za toto ID. Při sloučení vyhrává u každého záznamu novější změna a profily se spojují podle ID, takže se nic nepřepisuje celé. PIN profilu se přenáší spolu s profilem – je to jen dětská pojistka.
 
@@ -181,7 +188,8 @@ Vše se **učí per profil** a má **decay** — preference postupně vyprcháva
 
 ```
 index.html, sw.js, manifest.webmanifest   vstup aplikace
-config.example.js (→ config.js)           konfigurace (config.js je v .gitignore)
+config.js, config.example.js               konfigurace (v config.js jen veřejná adresa Workeru, žádné klíče)
+CLAUDE.md                                  pravidla pro Clauda (spolupráce ve dvou)
 css/        styles.css, patches.css, discover.css, netflix.css (Netflix vzhled, přepisuje ostatní)
 js/         app.js, home.js, discover.js, cinema.js, dock.js
 js/ai       brain.js (doporučovací algoritmus)
@@ -189,7 +197,7 @@ js/core     tmdb-proxy-shim.js, version.js, adblock.js, genres.js, sync.js + syn
 js/finder   finder.js (sestavení URL zdrojů)
 js/profiles gate.js (profily, avatary, PIN zámek)
 worker/     proxy Worker pro TMDB klíč + propojení zařízení (KV)
-docs/       CHANGELOG.md, css-vars.md
+docs/       CHANGELOG.md, TASKS.md, SPOLUPRACE.md, css-vars.md
 fonts/      Netflix Sans (woff2)
 tests/ scripts/ icons/
 ```

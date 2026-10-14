@@ -45,8 +45,8 @@
     
     <meta name="service-worker" content="cache: tile-logos" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
     <link rel="manifest" href="manifest.webmanifest" />
 
@@ -128,6 +128,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/></svg>
         <span>Propojit zařízení</span>
       </button>
+      <div class="pg-version" id="pgVersion" aria-label="Verze aplikace"></div>
     </div>
 
     <div id="mfPinModal">
@@ -264,6 +265,19 @@
             <div class="pw-title">Ještě jedna maličkost</div>
             <div class="pw-subtitle">Co tě baví? Vyber pár žánrů a my ti připravíme lepší start.</div>
             <div class="pw-genres" id="pwGenres"></div>
+            <label class="pw-only-anime" for="pwAnimeOnly">
+              <input type="checkbox" id="pwAnimeOnly">
+              <span><strong>Jen anime</strong><small>Doporučení i Objevovat ukážou jen anime. Půjde změnit v menu profilu.</small></span>
+            </label>
+            <div class="pw-age">
+              <div class="pw-age-t"><strong>Věk</strong> <small>nepovinné · doporučení ukážou jen vhodné tituly</small></div>
+              <div class="pw-age-row" id="pwAge">
+                <button type="button" class="pw-agebtn pw-on" data-age="0">Bez omezení</button>
+                <button type="button" class="pw-agebtn" data-age="7">Do 7</button>
+                <button type="button" class="pw-agebtn" data-age="12">Do 12</button>
+                <button type="button" class="pw-agebtn" data-age="15">Do 15</button>
+              </div>
+            </div>
             <div class="pw-actions">
               <button class="pw-skip" onclick="window.ProfileGate?.skipOnboardingGenres()">Přeskočit</button>
               <button class="pw-save" onclick="window.ProfileGate?.finishOnboarding()">Pokračovat</button>
@@ -805,236 +819,6 @@
       <span class="logo-progress-text" id="logoProgressText">0%</span>
     </div>
 
-    <div class="ps-menu-scene">
-      <div class="ps-menu" id="mainMenu">
-        <div
-          class="ps-tile-wrapper"
-          data-slug="the-simpsons"
-          tabindex="0"
-          onclick="openSeries('the-simpsons')"
-        >
-          <div class="ps-tile">
-            <img
-              class="tile-bg"
-              id="tile-bg-the-simpsons"
-              loading="lazy"
-              src="https://image.tmdb.org/t/p/w500/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg"
-              alt="The Simpsons"
-              onload="this.classList.add('loaded')"
-              onerror="
-                this.src = encodeURI(
-                  'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'450\'><rect width=\'300\' height=\'450\' fill=\'%23f5c51822\'/><defs><linearGradient id=\'g\' x1=\'0\' y1=\'0\' x2=\'0\' y2=\'1\'><stop offset=\'0\' stop-color=\'%23f5c518\' stop-opacity=\'0.3\'/><stop offset=\'1\' stop-color=\'%23000\' stop-opacity=\'0.8\'/></linearGradient></defs><rect width=\'300\' height=\'450\' fill=\'url(%23g)\'/><text x=\'150\' y=\'220\' text-anchor=\'middle\' fill=\'white\' font-size=\'18\' font-family=\'sans-serif\' font-weight=\'bold\'>The Simpsons</text></svg>',
-                );
-                this.onerror = null;
-                this.classList.add('loaded');
-              "
-            />
-            <div class="tile-gradient"></div>
-            <div class="tile-progress">
-              <div class="tile-progress-fill" id="prog-the-simpsons"></div>
-            </div>
-            <div class="tile-continue-badge" id="cont-the-simpsons">
-              <div class="tcb-dot"></div>
-              <span class="tcb-text" id="cont-text-the-simpsons"
-                >S1&#xB7;E1</span
-              >
-            </div>
-            <button
-              class="tile-watchlist-btn"
-              id="wlbtn-the-simpsons"
-              onclick="
-                event.stopPropagation();
-                toggleWatchlistItem('the-simpsons');
-              "
-              title="Oblíbené"
-            >
-              &#x2764;&#xFE0F;
-            </button>
-            <div class="tile-glare"></div>
-            <div class="tile-hero-overlay"></div>
-            <div class="tile-depth-shadow"></div>
-          </div>
-        </div>
-        <div
-          class="ps-tile-wrapper"
-          data-slug="family-guy"
-          tabindex="0"
-          onclick="openSeries('family-guy')"
-        >
-          <div class="ps-tile">
-            <img
-              class="tile-bg"
-              id="tile-bg-family-guy"
-              loading="lazy"
-              src="https://image.tmdb.org/t/p/w500/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg"
-              alt="Family Guy"
-              onload="this.classList.add('loaded')"
-              onerror="
-                this.src = encodeURI(
-                  'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'450\'><rect width=\'300\' height=\'450\' fill=\'%231a73e822\'/><defs><linearGradient id=\'g\' x1=\'0\' y1=\'0\' x2=\'0\' y2=\'1\'><stop offset=\'0\' stop-color=\'%231a73e8\' stop-opacity=\'0.3\'/><stop offset=\'1\' stop-color=\'%23000\' stop-opacity=\'0.8\'/></linearGradient></defs><rect width=\'300\' height=\'450\' fill=\'url(%23g)\'/><text x=\'150\' y=\'220\' text-anchor=\'middle\' fill=\'white\' font-size=\'18\' font-family=\'sans-serif\' font-weight=\'bold\'>Family Guy</text></svg>',
-                );
-                this.onerror = null;
-                this.classList.add('loaded');
-              "
-            />
-            <div class="tile-gradient"></div>
-            <div class="tile-progress">
-              <div class="tile-progress-fill" id="prog-family-guy"></div>
-            </div>
-            <div class="tile-continue-badge" id="cont-family-guy">
-              <div class="tcb-dot"></div>
-              <span class="tcb-text" id="cont-text-family-guy">S1&#xB7;E1</span>
-            </div>
-            <button
-              class="tile-watchlist-btn"
-              id="wlbtn-family-guy"
-              onclick="
-                event.stopPropagation();
-                toggleWatchlistItem('family-guy');
-              "
-              title="Oblíbené"
-            >
-              &#x2764;&#xFE0F;
-            </button>
-            <div class="tile-glare"></div>
-            <div class="tile-hero-overlay"></div>
-            <div class="tile-depth-shadow"></div>
-          </div>
-        </div>
-        <div
-          class="ps-tile-wrapper"
-          data-slug="south-park"
-          tabindex="0"
-          onclick="openSeries('south-park')"
-        >
-          <div class="ps-tile">
-            <img
-              class="tile-bg"
-              id="tile-bg-south-park"
-              loading="lazy"
-              src="https://image.tmdb.org/t/p/w500/lMZv8bGHDWQFbUMAfBOsyHAR3dX.jpg"
-              alt="South Park"
-              onload="this.classList.add('loaded')"
-              onerror="
-                this.src = encodeURI(
-                  'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'450\'><rect width=\'300\' height=\'450\' fill=\'%23ff6b3522\'/><defs><linearGradient id=\'g\' x1=\'0\' y1=\'0\' x2=\'0\' y2=\'1\'><stop offset=\'0\' stop-color=\'%23ff6b35\' stop-opacity=\'0.3\'/><stop offset=\'1\' stop-color=\'%23000\' stop-opacity=\'0.8\'/></linearGradient></defs><rect width=\'300\' height=\'450\' fill=\'url(%23g)\'/><text x=\'150\' y=\'220\' text-anchor=\'middle\' fill=\'white\' font-size=\'18\' font-family=\'sans-serif\' font-weight=\'bold\'>South Park</text></svg>',
-                );
-                this.onerror = null;
-                this.classList.add('loaded');
-              "
-            />
-            <div class="tile-gradient"></div>
-            <div class="tile-progress">
-              <div class="tile-progress-fill" id="prog-south-park"></div>
-            </div>
-            <div class="tile-continue-badge" id="cont-south-park">
-              <div class="tcb-dot"></div>
-              <span class="tcb-text" id="cont-text-south-park">S1&#xB7;E1</span>
-            </div>
-            <button
-              class="tile-watchlist-btn"
-              id="wlbtn-south-park"
-              onclick="
-                event.stopPropagation();
-                toggleWatchlistItem('south-park');
-              "
-              title="Oblíbené"
-            >
-              &#x2764;&#xFE0F;
-            </button>
-            <div class="tile-glare"></div>
-            <div class="tile-hero-overlay"></div>
-            <div class="tile-depth-shadow"></div>
-          </div>
-        </div>
-        <div
-          class="ps-tile-wrapper"
-          data-slug="futurama"
-          tabindex="0"
-          onclick="openSeries('futurama')"
-        >
-          <div class="ps-tile">
-            <img
-              alt="Futurama cover"
-              class="tile-bg"
-              id="tile-bg-futurama"
-              src="https://image.tmdb.org/t/p/w500/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"
-              onload="this.classList.add('loaded')"
-              onerror="
-                this.src = encodeURI(
-                  'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'450\'><rect width=\'300\' height=\'450\' fill=\'%237c4dff22\'/><defs><linearGradient id=\'g\' x1=\'0\' y1=\'0\' x2=\'0\' y2=\'1\'><stop offset=\'0\' stop-color=\'%237c4dff\' stop-opacity=\'0.3\'/><stop offset=\'1\' stop-color=\'%23000\' stop-opacity=\'0.8\'/></linearGradient></defs><rect width=\'300\' height=\'450\' fill=\'url(%23g)\'/><text x=\'150\' y=\'220\' text-anchor=\'middle\' fill=\'white\' font-size=\'18\' font-family=\'sans-serif\' font-weight=\'bold\'>Futurama</text></svg>',
-                );
-                this.onerror = null;
-                this.classList.add('loaded');
-              "
-            />
-            <div class="tile-gradient"></div>
-            <div class="tile-progress">
-              <div class="tile-progress-fill" id="prog-futurama"></div>
-            </div>
-            <div class="tile-continue-badge" id="cont-futurama">
-              <div class="tcb-dot"></div>
-              <span class="tcb-text" id="cont-text-futurama">S1&#xB7;E1</span>
-            </div>
-            <button
-              class="tile-watchlist-btn"
-              id="wlbtn-futurama"
-              onclick="
-                event.stopPropagation();
-                toggleWatchlistItem('futurama');
-              "
-              title="Oblíbené"
-            >
-              &#x2764;&#xFE0F;
-            </button>
-            <div class="tile-glare"></div>
-            <div class="tile-hero-overlay"></div>
-            <div class="tile-depth-shadow"></div>
-          </div>
-        </div>
-
-        <div
-          class="ps-tile-wrapper"
-          data-slug="__search__"
-          tabindex="0"
-          onclick="openUniverse()"
-        >
-          <div class="ps-tile">
-            <div class="tile-search-inner">
-              
-              <div class="tsi-grid"></div>
-              
-              <div class="tsi-scan"></div>
-              
-              <div class="tsi-bracket tsi-br-tl"></div>
-              <div class="tsi-bracket tsi-br-tr"></div>
-              <div class="tsi-bracket tsi-br-bl"></div>
-              <div class="tsi-bracket tsi-br-br"></div>
-              
-              <div class="tsi-content">
-                <div class="tsi-icon-wrap">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <div class="tsi-icon-ring"></div>
-                </div>
-                <div class="tsi-label">OBJEVOVAT</div>
-                <div class="tsi-tags" id="tsiTags">
-                  <span>Akce</span><span>Drama</span><span>Sci-Fi</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     
     <div class="modal-overlay" id="seriesModal" role="dialog" aria-modal="true" aria-label="Detail seriálu">
       <div class="modal-content">
@@ -2549,11 +2333,12 @@
     <script src="js/core/version.js"></script>
     <script src="js/core/adblock.js"></script>
     <script src="js/core/genres.js"></script>
+    <script src="js/core/age.js"></script>
     <script src="js/core/sync.js"></script>
-    <script src="js/core/qr.js" defer></script>
     <script src="js/core/sync-ui.js" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
     <script src="js/profiles/gate.js?v=1" defer></script>
+    <script src="js/profiles/prefs.js" defer></script>
     <script src="js/finder/finder.js?v=1" defer></script>
     <script src="js/app.js?v=9" defer></script>
     <script src="js/discover.js?v=1" defer></script>

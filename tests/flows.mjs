@@ -480,19 +480,6 @@ const cm = await page.evaluate(async () => {
 check("cinema: přehrávač běží bez sandboxu (Filemoon)", /svetserialu/.test(cm.src || "") && cm.sandbox === false, JSON.stringify(cm));
 check("cinema: bez přepínače ochrany a varovné ikony, oblíbené je jen srdce", !cm.protect && !cm.adtip && /^[♡♥]$/.test(cm.fav || ""), JSON.stringify(cm));
 
-const gs = await page.evaluate(async () => {
-  const key = Object.keys(HARDCODED_TRAILERS)[0], saved = window.gsap, out = {};
-  const mk = () => { const tile = document.createElement("div"); tile.className = "focused"; tile.innerHTML = '<div class="ps-tile"></div>'; document.body.appendChild(tile); return tile; };
-  // kontrola, že se k trailerům s gsap vůbec dostaneme (jinak by test nic neprokazoval)
-  const t1 = mk(); try { await loadTileTrailer(t1, 1, "tv", key); } catch (e) { out.withErr = e.message; }
-  out.withGsap = !!t1.querySelector(".tile-trailer"); try { removeTileTrailer(t1); } catch { /* stub */ } t1.remove();
-  delete window.gsap;
-  const t2 = mk(); try { await loadTileTrailer(t2, 1, "tv", key); removeTileTrailer(t2); } catch (e) { out.err = e.message; }
-  out.withoutGsap = !!t2.querySelector(".tile-trailer"); t2.remove();
-  window.gsap = saved; return out;
-});
-check("trailer: s gsap se přidá, bez gsap (CDN výpadek) nic nespadne a nepřidá", gs.withGsap === true && !gs.err && gs.withoutGsap === false, JSON.stringify(gs));
-
 const ac = await page.evaluate(() => {
   const root = document.documentElement, g = n => getComputedStyle(root).getPropertyValue(n).trim().toLowerCase();
   const out = {};
@@ -549,6 +536,23 @@ const av2 = await page.evaluate(async () => {
   window.fetch = orig; return out;
 });
 check("avatar: výchozí nabídka jsou postavy (anime + seriály, Marvel/DC, filmy), výběr se uloží", av2.n >= 2 && av2.rows >= 2 && /wikimedia\.org\/b\.jpg$/.test(av2.picked || ""), JSON.stringify(av2));
+
+const avOrd = await page.evaluate(async () => {
+  const orig = window.fetch, mk = n => ({ query: { pages: Object.fromEntries(Array.from({ length: n }, (_, i) => [i + 1, { title: "P" + i, index: i, thumbnail: { source: "https://upload.wikimedia.org/p" + n + "_" + i + ".jpg" } }])) } });
+  window.fetch = async u => {
+    u = String(u);
+    const body = /anilist/.test(u) ? { data: { Page: { characters: [], media: [] } } }
+      : /Stranger/.test(decodeURIComponent(u)) ? mk(2) : /Marvel|Spider/.test(decodeURIComponent(u)) ? mk(9) : mk(6);
+    return { ok: true, json: async () => body };
+  };
+  ProfileGate.openCreate();
+  for (let i = 0; i < 30 && !document.querySelector("#pcAvatarGrid .pc-av-row"); i++) await new Promise(r => setTimeout(r, 100));
+  const titles = [...document.querySelectorAll("#pcAvatarGrid .pc-av-row h4")].map(h => h.textContent);
+  window.fetch = orig; ProfileGate.closeCreate && ProfileGate.closeCreate();
+  return { titles, ver: document.getElementById("pgVersion").textContent, mv: window.MF_VERSION };
+});
+check("avatar: nejdřív řady s nejvíc obrázky, řada s 2 obrázky (Stranger Things) se nezobrazí", avOrd.titles[0] === "Marvel" && !avOrd.titles.includes("Stranger Things") && avOrd.titles.length >= 5, JSON.stringify(avOrd));
+check("verze aplikace je vpravo dole na obrazovce Kdo se dívá", avOrd.ver === "v" + avOrd.mv && /^\d+\.\d+\.\d+$/.test(avOrd.mv), JSON.stringify(avOrd));
 
 const dd = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
@@ -770,7 +774,11 @@ const menuT = await page.evaluate(() => {
   mfToggleProfileMenu(document.getElementById("nfAvatar"));
   const m = document.getElementById("nfProfileMenu");
   const out = { open: !!m, others: [...m.querySelectorAll("[data-pid]")].map(x => x.dataset.pid), acts: [...m.querySelectorAll("[data-act]")].map(x => x.dataset.act) };
-  m.querySelector("[data-act=edit]").click();
+  m.querySelector("[data-act=settings]").click();
+  out.hubRows = [...document.querySelectorAll("#mfSettingsModal [data-st]")].map(x => x.dataset.st).filter(x => x !== "close").join();
+  out.hubSub = document.querySelector('#mfSettingsModal [data-st="sync"] small').textContent;
+  document.querySelector('#mfSettingsModal [data-st="profile"]').click();
+  out.hubClosed = !document.getElementById("mfSettingsModal").classList.contains("show");
   out.menuClosed = !document.getElementById("nfProfileMenu");
   out.title = document.getElementById("pcModalTitle").textContent;
   out.save = document.querySelector("#mfProfileCreate .pc-btn-save").textContent;
@@ -793,7 +801,7 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "edit,manage,sync" && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings" && menuT.hubRows === "profile,prefs,sync" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 check("Kdo se dívá → Upravit: bez třesení, tužka na avataru, velké červené mínus, klik otevře úpravu", menuT.anim === "none" && menuT.overlay && menuT.rmSize >= 36 && menuT.editTitle === "Uprav si svůj profil" && menuT.editName === "MenuB", JSON.stringify(menuT));
 
 const cinOrder = await page.evaluate(() => {
@@ -835,6 +843,7 @@ check("pokračování: film z kina, pak seriál po poslední epizodě; Dokoukal 
 
 // --- Propojení zařízení (Worker podvržen v paměti)
 await page.evaluate(() => {
+  window.__origProxy = window.TMDB_PROXY_URL;
   window.TMDB_PROXY_URL = "https://w.test";
   const kv = window.__kv = { codes: {}, data: {}, n: 0 };
   const nativeFetch = window.fetch;
@@ -905,7 +914,7 @@ const syUi = await page.evaluate(async () => {
   MFSyncUI.open("home");
   const m = document.getElementById("mfSyncModal");
   out.homeShown = m.classList.contains("show") && m.querySelectorAll(".sy-choice").length === 2 && /Zobrazit kód/.test(m.textContent) && /Mám kód/.test(m.textContent);
-  m.querySelector('[data-sa="show"]').click(); await wait(200);
+  m.querySelector('[data-sa="show"]').click(); await wait(700);
   out.code = (document.getElementById("syCode") || {}).textContent;
   out.qr = !!document.querySelector("#syQr svg");
   out.timer = /platí ještě/.test((document.getElementById("syTimer") || {}).textContent || "");
@@ -949,7 +958,7 @@ const syEnt = await page.evaluate(() => {
 check("onboarding: nepropojeno = 3 kroky s krokem Propojení", syEnt.k3.endsWith("1/3") && syEnt.btn2 === "Pokračovat" && syEnt.step3, JSON.stringify(syEnt));
 check("onboarding: propojeno = 2 kroky", syEnt.k2.endsWith("1/2") && syEnt.btn2b === "Začít sledovat" && syEnt.closed, JSON.stringify(syEnt));
 check("sync: tlačítko v Kdo se dívá", syEnt.gateBtn);
-const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); const it = document.querySelector('#nfProfileMenu [data-act="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
+const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); document.querySelector('#nfProfileMenu [data-act="settings"]').click(); const it = document.querySelector('#mfSettingsModal [data-st="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
 check("sync: položka v menu profilu otevře obrazovku", syMenu.ok && syMenu.shown, JSON.stringify(syMenu));
 
 
@@ -990,17 +999,310 @@ check("sync: nový profil z jiného zařízení se objeví hned (bez obnovení)"
 check("sync: ostatní změny se načtou a nabídne se „Načíst změny“", sy2.banner && sy2.applied, JSON.stringify(sy2));
 check("sync: změna profilu se odešle do ~10 s", sy2.fastPush, JSON.stringify(sy2));
 
-// Starý trailer (Simpsonovi) se na skryté dlaždici nespouští
-const trl = await page.evaluate(async () => {
-  const tile = document.querySelector('[data-slug="the-simpsons"]');
-  if (!tile) return { skip: true };
-  tile.classList.add("focused");
-  await loadTileTrailer(tile, null, "tv", "the-simpsons");
-  const r = { hidden: !tile.offsetParent, trailer: !!document.querySelector(".tile-trailer iframe") };
-  tile.classList.remove("focused");
-  return r;
+await page.evaluate(() => { if (window.__origProxy === undefined) delete window.TMDB_PROXY_URL; else window.TMDB_PROXY_URL = window.__origProxy; });
+// Staré dlaždicové menu je pryč, nic nespouští trailer se zvukem na pozadí a data vestavěných seriálů se doplňují dál
+const trl = await page.evaluate(() => ({
+  tiles: document.querySelectorAll(".ps-tile-wrapper, #mainMenu").length,
+  trailer: document.querySelectorAll(".tile-trailer, iframe[src*='youtube']").length,
+  enrich: typeof loadTmdbDbData === "function",
+}));
+check("úklid: žádné staré dlaždice ani trailer na pozadí, doplnění dat seriálů zůstalo", trl.tiles === 0 && trl.trailer === 0 && trl.enrich, JSON.stringify(trl));
+const enr = await page.evaluate(async () => {
+  const keep = window.fetchTmdbDetails, k = Object.keys(db)[0], bak = { b: db[k]._backdrop, p: db[k]._poster };
+  window.fetchTmdbDetails = async () => ({ backdrop: "https://x/b.jpg", poster: "https://x/p.jpg", rating: 8, genres: [{ name: "Komedie" }] });
+  try { await loadTmdbDbData(); } finally { window.fetchTmdbDetails = keep; }
+  const r = { b: db[k]._backdrop, p: db[k]._poster, g: (db[k]._genres || []).join() };
+  db[k]._backdrop = bak.b; db[k]._poster = bak.p; return r;
 });
-check("trailer: skrytá dlaždice nespouští video se zvukem", trl.skip || (trl.hidden && !trl.trailer), JSON.stringify(trl));
+check("úklid: vestavěným seriálům se z TMDB doplní obrázky a žánry i bez dlaždic", enr.b === "https://x/b.jpg" && enr.p === "https://x/p.jpg" && enr.g === "Komedie", JSON.stringify(enr));
+
+// --- Kino: „Další epizoda“ nespadne, když je TMDB nedostupné
+const nxt = await page.evaluate(async () => {
+  const nf = window.fetch;
+  window.fetch = (u, i) => (typeof u === "string" && u.includes("api.themoviedb.org")) ? Promise.reject(new Error("offline")) : nf(u, i);
+  try {
+    MFCinemaPlayer.open("424242", "Nějaký seriál", "tv_ep", { season: 1, episode: 1 });
+    document.getElementById("mfCinNextEp").click();
+    await new Promise(r => setTimeout(r, 300));
+    return document.getElementById("mfCinEpCurrent").textContent;
+  } finally { window.fetch = nf; MFCinemaPlayer.close(); }
+});
+check("kino: Další epizoda funguje i bez TMDB", /S01 · E02/.test(nxt), nxt);
+
+
+// --- Paměť zdrojů: „Nefunguje to“, rychlé přepnutí, zapamatování funkčního zdroje
+const mem = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  localStorage.removeItem("mf_src_pref");
+  const label = () => document.getElementById("mfCinSrcLabel").textContent.replace(/\s*\(\d+\/\d+\)\s*$/, "");
+  const real = Date.now;
+  MFCinemaPlayer.open("777001", "Paměť test", "movie", {});
+  await wait(50);
+  out.first = label();
+  document.getElementById("mfCinBadSrc").click(); await wait(50);
+  out.afterBad = label();
+  const pref = JSON.parse(localStorage.getItem("mf_src_pref") || "{}")["movie:777001"];
+  out.badStored = !!(pref && pref.bad && pref.bad[out.first]);
+  // na druhém zdroji zůstane „dlouho“ → zavření ho uloží jako funkční
+  Date.now = () => real() + 61000;
+  MFCinemaPlayer.close(); Date.now = real;
+  const pref2 = JSON.parse(localStorage.getItem("mf_src_pref") || "{}")["movie:777001"];
+  out.goodStored = pref2 && pref2.good === out.afterBad;
+  // znovu otevřít: začne funkčním zdrojem, ne tím nefunkčním
+  MFCinemaPlayer.open("777001", "Paměť test", "movie", {}); await wait(50);
+  out.reopen = label();
+  // rychlé „Jiný zdroj“ označí aktuální jako nefunkční a přeskočí nefunkční
+  document.getElementById("mfCinSwitchSrc").click(); await wait(50);
+  const pref3 = JSON.parse(localStorage.getItem("mf_src_pref") || "{}")["movie:777001"];
+  out.quickBad = !!(pref3.bad[out.afterBad]);
+  out.skipsBad = label() !== out.first && label() !== out.afterBad;
+  MFCinemaPlayer.close();
+  // označení nefunkčního po 14 dnech vyprší
+  const all = JSON.parse(localStorage.getItem("mf_src_pref")); all["movie:777001"].bad = { [out.first]: Date.now() - 15 * 24 * 3600 * 1000 }; all["movie:777001"].good = "";
+  localStorage.setItem("mf_src_pref", JSON.stringify(all));
+  MFCinemaPlayer.open("777001", "Paměť test", "movie", {}); await wait(50);
+  out.expired = label() === out.first;
+  MFCinemaPlayer.close();
+  return out;
+});
+check("zdroje: Nefunguje to označí zdroj a přepne na další", mem.badStored && mem.afterBad !== mem.first, JSON.stringify(mem));
+check("zdroje: delší sledování uloží zdroj jako funkční a příště se začne jím", mem.goodStored && mem.reopen === mem.afterBad, JSON.stringify(mem));
+check("zdroje: rychlé přepnutí označí zdroj, nefunkční se přeskakují, po 14 dnech vyprší", mem.quickBad && mem.skipsBad && mem.expired, JSON.stringify(mem));
+
+
+// --- Sdílená paměť zdrojů (Worker): nápověda pro začátek, vlastní zkušenost má přednost, hlášení jednou za titul
+const shr = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms)), real = Date.now, nf = window.fetch, oldUrl = window.TMDB_PROXY_URL;
+  const label = () => document.getElementById("mfCinSrcLabel").textContent.replace(/\s*\(\d+\/\d+\)\s*$/, "");
+  const reset = () => { ["mf_src_pref", "mfx_src_shared", "mfx_src_reported", "mfx_src_share_off"].forEach(k => localStorage.removeItem(k)); };
+  const calls = []; let sharedLabel = "";
+  window.TMDB_PROXY_URL = "https://test.workers.dev";
+  window.fetch = (u, i) => {
+    if (typeof u === "string" && u.startsWith("https://test.workers.dev/src/")) {
+      const b = JSON.parse(i.body); calls.push({ p: u.slice(-4), key: b.key, label: b.label });
+      return Promise.resolve(new Response(JSON.stringify(u.endsWith("/get") ? { label: sharedLabel, n: 3 } : { ok: true }), { status: 200 }));
+    }
+    return nf(u, i);
+  };
+  try {
+    reset();
+    MFCinemaPlayer.open("777009", "Zjisti zdroje", "movie", {}); await wait(50);
+    out.L1 = label(); document.getElementById("mfCinSwitchSrc").click(); await wait(50);
+    out.L2 = label(); MFCinemaPlayer.close(); reset(); calls.length = 0;
+    sharedLabel = out.L2;
+    // 1) odpověď z Workeru dorazí brzy → začne se sdíleným zdrojem
+    MFCinemaPlayer.open("777004", "Sdíleno", "movie", {}); await wait(150);
+    out.async = label(); MFCinemaPlayer.close();
+    // 2) příště už jde z cache (bez dotazu)
+    const before = calls.filter(c => c.p === "/get").length;
+    MFCinemaPlayer.open("777004", "Sdíleno", "movie", {}); await wait(50);
+    out.cached = label(); out.noRefetch = calls.filter(c => c.p === "/get").length === before; MFCinemaPlayer.close();
+    // 3) vlastní zkušenost má přednost před sdíleným
+    reset(); localStorage.setItem("mfx_src_shared", JSON.stringify({ "movie:777005": { label: out.L2, t: Date.now() } }));
+    localStorage.setItem("mf_src_pref", JSON.stringify({ "movie:777005": { good: out.L1, bad: {}, t: Date.now() } }));
+    MFCinemaPlayer.open("777005", "Vlastní", "movie", {}); await wait(50);
+    out.ownWins = label() === out.L1; MFCinemaPlayer.close();
+    // 4) funkční zdroj se nahlásí jednou
+    reset(); calls.length = 0; sharedLabel = "";
+    for (let i = 0; i < 2; i++) {
+      MFCinemaPlayer.open("777006", "Hlášení", "movie", {}); await wait(50);
+      Date.now = () => real() + 61000; MFCinemaPlayer.close(); Date.now = real;
+    }
+    const rep = calls.filter(c => c.p === "port");
+    out.reports = rep.length; out.repKey = rep[0] && rep[0].key; out.repLabel = rep[0] && rep[0].label;
+    // 5) vypnuto: žádná komunikace
+    reset(); localStorage.setItem("mfx_src_share_off", "1"); calls.length = 0;
+    MFCinemaPlayer.open("777007", "Vypnuto", "movie", {}); await wait(100);
+    Date.now = () => real() + 61000; MFCinemaPlayer.close(); Date.now = real;
+    out.offCalls = calls.length;
+    // 6) nedostupný Worker nic nerozbije
+    reset(); window.fetch = (u, i) => (typeof u === "string" && u.includes("/src/")) ? Promise.reject(new Error("offline")) : nf(u, i);
+    try { MFCinemaPlayer.open("777008", "Offline", "movie", {}); await wait(100); out.offlineOk = !!label(); } catch { out.offlineOk = false; }
+    MFCinemaPlayer.close();
+  } finally { Date.now = real; window.fetch = nf; window.TMDB_PROXY_URL = oldUrl; reset(); }
+  return out;
+});
+check("sdílené zdroje: zdroj od ostatních se použije na začátku i z cache (bez dalšího dotazu)", shr.L1 !== shr.L2 && shr.async === shr.L2 && shr.cached === shr.L2 && shr.noRefetch, JSON.stringify(shr));
+check("sdílené zdroje: vlastní zkušenost má přednost", shr.ownWins, JSON.stringify(shr));
+check("sdílené zdroje: funkční zdroj se nahlásí jen jednou (titul + název zdroje)", shr.reports === 1 && shr.repKey === "movie:777006" && !!shr.repLabel, JSON.stringify(shr));
+check("sdílené zdroje: po vypnutí se nic neposílá, výpadek Workeru nic nerozbije", shr.offCalls === 0 && shr.offlineOk, JSON.stringify(shr));
+
+
+// --- Zaměření a žánry (menu profilu) a „Jen anime“ při zakládání profilu
+const pfT = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  const id = getActiveProfileId(), ps0 = _getProfiles(), bak = JSON.stringify(ps0.find(x => x.id === id));
+  const prof = () => _getProfiles().find(x => x.id === id);
+  const reset = () => { const ps = _getProfiles(), p = ps.find(x => x.id === id); p.prefs = { ...p.prefs }; delete p.prefs.animeOnly; p.prefs.likesAnime = false; p.likedGenres = []; _saveProfiles(ps); };
+  const click = (a, v) => document.querySelector('#mfPrefsModal [data-pf="' + a + '"]' + (v ? '[data-v="' + v + '"]' : "")).click();
+  try {
+    reset();
+    mfToggleProfileMenu(document.getElementById("nfAvatar")); await wait(50);
+    out.menuItem = !!document.querySelector('#nfProfileMenu [data-act="settings"]');
+    document.querySelector('#nfProfileMenu [data-act="settings"]').click(); await wait(30);
+    out.hubSub = document.querySelector('#mfSettingsModal [data-st="prefs"] small').textContent;
+    document.querySelector('#mfSettingsModal [data-st="prefs"]').click(); await wait(50);
+    out.opened = document.getElementById("mfPrefsModal").classList.contains("show");
+    out.startAll = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "all";
+    click("mode", "only"); click("genre", "28"); click("genre", "35"); click("save"); await wait(50);
+    let p = prof();
+    out.only = p.prefs.animeOnly === true && p.prefs.likesAnime === true && window.mfOnlyAnime() === true;
+    out.genres = JSON.stringify(p.likedGenres) === "[28,35]";
+    out.closed = !document.getElementById("mfPrefsModal").classList.contains("show");
+    // znovu otevřít: nastavení je vidět; zpět na „Všechno“ + přimíchávání
+    MFPrefs.open();
+    out.reopenOnly = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "only" && document.querySelectorAll('#mfPrefsModal .pf-chip.pf-on').length === 2;
+    click("mode", "all"); document.getElementById("mfPrefsMix").checked = true; document.getElementById("mfPrefsMix").dispatchEvent(new Event("change", { bubbles: true })); click("save"); await wait(50);
+    p = prof(); out.backAll = p.prefs.animeOnly === false && p.prefs.likesAnime === true && window.mfOnlyAnime() === false && JSON.stringify(p.likedGenres) === "[28,35]";
+    // nejvýš 5 žánrů
+    MFPrefs.open(); ["80", "12", "878"].forEach(g => click("genre", g)); click("genre", "14");
+    out.max5 = document.querySelectorAll('#mfPrefsModal .pf-chip.pf-on').length === 5 && /nejvýš 5/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
+    MFPrefs.close();
+    // zakládání profilu: přepínač „Jen anime“
+    reset();
+    ProfileGate.openOnboarding(id); await wait(30);
+    out.obBox = !!document.getElementById("pwAnimeOnly");
+    document.getElementById("pwAnimeOnly").checked = true;
+    document.querySelector('#pwGenres [data-genre="35"]').classList.add("selected");
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    p = prof(); out.obOnly = p.prefs.animeOnly === true && p.prefs.likesAnime === true && window.mfOnlyAnime() === true && JSON.stringify(p.likedGenres) === "[35]";
+    reset();
+    ProfileGate.openOnboarding(id); await wait(30);
+    out.obReset = document.getElementById("pwAnimeOnly").checked === false;
+    document.querySelector('#pwGenres [data-genre="35"]').classList.add("selected");
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    p = prof(); out.obAll = !("animeOnly" in p.prefs) && window.mfOnlyAnime() === false;
+    out.obAgeDefault = !("maxAge" in p.prefs);
+    reset();
+    ProfileGate.openOnboarding(id); await wait(30);
+    document.querySelector('#pwAge [data-age="12"]').click();
+    out.obAgeOn = document.querySelector('#pwAge .pw-on').dataset.age === "12";
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    out.obAge12 = prof().prefs.maxAge === 12;
+    ProfileGate.openOnboarding(id); await wait(30);
+    out.obAgeReset = document.querySelector('#pwAge .pw-on').dataset.age === "0";
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    out.obAgeCleared = !("maxAge" in prof().prefs);
+  } finally {
+    const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
+    try { MFPrefs.close(); ProfileGate.closeOnboarding(); mfCloseProfileMenu(); } catch { /* nic */ }
+  }
+  return out;
+});
+check("zaměření: Nastavení v menu profilu → Zaměření a žánry otevře okno (s popiskem aktuální volby)", pfT.menuItem && pfT.opened && pfT.startAll && /Všechno/.test(pfT.hubSub), JSON.stringify(pfT));
+check("zaměření: Jen anime + žánry se uloží do profilu a po otevření jsou vidět; zpět na Všechno funguje", pfT.only && pfT.genres && pfT.closed && pfT.reopenOnly && pfT.backAll, JSON.stringify(pfT));
+check("zaměření: nejvýš 5 žánrů", pfT.max5, JSON.stringify(pfT));
+check("zakládání profilu: věk je nepovinný (výchozí Bez omezení), zvolený se uloží a příště se vrátí na výchozí", pfT.obAgeDefault && pfT.obAgeOn && pfT.obAge12 && pfT.obAgeReset && pfT.obAgeCleared, JSON.stringify(pfT));
+check("zakládání profilu: přepínač Jen anime se uloží, bez něj zůstane běžný režim", pfT.obBox && pfT.obOnly && pfT.obReset && pfT.obAll, JSON.stringify(pfT));
+
+
+// --- Věkové omezení profilu (MFAge + nastavení v okně Zaměření a žánry)
+const ageT = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms)), real = window.tmdbGet;
+  const id = getActiveProfileId(), bak = JSON.stringify(_getProfiles().find(x => x.id === id));
+  const setP = fn => { const ps = _getProfiles(), p = ps.find(x => x.id === id); fn(p); _saveProfiles(ps); };
+  const click = (a, v) => document.querySelector('#mfPrefsModal [data-pf="' + a + '"]' + (v ? '[data-v="' + v + '"]' : "")).click();
+  const calls = [];
+  window.tmdbGet = async path => {
+    calls.push(path);
+    const m = /^\/(movie|tv)\/(\d+)/.exec(path), t = m[1], n = Number(m[2]);
+    const movieCert = { 1: "G", 2: "PG", 3: "PG-13", 4: "R", 5: "" }, tvCert = { 11: "TV-Y7-FV", 12: "TV-PG", 13: "TV-14", 14: "TV-MA" };
+    if (n === 99) return null;
+    if (t === "movie") return { release_dates: { results: [{ iso_3166_1: "DE", release_dates: [{ certification: "16" }] }, { iso_3166_1: "US", release_dates: [{ certification: "" }, { certification: movieCert[n] ?? "" }] }] } };
+    return { content_ratings: { results: [{ iso_3166_1: "US", rating: tvCert[n] ?? "" }] } };
+  };
+  localStorage.removeItem("mfx_age_cache");
+  const items = [1, 2, 3, 4, 5, 99].map(n => ({ tmdbId: n, mediaType: "movie" })).concat([11, 12, 13, 14].map(n => ({ id: n, type: "tv" })), [{ title: "bez id" }]);
+  const ids = l => l.map(x => (x.tmdbId || x.id || "?") + (x.mediaType || x.type || "")).join();
+  try {
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 0 }; delete p.pin; });
+    out.none = (await MFAge.filter(items)).length === items.length && calls.length === 0;
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 7 }; });
+    out.a7 = ids(await MFAge.filter(items));
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 12 }; });
+    out.a12 = ids(await MFAge.filter(items));
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 15 }; });
+    out.a15 = ids(await MFAge.filter(items));
+    const before = calls.length; await MFAge.filter(items); out.cached = calls.length === before + 1 && /\/99\?/.test(calls[calls.length - 1]); // znovu se zkusí jen nezjištěný (id 99)
+    // okno: změna věku, u profilu s PINem jen s PINem
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 0 }; p.pin = "1234"; });
+    MFPrefs.open(); click("age", "12");
+    out.pinField = !!document.getElementById("mfPrefsPin");
+    click("save");
+    out.blocked = (_getProfiles().find(x => x.id === id).prefs.maxAge || 0) === 0 && /PIN/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
+    const f = document.getElementById("mfPrefsPin"); f.value = "1234"; click("save"); await wait(30);
+    out.saved = _getProfiles().find(x => x.id === id).prefs.maxAge === 12 && MFAge.limit() === 12;
+    // stejná hodnota bez PINu se ukládá volně (měním jen žánry)
+    MFPrefs.open(); out.noPinSame = !document.getElementById("mfPrefsPin"); MFPrefs.close();
+  } finally {
+    window.tmdbGet = real; localStorage.removeItem("mfx_age_cache");
+    const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
+    try { MFPrefs.close(); } catch { /* nic */ }
+  }
+  return out;
+});
+check("věk: bez omezení se nic nefiltruje ani nedotazuje", ageT.none, JSON.stringify(ageT));
+check("věk: do 7 jen G / TV-Y7, do 12 + PG / TV-PG, do 15 + PG-13 / TV-14; R, TV-MA, bez hodnocení a neznámé se skryjí", ageT.a7 === "1movie,11tv" && ageT.a12 === "1movie,2movie,11tv,12tv" && ageT.a15 === "1movie,2movie,3movie,11tv,12tv,13tv", JSON.stringify(ageT));
+check("věk: hodnocení se zapamatuje (podruhé bez dotazu)", ageT.cached, JSON.stringify(ageT));
+check("věk: u profilu s PINem jde věk změnit jen se správným PINem", ageT.pinField && ageT.blocked && ageT.saved && ageT.noPinSame, JSON.stringify(ageT));
+
+
+// --- Omezený profil dostane víc kandidátů (3 stránky) + dock se neschová sám od sebe
+const wideT = await page.evaluate(async () => {
+  const out = {}, id = getActiveProfileId(), bak = JSON.stringify(_getProfiles().find(x => x.id === id));
+  const setAge = v => { const ps = _getProfiles(), p = ps.find(x => x.id === id); p.prefs = { ...p.prefs, maxAge: v }; _saveProfiles(ps); };
+  const seen = [], get = async p => { seen.push(p); const n = /page=(\d)/.exec(p); const k = n ? Number(n[1]) : 1; return { results: [{ id: k * 10, media_type: "movie" }, { id: 5, media_type: "movie" }] }; };
+  try {
+    setAge(0); seen.length = 0; const a = await MFAge.wide("/trending/all/week", get); out.free = seen.length === 1 && a.results.length === 2;
+    setAge(12); seen.length = 0; const b = await MFAge.wide("/discover/movie?x=1", get);
+    out.lim = seen.length === 3 && /page=2/.test(seen[1]) && /page=3/.test(seen[2]) && b.results.length === 4;
+    seen.length = 0; await MFAge.wide("/movie/123?append_to_response=release_dates", get); out.detail = seen.length === 1;
+    seen.length = 0; await MFAge.wide("/tv/popular?page=1", get); out.paged = seen.length === 1;
+    const dock = document.getElementById("mfDock"); if (dock) {
+      const sc = document.createElement("div"); sc.id = "tstScroll"; sc.style.cssText = "position:fixed;left:0;top:0;width:10px;height:300px;overflow:auto;z-index:-1";
+      sc.innerHTML = '<div style="height:4000px"></div>'; document.body.appendChild(sc);
+      const w = () => new Promise(r => setTimeout(r, 150));
+      sc.scrollTop = 100; await w(); sc.scrollTop = 500; await w();
+      out.dockStays = !dock.classList.contains("mf-dock-hidden");
+      document.dispatchEvent(new Event("wheel")); sc.scrollTop = 900; await w();
+      out.dockHides = dock.classList.contains("mf-dock-hidden");
+      sc.remove(); window.mfDockReveal && window.mfDockReveal();
+    } else { out.dockStays = out.dockHides = true; }
+  } finally {
+    const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
+  }
+  return out;
+});
+check("věk: omezený profil dotáhne 3 stránky seznamu (neomezený ani detail titulu ne)", wideT.free && wideT.lim && wideT.detail && wideT.paged, JSON.stringify(wideT));
+check("dock: neschová se sám při přesunu stránky, schová se při posouvání uživatelem", wideT.dockStays && wideT.dockHides, JSON.stringify(wideT));
+
+
+// --- Záloha dat do souboru
+const bk = await page.evaluate(async () => {
+  const out = {}, PK = "mf_profiles_v2";
+  Object.keys(localStorage).filter(k => k.startsWith("mf_")).forEach(k => localStorage.removeItem(k));
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_A", name: "Anna", created: 1 }]));
+  localStorage.setItem("mf_watched_p_A", JSON.stringify({ x: true }));
+  localStorage.setItem("mf_tmdb_key", "SECRET");
+  const ex = MFSync.exportData();
+  out.hasData = ex.app === "mujflix" && !!ex.data["mf_watched_p_A"] && !!ex.data[PK];
+  out.noSecret = !("mf_tmdb_key" in ex.data) && !JSON.stringify(ex).includes("SECRET");
+  // jiný stav: jiný profil a prázdná data → import vrátí data a spojí profily
+  Object.keys(localStorage).filter(k => k.startsWith("mf_")).forEach(k => localStorage.removeItem(k));
+  localStorage.setItem(PK, JSON.stringify([{ id: "p_B", name: "Bob", created: 2 }]));
+  const n = MFSync.importData(JSON.parse(JSON.stringify(ex)));
+  out.imported = n >= 2 && !!localStorage.getItem("mf_watched_p_A");
+  out.profiles = JSON.parse(localStorage.getItem(PK)).map(p => p.id).sort().join();
+  out.badFile = (() => { try { MFSync.importData({ app: "jine", data: {} }); return "ok"; } catch (e) { return e.code; } })();
+  out.evilKey = (() => { MFSync.importData({ app: "mujflix", data: { "mf_tmdb_key": "X", "mf_active_pid": "p_Z", "jiny_klic": "1" } }); return localStorage.getItem("mf_tmdb_key") === null && localStorage.getItem("jiny_klic") === null && localStorage.getItem("mf_active_pid") !== "p_Z"; })();
+  MFSyncUI.open("backup");
+  out.ui = !!document.querySelector('#mfSyncModal [data-sa="export"]') && !!document.getElementById("mfBackupFile");
+  MFSyncUI.close();
+  return out;
+});
+check("záloha: export obsahuje data bez API klíčů", bk.hasData && bk.noSecret, JSON.stringify(bk));
+check("záloha: import vrátí data a spojí profily, špatný soubor a cizí klíče odmítne", bk.imported && bk.profiles === "p_A,p_B" && bk.badFile === "badfile" && bk.evilKey, JSON.stringify(bk));
+check("záloha: obrazovka s tlačítky Stáhnout / Načíst", bk.ui);
 
 
 // --- Kino: „Další epizoda“ nespadne, když je TMDB nedostupné

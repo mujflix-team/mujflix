@@ -350,7 +350,13 @@ const ProfileGate = {
     try {
       const [ani, byAnime, ...wiki] = await Promise.all([this._anilistCharacters(""), this._anilistByAnime(), ...groups.map(g => this._wikiByTitles(g[1]))]);
       if (run !== this._avRun) return;
-      const html = groups.map((g, i) => this._charRowHtml(g[0], wiki[i])).join("") + this._charRowHtml("Anime postavy", ani) + byAnime.slice(0, 3).map(m => this._charRowHtml(m.title, m.list)).join("");
+      // Nejdřív řady, kde je obrázků nejvíc; řady s pár obrázky (např. když se u seriálu našly jen 2 postavy) se vynechají
+      const all = groups.map((g, i) => ({ title: g[0], list: wiki[i] || [] })).concat([{ title: "Anime postavy", list: ani || [] }], byAnime.slice(0, 3));
+      all.forEach((r, i) => { r.i = i; });
+      let good = all.filter(r => r.list.length >= 5);
+      good.length || (good = all.filter(r => r.list.length));
+      good.sort((a, b) => Math.min(b.list.length, 16) - Math.min(a.list.length, 16) || a.i - b.i);
+      const html = good.map(r => this._charRowHtml(r.title, r.list)).join("");
       grid.innerHTML = html || '<div class="pc-avatar-loading">Postavy se nepodařilo načíst. Zkus je vyhledat jménem.</div>';
     } catch (err) {
       grid.innerHTML = '<div class="pc-avatar-loading">Postavy se nepodařilo načíst.</div>';
@@ -479,6 +485,10 @@ const ProfileGate = {
       ["10749", "Romantika"], ["14", "Fantasy"], ["53", "Thriller"]
     ];
     n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" onclick="this.classList.toggle('selected')">${t}</button>`).join("");
+    const ao = document.getElementById("pwAnimeOnly");
+    ao && (ao.checked = !1);
+    const ag = document.getElementById("pwAge");
+    ag && (ag.onclick = ev => { const b = ev.target.closest(".pw-agebtn"); b && (ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x === b))); }, ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x.dataset.age === "0")));
     t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");
   },
   /** 3 kroky, pokud jde propojení nabídnout (je nastavené a zařízení ještě není propojené); jinak 2. */
@@ -522,11 +532,14 @@ const ProfileGate = {
     if (!e) return;
     const t = e.dataset.profileId || getActiveProfileId(),
       sel = [...e.querySelectorAll(".pw-genre.selected")].map(e => e.dataset.genre),
-      likesAnime = sel.includes("anime"),
+      animeOnlyBox = !!(document.getElementById("pwAnimeOnly") && document.getElementById("pwAnimeOnly").checked),
+      ageBtn = e.querySelector("#pwAge .pw-agebtn.pw-on"),
+      maxAge = ageBtn ? Number(ageBtn.dataset.age) || 0 : 0,
+      likesAnime = sel.includes("anime") || animeOnlyBox,
       n = [...new Set(sel.map(Number).filter(Number.isFinite))];
     if (t) {
       const o = _getProfiles(), i = o.find(e => e.id === t);
-      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, _saveProfiles(o));
+      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, maxAge ? i.prefs.maxAge = maxAge : delete i.prefs.maxAge, animeOnlyBox || (likesAnime && !n.length) ? i.prefs.animeOnly = !0 : delete i.prefs.animeOnly, _saveProfiles(o));
       if (getActiveProfileId() === t && void 0 !== aiBrain) n.forEach(e => aiBrain.boostGenreIds([e], .12));
       try { if (typeof window.renderHomepage === "function") window.renderHomepage(); } catch (e) {}
     }
@@ -604,4 +617,10 @@ document.addEventListener("keydown", e => {
     all[Math.min(digits.length, 3)].focus();
     e.preventDefault();
   }, true);
+})();
+
+/* Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová) */
+(function () {
+  function show() { var v = document.getElementById("pgVersion"); if (v) v.textContent = "v" + (window.MF_VERSION || "?") + (window.MF_BUILD ? " · " + window.MF_BUILD : ""), v.title = window.MF_BUILD_DATE ? "Sestaveno " + window.MF_BUILD_DATE : ""; }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", show); else show();
 })();

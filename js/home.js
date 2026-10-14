@@ -22,6 +22,8 @@
       }
 
       function fetchTmdbData() {
+        // Jen anime: obecné trendy a populární se nepoužijí, zbytečně se na ně neptáme
+        if (window.mfOnlyAnime && window.mfOnlyAnime()) return Promise.resolve({ trending: [], tv: [], movies: [] });
         if (_tmdbPromise) return _tmdbPromise;
         var TMDB_API_KEY = getTmdbKey();
         if (!TMDB_API_KEY || TMDB_API_KEY === 'YOUR_TMDB_API_KEY') {
@@ -29,20 +31,17 @@
           return Promise.resolve(null);
         }
 
-        _tmdbPromise = Promise.all([
-          fetch(TMDB_BASE + '/trending/all/week?api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ'),
-          fetch(TMDB_BASE + '/tv/popular?api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ&page=1'),
-          fetch(TMDB_BASE + '/movie/popular?api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ&page=1')
-        ]).then(function (resList) {
-          return Promise.all(resList.map(function (r) { return r.json(); }));
-        }).then(function (parsed) {
+        var lim = !!(window.MFAge && window.MFAge.limit()), N = lim ? 40 : 10;
+        var gj = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ').then(function (r) { return r.json(); }); };
+        var wj = function (p) { return window.MFAge ? window.MFAge.wide(p, gj) : gj(p); };
+        _tmdbPromise = Promise.all([wj('/trending/all/week'), wj('/tv/popular'), wj('/movie/popular')]).then(function (parsed) {
           var trending = parsed[0];
           var tv = parsed[1];
           var movies = parsed[2];
           return {
-            trending: (trending.results || []).slice(0, 10),
-            tv: (tv.results || []).slice(0, 10),
-            movies: (movies.results || []).slice(0, 10)
+            trending: (trending.results || []).slice(0, N),
+            tv: (tv.results || []).slice(0, N),
+            movies: (movies.results || []).slice(0, N)
           };
         }).catch(function (e) {
           console.warn('[mfh] TMDB fetch error:', e);
@@ -217,8 +216,11 @@
         if (!key) return Promise.resolve(null);
         var ks = Object.keys(_nfCache);
         if (ks.length >= 40) delete _nfCache[ks[0]];
-        _nfCache[path] = fetch(TMDB_BASE + path + (path.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key) + '&language=cs-CZ')
-          .then(function (r) { return r.json(); })
+        var get = function (p) {
+          return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key) + '&language=cs-CZ')
+            .then(function (r) { return r.json(); });
+        };
+        _nfCache[path] = (window.MFAge ? window.MFAge.wide(path, get) : get(path))
           .catch(function () { delete _nfCache[path]; return null; });
         return _nfCache[path];
       }
@@ -296,10 +298,8 @@
           (others.length ? others.map(function (p) {
             return '<button type="button" role="menuitem" class="nf-pm-item" data-pid="' + esc(p.id) + '"><span class="nf-pm-av" style="--c:' + esc(p.color || '#0a84ff') + '">' + avatarHtml(p) + '</span><span>' + esc(p.name || 'Profil') + '</span></button>';
           }).join('') + '<div class="nf-pm-sep"></div>' : '') +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="edit"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Upravit profil</span></button>' +
           '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="manage"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M17 5v6M14 8h6"/></svg><span>Spravovat profily</span></button>' +
-          '<div class="nf-pm-sep"></div>' +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="sync"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/></svg><span>Propojit zařízení</span></button>';
+          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="settings"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Nastavení</span></button>';
         document.body.appendChild(m);
         var r = btn.getBoundingClientRect();
         m.style.top = Math.round(r.bottom + 12) + 'px';
@@ -309,9 +309,8 @@
           if (!it) return;
           mfCloseProfileMenu();
           if (it.dataset.pid) { if (window.ProfileGate) ProfileGate.selectProfile(it.dataset.pid); }
-          else if (it.dataset.act === 'edit' && cur && window.ProfileGate) ProfileGate.openCreate(cur.id);
           else if (it.dataset.act === 'manage' && window.ProfileGate) { ProfileGate.show(); ProfileGate.toggleManageMode(); }
-          else if (it.dataset.act === 'sync' && window.MFSyncUI) MFSyncUI.open('home');
+          else if (it.dataset.act === 'settings' && window.MFProfileSettings) MFProfileSettings.open();
         });
         setTimeout(function () {
           document.addEventListener('pointerdown', mfProfileMenuOutside, true);
@@ -394,6 +393,19 @@
         var sec = document.getElementById(id + 'Section');
         if (!sec) return;
         if (!items || !items.length) { sec.remove(); return; }
+        // Věkové omezení profilu: bez omezení se vykreslí hned, jinak až po ověření hodnocení titulů
+        if (window.MFAge && window.MFAge.limit() && id !== 'mfhRecent' && id !== 'mfhMyList') {
+          var run = _nfRun;
+          window.MFAge.filter(items).then(function (ok) {
+            if (run !== _nfRun) return;
+            var s2 = document.getElementById(id + 'Section');
+            if (!s2) return;
+            if (!ok.length) { s2.remove(); return; }
+            renderCarousel(id, ok, ranked);
+            s2.hidden = false;
+          });
+          return;
+        }
         renderCarousel(id, items, ranked);
         sec.hidden = false;
       }
@@ -584,11 +596,7 @@
 
       /* Profil si vybral jen Anime (žádný jiný žánr) → doporučení jsou čistě anime, nic z naučených žánrů. */
       function mfhOnlyAnime() {
-        try {
-          if (!(window.mfLikesAnime && window.mfLikesAnime())) return false;
-          var p = nfActiveProfile();
-          return !((p && p.likedGenres) || []).length;
-        } catch (e) { return false; }
+        try { return !!(window.mfOnlyAnime && window.mfOnlyAnime()); } catch (e) { return false; }
       }
       function mfhFetchForYouBase(tmdb) {
         var genres = mfhTopGenreIdsWithProfile();
@@ -608,8 +616,8 @@
           var ids = window.mfGenreIdsFor ? window.mfGenreIdsFor(genres, type) : genres;
           if (!ids.length) return Promise.resolve([]);
           var q = '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=100&with_genres=' + encodeURIComponent(ids.join('|'));
-          return fetch(TMDB_BASE + '/discover/' + type + '?api_key=' + encodeURIComponent(key) + q)
-            .then(function (r) { return r.json(); })
+          var gp = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key)).then(function (r) { return r.json(); }); };
+          return (window.MFAge ? window.MFAge.wide('/discover/' + type + '?' + q.slice(1), gp) : gp('/discover/' + type + '?' + q.slice(1)))
             .then(function (d) { return (d.results || []).filter(function (r) { return !(window.mfIsAnime && window.mfIsAnime(r)); }).map(toItem(type)); })
             .catch(function () { return []; });
         })).then(function (lists) {
@@ -627,8 +635,9 @@
           if (!(window.mfLikesAnime && window.mfLikesAnime()) || !key) return out;
           var toItem = function (type) { return function (item) { return nfItem(item, type); }; };
           return Promise.all(['tv', 'movie'].map(function (type) {
-            return fetch(TMDB_BASE + '/discover/' + type + '?api_key=' + encodeURIComponent(key) + '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=50' + window.MF_ANIME_QUERY)
-              .then(function (r) { return r.json(); })
+            var ap = '/discover/' + type + '?language=cs-CZ&sort_by=popularity.desc&vote_count.gte=50' + window.MF_ANIME_QUERY;
+            var ag = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key)).then(function (r) { return r.json(); }); };
+            return (window.MFAge ? window.MFAge.wide(ap, ag) : ag(ap))
               .then(function (d) { return (d.results || []).map(toItem(type)); })
               .catch(function () { return []; });
           })).then(function (al) {
@@ -712,6 +721,8 @@
 
         fetchTmdbData().then(function (tmdb) {
           return mfhFetchForYou(tmdb);
+        }).then(function (items) {
+          return window.MFAge ? window.MFAge.filter(items) : items;
         }).then(function (items) {
           if (myRun !== _nfRun) return;
           items = fresh(items.filter(function (it) { return it.image; })).slice(0, 20);

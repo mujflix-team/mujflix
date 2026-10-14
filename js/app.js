@@ -297,31 +297,11 @@ async function fetchTmdbDetails(e) {
     return null
   }
 }
-async function loadTmdbTileImages() {
+async function loadTmdbDbData() {
+  // Doplní vestavěným seriálům obrázky, hodnocení a žánry z TMDB (používá domovská stránka, hodnocení a AI).
   for (const e of Object.keys(db)) {
-    const t = document.querySelector(`.ps-tile-wrapper[data-slug="${e}"]`);
-    if (!t) continue;
     const n = await fetchTmdbDetails(e);
-    if (n) {
-      const o = t.querySelector(".tile-bg");
-      if (o) {
-        const t = e => new Promise(t => {
-            const n = new Image;
-            n.onload = () => t(e), n.onerror = () => t(null), n.src = e
-          }),
-          i = n.backdrop ? await t(n.backdrop) || await t(db[e]._poster || db[e].poster || "") || "" : await t(db[e]._poster || db[e].poster || "") || "";
-        i && (o.src = i, o.complete && o.naturalWidth ? o.classList.add("loaded") : o.addEventListener("load", () => o.classList.add("loaded"), {
-          once: !0
-        }))
-      }
-      db[e]._backdrop = n.backdrop, db[e]._poster = n.poster, db[e]._rating = n.rating || 0, n.genres.length && (db[e]._genres = n.genres.map(e => e.name))
-    } else {
-      const n = t.querySelector(".tile-bg"),
-        o = db[e]._poster || db[e].poster || "";
-      n && o && (n.src = o, n.addEventListener("load", () => n.classList.add("loaded"), {
-        once: !0
-      }))
-    }
+    if (n) db[e]._backdrop = n.backdrop, db[e]._poster = n.poster, db[e]._rating = n.rating || 0, n.genres.length && (db[e]._genres = n.genres.map(e => e.name))
   }
 }
 
@@ -1465,231 +1445,10 @@ function clearAdaptiveColor() {
   document.getElementById("adaptiveBg")?.classList.remove("active")
 }
 
-function initTileEffects() {
-  document.getElementById("mainMenu");
-  document.querySelectorAll(".ps-tile-wrapper[data-slug]").forEach(e => {
-    const t = e.dataset.slug;
-    if (t && "__search__" !== t && "__foryou__" !== t && db[t]) {
-      const n = document.createElement("div");
-      n.className = "tile-tooltip";
-      const o = db[t];
-      n.innerHTML = `<div class="tt-title">${escapeHTML(o.name)}</div><div class="tt-meta">${function(e){const t=e||0,n=t/2,o=Math.floor(n),i=n-o>=.3,a=5-o-(i?1:0);return`<span class="tt-stars">${"★".repeat(o)}${i?"½":""}${"☆".repeat(a)}</span><span class="tt-rating-num">${t.toFixed(1)}</span>`}(o._rating)}<span>${o.totalEps} ep</span></div><div class="tt-genre">${escapeHTML((o._genres||[]).slice(0,2).join(" · "))}</div>`, e.appendChild(n)
-    }
-    const n = e.querySelector(".tile-bg");
-    if (n) {
-      const e = () => n.classList.add("loaded");
-      n.complete && n.naturalWidth ? e() : (n.addEventListener("load", e, {
-        once: !0
-      }), n.addEventListener("error", e, {
-        once: !0
-      }))
-    }
-    const o = e.querySelector(".tile-logo");
-    if (o) {
-      const e = () => o.classList.add("loaded");
-      o.complete && o.naturalWidth ? e() : (o.addEventListener("load", e, {
-        once: !0
-      }), o.addEventListener("error", e, {
-        once: !0
-      }))
-    }
-    t && db[t], initUniversalHover(e)
-  })
-}
-
-function initUniversalHover(e) {
-  if (e._hoverInited) return;
-  e._hoverInited = !0;
-  const t = document.getElementById("mainMenu"),
-    n = e.dataset.tmdbId,
-    o = e.dataset.type || "tv",
-    i = e.dataset.slug;
-  e.addEventListener("mouseenter", () => {
-    "mainMenu" === e.parentElement.id && t.classList.add("focus-mode"), e.classList.add("focused"), i && setAdaptiveColor(i);
-    const a = i && HARDCODED_TRAILERS[i];
-    (n || a) && (n && getTrailerKey(n, o, i), e._trailerTimer = setTimeout(() => {
-      (e.classList.contains("focused") || e.classList.contains("kb-focus")) && loadTileTrailer(e, n || null, o, i)
-    }, 1400))
-  }), e.addEventListener("mouseleave", () => {
-    "mainMenu" === e.parentElement.id && t.classList.remove("focus-mode"), e.classList.remove("focused"), clearAdaptiveColor(), e._trailerTimer && clearTimeout(e._trailerTimer), removeTileTrailer(e)
-  });
-  e.addEventListener("click", function(ev) {
-    if (!i || i === "__search__" || i === "__foryou__") return;
-    const _gEl = document.getElementById("mfProfileGate");
-    if (_gEl && _gEl.style.display === "flex") return;
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-    var tmdbId = e.dataset.tmdbId;
-    var type = o || "tv";
-    var item = (typeof db !== "undefined") && db[i];
-    var title = (item && item.name) || i;
-    if (tmdbId && typeof _showCinemaOrFinderChoice === "function") {
-      window._mfFinderTmdbId = tmdbId;
-      window._cinYear = (item && item._year) || null;
-      _showCinemaOrFinderChoice(tmdbId, title, type, title);
-    } else if (typeof openSeries === "function") {
-      openSeries(i);
-    }
-  }, true);
-}
-const HARDCODED_TRAILERS = {
-    "the-simpsons": "oMXk1wi-9Zs",
-    "family-guy": "J32iwo65RMc",
-    futurama: "GxEY6KNsz44",
-    "south-park": "FMKcPao7A6Y"
-  },
-  _trailerCache = {};
-let _activeTrailerWrapper = null;
-async function getTrailerKey(e, t = "tv", n = null) {
-  if (n && HARDCODED_TRAILERS[n]) return HARDCODED_TRAILERS[n];
-  if (n && db[n]?.trailerKey) return db[n].trailerKey;
-  const o = "trailer-" + t + "-" + e;
-  if (o in _trailerCache) return _trailerCache[o] || null;
-  try {
-    const n = TMDB + "/" + t + "/" + e + "/videos?api_key=" + TMDB_KEY,
-      i = await fetch(n);
-    if (i.ok) {
-      const e = await i.json(),
-        t = e?.results || [],
-        n = t.find(e => "YouTube" === e.site && "Trailer" === e.type) || t.find(e => "YouTube" === e.site && "Teaser" === e.type) || t.find(e => "YouTube" === e.site);
-      return _trailerCache[o] = n ? n.key : "", n ? n.key : null
-    }
-  } catch (e) {}
-  return null
-}
-async function loadTileTrailer(e, t, n = "tv", o = null) {
-  if (!window.gsap) return; // CDN s gsap nedostupná (výpadek / blokátor): trailer se nezobrazí, ale nic nespadne
-  if (!(o && HARDCODED_TRAILERS[o]) && !t) return;
-  // Starý přehled dlaždic je v Netflix vzhledu skrytý. Na neviditelné dlaždici se trailer nespouští (jinak hraje jen zvuk bez obrazu).
-  if (!e || !e.isConnected || !e.offsetParent || e.getBoundingClientRect().width < 2) return;
-  if (_activeTrailerWrapper && _activeTrailerWrapper !== e && removeTileTrailer(_activeTrailerWrapper), e.querySelector(".tile-trailer")) return;
-  const i = await getTrailerKey(t, n, o);
-  if (!i) return;
-  if (!e.offsetParent) return;
-  if (!e.classList.contains("focused") && !e.classList.contains("kb-focus")) return;
-  _activeTrailerWrapper = e, _activeTrailerWrapper = e;
-  const a = document.createElement("div");
-  a.className = "tile-trailer";
-  const s = `https://www.youtube-nocookie.com/embed/${i}?autoplay=1&mute=1&controls=0&loop=1&playlist=${i}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&start=12&vq=hd720&hl=cs&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-  a.innerHTML = `\n        <div class="tr-video-container">\n          <iframe src="${s}" allow="autoplay;encrypted-media" style="pointer-events:none;" referrerpolicy="strict-origin-when-cross-origin"></iframe>\n          <div style="position:absolute;inset:0;z-index:10;pointer-events:none;background:transparent;"></div>\n        </div>\n        <div class="tr-grad"></div>\n      `;
-  const r = e.querySelector(".ps-tile");
-  r && r.appendChild(a);
-  const l = e.querySelector(".tile-bg"),
-    c = e.querySelector(".tile-logo"),
-    d = e.querySelector(".tile-continue-badge"),
-    m = e.querySelector(".tile-watchlist-btn"),
-    u = a.querySelector(".tr-video-container"),
-    p = gsap.timeline({
-      defaults: {
-        ease: "power3.inOut"
-      }
-    });
-  p.to(r, {
-    scale: 1.18,
-    y: -12,
-    duration: 1,
-    boxShadow: "0 40px 100px rgba(0,0,0,0.95), 0 0 60px rgba(0,122,255,0.14)"
-  }, 0), l && p.to(l, {
-    opacity: 0,
-    filter: "blur(20px) scale(1.15)",
-    duration: .8
-  }, .1), c && p.to(c, {
-    opacity: .05,
-    filter: "blur(10px)",
-    scale: .85,
-    duration: .6
-  }, .15), d && p.to(d, {
-    opacity: 0,
-    y: -10,
-    duration: .5
-  }, 0), m && p.to(m, {
-    opacity: 0,
-    scale: .5,
-    duration: .4
-  }, 0), p.fromTo(a, {
-    opacity: 0
-  }, {
-    opacity: 1,
-    duration: 1.4
-  }, .45), u && p.fromTo(u, {
-    scale: .92
-  }, {
-    scale: 1.08,
-    duration: 2.5,
-    ease: "power1.out"
-  }, .35), e._gsapTl = p
-}
-
-function removeTileTrailer(e) {
-  if (!window.gsap && e) { const tr = e.querySelector(".tile-trailer"); tr && tr.remove(); e._trailerTimer && clearTimeout(e._trailerTimer); return }
-  if (!e) return;
-  e._trailerTimer && clearTimeout(e._trailerTimer), _activeTrailerWrapper === e && (_activeTrailerWrapper = null);
-  const t = e.querySelector(".tile-trailer"),
-    n = e.querySelector(".ps-tile");
-  if (e._gsapTl && (e._gsapTl.kill(), e._gsapTl = null), t || n) {
-    const o = e.querySelector(".tile-bg"),
-      i = e.querySelector(".tile-logo"),
-      a = e.querySelector(".tile-continue-badge"),
-      s = e.querySelector(".tile-watchlist-btn");
-    gsap.to(n, {
-      scale: 1,
-      duration: .4,
-      ease: "power2.out"
-    }), o && gsap.to(o, {
-      opacity: 1,
-      filter: "blur(0px)",
-      duration: .4
-    }), i && gsap.to(i, {
-      opacity: 1,
-      filter: "blur(0px)",
-      duration: .4,
-      onComplete: () => {
-        i && (i.style.opacity = "1")
-      }
-    }), a && gsap.to(a, {
-      opacity: 1,
-      scale: 1,
-      duration: .3
-    }), s && gsap.to(s, {
-      opacity: 1,
-      scale: 1,
-      duration: .3
-    }), t && gsap.to(t, {
-      opacity: 0,
-      duration: .3,
-      onComplete: () => t.remove()
-    })
-  }
-}
-
 /* class AIBrain → js/ai/brain.js */
 const aiBrain = new AIBrain;
 
 /* Finder → js/finder/finder.js */
-const menuWrappers = () => Array.from(document.querySelectorAll("#mainMenu .ps-tile-wrapper"));
-
-function setKbMenuFocus(e) {
-  const t = menuWrappers();
-  if (!t.length) return;
-  const n = t[kbMenuIndex];
-  n && (clearTimeout(n._trailerTimer), removeTileTrailer(n)), t.forEach(e => e.classList.remove("kb-focus")), kbMenuIndex = Math.max(0, Math.min(e, t.length - 1));
-  const o = t[kbMenuIndex];
-  if (!o) return;
-  o.classList.add("kb-focus"), o.scrollIntoView({
-    behavior: "smooth",
-    inline: "center",
-    block: "nearest"
-  });
-  const i = o.dataset.slug;
-  if (i && "__search__" !== i && setAdaptiveColor(i), i && "__search__" !== i && "__foryou__" !== i) {
-    const e = db[i]?.tmdbId,
-      t = HARDCODED_TRAILERS[i];
-    (e || t) && (o._trailerTimer = setTimeout(() => {
-      o.classList.contains("kb-focus") && loadTileTrailer(o, e || null, "tv", i)
-    }, 1400))
-  }
-}
-
 function setKbEpFocus(e) {
   const t = Array.from(document.querySelectorAll("#episodesGrid .episode-card"));
   t.length && (t.forEach(e => e.classList.remove("kb-focus")), kbEpIndex = Math.max(0, Math.min(e, t.length - 1)), t[kbEpIndex]?.classList.add("kb-focus"), t[kbEpIndex]?.scrollIntoView({
@@ -1726,14 +1485,6 @@ document.addEventListener("keydown", e => {
           n && n.querySelector(".ep-btn-mark")?.click()
         }
         return
-      }
-    } else if ("ArrowLeft" === e.key) e.preventDefault(), setKbMenuFocus(kbMenuIndex - 1);
-    else if ("ArrowRight" === e.key) e.preventDefault(), setKbMenuFocus(kbMenuIndex + 1);
-    else if ("Enter" === e.key) {
-      const e = menuWrappers()[kbMenuIndex];
-      if (e) {
-        const t = e.dataset.slug;
-        "__search__" === t ? openSearch() : "__foryou__" === t ? openForYouSeries() : openSeries(t)
       }
     }
   }
@@ -1895,6 +1646,7 @@ async function fetchRecommendedNews() {
     shows = [...at.filter(r => !ids.has(r.id)).slice(0, 4), ...shows], movies = [...am.filter(r => !ids.has(r.id)).slice(0, 2), ...movies]
   }
   if (movies.length + shows.length < 4 && !(window.mfOnlyAnime && window.mfOnlyAnime())) [movies, shows] = await Promise.all([q("movie", !1), q("tv", !1)]);
+  if (window.MFAge && window.MFAge.limit()) [movies, shows] = await Promise.all([window.MFAge.filter(movies), window.MFAge.filter(shows)]);
   const out = [];
   for (let i = 0; out.length < 8 && (i < movies.length || i < shows.length); i++) {
     movies[i] && out.push(movies[i]), out.length < 8 && shows[i] && out.push(shows[i])
@@ -1968,31 +1720,7 @@ function buildEpCard(e, t, n, o, i, a, s) {
 window.addEventListener("load", () => {
   if (Object.keys(db).forEach(e => {
       updateTileProgress(e), updateContinueBadge(e)
-    }), updateLogoProgress(), updateWatchlistBtns(), initTileEffects(), loadTmdbTileImages().then(() => initTileEffects()), document.querySelectorAll(".ps-tile-wrapper .tile-bg, .ps-tile-wrapper .tile-logo").forEach(e => {
-      const t = () => e.classList.add("loaded");
-      e.complete && e.naturalWidth > 0 ? t() : (e.addEventListener("load", t, {
-        once: !0
-      }), e.addEventListener("error", t, {
-        once: !0
-      }))
-    }), setKbMenuFocus(0), function() {
-      const e = ["Akce", "Drama", "Sci-Fi", "Horor", "Krimi", "Animák", "Komedie", "Thriller", "Dokument", "Reality", "Romantika", "Fantasy"],
-        t = document.getElementById("tsiTags");
-      if (!t) return;
-      let n = 0;
-
-      function o() {
-        const o = [];
-        for (let t = 0; t < 3; t++) o.push(e[(n + t) % e.length]);
-        n = (n + 3) % e.length, t.style.opacity = "0", t.style.transform = "translateY(4px)", setTimeout(() => {
-          t.innerHTML = o.map(e => `<span>${e}</span>`).join(""), t.style.transition = "opacity 0.4s ease, transform 0.4s ease", t.style.opacity = "1", t.style.transform = "translateY(0)"
-        }, 300)
-      }
-      o(), setInterval(() => { document.hidden || o() }, 2800)
-    }(), setTimeout(checkNewEpisodes, 8e3), initPWA(), !1) {}
-  document.querySelectorAll(".tile-bg").forEach(e => {
-    e.complete && e.naturalWidth > 0 && e.classList.add("loaded")
-  });
+    }), updateLogoProgress(), updateWatchlistBtns(), loadTmdbDbData(), setTimeout(checkNewEpisodes, 8e3), initPWA(), !1) {}
   const e = document.querySelector(".mf-header");
   if (e) {
     const t = document.querySelector(".ps-menu-scene") || document.body;
@@ -2025,22 +1753,6 @@ window.addEventListener("load", () => {
   }, {
     passive: !0
   });
-  const t = document.querySelector(".ps-menu");
-  t && t.addEventListener("wheel", e => {
-    Math.abs(e.deltaY) > Math.abs(e.deltaX) && (e.preventDefault(), t.scrollBy({
-      left: 1.4 * e.deltaY,
-      behavior: "smooth"
-    }))
-  }, {
-    passive: !1
-  });
-  document.querySelectorAll(".ps-tile-wrapper").forEach((e, t) => {
-    e.style.opacity = "0", e.style.transform = "translateY(18px) translateZ(0)", setTimeout(() => {
-      e.style.transition = "opacity 0.45s ease, transform 0.5s cubic-bezier(0.34,1.18,0.64,1)", e.style.opacity = "1", e.style.transform = "translateY(0) translateZ(0)", setTimeout(() => {
-        e.style.transition = "", e.style.transform = ""
-      }, 520)
-    }, 60 + 55 * t)
-  })
 });
 
 async function initPWA() {

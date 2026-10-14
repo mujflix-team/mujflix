@@ -367,6 +367,7 @@
         '<button type="button" class="mf-cin-fav-btn mf-cin-rate-btn" id="mfCinRateBtn" aria-label="Ohodnotit" title="Ohodnotit" style="display:none">☆</button>' +
         '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených" title="Přidat do Oblíbených">♡</button>' +
         '<button type="button" class="mf-cin-switch-btn" id="mfCinSwitchSrc">Jiný zdroj</button>' +
+        '<button type="button" class="mf-cin-switch-btn mf-cin-bad-btn" id="mfCinBadSrc" title="Zdroj nefunguje – zapamatuji si to a zkusím další">Nefunguje to</button>' +
       "</div>" +
 
 
@@ -388,6 +389,7 @@
 
     modal.querySelector("#mfStandaloneCinemaClose").onclick = close;
     modal.querySelector("#mfCinSwitchSrc").onclick = function () { cycleSource(1); };
+    modal.querySelector("#mfCinBadSrc").onclick = markBadAndNext;
     modal.querySelector("#mfCinPrevEp").onclick = function () { stepEpisode(-1); };
     modal.querySelector("#mfCinNextEp").onclick = function () { stepEpisode(1); };
     modal.querySelector("#mfCinPickEp").onclick = toggleEpGrid;
@@ -403,9 +405,118 @@
     });
   }
 
-  function cycleSource(dir) {
+  /* ── Paměť zdrojů: který zdroj pro daný titul fungoval / nefungoval (synchronizuje se mezi zařízeními) ─────────── */
+  var PREF_KEY = "mf_src_pref", BAD_TTL = 14 * 24 * 3600 * 1000, SOFT_BAD_TTL = 3 * 24 * 3600 * 1000, QUICK_SWITCH_MS = 25 * 1000, GOOD_AFTER_MS = 60 * 1000;
+
+  function prefsLoad() {
+    try { var o = JSON.parse(localStorage.getItem(PREF_KEY) || "{}"); return o && typeof o === "object" ? o : {}; } catch (e) { return {}; }
+  }
+  function prefsSave(all) {
+    try {
+      var keys = Object.keys(all);
+      if (keys.length > 300) {
+        keys.sort(function (a, b) { return (all[a].t || 0) - (all[b].t || 0); }).slice(0, keys.length - 300).forEach(function (k) { delete all[k]; });
+      }
+      localStorage.setItem(PREF_KEY, JSON.stringify(all));
+    } catch (e) {}
+  }
+  function prefKey() { return current ? current.type + ":" + current.tmdbId : ""; }
+  function prefEntry() { var e = prefsLoad()[prefKey()]; return e && typeof e === "object" ? e : { good: "", bad: {} }; }
+  /* Sdílená paměť (Worker): jaký zdroj funguje ostatním. Jen nápověda pro začátek, vlastní zkušenost má vždy přednost.
+     Posílá se jen „titul + název zdroje“, nic o uživateli. Cache a „už nahlášeno“ jsou jen na tomto zařízení (mfx_*, nesynchronizuje se). */
+  var SH_CACHE = "mfx_src_shared", SH_SENT = "mfx_src_reported", SH_OFF = "mfx_src_share_off", SH_TTL = 7 * 24 * 3600 * 1000, SH_TTL_EMPTY = 24 * 3600 * 1000;
+  function shRead(k) { try { var o = JSON.parse(localStorage.getItem(k) || "{}"); return o && typeof o === "object" ? o : {}; } catch (e) { return {}; } }
+  function shWrite(k, o) {
+    try {
+      var keys = Object.keys(o);
+      if (keys.length > 300) keys.slice(0, keys.length - 300).forEach(function (x) { delete o[x]; });
+      localStorage.setItem(k, JSON.stringify(o));
+    } catch (e) {}
+  }
+  function shBase() {
+    try { if (localStorage.getItem(SH_OFF) === "1") return ""; } catch (e) {}
+    return String(window.TMDB_PROXY_URL || "").replace(/\/+$/, "");
+  }
+  function shPost(path, body) {
+    return fetch(shBase() + path, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.ok ? r.json() : null; });
+  }
+  function shCached(key) {
+    var e = shRead(SH_CACHE)[key];
+    if (!e || typeof e !== "object") return null;
+    var age = Date.now() - (e.t || 0);
+    return age < (e.label ? SH_TTL : SH_TTL_EMPTY) ? e : null;
+  }
+  function shLabel(key) { var e = shCached(key); return e && e.label ? e.label : ""; }
+  /** Zeptá se Workeru (jednou za týden na titul) a výsledek uloží; cb(label) se zavolá, jen když je co říct. */
+  function shFetch(key, cb) {
+    if (!shBase() || shCached(key) || !/^(movie|tv):\d+$/.test(key)) return;
+    shPost("/src/get", { key: key }).then(function (r) {
+      if (!r) return;
+      var all = shRead(SH_CACHE);
+      all[key] = { label: typeof r.label === "string" ? r.label : "", t: Date.now() };
+      shWrite(SH_CACHE, all);
+      if (all[key].label && cb) cb(all[key].label);
+    }).catch(function () {});
+  }
+  function shReport(key, label) {
+    if (!shBase() || !label || !/^(movie|tv):\d+$/.test(key)) return;
+    var sent = shRead(SH_SENT);
+    if (sent[key] === label) return;
+    sent[key] = label; shWrite(SH_SENT, sent);
+    shPost("/src/report", { key: key, label: label }).catch(function () {});
+  }
+
+  function srcIsBad(label) {
+    var t = (prefEntry().bad || {})[label];
+    return !!t && Date.now() - t < BAD_TTL;
+  }
+  /** kind: "good" | "bad" (výslovné „Nefunguje to“, platí 14 dní) | "soft" (rychlé přepnutí, platí jen 3 dny). */
+  function srcMark(kind, label) {
+    if (!current || !label) return;
+    var all = prefsLoad(), k = prefKey(), e = all[k] || { good: "", bad: {} };
+    e.bad = e.bad || {};
+    if (kind === "good") { e.good = label; delete e.bad[label]; shReport(k, label); }
+    else { e.bad[label] = Date.now() - (kind === "soft" ? BAD_TTL - SOFT_BAD_TTL : 0); if (e.good === label) e.good = ""; }
+    e.t = Date.now();
+    all[k] = e;
+    prefsSave(all);
+  }
+  /** Zdroj, od kterého se začíná: ten, co pro titul fungoval; jinak první, který není označen jako nefunkční. */
+  function startIndex() {
+    var sources = sourcesFor(current.type), e = prefEntry();
+    var pref = e.good || shLabel(prefKey());
+    var gi = pref ? sources.findIndex(function (s) { return s.label === pref; }) : -1;
+    if (gi >= 0 && !srcIsBad(sources[gi].label)) return gi;
+    for (var i = 0; i < sources.length; i++) if (!srcIsBad(sources[i].label)) return i;
+    return 0;
+  }
+  function currentSrcLabel() {
+    var src = current && sourcesFor(current.type)[current.sourceIdx];
+    return src ? src.label : "";
+  }
+  /** Zdroj, na kterém uživatel zůstal dost dlouho (nepřepnul, šel na další epizodu / hodnotil), se bere jako funkční. */
+  function noteGoodIfStayed() {
+    if (current && current._srcSince && Date.now() - current._srcSince >= GOOD_AFTER_MS) srcMark("good", currentSrcLabel());
+  }
+  function markBadAndNext() {
+    srcMark("bad", currentSrcLabel());
+    if (typeof showToast === "function") showToast("Zdroj označen jako nefunkční, zkouším další", 2200);
+    cycleSource(1, true);
+  }
+
+  function cycleSource(dir, skipQuickCheck) {
     var sources = sourcesFor(current.type);
-    current.sourceIdx = (current.sourceIdx + dir + sources.length) % sources.length;
+    // rychlé „Jiný zdroj“ krátce po načtení = zdroj nefungoval
+    if (!skipQuickCheck && current._srcSince && Date.now() - current._srcSince < QUICK_SWITCH_MS) srcMark("soft", currentSrcLabel());
+    var idx = current.sourceIdx, found = false;
+    for (var n = 0; n < sources.length; n++) {
+      idx = (idx + dir + sources.length) % sources.length;
+      if (!srcIsBad(sources[idx].label)) { found = true; break; }
+    }
+    // všechny zdroje jsou označené jako nefunkční: prostě jeď dál po řadě
+    if (!found) idx = (current.sourceIdx + dir + sources.length) % sources.length;
+    current.sourceIdx = idx;
     renderCurrent();
   }
 
@@ -450,8 +561,9 @@
       current.season = newSeason;
       current.episode = newEp;
       if (current.localSlug) appMarkWatched(current.localSlug + "-S" + current.season + "-E" + current.episode);
+      noteGoodIfStayed();
       current.tried = new Set();
-      current.sourceIdx = 0;
+      current.sourceIdx = startIndex();
       renderCurrent();
       if (epGridPanel.style.display !== "none") renderEpGrid();
     });
@@ -525,8 +637,9 @@
         b.onclick = function () {
           current.episode = e;
           if (current.localSlug) appMarkWatched(current.localSlug + "-S" + current.season + "-E" + e);
+          noteGoodIfStayed();
           current.tried = new Set();
-          current.sourceIdx = 0;
+          current.sourceIdx = startIndex();
           renderCurrent();
           renderEpGrid();
         };
@@ -591,6 +704,7 @@
 
   /* Hvězdička: označí epizodu jako zhlédnutou a otevře okno „Jak se ti epizoda líbila?“ */
   function rateCurrentEpisode() {
+    noteGoodIfStayed();
     if (!current || typeof window.openEpRating !== "function") return;
     var btn = modal.querySelector("#mfCinRateBtn");
     if (current.type === "tv") {
@@ -611,6 +725,7 @@
     var sources = sourcesFor(current.type);
     var label = sources[current.sourceIdx].label;
     current._loadedUrl = url;
+    current._srcSince = Date.now();
     loadUrl(url, label, sources[current.sourceIdx].noEmbed);
     renderSourceBar();
     updateFavBtn();
@@ -666,13 +781,25 @@
     document.body.style.overflow = "hidden";
 
     if (current.type === "movie" && typeof window.mfRecordContinueMovie === "function") window.mfRecordContinueMovie(current.tmdbId, current.title);
+    current.sourceIdx = startIndex();
     renderCurrent();
+    if (!prefEntry().good) {
+      var openedKey = prefKey(), openedIdx = current.sourceIdx, openedAt = current._srcSince;
+      shFetch(openedKey, function (label) {
+        // odpověď dorazila brzy a uživatel zatím nic nepřepínal: začni zdrojem, který funguje ostatním
+        if (!current || prefKey() !== openedKey || current.sourceIdx !== openedIdx || current._srcSince !== openedAt) return;
+        if (Date.now() - openedAt > 2500 || prefEntry().good) return;
+        var ni = startIndex();
+        if (ni !== openedIdx) { current.sourceIdx = ni; renderCurrent(); }
+      });
+    }
     if (current.type === "tv") ensureEpCounts(function () {});
     loadAltTitles(current);
   }
 
   function close() {
     if (!modal) return;
+    if (current && modal.classList.contains("open")) noteGoodIfStayed();
     modal.classList.remove("open");
     frame.innerHTML = "";
     if (epGridPanel) epGridPanel.style.display = "none";

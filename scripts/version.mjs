@@ -17,7 +17,11 @@ if (arg) {
   if (!cl.includes(`## ${next}`)) writeFileSync("docs/CHANGELOG.md", cl.replace("# Changelog\n", `# Changelog\n\n## ${next}\n### Nově\n- \n\n### Opraveno\n- \n`));
 }
 
-const out = `/* GENEROVÁNO z package.json (node scripts/version.mjs) – needituj ručně. */\nwindow.MF_VERSION = "${pkg.version}";\n`;
+// Na Cloudflare Pages (Build command: node scripts/version.mjs) se k verzi přidá krátké ID commitu a datum sestavení
+const env = process.env || {};
+const sha = String(env.CF_PAGES_COMMIT_SHA || env.GITHUB_SHA || "").replace(/[^0-9a-f]/gi, "").slice(0, 7);
+const built = sha ? `window.MF_BUILD = "${sha}";\nwindow.MF_BUILD_DATE = "${new Date().toISOString().slice(0, 10)}";\n` : "";
+const out = `/* GENEROVÁNO z package.json (node scripts/version.mjs) – needituj ručně. */\nwindow.MF_VERSION = "${pkg.version}";\n${built}`;
 let cur = ""; try { cur = readFileSync("js/core/version.js", "utf8"); } catch { /* soubor ještě neexistuje */ }
 if (cur !== out) writeFileSync("js/core/version.js", out);
 console.log("Verze:", pkg.version);
