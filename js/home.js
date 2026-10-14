@@ -393,6 +393,19 @@
         var sec = document.getElementById(id + 'Section');
         if (!sec) return;
         if (!items || !items.length) { sec.remove(); return; }
+        // Věkové omezení profilu: bez omezení se vykreslí hned, jinak až po ověření hodnocení titulů
+        if (window.MFAge && window.MFAge.limit() && id !== 'mfhRecent' && id !== 'mfhMyList') {
+          var run = _nfRun;
+          window.MFAge.filter(items).then(function (ok) {
+            if (run !== _nfRun) return;
+            var s2 = document.getElementById(id + 'Section');
+            if (!s2) return;
+            if (!ok.length) { s2.remove(); return; }
+            renderCarousel(id, ok, ranked);
+            s2.hidden = false;
+          });
+          return;
+        }
         renderCarousel(id, items, ranked);
         sec.hidden = false;
       }
@@ -707,6 +720,8 @@
 
         fetchTmdbData().then(function (tmdb) {
           return mfhFetchForYou(tmdb);
+        }).then(function (items) {
+          return window.MFAge ? window.MFAge.filter(items) : items;
         }).then(function (items) {
           if (myRun !== _nfRun) return;
           items = fresh(items.filter(function (it) { return it.image; })).slice(0, 20);
