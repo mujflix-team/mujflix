@@ -350,7 +350,13 @@ const ProfileGate = {
     try {
       const [ani, byAnime, ...wiki] = await Promise.all([this._anilistCharacters(""), this._anilistByAnime(), ...groups.map(g => this._wikiByTitles(g[1]))]);
       if (run !== this._avRun) return;
-      const html = groups.map((g, i) => this._charRowHtml(g[0], wiki[i])).join("") + this._charRowHtml("Anime postavy", ani) + byAnime.slice(0, 3).map(m => this._charRowHtml(m.title, m.list)).join("");
+      // Nejdřív řady, kde je obrázků nejvíc; řady s pár obrázky (např. když se u seriálu našly jen 2 postavy) se vynechají
+      const all = groups.map((g, i) => ({ title: g[0], list: wiki[i] || [] })).concat([{ title: "Anime postavy", list: ani || [] }], byAnime.slice(0, 3));
+      all.forEach((r, i) => { r.i = i; });
+      let good = all.filter(r => r.list.length >= 5);
+      good.length || (good = all.filter(r => r.list.length));
+      good.sort((a, b) => Math.min(b.list.length, 16) - Math.min(a.list.length, 16) || a.i - b.i);
+      const html = good.map(r => this._charRowHtml(r.title, r.list)).join("");
       grid.innerHTML = html || '<div class="pc-avatar-loading">Postavy se nepodařilo načíst. Zkus je vyhledat jménem.</div>';
     } catch (err) {
       grid.innerHTML = '<div class="pc-avatar-loading">Postavy se nepodařilo načíst.</div>';
@@ -611,4 +617,10 @@ document.addEventListener("keydown", e => {
     all[Math.min(digits.length, 3)].focus();
     e.preventDefault();
   }, true);
+})();
+
+/* Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová) */
+(function () {
+  function show() { var v = document.getElementById("pgVersion"); if (v) v.textContent = "v" + (window.MF_VERSION || "?"); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", show); else show();
 })();
