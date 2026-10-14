@@ -62,7 +62,8 @@
   }
 
   function api(path) {
-    return tmdbGet(path).catch(function () { return null; });
+    var get = function (p) { return tmdbGet(p).catch(function () { return null; }); };
+    return window.MFAge ? window.MFAge.wide(path, get) : get(path);
   }
 
   function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
