@@ -1230,6 +1230,36 @@ check("věk: hodnocení se zapamatuje (podruhé bez dotazu)", ageT.cached, JSON.
 check("věk: u profilu s PINem jde věk změnit jen se správným PINem", ageT.pinField && ageT.blocked && ageT.saved && ageT.noPinSame, JSON.stringify(ageT));
 
 
+// --- Omezený profil dostane víc kandidátů (3 stránky) + dock se neschová sám od sebe
+const wideT = await page.evaluate(async () => {
+  const out = {}, id = getActiveProfileId(), bak = JSON.stringify(_getProfiles().find(x => x.id === id));
+  const setAge = v => { const ps = _getProfiles(), p = ps.find(x => x.id === id); p.prefs = { ...p.prefs, maxAge: v }; _saveProfiles(ps); };
+  const seen = [], get = async p => { seen.push(p); const n = /page=(\d)/.exec(p); const k = n ? Number(n[1]) : 1; return { results: [{ id: k * 10, media_type: "movie" }, { id: 5, media_type: "movie" }] }; };
+  try {
+    setAge(0); seen.length = 0; const a = await MFAge.wide("/trending/all/week", get); out.free = seen.length === 1 && a.results.length === 2;
+    setAge(12); seen.length = 0; const b = await MFAge.wide("/discover/movie?x=1", get);
+    out.lim = seen.length === 3 && /page=2/.test(seen[1]) && /page=3/.test(seen[2]) && b.results.length === 4;
+    seen.length = 0; await MFAge.wide("/movie/123?append_to_response=release_dates", get); out.detail = seen.length === 1;
+    seen.length = 0; await MFAge.wide("/tv/popular?page=1", get); out.paged = seen.length === 1;
+    const dock = document.getElementById("mfDock"); if (dock) {
+      const sc = document.createElement("div"); sc.id = "tstScroll"; sc.style.cssText = "position:fixed;left:0;top:0;width:10px;height:300px;overflow:auto;z-index:-1";
+      sc.innerHTML = '<div style="height:4000px"></div>'; document.body.appendChild(sc);
+      const w = () => new Promise(r => setTimeout(r, 150));
+      sc.scrollTop = 100; await w(); sc.scrollTop = 500; await w();
+      out.dockStays = !dock.classList.contains("mf-dock-hidden");
+      document.dispatchEvent(new Event("wheel")); sc.scrollTop = 900; await w();
+      out.dockHides = dock.classList.contains("mf-dock-hidden");
+      sc.remove(); window.mfDockReveal && window.mfDockReveal();
+    } else { out.dockStays = out.dockHides = true; }
+  } finally {
+    const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
+  }
+  return out;
+});
+check("věk: omezený profil dotáhne 3 stránky seznamu (neomezený ani detail titulu ne)", wideT.free && wideT.lim && wideT.detail && wideT.paged, JSON.stringify(wideT));
+check("dock: neschová se sám při přesunu stránky, schová se při posouvání uživatelem", wideT.dockStays && wideT.dockHides, JSON.stringify(wideT));
+
+
 // --- Záloha dat do souboru
 const bk = await page.evaluate(async () => {
   const out = {}, PK = "mf_profiles_v2";
