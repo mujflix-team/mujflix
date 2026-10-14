@@ -1,9 +1,10 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33437423/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33451909/CHANGELOG.md)
 # Changelog
 
 ## 2.3.5
 ### Nově
 - Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová).
+- Verze se hlídá sama: na Cloudflare Pages se při sestavení k verzi z `package.json` přidá krátké ID commitu (např. „v2.3.5 · abc1234“, datum sestavení je v nápovědě po najetí myší). Vyžaduje v Cloudflare Pages nastavit Build command `node scripts/version.mjs` a Build output directory `.`; bez toho se zobrazí jen číslo verze.
 - Výběr avatara: nahoře jsou řady s nejvíc obrázky; řady, kde se našly jen 1–4 obrázky (třeba Stranger Things), se nezobrazí.
 
 ## 2.3.4
