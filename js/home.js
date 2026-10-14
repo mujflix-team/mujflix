@@ -31,20 +31,17 @@
           return Promise.resolve(null);
         }
 
-        _tmdbPromise = Promise.all([
-          fetch(TMDB_BASE + '/trending/all/week?api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ'),
-          fetch(TMDB_BASE + '/tv/popular?api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ&page=1'),
-          fetch(TMDB_BASE + '/movie/popular?api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ&page=1')
-        ]).then(function (resList) {
-          return Promise.all(resList.map(function (r) { return r.json(); }));
-        }).then(function (parsed) {
+        var lim = !!(window.MFAge && window.MFAge.limit()), N = lim ? 40 : 10;
+        var gj = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ').then(function (r) { return r.json(); }); };
+        var wj = function (p) { return window.MFAge ? window.MFAge.wide(p, gj) : gj(p); };
+        _tmdbPromise = Promise.all([wj('/trending/all/week'), wj('/tv/popular'), wj('/movie/popular')]).then(function (parsed) {
           var trending = parsed[0];
           var tv = parsed[1];
           var movies = parsed[2];
           return {
-            trending: (trending.results || []).slice(0, 10),
-            tv: (tv.results || []).slice(0, 10),
-            movies: (movies.results || []).slice(0, 10)
+            trending: (trending.results || []).slice(0, N),
+            tv: (tv.results || []).slice(0, N),
+            movies: (movies.results || []).slice(0, N)
           };
         }).catch(function (e) {
           console.warn('[mfh] TMDB fetch error:', e);
@@ -219,8 +216,11 @@
         if (!key) return Promise.resolve(null);
         var ks = Object.keys(_nfCache);
         if (ks.length >= 40) delete _nfCache[ks[0]];
-        _nfCache[path] = fetch(TMDB_BASE + path + (path.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key) + '&language=cs-CZ')
-          .then(function (r) { return r.json(); })
+        var get = function (p) {
+          return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key) + '&language=cs-CZ')
+            .then(function (r) { return r.json(); });
+        };
+        _nfCache[path] = (window.MFAge ? window.MFAge.wide(path, get) : get(path))
           .catch(function () { delete _nfCache[path]; return null; });
         return _nfCache[path];
       }
@@ -616,8 +616,8 @@
           var ids = window.mfGenreIdsFor ? window.mfGenreIdsFor(genres, type) : genres;
           if (!ids.length) return Promise.resolve([]);
           var q = '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=100&with_genres=' + encodeURIComponent(ids.join('|'));
-          return fetch(TMDB_BASE + '/discover/' + type + '?api_key=' + encodeURIComponent(key) + q)
-            .then(function (r) { return r.json(); })
+          var gp = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key)).then(function (r) { return r.json(); }); };
+          return (window.MFAge ? window.MFAge.wide('/discover/' + type + '?' + q.slice(1), gp) : gp('/discover/' + type + '?' + q.slice(1)))
             .then(function (d) { return (d.results || []).filter(function (r) { return !(window.mfIsAnime && window.mfIsAnime(r)); }).map(toItem(type)); })
             .catch(function () { return []; });
         })).then(function (lists) {
@@ -635,8 +635,9 @@
           if (!(window.mfLikesAnime && window.mfLikesAnime()) || !key) return out;
           var toItem = function (type) { return function (item) { return nfItem(item, type); }; };
           return Promise.all(['tv', 'movie'].map(function (type) {
-            return fetch(TMDB_BASE + '/discover/' + type + '?api_key=' + encodeURIComponent(key) + '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=50' + window.MF_ANIME_QUERY)
-              .then(function (r) { return r.json(); })
+            var ap = '/discover/' + type + '?language=cs-CZ&sort_by=popularity.desc&vote_count.gte=50' + window.MF_ANIME_QUERY;
+            var ag = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key)).then(function (r) { return r.json(); }); };
+            return (window.MFAge ? window.MFAge.wide(ap, ag) : ag(ap))
               .then(function (d) { return (d.results || []).map(toItem(type)); })
               .catch(function () { return []; });
           })).then(function (al) {
