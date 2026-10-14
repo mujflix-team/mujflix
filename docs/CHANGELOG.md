@@ -1,4 +1,3 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33451909/CHANGELOG.md)
 # Changelog
 
 ## 2.3.5
