@@ -1025,3 +1025,5 @@ html body #mfProfileWelcome .pw-age-row { display: grid; grid-template-columns: 
 html body #mfProfileWelcome .pw-agebtn { background: transparent; border: 0; color: #d2d2d2; font: 700 0.95rem var(--nf-font, sans-serif); padding: 11px 4px; cursor: pointer; }
 html body #mfProfileWelcome .pw-agebtn + .pw-agebtn { border-left: 1px solid #595959; }
 html body #mfProfileWelcome .pw-agebtn.pw-on { background: #fff; color: #000; }
+
+#mfProfileGate .pg-version { position: fixed; right: 16px; bottom: 12px; font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 0.02em; pointer-events: none; user-select: none; }
