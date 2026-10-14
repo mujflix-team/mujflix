@@ -1,7 +1,9 @@
-[CHANGELOG.md](https://github.com/user-attachments/files/33417898/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/user-attachments/files/33436279/CHANGELOG.md)
 # Changelog
 
 ## 2.3.4
+- Oprava: s věkovým omezením zbývalo v řádcích jen pár titulů, protože se filtrovala jedna stránka (20 titulů). Omezený profil teď dotáhne 3 stránky seznamů (`MFAge.wide`) a základní seznam doporučení bere 40 titulů místo 10.
+- Oprava: dock se někdy sám schoval, když se stránka přesunula sama (načtení řádků, filtrování). Teď se schová jen při posouvání uživatelem (kolečko, prst, klávesy).
 - Věk jde nepovinně zvolit už při zakládání profilu (výchozí Bez omezení). Z Nastavení v menu profilu zmizela duplicitní položka Záloha dat; zůstává v Propojení zařízení.
 - Nové: **Věkové omezení profilu** (Nastavení → Zaměření a žánry → Bez omezení / Do 7 / Do 12 / Do 15). Hodnocení se bere z TMDB (americká škála G/PG/PG-13, TV-Y…TV-14), filtruje Pro tebe, Objevovat, hledání i novinky; titul bez hodnocení se u omezeného profilu skryje. Hodnocení se pamatuje jen na zařízení (`mfx_age_cache`). Není to zámek: u profilu s PINem jde věk změnit jen s PINem. Nový `js/core/age.js`.
 - Úklid: z `index.html` odstraněno staré dlaždicové menu (`.ps-menu-scene`, ~230 řádků), které bylo na nové domovské stránce vždy skryté. Vzhled beze změny (31 ze 32 snímků pixel po pixelu shodných, zbylý se liší jen načasováním tečky u zvonku); data `db` a `mf_db_custom` zůstávají.
