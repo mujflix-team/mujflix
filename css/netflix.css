@@ -973,14 +973,14 @@ html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margi
 #mfStandaloneCinema .mf-cin-bad-btn:hover { background: rgba(229, 9, 20, 0.2); color: #fff; }
 
 /* ── Zaměření a žánry (MFPrefs) a přepínač „Jen anime“ při zakládání profilu ── */
-#mfPrefsModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
-#mfPrefsModal.show { display: flex; }
-#mfPrefsModal .pf-box { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: auto; background: #181818; border: 1px solid #333; border-radius: 6px; padding: 30px 26px 24px; color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8); }
-#mfPrefsModal .pf-x { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: #b3b3b3; font-size: 1.9rem; line-height: 1; cursor: pointer; padding: 6px 10px; }
-#mfPrefsModal .pf-x:hover { color: #fff; }
-#mfPrefsModal .pf-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
-#mfPrefsModal .pf-text { color: #b3b3b3; font-size: 0.95rem; line-height: 1.5; margin: 0 0 18px; }
-#mfPrefsModal .pf-text b { color: #fff; }
+#mfPrefsModal, #mfSettingsModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+#mfPrefsModal.show, #mfSettingsModal.show { display: flex; }
+#mfPrefsModal .pf-box, #mfSettingsModal .pf-box { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: auto; background: #181818; border: 1px solid #333; border-radius: 6px; padding: 30px 26px 24px; color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8); }
+#mfPrefsModal .pf-x, #mfSettingsModal .pf-x { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: #b3b3b3; font-size: 1.9rem; line-height: 1; cursor: pointer; padding: 6px 10px; }
+#mfPrefsModal .pf-x:hover, #mfSettingsModal .pf-x:hover { color: #fff; }
+#mfPrefsModal .pf-title, #mfSettingsModal .pf-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+#mfPrefsModal .pf-text, #mfSettingsModal .pf-text { color: #b3b3b3; font-size: 0.95rem; line-height: 1.5; margin: 0 0 18px; }
+#mfPrefsModal .pf-text b, #mfSettingsModal .pf-text b { color: #fff; }
 #mfPrefsModal .pf-label { font-weight: 700; font-size: 0.95rem; margin: 16px 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
 #mfPrefsModal .pf-count { color: #808080; font-weight: 600; font-size: 0.85rem; }
 #mfPrefsModal .pf-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #595959; border-radius: 4px; overflow: hidden; }
@@ -1005,3 +1005,11 @@ html body #mfProfileWelcome .pw-only-anime { display: flex; align-items: flex-st
 html body #mfProfileWelcome .pw-only-anime input { margin-top: 4px; width: 18px; height: 18px; flex: none; }
 html body #mfProfileWelcome .pw-only-anime strong { display: block; font-size: 1rem; color: #fff; }
 html body #mfProfileWelcome .pw-only-anime small { display: block; color: #b3b3b3; font-size: 0.85rem; line-height: 1.4; margin-top: 2px; }
+#mfSettingsModal .pf-rows { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+#mfSettingsModal .pf-row { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #2a2a2a; border: 1px solid transparent; border-radius: 4px; color: #fff; font: inherit; padding: 14px 16px; cursor: pointer; }
+#mfSettingsModal .pf-row:hover, #mfSettingsModal .pf-row:focus-visible { background: #3a3a3a; border-color: #fff; outline: 0; }
+#mfSettingsModal .pf-row-ico { flex: none; width: 24px; height: 24px; color: #d2d2d2; }
+#mfSettingsModal .pf-row-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+#mfSettingsModal .pf-row-txt strong { font-size: 1.05rem; }
+#mfSettingsModal .pf-row-txt small { color: #b3b3b3; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#mfSettingsModal .pf-row-go { flex: none; color: #808080; font-size: 1.6rem; line-height: 1; }
