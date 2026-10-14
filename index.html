@@ -268,6 +268,15 @@
               <input type="checkbox" id="pwAnimeOnly">
               <span><strong>Jen anime</strong><small>Doporučení i Objevovat ukážou jen anime. Půjde změnit v menu profilu.</small></span>
             </label>
+            <div class="pw-age">
+              <div class="pw-age-t"><strong>Věk</strong> <small>nepovinné · doporučení ukážou jen vhodné tituly</small></div>
+              <div class="pw-age-row" id="pwAge">
+                <button type="button" class="pw-agebtn pw-on" data-age="0">Bez omezení</button>
+                <button type="button" class="pw-agebtn" data-age="7">Do 7</button>
+                <button type="button" class="pw-agebtn" data-age="12">Do 12</button>
+                <button type="button" class="pw-agebtn" data-age="15">Do 15</button>
+              </div>
+            </div>
             <div class="pw-actions">
               <button class="pw-skip" onclick="window.ProfileGate?.skipOnboardingGenres()">Přeskočit</button>
               <button class="pw-save" onclick="window.ProfileGate?.finishOnboarding()">Pokračovat</button>
@@ -2323,6 +2332,7 @@
     <script src="js/core/version.js"></script>
     <script src="js/core/adblock.js"></script>
     <script src="js/core/genres.js"></script>
+    <script src="js/core/age.js"></script>
     <script src="js/core/sync.js"></script>
     <script src="js/core/sync-ui.js" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
