@@ -784,7 +784,7 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings" && menuT.hubRows === "profile,prefs,sync,backup" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings" && menuT.hubRows === "profile,prefs,sync" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 check("Kdo se dívá → Upravit: bez třesení, tužka na avataru, velké červené mínus, klik otevře úpravu", menuT.anim === "none" && menuT.overlay && menuT.rmSize >= 36 && menuT.editTitle === "Uprav si svůj profil" && menuT.editName === "MenuB", JSON.stringify(menuT));
 
 const cinOrder = await page.evaluate(() => {
@@ -1155,6 +1155,17 @@ const pfT = await page.evaluate(async () => {
     document.querySelector('#pwGenres [data-genre="35"]').classList.add("selected");
     ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
     p = prof(); out.obAll = !("animeOnly" in p.prefs) && window.mfOnlyAnime() === false;
+    out.obAgeDefault = !("maxAge" in p.prefs);
+    reset();
+    ProfileGate.openOnboarding(id); await wait(30);
+    document.querySelector('#pwAge [data-age="12"]').click();
+    out.obAgeOn = document.querySelector('#pwAge .pw-on').dataset.age === "12";
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    out.obAge12 = prof().prefs.maxAge === 12;
+    ProfileGate.openOnboarding(id); await wait(30);
+    out.obAgeReset = document.querySelector('#pwAge .pw-on').dataset.age === "0";
+    ProfileGate.finishOnboarding(); ProfileGate.closeOnboarding();
+    out.obAgeCleared = !("maxAge" in prof().prefs);
   } finally {
     const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
     try { MFPrefs.close(); ProfileGate.closeOnboarding(); mfCloseProfileMenu(); } catch { /* nic */ }
@@ -1164,7 +1175,59 @@ const pfT = await page.evaluate(async () => {
 check("zaměření: Nastavení v menu profilu → Zaměření a žánry otevře okno (s popiskem aktuální volby)", pfT.menuItem && pfT.opened && pfT.startAll && /Všechno/.test(pfT.hubSub), JSON.stringify(pfT));
 check("zaměření: Jen anime + žánry se uloží do profilu a po otevření jsou vidět; zpět na Všechno funguje", pfT.only && pfT.genres && pfT.closed && pfT.reopenOnly && pfT.backAll, JSON.stringify(pfT));
 check("zaměření: nejvýš 5 žánrů", pfT.max5, JSON.stringify(pfT));
+check("zakládání profilu: věk je nepovinný (výchozí Bez omezení), zvolený se uloží a příště se vrátí na výchozí", pfT.obAgeDefault && pfT.obAgeOn && pfT.obAge12 && pfT.obAgeReset && pfT.obAgeCleared, JSON.stringify(pfT));
 check("zakládání profilu: přepínač Jen anime se uloží, bez něj zůstane běžný režim", pfT.obBox && pfT.obOnly && pfT.obReset && pfT.obAll, JSON.stringify(pfT));
+
+
+// --- Věkové omezení profilu (MFAge + nastavení v okně Zaměření a žánry)
+const ageT = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms)), real = window.tmdbGet;
+  const id = getActiveProfileId(), bak = JSON.stringify(_getProfiles().find(x => x.id === id));
+  const setP = fn => { const ps = _getProfiles(), p = ps.find(x => x.id === id); fn(p); _saveProfiles(ps); };
+  const click = (a, v) => document.querySelector('#mfPrefsModal [data-pf="' + a + '"]' + (v ? '[data-v="' + v + '"]' : "")).click();
+  const calls = [];
+  window.tmdbGet = async path => {
+    calls.push(path);
+    const m = /^\/(movie|tv)\/(\d+)/.exec(path), t = m[1], n = Number(m[2]);
+    const movieCert = { 1: "G", 2: "PG", 3: "PG-13", 4: "R", 5: "" }, tvCert = { 11: "TV-Y7-FV", 12: "TV-PG", 13: "TV-14", 14: "TV-MA" };
+    if (n === 99) return null;
+    if (t === "movie") return { release_dates: { results: [{ iso_3166_1: "DE", release_dates: [{ certification: "16" }] }, { iso_3166_1: "US", release_dates: [{ certification: "" }, { certification: movieCert[n] ?? "" }] }] } };
+    return { content_ratings: { results: [{ iso_3166_1: "US", rating: tvCert[n] ?? "" }] } };
+  };
+  localStorage.removeItem("mfx_age_cache");
+  const items = [1, 2, 3, 4, 5, 99].map(n => ({ tmdbId: n, mediaType: "movie" })).concat([11, 12, 13, 14].map(n => ({ id: n, type: "tv" })), [{ title: "bez id" }]);
+  const ids = l => l.map(x => (x.tmdbId || x.id || "?") + (x.mediaType || x.type || "")).join();
+  try {
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 0 }; delete p.pin; });
+    out.none = (await MFAge.filter(items)).length === items.length && calls.length === 0;
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 7 }; });
+    out.a7 = ids(await MFAge.filter(items));
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 12 }; });
+    out.a12 = ids(await MFAge.filter(items));
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 15 }; });
+    out.a15 = ids(await MFAge.filter(items));
+    const before = calls.length; await MFAge.filter(items); out.cached = calls.length === before + 1 && /\/99\?/.test(calls[calls.length - 1]); // znovu se zkusí jen nezjištěný (id 99)
+    // okno: změna věku, u profilu s PINem jen s PINem
+    setP(p => { p.prefs = { ...p.prefs, maxAge: 0 }; p.pin = "1234"; });
+    MFPrefs.open(); click("age", "12");
+    out.pinField = !!document.getElementById("mfPrefsPin");
+    click("save");
+    out.blocked = (_getProfiles().find(x => x.id === id).prefs.maxAge || 0) === 0 && /PIN/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
+    const f = document.getElementById("mfPrefsPin"); f.value = "1234"; click("save"); await wait(30);
+    out.saved = _getProfiles().find(x => x.id === id).prefs.maxAge === 12 && MFAge.limit() === 12;
+    // stejná hodnota bez PINu se ukládá volně (měním jen žánry)
+    MFPrefs.open(); out.noPinSame = !document.getElementById("mfPrefsPin"); MFPrefs.close();
+  } finally {
+    window.tmdbGet = real; localStorage.removeItem("mfx_age_cache");
+    const ps = _getProfiles(), i = ps.findIndex(x => x.id === id); if (i > -1) { ps[i] = JSON.parse(bak); _saveProfiles(ps); }
+    try { MFPrefs.close(); } catch { /* nic */ }
+  }
+  return out;
+});
+check("věk: bez omezení se nic nefiltruje ani nedotazuje", ageT.none, JSON.stringify(ageT));
+check("věk: do 7 jen G / TV-Y7, do 12 + PG / TV-PG, do 15 + PG-13 / TV-14; R, TV-MA, bez hodnocení a neznámé se skryjí", ageT.a7 === "1movie,11tv" && ageT.a12 === "1movie,2movie,11tv,12tv" && ageT.a15 === "1movie,2movie,3movie,11tv,12tv,13tv", JSON.stringify(ageT));
+check("věk: hodnocení se zapamatuje (podruhé bez dotazu)", ageT.cached, JSON.stringify(ageT));
+check("věk: u profilu s PINem jde věk změnit jen se správným PINem", ageT.pinField && ageT.blocked && ageT.saved && ageT.noPinSame, JSON.stringify(ageT));
 
 
 // --- Záloha dat do souboru
