@@ -36,7 +36,7 @@
         var lim = !!(window.MFAge && window.MFAge.limit()), N = lim ? 40 : 10;
         var gj = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(TMDB_API_KEY) + '&language=cs-CZ').then(function (r) { return r.json(); }); };
         var wj = function (p) { return window.MFAge ? window.MFAge.wide(p, gj) : gj(p); };
-        _tmdbPromise = Promise.all([wj('/trending/all/week'), wj('/tv/popular'), wj(lim ? '/discover/movie?sort_by=popularity.desc&vote_count.gte=100' + window.MFAge.certQuery() : '/movie/popular')]).then(function (parsed) {
+        _tmdbPromise = Promise.all([wj('/trending/all/week'), wj('/tv/popular'), wj("/movie/popular")]).then(function (parsed) {
           var trending = parsed[0];
           var tv = parsed[1];
           var movies = parsed[2];
