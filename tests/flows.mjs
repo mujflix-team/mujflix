@@ -1258,6 +1258,9 @@ const wideT = await page.evaluate(async () => {
     out.lim = seen.length === 3 && /page=2/.test(seen[1]) && /page=3/.test(seen[2]) && b.results.length === 4;
     seen.length = 0; await MFAge.wide("/movie/123?append_to_response=release_dates", get); out.detail = seen.length === 1;
     seen.length = 0; await MFAge.wide("/tv/popular?page=1", get); out.paged = seen.length === 1;
+    setAge(7); out.rw = MFAge.rewrite("/movie/popular").includes("/discover/movie") && MFAge.rewrite("/movie/popular").includes("certification.lte=G") && /with_genres=10762/.test(MFAge.rewrite("/tv/popular")) && MFAge.rewrite("/trending/all/week") === "/trending/all/week";
+    setAge(15); out.rw15 = /certification\.lte=PG-13/.test(MFAge.rewrite("/discover/movie?with_genres=28")) && !/with_genres/.test(MFAge.rewrite("/tv/popular")) && /discover\/tv/.test(MFAge.rewrite("/tv/popular"));
+    setAge(0); out.rw0 = MFAge.rewrite("/movie/popular") === "/movie/popular";
     const dock = document.getElementById("mfDock"); if (dock) {
       const sc = document.createElement("div"); sc.id = "tstScroll"; sc.style.cssText = "position:fixed;left:0;top:0;width:10px;height:300px;overflow:auto;z-index:-1";
       sc.innerHTML = '<div style="height:4000px"></div>'; document.body.appendChild(sc);
@@ -1273,8 +1276,18 @@ const wideT = await page.evaluate(async () => {
   }
   return out;
 });
-check("věk: omezený profil dotáhne 3 stránky seznamu (neomezený ani detail titulu ne)", wideT.free && wideT.lim && wideT.detail && wideT.paged, JSON.stringify(wideT));
+check("věk: omezený profil dotáhne 3 stránky seznamu (neomezený ani detail titulu ne)", wideT.free && wideT.lim && wideT.detail && wideT.paged && wideT.rw && wideT.rw15 && wideT.rw0, JSON.stringify(wideT));
 check("dock: neschová se sám při přesunu stránky, schová se při posouvání uživatelem", wideT.dockStays && wideT.dockHides, JSON.stringify(wideT));
+
+
+// --- Banner bez titulu se sbalí (dřív ho přebila výška z media query)
+const heroT = await page.evaluate(() => {
+  const h = document.getElementById("nfHero"); if (!h) return { skip: true };
+  const old = h.className; h.className = "nf-hero nf-hero-none"; const a = h.getBoundingClientRect().height;
+  h.className = "nf-hero nf-hero-empty"; const b = h.getBoundingClientRect().height; h.className = old;
+  return { a, b };
+});
+check("banner: stav „bez titulu“ je nízký, jen načítací stav je vysoký", heroT.skip || (heroT.a < 200 && heroT.b > 300), JSON.stringify(heroT));
 
 
 // --- Záloha dat do souboru
