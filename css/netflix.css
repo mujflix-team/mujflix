@@ -132,7 +132,7 @@ html body.discover-open #mfDock { display: none !important; }
     linear-gradient(77deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 70%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 24%);
 }
-.nf-hero-body { position: relative; z-index: 1; width: min(660px, 100%); padding: 0 var(--nf-pad) clamp(90px, 15vh, 170px); }
+.nf-hero-body { position: relative; z-index: 1; width: min(660px, 100%); padding: 0 var(--nf-pad) clamp(110px, 16vh, 180px); }
 .nf-hero-eyebrow { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--nf-dim); margin-bottom: 8px; }
 .nf-hero-title {
   margin: 0 0 12px; font: 800 clamp(2rem, 5.2vw, 4.2rem)/1.02 -apple-system, "SF Pro Display", "Inter", sans-serif;
@@ -161,7 +161,7 @@ html body.discover-open #mfDock { display: none !important; }
 .nf-btn-ghost.on svg { fill: #ff453a; stroke: #ff453a; }
 
 /* řady */
-.nf-rows { position: relative; z-index: 2; margin-top: -70px; padding-bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
+.nf-rows { position: relative; z-index: 2; margin-top: -36px; padding-bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
 .nf-hero-empty + .nf-rows, .nf-hero-none + .nf-rows { margin-top: 0; }
 .nf-row { margin: 0 0 clamp(14px, 2.4vw, 32px); }
 .nf-row[hidden] { display: none; }
@@ -224,13 +224,13 @@ html body.discover-open #mfDock { display: none !important; }
 /* telefon */
 @media (max-width: 899px) {
   .nf-hero { height: clamp(420px, 72vh, 640px); }
-  .nf-hero-body { padding-bottom: 64px; }
+  .nf-hero-body { padding-bottom: 72px; }
   .nf-hero-title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
   .nf-hero-desc { -webkit-line-clamp: 2; }
   .nf-hero-actions { gap: 10px; }
   .nf-btn { height: 44px; padding: 0 20px; font-size: 0.98rem; flex: 1 1 0; }
   .nf-hero-body { width: 100%; }
-  .nf-rows { margin-top: -48px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }
+  .nf-rows { margin-top: -28px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }
   .nf-card { width: 108px; }
   .nf-row-ranked .nf-card { width: 168px; }
   .nf-rank { font-size: 110px; }
@@ -542,7 +542,7 @@ html body .notif-panel-list { flex: 1 1 auto; overflow-y: auto; padding: 4px 8px
 }
 @media (min-width: 900px) and (max-height: 860px) {
   .nf-hero { height: clamp(400px, 70vh, 600px); }
-  .nf-hero-body { padding-bottom: clamp(84px, 14vh, 120px); }
+  .nf-hero-body { padding-bottom: clamp(100px, 15vh, 130px); }
   .nf-hero-title { font-size: clamp(2rem, 4.2vw, 3.4rem); }
   html body #seriesModal .modal-hero { min-height: clamp(250px, 42vh, 380px); }
   .nf-row { margin-bottom: 18px; }
@@ -1027,3 +1027,6 @@ html body #mfProfileWelcome .pw-agebtn + .pw-agebtn { border-left: 1px solid #59
 html body #mfProfileWelcome .pw-agebtn.pw-on { background: #fff; color: #000; }
 
 #mfProfileGate .pg-version { position: fixed; right: 16px; bottom: 12px; font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 0.02em; user-select: none; }
+
+/* Bez titulu pro banner (např. omezený věk nenechal nic s obrázkem): banner se sbalí, neřídí ho výška z media query výše */
+html body .nf-hero.nf-hero-none { height: calc(var(--nf-bar-h) + 40px + env(safe-area-inset-top, 0px)); min-height: 0; }
