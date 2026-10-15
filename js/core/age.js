@@ -87,7 +87,25 @@
 
   /** Omezený profil: seznamy z TMDB (trending, discover, top rated…) mají jen 20 titulů a po odfiltrování by jich zbylo pár.
       Proto se u nich dotáhnou další 2 stránky a výsledky se spojí. get(path) vrací Promise s {results:[…]}. */
+  /** Pro omezený profil se obecné seznamy nahradí dotazem, který TMDB filtruje rovnou (filmy podle hodnocení, seriály podle rodinných žánrů). */
+  var FAM = { 7: "10762|10751|16", 12: "10762|10751|16|10759|10765|35" };
+  function rewrite(path) {
+    var lim = limit();
+    if (!lim || typeof path !== "string") return path;
+    var i = path.indexOf("?"), p = i < 0 ? path : path.slice(0, i), q = i < 0 ? "" : path.slice(i + 1);
+    var join = function (base, extra) { return base + (q || extra ? "?" : "") + [extra, q].filter(Boolean).join("&"); };
+    if (p === "/movie/popular") { p = "/discover/movie"; q = "sort_by=popularity.desc&vote_count.gte=100" + (q ? "&" + q : ""); }
+    else if (p === "/movie/top_rated") { p = "/discover/movie"; q = "sort_by=vote_average.desc&vote_count.gte=300" + (q ? "&" + q : ""); }
+    else if (p === "/tv/popular") { p = "/discover/tv"; q = "sort_by=popularity.desc&vote_count.gte=50" + (q ? "&" + q : ""); }
+    else if (p === "/tv/top_rated") { p = "/discover/tv"; q = "sort_by=vote_average.desc&vote_count.gte=200" + (q ? "&" + q : ""); }
+    if (p === "/discover/movie" && q.indexOf("certification") < 0) q += (q ? "" : "") + certQuery();
+    if (p === "/discover/tv" && FAM[lim] && q.indexOf("with_genres") < 0) q += (q ? "&" : "") + "with_genres=" + encodeURIComponent(FAM[lim]);
+    q = q.replace(/^&/, "");
+    return p + (q ? "?" + q : "");
+  }
+
   function wide(path, get) {
+    if (limit() && !/^\/(movie|tv)\/\d+/.test(String(path))) path = rewrite(path);
     if (!limit() || /^\/(movie|tv)\/\d+/.test(String(path).replace(/^https?:\/\/[^/]+(\/3)?/, "")) || /[?&]page=/.test(path)) return get(path);
     var sep = String(path).indexOf("?") < 0 ? "?" : "&";
     return Promise.all([get(path), get(path + sep + "page=2"), get(path + sep + "page=3")]).then(function (r) {
@@ -105,5 +123,5 @@
     return c ? "&certification_country=US&certification.lte=" + c : "";
   }
 
-  window.MFAge = { wide: wide, certQuery: certQuery, stats: stats, limit: limit, filter: filter, levels: LEVELS, _rating: rating, _allowed: allowed, _certOf: certOf };
+  window.MFAge = { wide: wide, rewrite: rewrite, certQuery: certQuery, stats: stats, limit: limit, filter: filter, levels: LEVELS, _rating: rating, _allowed: allowed, _certOf: certOf };
 })();
