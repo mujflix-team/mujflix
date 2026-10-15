@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.6
+### Opraveno
+- Věkové omezení: omezený profil dostává mnohem víc titulů. Obecné seznamy (populární, nejlépe hodnocené) se nahradí dotazem, který TMDB filtruje rovnou: filmy podle hodnocení (`certification.lte`), seriály podle rodinných žánrů u Do 7 a Do 12.
+- Domovská stránka: prázdný vysoký banner, když pro něj není titul, se teď sbalí (výšku z media query mu dřív přebíjela). Hlavní příčina prázdné plochy nad řádkem u omezeného profilu.
+- Domovská stránka: nadpis prvního řádku už nezasahuje do tlačítek Otevřít a Oblíbené v horním banneru (menší překryv banneru a řádků).
+
 ## 2.3.5
 ### Nově
 - Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová).
