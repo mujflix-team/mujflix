@@ -405,7 +405,7 @@
     </header>
 
     <div class="nf-top" id="nfTop">
-      <button type="button" class="nf-logo" id="nfLogo" aria-label="MůjFlix – nahoru" onclick="var h=document.getElementById('mfSectionHome');if(h)h.scrollTo({top:0,behavior:'smooth'})">Můj<span>Flix</span></button>
+      <button type="button" class="nf-logo" id="nfLogo" aria-label="MůjFlix – nahoru" onclick="window.mfGoHome&&window.mfGoHome()">Můj<span>Flix</span></button>
       <div class="nf-top-gap"></div>
       <button type="button" class="nf-icon-btn" id="nfSearchBtn" aria-label="Hledat" title="Hledat (/)" onclick="openSearch()">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
