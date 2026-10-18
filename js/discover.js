@@ -528,7 +528,7 @@
       body.appendChild(sec);
       r.load().then(ageFilter).then(function (items) {
         if (myRun !== run) return;
-        if (!items.length) { sec.remove(); return; }
+        if (items.length < (window.MFAge && window.MFAge.limit() ? 6 : 1)) { sec.remove(); return; }
         fillRow(sec, items.slice(0, 20), r.showType);
         rowsKept++;
         if (r.hero && !heroDone) {
