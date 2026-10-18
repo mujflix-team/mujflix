@@ -108,7 +108,8 @@
     if (limit() && !/^\/(movie|tv)\/\d+/.test(String(path))) path = rewrite(path);
     if (!limit() || /^\/(movie|tv)\/\d+/.test(String(path).replace(/^https?:\/\/[^/]+(\/3)?/, "")) || /[?&]page=/.test(path)) return get(path);
     var sep = String(path).indexOf("?") < 0 ? "?" : "&";
-    return Promise.all([get(path), get(path + sep + "page=2"), get(path + sep + "page=3")]).then(function (r) {
+    var pages = /with_genres=/.test(path) ? [2, 3, 4, 5] : [2, 3];
+    return Promise.all([get(path)].concat(pages.map(function (n) { return get(path + sep + "page=" + n); }))).then(function (r) {
       var first = r[0];
       if (!first || !Array.isArray(first.results)) return first;
       var seen = {}, all = [];
