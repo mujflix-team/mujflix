@@ -840,7 +840,7 @@ function openSeries(e) {
   const t = db[e],
     n = findNextEp(e);
   activeSeason = n ? n.se : 1, document.getElementById("sTitle").textContent = t.name, document.getElementById("sInfo").textContent = `${totalSeasons(e)} ${(c => 1 === c ? "série" : c >= 2 && c <= 4 ? "série" : "sérií")(totalSeasons(e))} · ~${t.totalEps} epizod`;
-  document.getElementById("modalHeroImg").src = t._backdrop || t.poster, document.getElementById("tmdbBadge").style.display = TMDB_KEY ? "inline-flex" : "none";
+  document.getElementById("modalHeroImg").src = t._backdrop || t.poster, (function (b, g) { b.textContent = g.slice(0, 3).join(" · "), b.style.display = g.length ? "inline-flex" : "none" })(document.getElementById("tmdbBadge"), Array.isArray(t._genres) ? t._genres : []);
   const o = document.getElementById("seriesModal"),
     i = o.querySelector(".modal-body") || o.querySelector("#modalBody");
   i && (i.scrollTop = 0), o.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -958,17 +958,18 @@ async function renderEpisodes() {
       a = i ? i.uid : null;
 
     function e(e) {
+      const frag = document.createDocumentFragment();
       if (t.innerHTML = "", showAllSeasons) {
         const i = totalSeasons(activeSeries);
         for (let s = 1; s <= i; s++) {
           const i = document.createElement("div");
-          i.style.cssText = "grid-column:1/-1;font-family:-apple-system, SF Pro Display, Helvetica Neue,sans-serif;font-size:0.84rem;font-weight:700;color:var(--muted);padding:16px 20px 8px;border-bottom:1px solid var(--border);margin-bottom:0;", i.textContent = `Serie ${s}`, t.appendChild(i);
+          i.style.cssText = "grid-column:1/-1;font-family:-apple-system, SF Pro Display, Helvetica Neue,sans-serif;font-size:0.84rem;font-weight:700;color:var(--muted);padding:16px 20px 8px;border-bottom:1px solid var(--border);margin-bottom:0;", i.textContent = `Serie ${s}`, frag.appendChild(i);
           const r = e && e[s] || null,
             l = epsInSeason(activeSeries, s);
           for (let e = 1; e <= l; e++) {
             const i = `${activeSeries}-S${s}-E${e}`,
               l = r ? r.find(t => t.ep === e) : null;
-            t.appendChild(buildEpCard(i, s, e, l, !!o[i], i === a, n.poster))
+            frag.appendChild(buildEpCard(i, s, e, l, !!o[i], i === a, n.poster))
           }
         }
       } else {
@@ -978,9 +979,10 @@ async function renderEpisodes() {
         for (let e = 1; e <= s; e++) {
           const s = `${activeSeries}-S${activeSeason}-E${e}`,
             r = i ? i.find(t => t.ep === e) : null;
-          t.appendChild(buildEpCard(s, activeSeason, e, r, !!o[s], s === a, n.poster))
+          frag.appendChild(buildEpCard(s, activeSeason, e, r, !!o[s], s === a, n.poster))
         }
       }
+      t.appendChild(frag);
       kbEpIndex >= 0 && setKbEpFocus(kbEpIndex)
     }
     const _reqSeries = activeSeries, _reqSeason = activeSeason;
@@ -1016,7 +1018,7 @@ function _buildEpCardBase(e, t, n, o, i, a, s) {
     g = escapeHTML(o && o.still ? o.still : s),
     f = !i && o && o.still,
     y = document.createElement("div");
-  return y.className = "episode-card" + (i ? " watched" : "") + (a ? " next-ep" : "") + (f ? " spoiler-blur" : ""), y.id = `card-${e}`, y.dataset.n = n, y.innerHTML = `\n        <div class="ep-thumb">\n          <img src="${g}" alt="" loading="lazy">\n          ${a?'<div class="ep-next-tag">Další</div>':""}\n          <div class="ep-seen-dot">✓</div>\n          ${f?'<div class="spoiler-label"><span style="font-size:1.4rem">🙈</span><span>Spoiler</span></div>':""}\n          <div class="ep-hover-play">\n            <div class="ep-play-ring">\n              <svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>\n            </div>\n          </div>\n        </div>\n        <div class="ep-body">\n          <div class="ep-meta-row">\n            <span class="ep-num">S${t} · E${n}</span>\n            ${u?`<span class="ep-runtime">${u}</span>`:""}\n            ${p?`<span class="ep-rating">★ ${p}</span>`:""}\n          </div>\n          <div class="ep-title">${d}</div>\n          ${m?`<div class="ep-desc">${m}</div>`:""}\n          <div class="ep-actions">\n            <button class="ep-btn-play-hbo">\n              <svg viewBox="0 0 10 12" width="10" height="12"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg>\n                Otevřít epizodu\n            </button>\n            <button class="ep-btn-mark" title="${i?"Označit jako neshlédnuté":"Označit jako shlédnuté"}">${i?"✓":"○"}</button>\n          </div>\n        </div>`, y.querySelector(".ep-btn-play-hbo").addEventListener("click", o => {
+  return y.className = "episode-card" + (i ? " watched" : "") + (a ? " next-ep" : "") + (f ? " spoiler-blur" : ""), y.id = `card-${e}`, y.dataset.n = n, y.innerHTML = `\n        <div class="ep-thumb">\n          <img src="${g}" alt="" loading="lazy">\n          ${a?'<div class="ep-next-tag">Další</div>':""}\n          <div class="ep-seen-dot">✓</div>\n          ${f?'<div class="spoiler-label" aria-label="Náhled je skrytý, aby ti nic neprozradil"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a12 12 0 0 1-2.6 3.3"/><path d="M6.3 7.6C4.5 9 3.3 10.8 2.5 12c1 2 4.5 6 9.5 6 1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg><span>Skryto</span></div>':""}\n          <div class="ep-hover-play">\n            <div class="ep-play-ring">\n              <svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>\n            </div>\n          </div>\n        </div>\n        <div class="ep-body">\n          <div class="ep-meta-row">\n            <span class="ep-num">S${t} · E${n}</span>\n            ${u?`<span class="ep-runtime">${u}</span>`:""}\n            ${p?`<span class="ep-rating">★ ${p}</span>`:""}\n          </div>\n          <div class="ep-title">${d}</div>\n          ${m?`<div class="ep-desc">${m}</div>`:""}\n          <div class="ep-actions">\n            <button class="ep-btn-play-hbo">\n              <svg viewBox="0 0 10 12" width="10" height="12"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg>\n                Otevřít epizodu\n            </button>\n            <button class="ep-btn-mark" title="${i?"Označit jako neshlédnuté":"Označit jako shlédnuté"}">${i?"✓":"○"}</button>\n          </div>\n        </div>`, y.querySelector(".ep-btn-play-hbo").addEventListener("click", o => {
     o.stopPropagation(), playWithConfirm(e, t, n, c)
   }), y.querySelector(".ep-hover-play").addEventListener("click", o => {
     o.stopPropagation(), playWithConfirm(e, t, n, c)
