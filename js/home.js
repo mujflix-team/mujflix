@@ -402,7 +402,8 @@
             if (run !== _nfRun) return;
             var s2 = document.getElementById(id + 'Section');
             if (!s2) return;
-            if (!ok.length) { s2.remove(); return; }
+            // Omezený profil: řádek s pár tituly (např. Drama jen se třemi) působí rozbitě, tak se raději schová
+            if (ok.length < (id === 'mfhForYou' ? 1 : 6)) { s2.remove(); return; }
             renderCarousel(id, ok, ranked);
             s2.hidden = false;
           });
