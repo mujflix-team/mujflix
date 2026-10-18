@@ -878,6 +878,10 @@
     state.type = type || 'all';
     openUniverse(false);
   };
+  // Po změně věku/žánrů/zaměření se otevřený Objevovat sám obnoví (bez Ctrl+R)
+  window.addEventListener('mf:profile-changed', function () {
+    try { if (els && els.root && els.root.classList.contains('open')) refresh(); } catch (e) {}
+  });
   window.openUniverse = function () { openUniverse(false); };
   window.openDiscover = function () { openUniverse(false); };
   window.openSearch = function () { openUniverse(true); };
