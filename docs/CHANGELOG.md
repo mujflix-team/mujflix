@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.7
+### Opraveno
+- Omezený profil: řádky s méně než 6 tituly (např. Drama jen se třemi) se na domovské stránce a v Objevovat schovají, aby nepůsobily rozbitě.
+- Omezený profil: žánrové řádky dotáhnou až 5 stránek z TMDB (dřív 3), takže jich po filtru zbude víc.
+
 ## 2.3.6
 ### Opraveno
 - Věkové omezení: omezený profil dostává mnohem víc titulů. Obecné seznamy (populární, nejlépe hodnocené) se nahradí dotazem, který TMDB filtruje rovnou: filmy podle hodnocení (`certification.lte`), seriály podle rodinných žánrů u Do 7 a Do 12.
