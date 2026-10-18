@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.3.8
+### Nově
+- Po změně věku, žánrů nebo „Jen anime“ se domovská stránka i Objevovat obnoví samy (bez Ctrl+R). Řady se při ověřování věku ukážou jako načítací dlaždice, ne jako prázdné místo.
+- Logo vlevo nahoře vrací na domovskou stránku k banneru.
+- Panel Novinky má šipku, která míří na zvonek (stejně jako menu profilu u avatara).
+- Skrytý náhled epizody (dřív „Spoiler“ s opičkou) je teď tmavý panel s přeškrtnutým okem a nápisem „Skryto“; po najetí myší se náhled ukáže.
+- V detailu seriálu je místo štítku TMDB výpis žánrů.
+
+### Opraveno
+- Seznam epizod se netrhá: žádné blur ani brightness filtry na stovkách miniatur a epizody se vkládají najednou (jeden přepočet místo stovek).
+- Šedá plocha za žánry v „Zaměření a žánry“ po kliknutí: štítky spadly pod obecné pravidlo `[class*="-chip"]:hover` (přejmenováno na `pf-tag`).
+- Šipky u řad už nemizí pod zvětšenou kartou a klik nepropadne na film pod nimi.
+- `#serialy` a spol. se z adresy mažou hned, ne až po chvíli.
+
 ## 2.3.7
 ### Opraveno
 - Omezený profil: řádky s méně než 6 tituly (např. Drama jen se třemi) se na domovské stránce a v Objevovat schovají, aby nepůsobily rozbitě.
