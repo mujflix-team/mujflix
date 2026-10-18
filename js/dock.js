@@ -10,11 +10,11 @@
     var push = history.pushState;
     history.pushState = function (s, t, u) {
       var r = push.apply(this, arguments);
-      if (typeof u === "string" && u.charAt(0) === "#") setTimeout(strip, 120);
+      if (typeof u === "string" && u.charAt(0) === "#") setTimeout(strip, 0);
       return r;
     };
-    window.addEventListener("hashchange", function () { setTimeout(strip, 120); });
-    setTimeout(strip, 1500);
+    window.addEventListener("hashchange", function () { setTimeout(strip, 0); });
+    setTimeout(strip, 400);
   } catch (err) { console.warn("[clean url]", err); }
 })();
 
