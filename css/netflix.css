@@ -989,11 +989,11 @@ html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margi
 #mfPrefsModal .pf-segbtn.pf-on { background: #fff; color: #000; }
 #mfPrefsModal .pf-note { margin: 10px 0 0; color: #b3b3b3; font-size: 0.9rem; line-height: 1.45; }
 #mfPrefsModal .pf-mix { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; color: #d2d2d2; font-size: 0.95rem; cursor: pointer; }
-#mfPrefsModal .pf-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-#mfPrefsModal .pf-chips.pf-dim { opacity: 0.45; }
-#mfPrefsModal .pf-chip { background: transparent; border: 1px solid #595959; border-radius: 4px; color: #d2d2d2; font: 500 0.98rem var(--nf-font, sans-serif); padding: 10px 14px; cursor: pointer; }
-#mfPrefsModal .pf-chip:hover { border-color: #fff; color: #fff; }
-#mfPrefsModal .pf-chip.pf-on { background: #fff; border-color: #fff; color: #000; font-weight: 700; }
+#mfPrefsModal .pf-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+#mfPrefsModal .pf-tags.pf-dim { opacity: 0.45; }
+#mfPrefsModal .pf-tag { background: transparent; border: 1px solid #595959; border-radius: 4px; color: #d2d2d2; font: 500 0.98rem var(--nf-font, sans-serif); padding: 10px 14px; cursor: pointer; }
+#mfPrefsModal .pf-tag:hover { border-color: #fff; color: #fff; }
+#mfPrefsModal .pf-tag.pf-on { background: #fff; border-color: #fff; color: #000; font-weight: 700; }
 #mfPrefsModal .pf-msg { min-height: 1.3em; margin: 12px 0 2px; font-size: 0.92rem; color: #b3b3b3; }
 #mfPrefsModal .pf-msg.pf-err { color: #ff6b6b; }
 #mfPrefsModal .pf-save, #mfPrefsModal .pf-cancel { display: block; width: 100%; height: 46px; margin-top: 10px; border-radius: 4px; font: 700 1.05rem var(--nf-font, sans-serif); cursor: pointer; }
@@ -1030,3 +1030,24 @@ html body #mfProfileWelcome .pw-agebtn.pw-on { background: #fff; color: #000; }
 
 /* Bez titulu pro banner (např. omezený věk nenechal nic s obrázkem): banner se sbalí, neřídí ho výška z media query výše */
 html body .nf-hero.nf-hero-none { height: calc(var(--nf-bar-h) + 40px + env(safe-area-inset-top, 0px)); min-height: 0; }
+
+/* Skrytý náhled epizody (bez spoilerů): bez těžkého blur filtru na stovkách obrázků, jen tmavý panel s ikonou; po najetí se náhled ukáže */
+html body .spoiler-blur .ep-thumb { background: linear-gradient(135deg, #1b1b1f, #121214); }
+html body .spoiler-blur .ep-thumb img { filter: none; opacity: 0; transition: opacity 0.2s ease; }
+html body .spoiler-blur .ep-thumb:hover img { opacity: 1; }
+html body .spoiler-label { gap: 5px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); transition: opacity 0.2s ease; pointer-events: none; }
+html body .spoiler-blur .ep-thumb:hover .spoiler-label { opacity: 0; }
+
+/* Šipky u řad musí být nad zvětšenou kartou, jinak je při najetí přebije a kliknutí propadne na kartu pod nimi */
+html body .nf-arrow { z-index: 6; }
+
+/* Šipka oznámení míří na zvonek (stejně jako u menu profilu) */
+html body .notif-panel::before { content: ""; position: absolute; top: -7px; left: var(--notif-arrow-x, calc(100% - 96px)); width: 12px; height: 12px; background: #181818; border-left: 1px solid #333; border-top: 1px solid #333; transform: rotate(45deg); pointer-events: none; }
+html body .notif-panel { overflow: visible !important; }
+html body .notif-panel-list { border-radius: 0 0 6px 6px; }
+
+/* Miniatury epizod bez filtru brightness/saturate (stovky obrázků s filtrem zbytečně zatěžují grafiku); hover jen jemně přiblíží */
+html body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-thumb img,
+html body:not(.tv-mode):not(.appletv-mode) .episode-card:hover .ep-thumb img { filter: none !important; }
+html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb img { opacity: 0; }
+html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb:hover img { opacity: 1; }
