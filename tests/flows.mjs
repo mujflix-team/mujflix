@@ -1151,12 +1151,12 @@ const pfT = await page.evaluate(async () => {
     out.closed = !document.getElementById("mfPrefsModal").classList.contains("show");
     // znovu otevřít: nastavení je vidět; zpět na „Všechno“ + přimíchávání
     MFPrefs.open();
-    out.reopenOnly = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "only" && document.querySelectorAll('#mfPrefsModal .pf-chip.pf-on').length === 2;
+    out.reopenOnly = document.querySelector('#mfPrefsModal .pf-segbtn.pf-on').dataset.v === "only" && document.querySelectorAll('#mfPrefsModal .pf-tag.pf-on').length === 2;
     click("mode", "all"); document.getElementById("mfPrefsMix").checked = true; document.getElementById("mfPrefsMix").dispatchEvent(new Event("change", { bubbles: true })); click("save"); await wait(50);
     p = prof(); out.backAll = p.prefs.animeOnly === false && p.prefs.likesAnime === true && window.mfOnlyAnime() === false && JSON.stringify(p.likedGenres) === "[28,35]";
     // nejvýš 5 žánrů
     MFPrefs.open(); ["80", "12", "878"].forEach(g => click("genre", g)); click("genre", "14");
-    out.max5 = document.querySelectorAll('#mfPrefsModal .pf-chip.pf-on').length === 5 && /nejvýš 5/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
+    out.max5 = document.querySelectorAll('#mfPrefsModal .pf-tag.pf-on').length === 5 && /nejvýš 5/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
     MFPrefs.close();
     // zakládání profilu: přepínač „Jen anime“
     reset();
@@ -1288,6 +1288,26 @@ const heroT = await page.evaluate(() => {
   return { a, b };
 });
 check("banner: stav „bez titulu“ je nízký, jen načítací stav je vysoký", heroT.skip || (heroT.a < 200 && heroT.b > 300), JSON.stringify(heroT));
+
+
+// --- Dávka A: zvonek, logo, žánrové štítky, spoiler
+const batchA = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
+  out.home = typeof window.mfGoHome === "function" && /mfGoHome/.test(document.getElementById("nfLogo").getAttribute("onclick") || "");
+  const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none";
+  const p = document.getElementById("notifPanel"); window.openNotifPanel && window.openNotifPanel(); await w(250);
+  const x = parseFloat(p.style.getPropertyValue("--notif-arrow-x")); out.arrow = p.classList.contains("open") ? (x > 0 && x < p.getBoundingClientRect().width) : true;
+  try { window.closeNotifPanel && window.closeNotifPanel(); } catch { /* nic */ }
+  gate.style.display = gd;
+  MFPrefs.open(); await w(100);
+  const tags = document.querySelector("#mfPrefsModal .pf-tags"); out.tagsClass = !!tags && !document.querySelector('#mfPrefsModal [class*="-chip"]');
+  MFPrefs.close();
+  const sp = document.createElement("div"); sp.className = "episode-card spoiler-blur"; sp.innerHTML = '<div class="ep-thumb"><img alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></div>'; document.body.appendChild(sp);
+  out.noBlur = getComputedStyle(sp.querySelector("img")).filter === "none"; sp.remove();
+  return out;
+});
+check("zvonek: šipka míří na ikonu; logo vrací na domovskou stránku", batchA.home && batchA.arrow, JSON.stringify(batchA));
+check("žánry: štítky nespadají pod obecné pravidlo „-chip“ (šedá plocha), spoiler bez blur filtru", batchA.tagsClass && batchA.noBlur, JSON.stringify(batchA));
 
 
 // --- Záloha dat do souboru
