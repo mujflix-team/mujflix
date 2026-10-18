@@ -213,7 +213,8 @@
       var _nfCache = {};
 
       function nfJson(path) {
-        if (_nfCache[path]) return _nfCache[path];
+        var ck = path + '|' + (window.MFAge ? window.MFAge.limit() : 0) + '|' + (mfhOnlyAnime() ? 1 : 0);
+        if (_nfCache[ck]) return _nfCache[ck];
         var key = getTmdbKey();
         if (!key) return Promise.resolve(null);
         var ks = Object.keys(_nfCache);
@@ -222,9 +223,9 @@
           return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key) + '&language=cs-CZ')
             .then(function (r) { return r.json(); });
         };
-        _nfCache[path] = (window.MFAge ? window.MFAge.wide(path, get) : get(path))
-          .catch(function () { delete _nfCache[path]; return null; });
-        return _nfCache[path];
+        _nfCache[ck] = (window.MFAge ? window.MFAge.wide(path, get) : get(path))
+          .catch(function () { delete _nfCache[ck]; return null; });
+        return _nfCache[ck];
       }
 
       function nfItem(raw, type) {
@@ -321,6 +322,33 @@
       };
 
       window.nfRenderProfile = nfRenderProfile;
+
+      /* Logo vlevo nahoře: zpátky na domovskou stránku a nahoru k banneru */
+      window.mfGoHome = function () {
+        try { if (typeof window.closeUniverse === 'function') window.closeUniverse(); } catch (e) {}
+        try { var sm = document.getElementById('seriesModal'); if (sm && sm.classList.contains('open') && typeof window.closeModal === 'function') window.closeModal(); } catch (e) {}
+        try { if (typeof window.mfShowSection === 'function') window.mfShowSection('serialy'); } catch (e) {}
+        var h = document.getElementById('mfSectionHome');
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+        try { if (h && h.scrollTo) h.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+        try { if (window.mfDockReveal) window.mfDockReveal(); } catch (e) {}
+      };
+
+      /* Šipka u panelu Novinky míří na zvonek */
+      function nfPlaceNotifArrow() {
+        var p = document.getElementById('notifPanel'), b = document.getElementById('nfBellBtn');
+        if (!p || !b || !p.classList.contains('open')) return;
+        var pr = p.getBoundingClientRect(), br = b.getBoundingClientRect();
+        if (!pr.width || !br.width) return;
+        var x = Math.max(16, Math.min(pr.width - 28, br.left + br.width / 2 - pr.left - 6));
+        p.style.setProperty('--notif-arrow-x', x + 'px');
+      }
+      (function () {
+        var p = document.getElementById('notifPanel');
+        if (!p) return;
+        new MutationObserver(function () { requestAnimationFrame(nfPlaceNotifArrow); }).observe(p, { attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('resize', nfPlaceNotifArrow);
+      })();
       window.renderHomepage = function () { return renderHomepage.apply(this, arguments); };
       // Po přepnutí/vytvoření profilu překresli doporučení až poté, co se načte paměť AI daného profilu
       window.addEventListener('mf:profile-changed', function () {
@@ -398,6 +426,10 @@
         // Věkové omezení profilu: bez omezení se vykreslí hned, jinak až po ověření hodnocení titulů
         if (window.MFAge && window.MFAge.limit() && id !== 'mfhRecent' && id !== 'mfhMyList') {
           var run = _nfRun;
+          // Během ověřování hodnocení je vidět načítací stav (ne prázdné místo), ať je jasné, že se něco děje
+          var trk = document.getElementById(id);
+          if (trk) trk.innerHTML = new Array(9).join('<div class="nf-card nf-card-sk" aria-hidden="true"><div class="nf-poster nf-skeleton"></div></div>');
+          sec.hidden = false;
           window.MFAge.filter(items, 20).then(function (ok) {
             if (run !== _nfRun) return;
             var s2 = document.getElementById(id + 'Section');
@@ -683,7 +715,7 @@
           cont && [cont.slug, cont.progress, cont.episode],
           recent.map(function (r) { return r.slug; }),
           mine.map(function (m) { return m.title; }),
-          genres, !!getTmdbKey(), !!(window.mfLikesAnime && window.mfLikesAnime())
+          genres, !!getTmdbKey(), !!(window.mfLikesAnime && window.mfLikesAnime()), mfhOnlyAnime(), window.MFAge ? window.MFAge.limit() : 0
         ]);
         if (sig === _nfSig && host.children.length) return;
         _nfSig = sig;
