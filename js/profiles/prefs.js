@@ -57,7 +57,7 @@
     var oldPin = el.querySelector("#mfPrefsPin"), oldPinVal = oldPin ? oldPin.value : "";
     var chips = GENRES.map(function (g) {
       var on = state.genres.indexOf(g[0]) > -1;
-      return '<button type="button" class="pf-chip' + (on ? " pf-on" : "") + '" data-pf="genre" data-v="' + g[0] + '" aria-pressed="' + on + '">' + g[1] + "</button>";
+      return '<button type="button" class="pf-tag' + (on ? " pf-on" : "") + '" data-pf="genre" data-v="' + g[0] + '" aria-pressed="' + on + '">' + g[1] + "</button>";
     }).join("");
     el.innerHTML =
       '<div class="pf-box">' +
@@ -79,7 +79,7 @@
         '<div class="pf-note">' + (state.age ? "Doporučení, Objevovat i hledání ukážou jen tituly vhodné " + AGES.filter(function (a) { return a[0] === state.age; })[0][2] + ". Hodnocení bere z TMDB (americká škála); titul bez hodnocení se skryje." : "Bez omezení: ukáže se všechno.") + "</div>" +
         (state.pin && state.age !== state.age0 ? '<input type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="pf-pin" id="mfPrefsPin" placeholder="PIN profilu pro změnu věku" aria-label="PIN profilu">' : "") +
         '<div class="pf-label">Oblíbené žánry <span class="pf-count">' + state.genres.length + "/" + MAX_GENRES + "</span></div>" +
-        '<div class="pf-chips' + (state.only ? " pf-dim" : "") + '">' + chips + "</div>" +
+        '<div class="pf-tags' + (state.only ? " pf-dim" : "") + '">' + chips + "</div>" +
         '<div class="pf-msg" role="status"></div>' +
         '<button type="button" class="pf-save" data-pf="save">Uložit</button>' +
         '<button type="button" class="pf-cancel" data-pf="close">Zrušit</button>' +
