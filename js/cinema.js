@@ -198,7 +198,7 @@
         if (current !== cur) return;
         var ordered = kind === "movie"
           ? [pick("SK"), pick("CZ"), cur.title, en, orig]
-          : [romaji, en, orig, cur.title, pick("SK"), pick("CZ")];
+          : [en, romaji, orig, cur.title, pick("SK"), pick("CZ")];
         applyAlts(cur, ordered, info);
       };
       // Anime weby (NajSerialy…) používají romaji název (Shuiro no Kamen) – TMDB ho nemá, vezme se z AniList
@@ -222,6 +222,8 @@
     var fy = String(info.first_air_date || "").slice(0, 4);
     if (/^\d{4}$/.test(fy)) cur.firstYear = fy;
     if (!list.length) return;
+    /* Název bez latinky (ドラゴンボール超) dá prázdný slug → weby ho nenajdou; pro adresy se použije první latinský název (dragon-ball-super). */
+    if (!daslug(cur.title)) cur.slugTitle = list[0];
     var before = sourcesFor(cur.type)[cur.sourceIdx];
     cur.altTitles = list;
     var after = sourcesFor(cur.type);
@@ -237,10 +239,11 @@
   function buildUrl() {
     var sources = sourcesFor(current.type);
     var src = sources[current.sourceIdx];
+    var ttl = current.slugTitle || current.title;
     if (current.type === "movie") {
-      return src.build(current.title, current.year);
+      return src.build(ttl, current.year);
     }
-    return src.build(current.title, current.season, current.episode, current.localSlug);
+    return src.build(ttl, current.season, current.episode, current.localSlug);
   }
 
   function appGetWatched() {
