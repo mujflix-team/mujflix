@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0
+### Nově
+- Mini přehrávač traileru v banneru domovské stránky (vpravo nahoře): miniatura, po kliknutí YouTube trailer, celá obrazovka a zavření. Při odscrollování z banneru se video pozastaví. Iframe se načte až po kliknutí.
+- „Pokračovat ve sledování“: vpravo v banneru je hromádka dalších rozkoukaných titulů s počtem; klepnutím na kartu se přepne do banneru (tam je i „Dokoukal jsem“).
+- Detail seriálu: řádek rok · žánry · počet sérií · HD, popis, herci a tlačítko „Přehrát/Pokračovat · S1 E1“.
+
 ## 2.3.11
 ### Nově
 - Uvítání nového profilu je přívětivější („Vítej v MůjFlixu“, nic není povinné).
