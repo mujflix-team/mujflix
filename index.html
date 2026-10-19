@@ -893,9 +893,14 @@
                 title="Přidat do Oblíbených" aria-label="Přidat do Oblíbených"
               >♡</button>
             </div>
+            <div class="sd-links">
+              <button type="button" class="sd-link" id="sdMoreEps" onclick="_sdMoreEpisodes()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="14" height="14" rx="2"/><path d="M3 7v12a2 2 0 0 0 2 2h12"/></svg><span>Další epizody</span></button>
+              <button type="button" class="sd-link" id="sdSimilarBtn" onclick="_sdToggleSimilar()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Podobné</span></button>
+            </div>
           </div>
         </div>
         <div class="modal-body" id="modalBody">
+          <div class="sd-similar" id="sdSimilar" hidden></div>
           
           <div class="season-select-view active" id="seasonSelectView">
             <div class="ssv-grid" id="ssvGrid"></div>
