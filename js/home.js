@@ -489,6 +489,7 @@
       /* ---------- Hero banner ---------- */
 
       var _heroItem = null;
+      var _trTok = 0, _trObs = null;
 
       function nfHeroSkeleton() {
         var hero = document.getElementById('nfHero');
@@ -498,6 +499,7 @@
       function nfHeroShow(h) {
         var hero = document.getElementById('nfHero');
         if (!hero) return;
+        _trTok++; if (_trObs) { try { _trObs.disconnect(); } catch (e) {} _trObs = null; }
         var bg = h.image
           ? '<img class="nf-hero-bg" src="' + esc(h.image) + '" alt="" decoding="async" onerror="this.style.display=\'none\'">'
           : '';
@@ -552,6 +554,42 @@
         });
       }
 
+      /* Hromádka rozkoukaných: karty za sebou vpravo nahoře v banneru; klepnutí na kartu ji přepne do banneru. */
+      function nfContinueStack(list, sel) {
+        var hero = document.getElementById('nfHero');
+        if (!hero) return;
+        var old = hero.querySelector('.nf-cstack');
+        if (old) old.remove();
+        if (!list || list.length < 2) return;
+        var others = [];
+        list.forEach(function (c, i) { if (i !== sel) others.push({ c: c, i: i }); });
+        var box = document.createElement('div');
+        box.className = 'nf-cstack';
+        box.setAttribute('role', 'group');
+        box.setAttribute('aria-label', 'Rozkoukané: ' + list.length);
+        var shown = others.slice(0, 3);
+        shown.forEach(function (o, k) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'nf-cs-card';
+          b.style.setProperty('--k', String(k));
+          b.setAttribute('aria-label', 'Přepnout na ' + o.c.title);
+          b.innerHTML = (o.c.image ? '<img src="' + esc(o.c.image) + '" alt="" loading="lazy" onerror="this.remove()">' : '') +
+            '<span class="nf-cs-t">' + esc(o.c.title) + (o.c.episode ? '<small>' + esc(o.c.episode) + '</small>' : '') + '</span>';
+          b.addEventListener('click', function () {
+            _lastContinue = o.c;
+            nfHeroFromContinue(o.c);
+            nfContinueStack(list, o.i);
+          });
+          box.appendChild(b);
+        });
+        var n = document.createElement('div');
+        n.className = 'nf-cs-count';
+        n.textContent = list.length + ' ' + mfhPl(list.length, 'rozkoukané', 'rozkoukané', 'rozkoukaných');
+        box.appendChild(n);
+        hero.appendChild(box);
+      }
+
       function nfHeroFromTmdb(it) {
         _heroItem = it;
         nfHeroShow({
@@ -565,6 +603,86 @@
             if (typeof toggleTmdbFavorite === 'function') toggleTmdbFavorite(it.tmdbId, it.mediaType, it.title, it.image, null);
           }
         });
+        try { nfHeroTrailer(it); } catch (e) {}
+      }
+      /* ---------- Mini přehrávač traileru v banneru ----------
+       * Trailer z TMDB (/videos, YouTube). Iframe se načte až po kliknutí (šetří výkon i data); při odscrollování
+       * z banneru se video pozastaví a po návratu je zase k dispozici. */
+      function ytCmd(frame, func) {
+        try { frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: [] }), '*'); } catch (e) {}
+      }
+
+      function nfPickTrailer(list) {
+        var yt = (list || []).filter(function (v) { return v && v.site === 'YouTube' && v.key && /^[\w-]{6,20}$/.test(v.key); });
+        var by = function (type) { return yt.filter(function (v) { return v.type === type; }); };
+        var pool = by('Trailer').length ? by('Trailer') : (by('Teaser').length ? by('Teaser') : []);
+        if (!pool.length) return null;
+        pool.sort(function (a, b) { return (b.official ? 1 : 0) - (a.official ? 1 : 0); });
+        return pool[0].key;
+      }
+
+      function nfHeroTrailer(it) {
+        var tok = ++_trTok;
+        if (_trObs) { try { _trObs.disconnect(); } catch (e) {} _trObs = null; }
+        var key = getTmdbKey();
+        if (!key || !it || !it.tmdbId) return;
+        var kind = it.mediaType === 'tv' ? 'tv' : 'movie';
+        var url = TMDB_BASE + '/' + kind + '/' + it.tmdbId + '/videos?api_key=' + encodeURIComponent(key) + '&language=cs-CZ&include_video_language=cs,en,null';
+        fetch(url).then(function (r) { return r.json(); }).then(function (d) {
+          if (tok !== _trTok) return;
+          var vid = nfPickTrailer(d && d.results);
+          var hero = document.getElementById('nfHero');
+          if (!vid || !hero || hero.classList.contains('nf-hero-none') || hero.classList.contains('nf-hero-empty')) return;
+          var box = document.createElement('div');
+          box.className = 'nf-trailer';
+          box.innerHTML =
+            '<button type="button" class="nf-tr-open" aria-label="Přehrát trailer: ' + esc(it.title) + '">' +
+              '<img src="https://i.ytimg.com/vi/' + vid + '/hqdefault.jpg" alt="" loading="lazy">' +
+              '<span class="nf-tr-play"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>' +
+              '<span class="nf-tr-label">Trailer</span>' +
+            '</button>';
+          hero.appendChild(box);
+          var frame = null;
+          function stop() {
+            if (frame) { frame.remove(); frame = null; }
+            box.classList.remove('playing');
+          }
+          box.querySelector('.nf-tr-open').addEventListener('click', function () {
+            if (frame) return;
+            frame = document.createElement('iframe');
+            frame.className = 'nf-tr-frame';
+            frame.title = 'Trailer: ' + it.title;
+            frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+            frame.setAttribute('allowfullscreen', '');
+            frame.referrerPolicy = 'strict-origin-when-cross-origin';
+            frame.src = 'https://www.youtube-nocookie.com/embed/' + vid + '?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1';
+            box.appendChild(frame);
+            box.classList.add('playing');
+            if (!box.querySelector('.nf-tr-ctl')) {
+              var ctl = document.createElement('div');
+              ctl.className = 'nf-tr-ctl';
+              ctl.innerHTML =
+                '<button type="button" class="nf-tr-fs" aria-label="Celá obrazovka" title="Celá obrazovka"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>' +
+                '<button type="button" class="nf-tr-x" aria-label="Zavřít trailer" title="Zavřít">✕</button>';
+              box.appendChild(ctl);
+              ctl.querySelector('.nf-tr-x').addEventListener('click', stop);
+              ctl.querySelector('.nf-tr-fs').addEventListener('click', function () {
+                var el = frame || box;
+                var rq = el.requestFullscreen || el.webkitRequestFullscreen;
+                try { if (rq) rq.call(el); } catch (e) {}
+              });
+            }
+          });
+          /* odscrollováno z banneru → pozastavit a schovat, ať video neběží na pozadí */
+          if ('IntersectionObserver' in window) {
+            _trObs = new IntersectionObserver(function (ents) {
+              var vis = ents[0].isIntersecting && ents[0].intersectionRatio > 0.35;
+              if (!vis && frame && !document.fullscreenElement) { ytCmd(frame, 'pauseVideo'); box.classList.add('away'); }
+              else if (vis) box.classList.remove('away');
+            }, { threshold: [0, 0.35, 0.6] });
+            _trObs.observe(hero);
+          }
+        }).catch(function () {});
       }
 
       function mfhRecentItems() {
@@ -716,7 +834,8 @@
         if (!host) return;
 
         var hasHistory = mfhHasWatchHistory();
-        var cont = hasHistory ? mfhGetRealContinueItem() : null;
+        var conts = hasHistory ? mfhContinueCandidates() : [];
+        var cont = conts.length ? conts[0] : null;
         _lastContinue = cont;
         var recent = mfhRecentItems();
         var mine = mfhMyListItems();
@@ -725,6 +844,7 @@
 
         var sig = JSON.stringify([
           cont && [cont.slug, cont.progress, cont.episode],
+          conts.map(function (c) { return c.slug || ('m' + c.tmdbId); }),
           recent.map(function (r) { return r.slug; }),
           mine.map(function (m) { return m.title; }),
           genres, !!getTmdbKey(), !!(window.mfLikesAnime && window.mfLikesAnime()), mfhOnlyAnime(), window.MFAge ? window.MFAge.limit() : 0
@@ -734,7 +854,7 @@
         var myRun = ++_nfRun;
         host.innerHTML = '';
 
-        if (cont) nfHeroFromContinue(cont); else nfHeroSkeleton();
+        if (cont) { nfHeroFromContinue(cont); nfContinueStack(conts, 0); } else nfHeroSkeleton();
 
         nfRowShell('mfhRecent', 'Nedávno sledováno');
         nfRowShell('mfhMyList', 'Oblíbené');
