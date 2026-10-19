@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.2
+### Změněno
+- Detail seriálu je na celou obrazovku jako v klasických službách: vlevo název, metadata, popis, herci, tlačítka a odkazy „Další epizody“ / „Podobné“. Mřížka sérií se už neukazuje, díly a výběr série jsou po „Další epizody“.
+
 ## 2.4.1
 ### Nově
 - Detail seriálu: pod tlačítky jsou odkazy „Další epizody“ (otevře díly) a „Podobné“ (podobné seriály z TMDB, klepnutím se otevře jejich detail).
