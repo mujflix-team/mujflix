@@ -305,6 +305,27 @@ const stT = await page.evaluate(async () => {
 });
 check("rozkoukané: hromádka karet v banneru a klepnutím se přepne titul", stT.stack && stT.cards >= 1 && /rozkouk/.test(stT.count || "") && stT.switched && stT.still, JSON.stringify(stT));
 
+// --- Detail seriálu: Další epizody / Podobné
+const sdT = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  const slug = Object.keys(db)[0]; db[slug].tmdbId = 1399;
+  const of = window.fetch; window.MF_USING_TMDB_PROXY = true;
+  window.fetch = async (u, ...r) => /\/similar/.test(String(u)) ? { ok: true, json: async () => ({ results: [{ id: 1, name: "Podobný A", poster_path: "/a.jpg" }, { id: 2, name: "Podobný B", poster_path: "/b.jpg" }] }) } : of(u, ...r);
+  try {
+    openSeries(slug); await w(500);
+    out.links = !!document.getElementById("sdMoreEps") && !!document.getElementById("sdSimilarBtn");
+    document.getElementById("sdSimilarBtn").click(); await w(600);
+    out.cards = document.querySelectorAll("#sdSimilar .sd-sim-card").length;
+    document.getElementById("sdSimilarBtn").click(); await w(300);
+    out.back = document.getElementById("sdSimilar").hidden && document.getElementById("seasonSelectView").style.display !== "none";
+    document.getElementById("sdMoreEps").click(); await w(300);
+    out.eps = document.getElementById("episodesView").style.display === "flex";
+  } finally { window.fetch = of; closeModal(); }
+  return out;
+});
+check("detail seriálu: Další epizody otevře díly a Podobné ukáže doporučení", sdT.links && sdT.cards === 2 && sdT.back && sdT.eps, JSON.stringify(sdT));
+
 // --- Zdroje: Uzi.la je před Prehraj.to
 const order = await page.evaluate(() => { MFCinemaPlayer.open("1", "X", "movie"); const lbl = [...document.querySelectorAll("#mfStandaloneCinema *")].map(e => e.textContent).join("|"); MFCinemaPlayer.close(); return lbl.length > 0; });
 check("cinema: otevření bez chyby po přeskládání zdrojů", order);
