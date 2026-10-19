@@ -336,6 +336,16 @@
         try { if (window.mfDockReveal) window.mfDockReveal(); } catch (e) {}
       };
 
+      /* Plynulé objevení obrázků: plakát se po načtení jemně rozsvítí (CSS .is-loaded); chyba načtení ho taky odkryje */
+      (function () {
+        var mark = function (e) {
+          var t = e.target;
+          if (t && t.tagName === 'IMG' && t.classList) t.classList.add('is-loaded');
+        };
+        document.addEventListener('load', mark, true);
+        document.addEventListener('error', mark, true);
+      })();
+
       /* Šipka u panelu Novinky míří na zvonek */
       function nfPlaceNotifArrow() {
         var p = document.getElementById('notifPanel'), b = document.getElementById('nfBellBtn');
