@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1
+### Nově
+- Detail seriálu: pod tlačítky jsou odkazy „Další epizody“ (otevře díly) a „Podobné“ (podobné seriály z TMDB, klepnutím se otevře jejich detail).
+
 ## 2.4.0
 ### Nově
 - Mini přehrávač traileru v banneru domovské stránky (vpravo nahoře): miniatura, po kliknutí YouTube trailer, celá obrazovka a zavření. Při odscrollování z banneru se video pozastaví. Iframe se načte až po kliknutí.
