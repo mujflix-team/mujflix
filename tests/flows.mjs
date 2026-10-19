@@ -206,6 +206,27 @@ const alt = await page.evaluate(async () => {
 check("uzi.la: nabízí slovenský název (spider-man-cez-paralelne-svety)", alt.includes("https://uzi.la/p/spider-man-cez-paralelne-svety"), JSON.stringify(alt));
 check("uzi.la: nabízí i český a původní název", alt.length >= 3, JSON.stringify(alt));
 
+// --- Japonský název (bez latinky) → adresy z anglického názvu
+const jp = await page.evaluate(async () => {
+  window.MF_USING_TMDB_PROXY = true;
+  const realFetch = window.fetch;
+  window.fetch = (u) => {
+    u = String(u);
+    const json = u.includes("/translations") ? { translations: [] } : { name: "Dragon Ball Super", original_name: "ドラゴンボール超", original_language: "ja" };
+    return Promise.resolve({ ok: true, json: () => Promise.resolve(json) });
+  };
+  MFCinemaPlayer.open("62715", "ドラゴンボール超", "tv", 1, 1);
+  await new Promise(r => setTimeout(r, 600));
+  const urls = [];
+  for (let i = 0; i < 12; i++) {
+    urls.push(window.MFCinemaPlayer.currentUrl() || "");
+    document.getElementById("mfCinSwitchSrc")?.click();
+  }
+  window.fetch = realFetch; MFCinemaPlayer.close();
+  return urls;
+});
+check("japonský název: odkazy používají dragon-ball-super", jp.some(u => /najserialy\.io\/serial\/dragon-ball-super\//.test(u)) && jp.some(u => /svetserialu\.to\/serial\/dragon-ball-super\//.test(u)), JSON.stringify(jp));
+
 // --- Zdroje: Uzi.la je před Prehraj.to
 const order = await page.evaluate(() => { MFCinemaPlayer.open("1", "X", "movie"); const lbl = [...document.querySelectorAll("#mfStandaloneCinema *")].map(e => e.textContent).join("|"); MFCinemaPlayer.close(); return lbl.length > 0; });
 check("cinema: otevření bez chyby po přeskládání zdrojů", order);
@@ -1295,6 +1316,8 @@ const batchA = await page.evaluate(async () => {
   const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
   out.home = typeof window.mfGoHome === "function" && /mfGoHome/.test(document.getElementById("nfLogo").getAttribute("onclick") || "");
   const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none";
+  try { window.mfGoHome && window.mfGoHome(); } catch { /* nic */ }
+  document.getElementById("nfTop")?.classList.remove("nf-top-hidden"); await w(200);
   const p = document.getElementById("notifPanel"); window.openNotifPanel && window.openNotifPanel(); await w(250);
   const x = parseFloat(p.style.getPropertyValue("--notif-arrow-x")); out.arrow = p.classList.contains("open") ? (x > 0 && x < p.getBoundingClientRect().width) : true;
   try { window.closeNotifPanel && window.closeNotifPanel(); } catch { /* nic */ }
