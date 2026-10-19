@@ -1124,3 +1124,17 @@ html body #seriesModal:not(.nf-compact) .panel-progress-wrap { margin-top: 12px;
   html body #seriesModal .btn-continue { padding: 0 12px !important; font-size: 0.84rem !important; }
 }
 .nf-cs-card:not(:first-of-type) .nf-cs-t { display: none; }
+
+/* Odkazy pod tlačítky v detailu seriálu (Další epizody / Podobné) */
+html body #seriesModal .sd-links { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-top: 4px; }
+html body #seriesModal .sd-link { display: inline-flex; align-items: center; gap: 12px; padding: 9px 4px; border: 0; background: transparent; color: #fff; font: inherit; font-size: 0.98rem; font-weight: 700; cursor: pointer; border-radius: 6px; }
+html body #seriesModal .sd-link:hover, html body #seriesModal .sd-link.on { background: rgba(255, 255, 255, 0.12); }
+html body #seriesModal.nf-compact .sd-links { display: none; }
+html body #seriesModal .sd-similar { padding: 20px var(--nf-pad, 4%) 90px; }
+html body #seriesModal .sd-similar[hidden] { display: none; }
+html body #seriesModal .sd-sim-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 14px; color: #fff; }
+html body #seriesModal .sd-sim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(110px, 12vw, 170px), 1fr)); gap: 18px 12px; }
+html body #seriesModal .sd-sim-card { padding: 0; border: 0; background: transparent; color: #e5e5e5; text-align: left; cursor: pointer; font: inherit; }
+html body #seriesModal .sd-sim-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 6px; display: block; background: #1d1d1d; transition: transform 0.2s; }
+html body #seriesModal .sd-sim-card:hover img { transform: scale(1.05); }
+html body #seriesModal .sd-sim-card span { display: block; margin-top: 6px; font-size: 0.8rem; font-weight: 600; }
