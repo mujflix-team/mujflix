@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.10
+### Opraveno
+- Prázdné Oblíbené → Objevovat → ✕ už nenechá zmizet dock; zavření Objevování vrátí na domovskou stránku.
+- Panel Novinky: při zavírání se šipka hned schová (žádná druhá šipka); poloha šipky se počítá jen u otevřeného panelu.
+- Logo MůjFlix v Objevování vede na domovskou stránku.
+- Klik na logo na domovské stránce plynule vyjede nahoru (bez skoku).
+
 ## 2.3.9
 ### Opraveno
 - Seriály s japonským/čínským názvem (např. „ドラゴンボール超“) se na NajSerialy, SvetSerialu, Bombuj a Uzi.la už hledají podle latinského názvu z TMDB (`dragon-ball-super`), ne podle prázdného odkazu. Anglický název je první varianta, romaji další.
