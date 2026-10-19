@@ -849,9 +849,42 @@ function openSeries(e) {
     e && (e.style.opacity = "0", e.style.transform = "translateY(12px)", setTimeout(() => {
       e.style.transition = "opacity 0.4s ease, transform 0.45s cubic-bezier(0.34,1.2,0.64,1)", e.style.opacity = "1", e.style.transform = "translateY(0)"
     }, 120))
-  })), switchToSeasonView(), renderSeasons(), updatePanelProgress(), updateModalFavBtn(), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
+  })), switchToSeasonView(), renderSeasons(), updatePanelProgress(), updateModalFavBtn(), _sdFill(e, n), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
   const a = document.getElementById("modalRateBtn");
   a && (a.style.display = calcProgress(e).seen > 0 ? "flex" : "none")
+}
+
+/* Detail seriálu: řádek s metadaty (rok · žánry · série · HD), popis, herci a popisek tlačítka Pokračovat/Přehrát. */
+const _sdCache = {};
+
+function _sdPaint(slug, info) {
+  if (slug !== activeSeries || !db[slug]) return;
+  const t = db[slug], ov = document.getElementById("sOverview"), cast = document.getElementById("sCast"), meta = document.getElementById("sInfo");
+  const ns = totalSeasons(slug), pl = ns === 1 ? "série" : ns >= 2 && ns <= 4 ? "série" : "sérií";
+  const year = String(info && info.first_air_date || "").slice(0, 4);
+  const genres = (Array.isArray(t._genres) && t._genres.length ? t._genres : ((info && info.genres) || []).map(g => g.name)).slice(0, 3);
+  const parts = [/^\d{4}$/.test(year) ? year : "", ...genres, `${ns} ${pl}`, "HD"].filter(Boolean);
+  meta && (meta.textContent = parts.join(" · "));
+  const text = String(info && info.overview || "").trim();
+  ov && (ov.textContent = text, ov.hidden = !text);
+  const names = ((info && info.cast) || []).slice(0, 4).join(", ");
+  cast && (cast.textContent = names ? "Hrají: " + names : "", cast.hidden = !names)
+}
+
+function _sdFill(slug, next) {
+  const t = db[slug], btn = document.querySelector("#seriesModal .btn-continue");
+  if (btn) {
+    const seen = calcProgress(slug).seen > 0, lbl = next ? `S${next.se} E${next.ep}` : "";
+    const svg = btn.querySelector("svg");
+    btn.textContent = "", svg && btn.appendChild(svg), btn.appendChild(document.createTextNode((seen ? "Pokračovat" : "Přehrát") + (lbl ? " · " + lbl : "")))
+  }
+  _sdPaint(slug, _sdCache[t.tmdbId]);
+  if (!t.tmdbId || _sdCache[t.tmdbId] || !(TMDB_KEY || window.MF_USING_TMDB_PROXY || window.MF_PROXY?.enabled)) return;
+  const id = t.tmdbId;
+  Promise.all([tmdbGet(`/tv/${id}?language=cs-CZ`).catch(() => null), tmdbGet(`/tv/${id}/credits?language=cs-CZ`).catch(() => null)]).then(([d, c]) => {
+    const info = Object.assign({}, d || {}, { cast: ((c && c.cast) || []).map(x => x && x.name).filter(Boolean) });
+    _sdCache[id] = info, _sdPaint(slug, info)
+  })
 }
 
 function closeModal() {
