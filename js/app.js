@@ -1678,6 +1678,7 @@ function saveGenrePrefs() {
 
 async function checkNewEpisodes() {
   const list = document.getElementById("notifPanelList");
+  if (!list) return;
   try {
     // sledované seriály: oblíbené z TMDB + seriály s aspoň jednou zhlédnutou epizodou
     const ids = new Map(), watched = getWatched();
@@ -1835,7 +1836,7 @@ function buildEpCard(e, t, n, o, i, a, s) {
 window.addEventListener("load", () => {
   if (Object.keys(db).forEach(e => {
       updateTileProgress(e), updateContinueBadge(e)
-    }), updateLogoProgress(), updateWatchlistBtns(), loadTmdbDbData(), setTimeout(checkNewEpisodes, 8e3), initPWA(), !1) {}
+    }), updateLogoProgress(), updateWatchlistBtns(), loadTmdbDbData(), initPWA(), !1) {}
   const e = document.querySelector(".mf-header");
   if (e) {
     const t = document.querySelector(".ps-menu-scene") || document.body;
