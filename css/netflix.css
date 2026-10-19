@@ -1081,3 +1081,46 @@ html body #watchlistOverlay .wl-empty-btn { border-radius: 4px; }
   html body #watchlistOverlay .wl-card-name { font-size: 0.74rem; }
   html body #watchlistOverlay .wl-card:hover .wl-card-poster { transform: none; }
 }
+
+/* ===== Mini přehrávač traileru v banneru ===== */
+.nf-hero { overflow: hidden; }
+.nf-trailer { position: absolute; z-index: 3; right: var(--nf-pad); top: calc(var(--nf-bar-h) + 22px + env(safe-area-inset-top, 0px)); width: clamp(150px, 24vw, 360px); aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.14); transition: opacity 0.3s ease, transform 0.3s ease; }
+.nf-trailer.away { opacity: 0; transform: translateY(-8px) scale(0.96); pointer-events: none; }
+.nf-tr-open { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; color: #fff; }
+.nf-tr-open img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.2s, transform 0.3s; }
+.nf-tr-open:hover img { opacity: 1; transform: scale(1.04); }
+.nf-tr-play { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(255, 255, 255, 0.85); display: flex; align-items: center; justify-content: center; }
+.nf-tr-label { position: absolute; left: 8px; bottom: 6px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; text-shadow: 0 1px 4px #000; }
+.nf-trailer.playing .nf-tr-open { display: none; }
+.nf-tr-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.nf-tr-ctl { position: absolute; top: 6px; right: 6px; z-index: 2; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+.nf-trailer:hover .nf-tr-ctl, .nf-trailer:focus-within .nf-tr-ctl { opacity: 1; }
+@media (hover: none) { .nf-tr-ctl { opacity: 1; } }
+.nf-tr-ctl button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(20, 20, 20, 0.8); color: #fff; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.nf-tr-ctl button:hover { background: #fff; color: #000; }
+@media (max-width: 899px) { .nf-trailer { width: min(46vw, 210px); top: calc(var(--nf-bar-h) + 10px + env(safe-area-inset-top, 0px)); } }
+
+/* ===== Hromádka rozkoukaných v banneru ===== */
+.nf-cstack { position: absolute; z-index: 3; right: var(--nf-pad); top: calc(var(--nf-bar-h) + 22px + env(safe-area-inset-top, 0px)); width: clamp(150px, 22vw, 320px); aspect-ratio: 16 / 12; }
+.nf-cs-card { position: absolute; left: 0; top: 0; width: calc(100% - 28px); aspect-ratio: 16 / 9; padding: 0; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 8px; overflow: hidden; background: #1b1b1b; cursor: pointer; color: #fff; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6); transform: translate(calc(var(--k) * 14px), calc(var(--k) * 12px)); z-index: calc(10 - var(--k)); filter: brightness(calc(1 - var(--k) * 0.18)); transition: transform 0.25s ease; }
+.nf-cs-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.nf-cs-card:hover { transform: translate(calc(var(--k) * 14px), calc(var(--k) * 12px - 6px)); }
+.nf-cs-t { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 6px; font-size: 0.74rem; font-weight: 700; text-align: left; background: linear-gradient(transparent, rgba(0, 0, 0, 0.85)); display: block; }
+.nf-cs-t small { display: block; font-weight: 500; color: #cfcfcf; font-size: 0.66rem; }
+.nf-cs-count { position: absolute; left: 0; bottom: -4px; font-size: 0.72rem; font-weight: 700; color: #d2d2d2; letter-spacing: 0.04em; text-shadow: 0 1px 4px #000; }
+@media (max-width: 899px) { .nf-cstack { width: min(44vw, 190px); top: calc(var(--nf-bar-h) + 10px + env(safe-area-inset-top, 0px)); } }
+
+/* ===== Detail seriálu: popis a herci ===== */
+html body #seriesModal .sd-overview { margin: 10px 0 0; max-width: 640px; font-size: 0.95rem; line-height: 1.45; color: #e5e5e5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8); }
+html body #seriesModal .sd-overview[hidden], html body #seriesModal .sd-cast[hidden] { display: none; }
+html body #seriesModal .sd-cast { margin-top: 8px; max-width: 640px; font-size: 0.82rem; color: #a8a8a8; }
+html body #seriesModal.nf-compact .sd-overview, html body #seriesModal.nf-compact .sd-cast { display: none !important; }
+@media (max-width: 899px) { html body #seriesModal .sd-overview { -webkit-line-clamp: 2; font-size: 0.86rem; } }
+html body #seriesModal:not(.nf-compact) .modal-hero { min-height: clamp(360px, 52vh, 480px) !important; }
+html body #seriesModal:not(.nf-compact) .panel-progress-wrap { margin-top: 12px; }
+@media (max-width: 899px) { html body #seriesModal:not(.nf-compact) .modal-hero { min-height: clamp(330px, 50vh, 420px) !important; } }
+@media (max-width: 899px) {
+  html body #seriesModal .btn-shuffle .kb { display: none; }
+  html body #seriesModal .btn-continue { padding: 0 12px !important; font-size: 0.84rem !important; }
+}
+.nf-cs-card:not(:first-of-type) .nf-cs-t { display: none; }
