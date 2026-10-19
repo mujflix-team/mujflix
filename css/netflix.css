@@ -1171,3 +1171,20 @@ html body #seriesModal.nf-compact .sd-logo { max-height: 44px; margin: 0; }
 html body #seriesModal .modal-hero-left h2.sd-has-logo, html body .nf-hero-title.has-logo { position: static; }
 html body #seriesModal .modal-hero-left h2.sd-has-logo { font-size: 0 !important; line-height: 0 !important; height: 0; margin: 0 !important; overflow: hidden; }
 html body #nfHero .nf-hero-title.has-logo { font-size: 0 !important; line-height: 0 !important; }
+
+/* Trailer: žádné ovládání YouTube, jen tři malá tlačítka a klepnutí = pauza */
+.nf-tr-frame { pointer-events: none; }
+.nf-tr-tap { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.nf-trailer.paused::after { content: "❚❚"; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #fff; background: rgba(0, 0, 0, 0.55); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1; }
+.nf-tr-ctl { z-index: 2; opacity: 1 !important; }
+.nf-tr-ctl button { width: 26px; height: 26px; background: rgba(20, 20, 20, 0.7); }
+.nf-tr-snd .on { display: block; } .nf-tr-snd .off { display: none; }
+.nf-tr-snd.muted .on { display: none; } .nf-tr-snd.muted .off { display: block; }
+.nf-trailer:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; border: 0; }
+.nf-trailer:fullscreen .nf-tr-ctl { top: 18px; right: 18px; }
+.nf-trailer:fullscreen .nf-tr-ctl button { width: 40px; height: 40px; }
+
+/* Karty řad: při najetí se zvětšený plakát a stín neoříznou do obdélníku */
+html body .nf-track { padding: 32px var(--nf-pad) 48px; margin: -16px 0 -26px; }
+html body .nf-arrow { top: 32px; bottom: 48px; }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6); }
