@@ -656,33 +656,43 @@
           var frame = null;
           function stop() {
             if (frame) { frame.remove(); frame = null; }
-            box.classList.remove('playing');
+            box.querySelectorAll('.nf-tr-tap, .nf-tr-ctl').forEach(function (n) { n.remove(); });
+            box.classList.remove('playing', 'paused');
           }
+          var muted = true, paused = false;
           box.querySelector('.nf-tr-open').addEventListener('click', function () {
             if (frame) return;
+            muted = true; paused = false;
             frame = document.createElement('iframe');
             frame.className = 'nf-tr-frame';
             frame.title = 'Trailer: ' + it.title;
             frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-            frame.setAttribute('allowfullscreen', '');
             frame.referrerPolicy = 'strict-origin-when-cross-origin';
-            frame.src = 'https://www.youtube-nocookie.com/embed/' + vid + '?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1';
+            /* bez vlastních ovládacích prvků YouTube (nadpis, kanál, lišta); ovládá se jen třemi tlačítky a klepnutím na video */
+            frame.src = 'https://www.youtube-nocookie.com/embed/' + vid + '?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1&rel=0&modestbranding=1&enablejsapi=1';
             box.appendChild(frame);
+            var tap = document.createElement('button');
+            tap.type = 'button'; tap.className = 'nf-tr-tap'; tap.setAttribute('aria-label', 'Pozastavit / pokračovat');
+            tap.addEventListener('click', function () { paused = !paused; ytCmd(frame, paused ? 'pauseVideo' : 'playVideo'); box.classList.toggle('paused', paused); });
+            box.appendChild(tap);
             box.classList.add('playing');
-            if (!box.querySelector('.nf-tr-ctl')) {
-              var ctl = document.createElement('div');
-              ctl.className = 'nf-tr-ctl';
-              ctl.innerHTML =
-                '<button type="button" class="nf-tr-fs" aria-label="Celá obrazovka" title="Celá obrazovka"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>' +
-                '<button type="button" class="nf-tr-x" aria-label="Zavřít trailer" title="Zavřít">✕</button>';
-              box.appendChild(ctl);
-              ctl.querySelector('.nf-tr-x').addEventListener('click', stop);
-              ctl.querySelector('.nf-tr-fs').addEventListener('click', function () {
-                var el = frame || box;
-                var rq = el.requestFullscreen || el.webkitRequestFullscreen;
-                try { if (rq) rq.call(el); } catch (e) {}
-              });
-            }
+            var ctl = document.createElement('div');
+            ctl.className = 'nf-tr-ctl';
+            ctl.innerHTML =
+              '<button type="button" class="nf-tr-snd muted" aria-label="Zapnout zvuk" title="Zvuk"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="m22 9-6 6M16 9l6 6"/></svg></button>' +
+              '<button type="button" class="nf-tr-fs" aria-label="Celá obrazovka" title="Celá obrazovka"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>' +
+              '<button type="button" class="nf-tr-x" aria-label="Zavřít trailer" title="Zavřít">✕</button>';
+            box.appendChild(ctl);
+            ctl.querySelector('.nf-tr-x').addEventListener('click', function () { if (document.fullscreenElement === box) { try { document.exitFullscreen(); } catch (e) {} } stop(); });
+            ctl.querySelector('.nf-tr-snd').addEventListener('click', function (e) {
+              muted = !muted; ytCmd(frame, muted ? 'mute' : 'unMute'); e.currentTarget.classList.toggle('muted', muted);
+            });
+            ctl.querySelector('.nf-tr-fs').addEventListener('click', function () {
+              try {
+                if (document.fullscreenElement) document.exitFullscreen();
+                else (box.requestFullscreen || box.webkitRequestFullscreen).call(box);
+              } catch (e) {}
+            });
           });
           /* odscrollováno z banneru → pozastavit a schovat, ať video neběží na pozadí */
           if ('IntersectionObserver' in window) {
