@@ -1055,3 +1055,29 @@ html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb:
 /* Šipka panelu Novinky se při zavírání hned schová (žádná „druhá šipka“) */
 html body .notif-panel:not(.visible)::before { opacity: 0; transition: none; }
 .dv-brand { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* ===== Dávka C: načítání, Oblíbené jako ostatní řady ===== */
+.nf-skeleton { background: linear-gradient(100deg, #141414 30%, #232323 50%, #141414 70%); background-size: 200% 100%; animation: nfShimmer 1.8s ease-in-out infinite; }
+.nf-poster { background: linear-gradient(160deg, #1d1d1d, #131313); }
+.nf-img, #watchlistOverlay .wl-card-poster img { transition: opacity 0.45s ease; }
+.nf-img:not(.is-loaded), #watchlistOverlay .wl-card-poster img:not(.is-loaded) { opacity: 0; animation: nfImgSafety 0s 4s forwards; }
+@keyframes nfImgSafety { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .nf-img, #watchlistOverlay .wl-card-poster img { transition: none; } }
+
+html body #watchlistOverlay .watchlist-box { padding: calc(var(--nf-bar-h, 64px) + 16px) var(--nf-pad, 4%) 40px !important; gap: 14px !important; }
+html body #watchlistOverlay .wl-list { grid-template-columns: repeat(auto-fill, minmax(clamp(118px, 12.5vw, 196px), 1fr)); gap: 22px 12px; padding: 8px 4px 90px; }
+html body #watchlistOverlay .wl-card { gap: 0; }
+html body #watchlistOverlay .wl-card-poster { border-radius: 6px; border: 0; background: linear-gradient(160deg, #1d1d1d, #131313); transition: transform 0.22s ease, box-shadow 0.22s ease; }
+html body #watchlistOverlay .wl-card:hover { z-index: 4; position: relative; }
+html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(1.08); border: 0; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
+html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { outline: 2px solid #fff; outline-offset: 2px; }
+html body #watchlistOverlay .wl-card-name { margin: 0; padding: 8px 2px 0; font-size: 0.82rem; font-weight: 600; line-height: 1.25; color: #e5e5e5; }
+html body #watchlistOverlay .wl-card-badge { border-radius: 3px; background: rgba(0, 0, 0, 0.7); backdrop-filter: none; font-size: 0.62rem; padding: 3px 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+html body #watchlistOverlay .wl-card-remove { width: 28px; height: 28px; border-radius: 50%; background: rgba(20, 20, 20, 0.8); backdrop-filter: none; border: 1px solid rgba(255, 255, 255, 0.35); }
+html body #watchlistOverlay .wl-card-play { background: rgba(0, 0, 0, 0.25); }
+html body #watchlistOverlay .wl-empty-btn { border-radius: 4px; }
+@media (max-width: 899px) {
+  html body #watchlistOverlay .wl-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 8px; }
+  html body #watchlistOverlay .wl-card-name { font-size: 0.74rem; }
+  html body #watchlistOverlay .wl-card:hover .wl-card-poster { transform: none; }
+}
