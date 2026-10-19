@@ -900,6 +900,7 @@ async function _sdToggleSimilar() {
   const box = document.getElementById("sdSimilar"), btn = document.getElementById("sdSimilarBtn"), t = db[activeSeries];
   if (!box || !t) return;
   if (!box.hidden) return switchToSeasonView();
+  document.getElementById("seriesModal").classList.remove("sd-detail");
   document.getElementById("seasonSelectView").style.display = "none", document.getElementById("seasonSelectView").classList.remove("active"), document.getElementById("episodesView").style.display = "none";
   box.hidden = !1, btn && btn.classList.add("on"), box.textContent = "Načítám podobné…";
   let list = [];
@@ -986,7 +987,7 @@ function selectSeasonFromDropdown(v) {
 }
 
 function switchToSeasonView() {
-  _sdHideSimilar();
+  _sdHideSimilar(), document.getElementById("seriesModal").classList.add("sd-detail");
   document.getElementById("seasonSelectView").style.display = "", document.getElementById("seasonSelectView").classList.add("active"), document.getElementById("episodesView").style.display = "none";
   const e = document.getElementById("modalBody");
   e && e.scrollTo({
@@ -996,7 +997,7 @@ function switchToSeasonView() {
 }
 
 function switchToEpisodesView() {
-  _sdHideSimilar();
+  _sdHideSimilar(), document.getElementById("seriesModal").classList.remove("sd-detail");
   document.getElementById("seasonSelectView").style.display = "none", document.getElementById("seasonSelectView").classList.remove("active");
   document.getElementById("episodesView").style.display = "flex";
   const e = document.getElementById("epViewTitle");
