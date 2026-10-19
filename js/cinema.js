@@ -1034,7 +1034,7 @@
       -webkit-backdrop-filter: blur(24px);
       box-shadow: 0 8px 32px rgba(0,0,0,0.7);
       pointer-events: auto;
-      max-width: 260px;
+      max-width: 240px;
     `;
 
     const panelLabel = document.createElement('div');
@@ -1125,11 +1125,38 @@
       const prefix = (czData.region === 'CZ' ? '' : czData.region + ': ') + (flat.length ? '' : 'půjčit/koupit: ');
 
       const badgeText = badge.querySelector('#legalBadgeText');
-      if (badgeText) badgeText.textContent = prefix + (shown || 'Dostupné v ' + regionName);
+      if (badgeText) {
+        badgeText.textContent = prefix + (shown || 'Dostupné v ' + regionName);
+        /* Místo textu a ikony televize jsou vidět loga služeb (název zůstává pro čtečky a v title) */
+        badgeText.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;';
+      }
+      const allP = (czData.groups.flatrate || []).concat(czData.groups.rent || [], czData.groups.buy || []).filter(p => p.logo_path);
+      if (allP.length) {
+        const oldSvg = badge.querySelector('svg');
+        if (oldSvg) oldSvg.remove();
+        const stack = document.createElement('span');
+        stack.style.cssText = 'display:flex;align-items:center;';
+        allP.slice(0, 3).forEach((p, i) => {
+          const im = document.createElement('img');
+          im.src = 'https://image.tmdb.org/t/p/w92' + p.logo_path;
+          im.alt = '';
+          im.style.cssText = 'width:24px;height:24px;border-radius:6px;object-fit:cover;border:1px solid rgba(0,0,0,0.5);' + (i ? 'margin-left:-8px;' : '');
+          im.onerror = () => { im.style.display = 'none'; };
+          stack.appendChild(im);
+        });
+        if (allP.length > 3) {
+          const more = document.createElement('span');
+          more.textContent = '+' + (allP.length - 3);
+          more.style.cssText = 'margin-left:6px;font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.7);';
+          stack.appendChild(more);
+        }
+        badge.insertBefore(stack, badge.firstChild);
+        badge.style.padding = '6px 10px';
+      }
       badge.title = 'Dostupné legálně v regionu ' + regionName;
 
       badge.style.borderColor = 'rgba(0,122,255,0.3)';
-      badge.querySelector('svg').style.stroke = '#007aff';
+      const bsvg = badge.querySelector('svg'); if (bsvg) bsvg.style.stroke = '#007aff';
 
       panelLabel.textContent = 'Legálně dostupné (' + regionName + ')';
 
@@ -1159,10 +1186,10 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 10px;
+            padding: ${logoUrl ? '3px' : '6px 10px'};
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
+            border-radius: ${logoUrl ? '12px' : '20px'};
             text-decoration: none;
             transition: all 0.18s;
             cursor: pointer;
@@ -1180,13 +1207,14 @@
             const logo = document.createElement('img');
             logo.src = logoUrl;
             logo.alt = providerName;
-            logo.style.cssText = `width:20px;height:20px;object-fit:contain;border-radius:4px;`;
-            logo.onerror = () => logo.style.display = 'none';
+            logo.style.cssText = `width:40px;height:40px;object-fit:cover;border-radius:9px;display:block;`;
+            logo.onerror = () => { logo.style.display = 'none'; btn.style.padding = '6px 10px'; name.style.display = ''; };
             btn.appendChild(logo);
           }
 
           const name = document.createElement('span');
-          name.style.cssText = `font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.8);white-space:nowrap;font-family:-apple-system,sans-serif;`;
+          if (logoUrl) name.style.display = 'none';
+          name.style.cssText += `font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.8);white-space:nowrap;font-family:-apple-system,sans-serif;`;
           name.textContent = providerName;
           btn.appendChild(name);
           providersRow.appendChild(btn);
