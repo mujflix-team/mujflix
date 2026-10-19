@@ -261,6 +261,50 @@ check("uvítání: nový profil dostane přívětivý nadpis", bc.welcome, JSON.
 check("načítání: obrázek je skrytý do načtení a pak dostane is-loaded", bc.before === "0" && bc.loaded, JSON.stringify(bc));
 check("Oblíbené: plakáty mají stejný poloměr jako řady (6px)", bc.radius === "6px", JSON.stringify(bc));
 
+// --- Dávka D: trailer v banneru
+const trT = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
+  const origFetch = window.fetch;
+  window.fetch = async (u) => {
+    const url = String(u);
+    if (/\/videos/.test(url)) return { ok: true, json: async () => ({ results: [{ site: "YouTube", key: "abcDEF12345", type: "Trailer", official: true }, { site: "Vimeo", key: "zzz", type: "Trailer" }] }) };
+    const mk = n => ({ results: Array.from({ length: n }, (_, i) => ({ id: 500 + i, title: "H" + i, name: "H" + i, overview: "Popis", poster_path: "/p.jpg", backdrop_path: "/b.jpg", vote_average: 7, release_date: "2020-01-01", first_air_date: "2020-01-01", genre_ids: [18] })) });
+    return { ok: true, json: async () => mk(10) };
+  };
+  localStorage.setItem("mf_tmdb_key", "K");
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  try {
+    const pid = getActiveProfileId(); const ps = _getProfiles(); const p = ps.find(x => x.id === pid); p.prefs = { ...p.prefs, maxAge: 0, animeOnly: false }; _saveProfiles(ps);
+    window.renderHomepage(); await w(1800);
+    const box = document.querySelector("#nfHero .nf-trailer");
+    out.box = !!box; out.noFrame = box ? !box.querySelector("iframe") : null;
+    if (box) { box.querySelector(".nf-tr-open").click(); await w(100); const f = box.querySelector("iframe"); out.src = f ? f.src : ""; out.ctl = !!box.querySelector(".nf-tr-fs") && !!box.querySelector(".nf-tr-x"); box.querySelector(".nf-tr-x").click(); out.closed = !box.querySelector("iframe"); }
+  } finally { window.fetch = origFetch; localStorage.removeItem("mf_tmdb_key"); }
+  return out;
+});
+check("trailer v banneru: miniatura, po kliknutí YouTube přehrávač s ovládáním, jde zavřít", trT.skip || (trT.box && trT.noFrame && /youtube-nocookie\.com\/embed\/abcDEF12345/.test(trT.src || "") && trT.ctl && trT.closed), JSON.stringify(trT));
+
+// --- Dávka D: hromádka rozkoukaných
+const stT = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  const slugs = Object.keys(db).slice(0, 3);
+  const key = (typeof uKey === "function" ? uKey("mf_watch_timeline") : "mf_watch_timeline");
+  const prev = localStorage.getItem(key);
+  localStorage.setItem(key, JSON.stringify(slugs.map((sl, i) => ({ slug: sl, ts: Date.now() - i * 1000 }))));
+  try {
+    window.mfhResetSig && window.mfhResetSig();
+    window.renderHomepage(); await w(600);
+    const box = document.querySelector("#nfHero .nf-cstack");
+    out.stack = !!box; out.cards = box ? box.querySelectorAll(".nf-cs-card").length : 0;
+    out.count = box ? box.querySelector(".nf-cs-count")?.textContent : "";
+    const t0 = document.querySelector("#nfHero .nf-hero-title")?.textContent;
+    if (box) { box.querySelector(".nf-cs-card").click(); await w(100); out.switched = document.querySelector("#nfHero .nf-hero-title")?.textContent !== t0; out.still = !!document.querySelector("#nfHero .nf-cstack"); }
+  } finally { prev == null ? localStorage.removeItem(key) : localStorage.setItem(key, prev); }
+  return out;
+});
+check("rozkoukané: hromádka karet v banneru a klepnutím se přepne titul", stT.stack && stT.cards >= 1 && /rozkouk/.test(stT.count || "") && stT.switched && stT.still, JSON.stringify(stT));
+
 // --- Zdroje: Uzi.la je před Prehraj.to
 const order = await page.evaluate(() => { MFCinemaPlayer.open("1", "X", "movie"); const lbl = [...document.querySelectorAll("#mfStandaloneCinema *")].map(e => e.textContent).join("|"); MFCinemaPlayer.close(); return lbl.length > 0; });
 check("cinema: otevření bez chyby po přeskládání zdrojů", order);
