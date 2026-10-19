@@ -887,6 +887,47 @@ function _sdFill(slug, next) {
   })
 }
 
+function _sdHideSimilar() {
+  const b = document.getElementById("sdSimilar"), btn = document.getElementById("sdSimilarBtn");
+  b && (b.hidden = !0), btn && btn.classList.remove("on")
+}
+
+function _sdMoreEpisodes() {
+  activeSeries && db[activeSeries] && (showAllSeasons = !1, renderSeasons(), switchToEpisodesView())
+}
+
+async function _sdToggleSimilar() {
+  const box = document.getElementById("sdSimilar"), btn = document.getElementById("sdSimilarBtn"), t = db[activeSeries];
+  if (!box || !t) return;
+  if (!box.hidden) return switchToSeasonView();
+  document.getElementById("seasonSelectView").style.display = "none", document.getElementById("seasonSelectView").classList.remove("active"), document.getElementById("episodesView").style.display = "none";
+  box.hidden = !1, btn && btn.classList.add("on"), box.textContent = "Načítám podobné…";
+  let list = [];
+  try {
+    if (t.tmdbId) {
+      const d = await tmdbGet(`/tv/${t.tmdbId}/similar?language=cs-CZ`);
+      list = ((d && d.results) || []).filter(x => x && x.id && x.poster_path).slice(0, 18)
+    }
+  } catch (e) {}
+  if (box.hidden) return;
+  if (!list.length) return void(box.textContent = "Podobné seriály se nepodařilo najít.");
+  box.textContent = "";
+  const h = document.createElement("div");
+  h.className = "sd-sim-title", h.textContent = "Podobné seriály", box.appendChild(h);
+  const g = document.createElement("div");
+  g.className = "sd-sim-grid", list.forEach(x => {
+    const c = document.createElement("button");
+    c.type = "button", c.className = "sd-sim-card", c.setAttribute("aria-label", x.name || "");
+    const im = document.createElement("img");
+    im.src = "https://image.tmdb.org/t/p/w342" + x.poster_path, im.alt = "", im.loading = "lazy", c.appendChild(im);
+    const n = document.createElement("span");
+    n.textContent = x.name || "", c.appendChild(n), c.onclick = () => {
+      try { closeModal() } catch (e) {}
+      setTimeout(() => { "function" == typeof openDiscoverTv && openDiscoverTv(x.id, x.name) }, 250)
+    }, g.appendChild(c)
+  }), box.appendChild(g)
+}
+
 function closeModal() {
   const e = document.getElementById("seriesModal");
   e.classList.remove("visible");
@@ -945,6 +986,7 @@ function selectSeasonFromDropdown(v) {
 }
 
 function switchToSeasonView() {
+  _sdHideSimilar();
   document.getElementById("seasonSelectView").style.display = "", document.getElementById("seasonSelectView").classList.add("active"), document.getElementById("episodesView").style.display = "none";
   const e = document.getElementById("modalBody");
   e && e.scrollTo({
@@ -954,6 +996,7 @@ function switchToSeasonView() {
 }
 
 function switchToEpisodesView() {
+  _sdHideSimilar();
   document.getElementById("seasonSelectView").style.display = "none", document.getElementById("seasonSelectView").classList.remove("active");
   document.getElementById("episodesView").style.display = "flex";
   const e = document.getElementById("epViewTitle");
