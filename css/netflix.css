@@ -1138,3 +1138,21 @@ html body #seriesModal .sd-sim-card { padding: 0; border: 0; background: transpa
 html body #seriesModal .sd-sim-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 6px; display: block; background: #1d1d1d; transition: transform 0.2s; }
 html body #seriesModal .sd-sim-card:hover img { transform: scale(1.05); }
 html body #seriesModal .sd-sim-card span { display: block; margin-top: 6px; font-size: 0.8rem; font-weight: 600; }
+
+/* ===== Detail seriálu na celou obrazovku (jako na TV): vlevo název, popis, tlačítka; díly až po „Další epizody“ ===== */
+html body #seriesModal.sd-detail #modalBody { display: none !important; }
+html body #seriesModal.sd-detail .modal-content { overflow: hidden !important; }
+html body #seriesModal.sd-detail .modal-hero { height: 100vh !important; height: 100dvh !important; min-height: 100vh !important; max-height: none !important; }
+html body #seriesModal.sd-detail .modal-hero-img { object-position: center 20%; }
+html body #seriesModal.sd-detail .modal-hero-overlay { background: linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0.05) 72%), linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 35%) !important; }
+html body #seriesModal.sd-detail .modal-hero-content { top: 0; bottom: 0; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; gap: 0 !important; padding: 80px var(--nf-pad, 5%) 40px !important; }
+html body #seriesModal.sd-detail .modal-hero-left { flex: 0 0 auto !important; width: min(560px, 100%) !important; }
+html body #seriesModal.sd-detail .panel-progress-wrap { max-width: 340px; }
+html body #seriesModal.sd-detail .panel-btns { display: grid !important; grid-template-columns: auto auto 1fr; gap: 10px !important; align-items: center; width: min(340px, 100%); margin-top: 16px; flex-wrap: nowrap !important; }
+html body #seriesModal.sd-detail .panel-btns > .btn-shuffle { grid-row: 1; }
+html body #seriesModal.sd-detail .panel-btns > .btn-continue { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; height: 46px; border-radius: 24px !important; padding: 0 20px !important; font-size: 1rem !important; }
+html body #seriesModal.sd-detail .sd-links { margin-top: 8px; }
+@media (max-width: 899px) {
+  html body #seriesModal.sd-detail .modal-hero-overlay { background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.15) 100%) !important; }
+  html body #seriesModal.sd-detail .modal-hero-content { justify-content: flex-end !important; padding: 70px 18px 28px !important; }
+}
