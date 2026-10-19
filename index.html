@@ -387,18 +387,7 @@
         <span style="font-size:0.8rem;color:rgba(255,255,255,0.38);font-family:-apple-system,'SF Pro Text',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Hledat filmy, seriály…</span>
       </div>
 
-      <button
-        class="mf-header-btn"
-        onclick="openNotifPanel()"
-        title="Nové epizody"
-        id="hdrNotifBtn"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-        <span class="dock-badge" id="hdrNotifBadge"></span>
-      </button>
+
 
       <div id="mfWelcomeNote" aria-live="polite"></div>
       
@@ -409,10 +398,6 @@
       <div class="nf-top-gap"></div>
       <button type="button" class="nf-icon-btn" id="nfSearchBtn" aria-label="Hledat" title="Hledat (/)" onclick="openSearch()">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </button>
-      <button type="button" class="nf-icon-btn" id="nfBellBtn" aria-label="Novinky" title="Novinky" onclick="openNotifPanel()">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="nf-bell-dot" id="nfBellDot"></span>
       </button>
       <button type="button" class="nf-avatar" id="nfAvatar" aria-label="Profil" aria-haspopup="menu" onclick="window.mfToggleProfileMenu && window.mfToggleProfileMenu(this)">🙂</button>
     </div>
@@ -781,38 +766,7 @@
       </div>
     </div>
 
-    <div
-      class="notif-bell"
-      id="notifBell"
-      onclick="openNotifPanel()"
-      title="Novinky"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-      </svg>
-      <div class="notif-bell-badge" id="notifBellBadge"></div>
-    </div>
-    
-    <div class="notif-panel" id="notifPanel">
-      <div class="notif-panel-header">
-        <div class="notif-panel-title">Novinky</div>
-        <button class="notif-panel-close" onclick="closeNotifPanel()">✕</button>
-      </div>
-      <div class="notif-panel-list" id="notifPanelList">
-        <div style="color:var(--muted);font-size:0.73rem;padding:12px;text-align:center;">Načítám...</div>
-      </div>
-    </div>
-    <div class="logo-progress">
+<div class="logo-progress">
       <div class="logo-progress-bar">
         <div class="logo-progress-fill" id="logoProgressFill"></div>
       </div>
