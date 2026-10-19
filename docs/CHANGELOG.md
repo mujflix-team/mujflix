@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.6
+### Změněno
+- Zvonek Novinky a celý panel novinek jsou pryč (tlačítko nahoře i v hlavičce); kontrola nových epizod se už nespouští.
+- Trailer v banneru: bez ovládání YouTube (nadpis, kanál, lišta); jen tři malá tlačítka (zvuk, celá obrazovka, zavřít), klepnutí na video = pauza.
+- Řady: zvětšený plakát při najetí a jeho stín se už neořízne do obdélníku.
+
 ## 2.4.5
 ### Změněno
 - „Pokračovat“ (v detailu seriálu i v banneru domovské stránky) rovnou pustí další epizodu; dřív jen otevřelo detail / seznam dílů.
