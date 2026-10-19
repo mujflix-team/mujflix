@@ -227,6 +227,26 @@ const jp = await page.evaluate(async () => {
 });
 check("japonský název: odkazy používají dragon-ball-super", jp.some(u => /najserialy\.io\/serial\/dragon-ball-super\//.test(u)) && jp.some(u => /svetserialu\.to\/serial\/dragon-ball-super\//.test(u)), JSON.stringify(jp));
 
+// --- Prázdné Oblíbené → Objevovat → zavřít: dock zůstane; logo v Objevování vede domů
+const dk = await page.evaluate(async () => {
+  const w = ms => new Promise(r => setTimeout(r, ms)); const out = {};
+  const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none";
+  const dock = () => getComputedStyle(document.getElementById("mfDock")).display;
+  window.mfGoHome(); await w(500);
+  document.getElementById("dockProtebe")?.click(); await w(600);
+  document.querySelector("#watchlistEmpty .wl-empty-btn")?.click(); await w(800);
+  out.brand = document.querySelector("#universeOverlay .dv-brand")?.getAttribute("onclick") || "";
+  window.closeUniverse(); await w(900);
+  out.dock = dock(); out.home = document.documentElement.classList.contains("mfh-home-on");
+  document.querySelector("#watchlistEmpty .wl-empty-btn")?.click(); await w(800);
+  document.querySelector("#universeOverlay .dv-brand").click(); await w(900);
+  out.brandHome = document.documentElement.classList.contains("mfh-home-on") && !document.getElementById("universeOverlay").classList.contains("open");
+  gate.style.display = gd;
+  return out;
+});
+check("dock: po Oblíbené → Objevovat → ✕ zůstane dock a domovská stránka", dk.dock !== "none" && dk.home, JSON.stringify(dk));
+check("objevování: logo MůjFlix vrací na domovskou stránku", /mfGoHome/.test(dk.brand) && dk.brandHome, JSON.stringify(dk));
+
 // --- Zdroje: Uzi.la je před Prehraj.to
 const order = await page.evaluate(() => { MFCinemaPlayer.open("1", "X", "movie"); const lbl = [...document.querySelectorAll("#mfStandaloneCinema *")].map(e => e.textContent).join("|"); MFCinemaPlayer.close(); return lbl.length > 0; });
 check("cinema: otevření bez chyby po přeskládání zdrojů", order);
