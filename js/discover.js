@@ -864,6 +864,12 @@
       state = { type: 'all', genre: '', sort: 'popular', year: '', query: '' };
       els.input.value = '';
       els.body.textContent = '';
+      /* Objevovat otevřené z jiné sekce (např. prázdné Oblíbené → Objevovat): po zavření zpět na domů, ať nezmizí dock */
+      try {
+        var wl = document.getElementById('watchlistOverlay');
+        var wlOpen = wl && (wl.classList.contains('open') || wl.classList.contains('visible'));
+        if (!document.documentElement.classList.contains('mfh-home-on') && !document.body.classList.contains('mf-section-protebe') && !wlOpen && typeof window.mfShowSection === 'function') { if (typeof window.mfhShowHome === 'function') window.mfhShowHome({ force: true }); else window.mfShowSection('serialy'); }
+      } catch (e) {}
     }, 300);
     try { kbLayer = 'menu'; } catch (e) {}
     try { if (typeof resumeBgParticles === 'function') resumeBgParticles(); } catch (e) {}
