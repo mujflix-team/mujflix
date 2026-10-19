@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.9
+### Opraveno
+- Seriály s japonským/čínským názvem (např. „ドラゴンボール超“) se na NajSerialy, SvetSerialu, Bombuj a Uzi.la už hledají podle latinského názvu z TMDB (`dragon-ball-super`), ne podle prázdného odkazu. Anglický název je první varianta, romaji další.
+
 ## 2.3.8
 ### Nově
 - Po změně věku, žánrů nebo „Jen anime“ se domovská stránka i Objevovat obnoví samy (bez Ctrl+R). Řady se při ověřování věku ukážou jako načítací dlaždice, ne jako prázdné místo.
