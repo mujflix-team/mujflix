@@ -1051,3 +1051,7 @@ html body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-thumb img,
 html body:not(.tv-mode):not(.appletv-mode) .episode-card:hover .ep-thumb img { filter: none !important; }
 html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb img { opacity: 0; }
 html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb:hover img { opacity: 1; }
+
+/* Šipka panelu Novinky se při zavírání hned schová (žádná „druhá šipka“) */
+html body .notif-panel:not(.visible)::before { opacity: 0; transition: none; }
+.dv-brand { cursor: pointer; -webkit-tap-highlight-color: transparent; }
