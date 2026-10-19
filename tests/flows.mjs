@@ -278,11 +278,11 @@ const trT = await page.evaluate(async () => {
     window.renderHomepage(); await w(1800);
     const box = document.querySelector("#nfHero .nf-trailer");
     out.box = !!box; out.noFrame = box ? !box.querySelector("iframe") : null;
-    if (box) { box.querySelector(".nf-tr-open").click(); await w(100); const f = box.querySelector("iframe"); out.src = f ? f.src : ""; out.ctl = !!box.querySelector(".nf-tr-fs") && !!box.querySelector(".nf-tr-x"); box.querySelector(".nf-tr-x").click(); out.closed = !box.querySelector("iframe"); }
+    if (box) { box.querySelector(".nf-tr-open").click(); await w(100); const f = box.querySelector("iframe"); out.src = f ? f.src : ""; out.ctl = !!box.querySelector(".nf-tr-fs") && !!box.querySelector(".nf-tr-x") && !!box.querySelector(".nf-tr-snd"); out.btns = box.querySelectorAll(".nf-tr-ctl button").length; out.noYtUi = /controls=0/.test(f ? f.src : ""); box.querySelector(".nf-tr-x").click(); out.closed = !box.querySelector("iframe"); }
   } finally { window.fetch = origFetch; localStorage.removeItem("mf_tmdb_key"); }
   return out;
 });
-check("trailer v banneru: miniatura, po kliknutí YouTube přehrávač s ovládáním, jde zavřít", trT.skip || (trT.box && trT.noFrame && /youtube-nocookie\.com\/embed\/abcDEF12345/.test(trT.src || "") && trT.ctl && trT.closed), JSON.stringify(trT));
+check("trailer v banneru: miniatura, po kliknutí YouTube přehrávač s ovládáním, jde zavřít", trT.skip || (trT.box && trT.noFrame && /youtube-nocookie\.com\/embed\/abcDEF12345/.test(trT.src || "") && trT.ctl && trT.btns === 3 && trT.noYtUi && trT.closed), JSON.stringify(trT));
 
 // --- Dávka D: hromádka rozkoukaných
 const stT = await page.evaluate(async () => {
@@ -414,19 +414,6 @@ const wl = await page.evaluate(async () => {
 });
 check("oblíbené: odebraná položka se po doplnění plakátů nevrátí", wl.join() === "b", wl.join());
 
-// --- Novinky (zvonek): nové epizody sledovaných seriálů
-const nw = await page.evaluate(async () => {
-  const d = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
-  localStorage.setItem(uKey("mf_watchlist"), JSON.stringify([{ slug: "__tmdbfav_tv_9", name: "Test Show", type: "series", tmdbId: 9, poster: "x" }]));
-  const orig = window.tmdbGet;
-  window.tmdbGet = async () => ({ name: "Test <b>Show</b>", next_episode_to_air: { air_date: d(2), season_number: 2, episode_number: 5 }, last_episode_to_air: { air_date: d(-3), season_number: 2, episode_number: 4 } });
-  try { await checkNewEpisodes(); } finally { window.tmdbGet = orig; }
-  const list = document.getElementById("notifPanelList");
-  return { items: list.querySelectorAll(".notif-item").length, html: list.innerHTML.includes("<b>Show"), dot: document.getElementById("nfBellDot").classList.contains("visible") };
-});
-check("novinky: zobrazí vyšlou i budoucí epizodu", nw.items === 2, String(nw.items));
-check("novinky: název se escapuje", !nw.html);
-check("novinky: zvonek svítí", nw.dot);
 
 // --- Hodnocení epizod je per profil (+ jednorázová migrace starého globálního)
 const er = await page.evaluate(() => {
@@ -720,22 +707,6 @@ const dd = await page.evaluate(() => {
 });
 check("série: výběr sezóny v rozbalovátku změní sezónu", dd.s === 2 && dd.all === false && dd.val === "2", JSON.stringify(dd));
 
-const recT = await page.evaluate(async () => {
-  const orig = window.tmdbGet;
-  const calls = [];
-  window.tmdbGet = async (p) => {
-    calls.push(p);
-    if (p.startsWith("/discover/movie")) return { results: [{ id: 501, title: "Nový <b>film</b>", poster_path: "/m.jpg", release_date: "2026-09-01", vote_average: 7.5 }] };
-    if (p.startsWith("/discover/tv")) return { results: [{ id: 601, name: "Nový seriál", poster_path: "/t.jpg", first_air_date: "2026-09-10", vote_average: 8 }] };
-    return null;
-  };
-  aiBrain.memory.genreIdPrefs = { 28: 0.9, 18: 0.5 };
-  await checkNewEpisodes();
-  const list = document.getElementById("notifPanelList");
-  const out = { recs: list.querySelectorAll(".notif-rec").length, xss: !!list.querySelector("b"), usedGenres: calls.some(c => /with_genres=28%7C18|with_genres=28\|18/.test(c)), empty: /Zatím žádné/.test(list.textContent) };
-  window.tmdbGet = orig; return out;
-});
-check("Novinky: ukazují doporučené nové filmy a seriály podle žánrů, bez XSS", recT.recs === 2 && !recT.xss && recT.usedGenres && !recT.empty, JSON.stringify(recT));
 
 const nextEpT = await page.evaluate(() => {
   openSeries(Object.keys(db)[0]); activeSeason = 1; renderSeasons(); renderEpisodes && 0;
@@ -1453,10 +1424,6 @@ const batchA = await page.evaluate(async () => {
   out.home = typeof window.mfGoHome === "function" && /mfGoHome/.test(document.getElementById("nfLogo").getAttribute("onclick") || "");
   const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none";
   try { window.mfGoHome && window.mfGoHome(); } catch { /* nic */ }
-  document.getElementById("nfTop")?.classList.remove("nf-top-hidden"); await w(200);
-  const p = document.getElementById("notifPanel"); window.openNotifPanel && window.openNotifPanel(); await w(250);
-  const x = parseFloat(p.style.getPropertyValue("--notif-arrow-x")); out.arrow = p.classList.contains("open") ? (x > 0 && x < p.getBoundingClientRect().width) : true;
-  try { window.closeNotifPanel && window.closeNotifPanel(); } catch { /* nic */ }
   gate.style.display = gd;
   MFPrefs.open(); await w(100);
   const tags = document.querySelector("#mfPrefsModal .pf-tags"); out.tagsClass = !!tags && !document.querySelector('#mfPrefsModal [class*="-chip"]');
@@ -1465,7 +1432,9 @@ const batchA = await page.evaluate(async () => {
   out.noBlur = getComputedStyle(sp.querySelector("img")).filter === "none"; sp.remove();
   return out;
 });
-check("zvonek: šipka míří na ikonu; logo vrací na domovskou stránku", batchA.home && batchA.arrow, JSON.stringify(batchA));
+check("logo vrací na domovskou stránku", batchA.home, JSON.stringify(batchA));
+const bellGone = await page.evaluate(() => !document.getElementById("nfBellBtn") && !document.getElementById("notifBell") && !document.getElementById("hdrNotifBtn") && !document.getElementById("notifPanel"));
+check("zvonek Novinky už v aplikaci není", bellGone);
 check("žánry: štítky nespadají pod obecné pravidlo „-chip“ (šedá plocha), spoiler bez blur filtru", batchA.tagsClass && batchA.noBlur, JSON.stringify(batchA));
 
 
