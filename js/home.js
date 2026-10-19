@@ -327,7 +327,9 @@
       window.mfGoHome = function () {
         try { if (typeof window.closeUniverse === 'function') window.closeUniverse(); } catch (e) {}
         try { var sm = document.getElementById('seriesModal'); if (sm && sm.classList.contains('open') && typeof window.closeModal === 'function') window.closeModal(); } catch (e) {}
-        try { if (typeof window.mfShowSection === 'function') window.mfShowSection('serialy'); } catch (e) {}
+        /* Už jsme na domovské stránce → jen plynule nahoru (přepnutí sekce by skočilo skokem) */
+        var onHome = document.documentElement.classList.contains('mfh-home-on') && !document.body.classList.contains('mf-section-protebe');
+        try { if (!onHome && typeof window.mfShowSection === 'function') window.mfShowSection('serialy'); } catch (e) {}
         var h = document.getElementById('mfSectionHome');
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
         try { if (h && h.scrollTo) h.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
@@ -337,10 +339,10 @@
       /* Šipka u panelu Novinky míří na zvonek */
       function nfPlaceNotifArrow() {
         var p = document.getElementById('notifPanel'), b = document.getElementById('nfBellBtn');
-        if (!p || !b || !p.classList.contains('open')) return;
+        if (!p || !b || !p.classList.contains('open') || !p.classList.contains('visible')) return;
         var pr = p.getBoundingClientRect(), br = b.getBoundingClientRect();
         if (!pr.width || !br.width) return;
-        var x = Math.max(16, Math.min(pr.width - 28, br.left + br.width / 2 - pr.left - 6));
+        var x = Math.max(16, Math.min(p.offsetWidth - 28, br.left + br.width / 2 - p.offsetLeft - 6));
         p.style.setProperty('--notif-arrow-x', x + 'px');
       }
       (function () {
