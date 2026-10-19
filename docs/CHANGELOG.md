@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.11
+### Nově
+- Uvítání nového profilu je přívětivější („Vítej v MůjFlixu“, nic není povinné).
+- Oblíbené mají stejné karty jako ostatní řady (menší zaoblení, zvětšení po najetí, stejné písmo).
+- Plakáty se po načtení jemně rozsvítí a načítací dlaždice mají tmavší filmový shimmer.
+- „Kde sledovat“: místo názvů a ikony televize jsou vidět loga služeb; kratší odznak i panel.
+
 ## 2.3.10
 ### Opraveno
 - Prázdné Oblíbené → Objevovat → ✕ už nenechá zmizet dock; zavření Objevování vrátí na domovskou stránku.
