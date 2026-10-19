@@ -247,6 +247,20 @@ const dk = await page.evaluate(async () => {
 check("dock: po Oblíbené → Objevovat → ✕ zůstane dock a domovská stránka", dk.dock !== "none" && dk.home, JSON.stringify(dk));
 check("objevování: logo MůjFlix vrací na domovskou stránku", /mfGoHome/.test(dk.brand) && dk.brandHome, JSON.stringify(dk));
 
+// --- Dávka C: uvítání, Oblíbené jako řady, obrázky se plynule objeví
+const bc = await page.evaluate(() => {
+  const r = {};
+  r.welcome = /Vítej/.test(document.querySelector("#pwStep1 .pw-title")?.textContent || "");
+  const img = document.createElement("img"); img.className = "nf-img"; document.body.appendChild(img);
+  r.before = getComputedStyle(img).opacity; img.dispatchEvent(new Event("load")); r.loaded = img.classList.contains("is-loaded"); img.remove();
+  const wl = document.getElementById("watchlistOverlay"), c = document.createElement("div"); c.className = "wl-card-poster"; wl.appendChild(c);
+  r.radius = getComputedStyle(c).borderRadius; c.remove();
+  return r;
+});
+check("uvítání: nový profil dostane přívětivý nadpis", bc.welcome, JSON.stringify(bc));
+check("načítání: obrázek je skrytý do načtení a pak dostane is-loaded", bc.before === "0" && bc.loaded, JSON.stringify(bc));
+check("Oblíbené: plakáty mají stejný poloměr jako řady (6px)", bc.radius === "6px", JSON.stringify(bc));
+
 // --- Zdroje: Uzi.la je před Prehraj.to
 const order = await page.evaluate(() => { MFCinemaPlayer.open("1", "X", "movie"); const lbl = [...document.querySelectorAll("#mfStandaloneCinema *")].map(e => e.textContent).join("|"); MFCinemaPlayer.close(); return lbl.length > 0; });
 check("cinema: otevření bez chyby po přeskládání zdrojů", order);
@@ -468,11 +482,12 @@ const lp = await page.evaluate(async () => {
     const panel = document.getElementById("legalProvidersPanel");
     const links = panel ? [...panel.querySelectorAll("a")].map(a => a.title) : [];
     const unknown = panel ? [...panel.querySelectorAll("a")].find(a => a.title === "Neznámá služba") : null;
-    return { badge: badge && badge.textContent, links, unknownHref: unknown && unknown.href, text: panel ? panel.textContent : "" };
+    return { badge: badge && badge.textContent, logos: panel ? panel.querySelectorAll('a img').length : 0, badgeLogos: document.querySelectorAll('#legalProvidersBadge img').length, links, unknownHref: unknown && unknown.href, text: panel ? panel.textContent : "" };
   } finally { window.fetch = orig; try { window.MFCinemaPlayer.close(); } catch { /* přehrávač už je zavřený */ } }
 });
 check("Kde sledovat: odznak ukáže názvy služeb", /Netflix/.test(lp.badge || "") && /Max/.test(lp.badge || ""), JSON.stringify(lp));
 check("Kde sledovat: Netflix, Max i neznámá služba jsou v panelu", ["Netflix", "Max", "Neznámá služba"].every(n => lp.links.includes(n)), JSON.stringify(lp.links));
+check("Kde sledovat: v panelu i v odznaku jsou loga služeb", lp.logos >= 2 && lp.badgeLogos >= 2, JSON.stringify([lp.logos, lp.badgeLogos]));
 check("Kde sledovat: půjčení má vlastní skupinu a neznámá služba odkaz na TMDB", lp.links.includes("Apple TV") && /Půjčit/.test(lp.text) && /themoviedb\.org/.test(lp.unknownHref || ""), JSON.stringify([lp.text.slice(0, 120), lp.unknownHref]));
 
 // --- Mood picker nabídne epizody
