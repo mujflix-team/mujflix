@@ -1,0 +1,654 @@
+/* MůjFlix — ProfileGate: výběr/tvorba profilů, PIN, avatar picker.
+ * Závisí na globálech z js/app.js (PROFILE_COLORS, PROFILE_EMOJIS, _loadProfiles, _saveProfiles, getActiveProfileId, ...)
+ * používaných až za běhu. Načítá se PŘED js/app.js. */
+const PROFILE_COLORS = ["#007AFF", "#ff6b6b", "#4ecdc4", "#a29bfe", "#fd79a8", "#fdcb6e", "#6c5ce7", "#00b894", "#e17055", "#74b9ff"];
+const PROFILE_EMOJIS = ["🎬", "🍿", "🎭", "🎪", "🎡", "🃏", "🎲", "🎰", "🦁", "🐺", "🦊", "🐸", "👾", "🤖", "🦸", "🧙", "🧛", "🤡", "👻", "🤩", "😎", "🥷", "🦄", "🐉"];
+
+const ProfileGate = {
+  _pinBuffer: "",
+  _pinTargetId: null,
+  _editingId: null,
+  _manageMode: false,
+  _selectedEmoji: PROFILE_EMOJIS[0],
+  _selectedColor: PROFILE_COLORS[0],
+  _selectedAvatar: PROFILE_EMOJIS[0],
+  show() {
+    const e = document.getElementById("mfProfileGate");
+    e && (e.style.display = "flex", e.classList.remove("hiding")), this._manageMode = false, this.renderGate()
+  },
+  hide() {
+    const e = document.getElementById("mfProfileGate");
+    e && (e.classList.add("hiding"), setTimeout(() => {
+      e.style.display = "none"
+    }, 520))
+  },
+  renderGate() {
+    const e = document.getElementById("pgProfilesList");
+    if (!e) return;
+    const t = _getProfiles();
+    e.innerHTML = "", t.forEach(t => {
+      const n = document.createElement("div");
+      n.dataset.profileId = t.id;
+      n.className = "pg-profile-item" + (this._manageMode ? " pg-manage-mode" : "");
+      const avatar = /^https?:\/\//i.test(t.avatar || "") ?
+        `<img class="pg-avatar-image" src="${escapeHTML(t.avatar)}" alt="">` : escapeHTML(t.avatar || "🎬");
+      n.innerHTML = `
+            <div class="pg-avatar-wrap">
+              <div class="pg-avatar" style="--pg-color:${escapeHTML(t.color||"#007AFF")};${getActiveProfileId()===t.id?"border-color:"+escapeHTML(t.color)+";box-shadow:0 0 0 1px "+escapeHTML(t.color)+",0 8px 40px rgba(0,0,0,0.6);":""}">
+                ${avatar}
+                ${this._manageMode ? '<span class="pg-edit-overlay" aria-hidden="true"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>' : ""}
+              </div>
+              ${this._manageMode ? `<button class="pg-remove-btn" type="button" aria-label="Odebrat profil ${escapeHTML(t.name)}" onclick="event.stopPropagation(); window.ProfileGate?.removeProfile('${escapeHTML(t.id)}')">−</button>` : ""}
+            </div>
+            <div class="pg-name">${escapeHTML(t.name)}</div>
+          `;
+      n.onclick = () => this._manageMode ? ProfileGate.openCreate(t.id) : ProfileGate.selectProfile(t.id);
+      e.appendChild(n);
+    });
+    const n = document.createElement("div");
+    n.className = "pg-profile-item", n.innerHTML = '\n          <div class="pg-add-btn">＋</div>\n          <div class="pg-name" style="color:rgba(255,255,255,0.35)">Přidat profil</div>\n        ', n.onclick = () => ProfileGate.openCreate(), e.appendChild(n)
+    const manage = document.getElementById("profileManageBtn");
+    if (manage) {
+      manage.textContent = this._manageMode ? "Hotovo" : "Upravit";
+      manage.classList.toggle("active", this._manageMode);
+    }
+  },
+  toggleManageMode() {
+    this._manageMode = !this._manageMode;
+    this.renderGate();
+  },
+  /** Smaže data odebraného profilu (sledování, hodnocení, AI paměť, klíče…), aby nezůstala v úložišti. */
+  _purgeProfileData(e) {
+    if (!e || "string" != typeof e) return;
+    try {
+      const t = "_" + e;
+      Object.keys(localStorage).filter(n => n.startsWith("mf_") && (n.endsWith(t) || n.includes(t + "_"))).forEach(n => localStorage.removeItem(n))
+    } catch (n) {}
+  },
+  removeProfile(e) {
+    const t = _getProfiles().find(t => t.id === e);
+    if (!t) return;
+    const item = document.querySelector(`.pg-profile-item[data-profile-id="${e}"]`);
+    if (item) item.classList.add("pg-removing");
+    setTimeout(() => {
+      const profiles = _getProfiles().filter(profile => profile.id !== e);
+      _saveProfiles(profiles);
+      this._purgeProfileData(e);
+      if (getActiveProfileId() === e) {
+        profiles.length ? setActiveUser(profiles[0].id) : localStorage.removeItem(ACTIVE_PID_KEY);
+        this.renderBadge();
+      }
+      this._manageMode = true;
+      this.renderGate();
+      if (!profiles.length) this.show();
+    }, item ? 220 : 0);
+  },
+  selectProfile(e) {
+    try {
+      const profiles = _getProfiles();
+      const t = profiles.find(t => t.id === e);
+      if (!t) {
+        console.warn('[ProfileGate] selectProfile: profil nenalezen, id=', e, 'dostupné:', profiles.map(p=>p.id));
+        if (profiles.length > 0) {
+          
+          this.activateProfile(profiles[0].id);
+        }
+        return;
+      }
+      t.pin ? this.openPin(t) : this.activateProfile(t.id);
+    } catch(err) {
+      console.error('[ProfileGate] selectProfile chyba:', err);
+      this.hide();
+    }
+  },
+  activateProfile(e) {
+    localStorage.setItem(ACTIVE_PID_KEY, e), window.dispatchEvent(new Event("mf:profile-changed")), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
+      void 0 !== aiBrain && (aiBrain.reloadForProfile(), aiBrain.applyDecay()), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), "function" == typeof updateLogoProgress && updateLogoProgress()
+    }, 100);
+    const t = _getProfiles().find(t => t.id === e);
+    if (t) {
+      const n = document.getElementById("mfWelcomeNote");
+      n && (n.textContent = "Ahoj, " + czechVocative((t.name || "").split(" ")[0]), n.classList.add("show"), clearTimeout(n._timer), n._timer = setTimeout(() => n.classList.remove("show"), 4200));
+    }
+  },
+  openPin(e) {
+    this._pinBuffer = "", this._pinTargetId = e.id;
+    const t = document.getElementById("mfPinModal");
+    t && (this._setPinAvatar(e.avatar), document.getElementById("pmTitle").textContent = e.name, t.classList.add("show"), this._renderPinDots(), this._pinStatus())
+  },
+  _setPinAvatar(av) {
+    const el = document.getElementById("pmAvatar");
+    if (!el) return;
+    if (/^https?:\/\//i.test(av || "")) { el.textContent = ""; const im = document.createElement("img"); im.alt = ""; im.src = av; im.referrerPolicy = "no-referrer"; el.appendChild(im); }
+    else el.textContent = av || "🎬";
+  },
+  closePin() {
+    this._pinBuffer = "", this._pinTargetId = null, clearInterval(this._pinTick);
+    const e = document.getElementById("mfPinModal");
+    e && e.classList.remove("show"), this._renderPinDots()
+  },
+  pinInput(e) {
+    if (this._pinLockLeft() > 0) return;
+    "back" === e ? this._pinBuffer = this._pinBuffer.slice(0, -1) : this._pinBuffer.length < 4 && (this._pinBuffer += e), this._renderPinDots(), 4 === this._pinBuffer.length && setTimeout(() => this._checkPin(), 120)
+  },
+  _renderPinDots(e) {
+    for (let t = 0; t < 4; t++) {
+      const n = document.getElementById("pmd" + t);
+      n && (n.className = "pm-dot", t < this._pinBuffer.length && n.classList.add("filled"), "error" === e && n.classList.add("error"))
+    }
+  },
+  /* Zámek PINu: 5 pokusů, pak blokace, která se stupňuje (30 s → 2 min → 10 min → 30 min → 1 h → 4 h → 24 h).
+     Stav je v localStorage po profilech, takže ho nejde obejít obnovením stránky. Správný PIN ho vynuluje. */
+  PIN_MAX: 5,
+  PIN_LOCKS: [30, 120, 600, 1800, 3600, 14400, 86400],
+  _pinState(id) {
+    try { return JSON.parse(localStorage.getItem("mf_pin_lock") || "{}")[id || this._pinTargetId] || { fails: 0, level: 0, until: 0 }; } catch (e) { return { fails: 0, level: 0, until: 0 }; }
+  },
+  _pinSave(st, id) {
+    try { const all = JSON.parse(localStorage.getItem("mf_pin_lock") || "{}"); all[id || this._pinTargetId] = st; localStorage.setItem("mf_pin_lock", JSON.stringify(all)); } catch (e) {}
+  },
+  _pinLockLeft() {
+    return Math.max(0, Math.ceil((this._pinState().until - Date.now()) / 1000));
+  },
+  _pinFmt(sec) {
+    const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    return h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+  },
+  _pinStatus(wrong) {
+    const el = document.getElementById("pmMsg");
+    if (!el) return;
+    clearInterval(this._pinTick);
+    const left = this._pinLockLeft(), pad = document.querySelector("#mfPinModal .pm-numpad");
+    if (left > 0) {
+      const tick = () => {
+        const l = this._pinLockLeft();
+        if (l <= 0) { clearInterval(this._pinTick); this._pinStatus(); return; }
+        el.textContent = "Příliš mnoho pokusů. Zkus to znovu za " + this._pinFmt(l);
+      };
+      el.className = "pm-msg lock", pad && pad.classList.add("locked"), tick(), this._pinTick = setInterval(tick, 1000);
+      return;
+    }
+    pad && pad.classList.remove("locked");
+    const used = this._pinState().fails, rest = this.PIN_MAX - used;
+    if (wrong && used > 0) el.className = "pm-msg err", el.textContent = "Špatný PIN. Zbývá " + rest + (rest === 1 ? " pokus" : rest < 5 ? " pokusy" : " pokusů");
+    else if (used > 0) el.className = "pm-msg", el.textContent = "Zbývá " + rest + (rest === 1 ? " pokus" : rest < 5 ? " pokusy" : " pokusů");
+    else el.className = "pm-msg", el.textContent = "";
+  },
+  _checkPin() {
+    const e = _getProfiles().find(e => e.id === this._pinTargetId);
+    if (!e || this._pinLockLeft() > 0) return;
+    if (this._pinBuffer === e.pin) { this._pinSave({ fails: 0, level: 0, until: 0 }); return this.activateProfile(e.id); }
+    const st = this._pinState();
+    st.fails += 1;
+    if (st.fails >= this.PIN_MAX) {
+      st.until = Date.now() + this.PIN_LOCKS[Math.min(st.level, this.PIN_LOCKS.length - 1)] * 1000, st.level += 1, st.fails = 0;
+    }
+    this._pinSave(st);
+    this._renderPinDots("error"), this._pinStatus(!0), setTimeout(() => {
+      this._pinBuffer = "", this._renderPinDots()
+    }, 700)
+  },
+  openCreate(e) {
+    this._editingId = e || null, this._selectedEmoji = PROFILE_EMOJIS[0], this._selectedColor = PROFILE_COLORS[0], this._selectedAvatar = PROFILE_EMOJIS[0];
+    const t = document.getElementById("mfProfileCreate");
+    if (!t) return;
+    const _gate = document.getElementById("mfProfileGate");
+    if (_gate) _gate.style.pointerEvents = "none";
+    document.getElementById("pcModalTitle").textContent = e ? "Uprav si svůj profil" : "Vytvoř si svůj profil";
+    const _set = (sel, txt) => { const x = t.querySelector(sel); x && (x.textContent = txt) };
+    _set(".pc-eyebrow", e ? "Upravit profil" : "Nový profil"), _set(".pc-subtitle", e ? "Změň si jméno, avatar nebo PIN." : "Vyber si jméno, avatar a barvu. Hotovo za chvilku."), _set(".pc-btn-save", e ? "Uložit změny →" : "Vytvořit profil →");
+    const _del = document.getElementById("pcDeleteBtn");
+    _del && (_del.style.display = e && _getProfiles().length > 1 ? "" : "none");
+    const n = document.getElementById("pcName");
+    if (e) {
+      const t = _getProfiles().find(t => t.id === e);
+      t && (n.value = t.name, this._selectedAvatar = t.avatar || PROFILE_EMOJIS[0], this._selectedColor = t.color || PROFILE_COLORS[0])
+    } else n.value = "";
+    const preview = document.getElementById("pcAvatarPreview");
+    preview && (preview.innerHTML = /^https?:\/\//i.test(this._selectedAvatar) ? `<img src="${escapeHTML(this._selectedAvatar)}" alt="">` : escapeHTML(this._selectedAvatar));
+    const picker = document.getElementById("pcAvatarPicker");
+    picker && (picker.hidden = true, this._syncPickerClass());
+    this.loadAvatarPicker();
+    ["pcPin0", "pcPin1", "pcPin2", "pcPin3"].forEach(e => {
+      const t = document.getElementById(e);
+      t && (t.value = "")
+    });
+    const _pinRow = document.getElementById("pcPinRemoveRow"), _pinChk = document.getElementById("pcPinRemove");
+    _pinChk && (_pinChk.checked = !1);
+    _pinRow && (_pinRow.style.display = e && _getProfiles().find(t => t.id === e)?.pin ? "flex" : "none");
+    t.classList.add("show"), setTimeout(() => n.focus(), 100)
+  },
+  deleteFromEdit() {
+    const id = this._editingId, p = id && _getProfiles().find(x => x.id === id);
+    if (!p || _getProfiles().length < 2) return;
+    if (!confirm("Opravdu smazat profil „" + p.name + "“? Smaže se i jeho sledování a hodnocení.")) return;
+    this.closeCreate(), this.removeProfile(id);
+    if (document.getElementById("mfProfileGate")?.style.display === "none" || getActiveProfileId() !== id) { try { window.nfRenderProfile && window.nfRenderProfile() } catch (e) {} }
+  },
+  closeCreate() {
+    const e = document.getElementById("mfProfileCreate");
+    e && e.classList.remove("show"), this._editingId = null;
+    const _gate = document.getElementById("mfProfileGate");
+    if (_gate) _gate.style.pointerEvents = "";
+  },
+  _pickEmoji(e, t) {
+    this._selectedEmoji = e, document.querySelectorAll(".pc-emoji-btn").forEach(e => e.classList.remove("selected")), t.classList.add("selected")
+  },
+  toggleAvatarPicker() {
+    const e = document.getElementById("pcAvatarPicker");
+    if (e) e.hidden = !e.hidden, this._syncPickerClass();
+  },
+  _syncPickerClass() {
+    const e = document.getElementById("pcAvatarPicker"), c = document.getElementById("mfProfileCreate");
+    c && e && c.classList.toggle("picker-open", !e.hidden)
+  },
+  /* Výběr avatara jako v Netflixu: nahoře POSTAVY (AniList = anime postavy, Wikipedie = postavy ze seriálů a filmů),
+     pod nimi řady podle titulů z TMDB (záběry a plakáty). TMDB sám obrázky postav nemá. */
+  async _fetchJson(url, opts) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 7000);
+    try { const r = await fetch(url, { ...(opts || {}), signal: ctl.signal }); return r.ok ? await r.json() : null; } catch (e) { return null; } finally { clearTimeout(t); }
+  },
+  async _anilistCharacters(q) {
+    const nm = "name{full} image{large}",
+      query = q
+        ? `query($q:String){Page(perPage:16){characters(search:$q){${nm}}} Media(search:$q,type:ANIME){characters(perPage:14,sort:FAVOURITES_DESC){nodes{${nm}}}}}`
+        : `query{Page(perPage:20){characters(sort:FAVOURITES_DESC){${nm}}}}`,
+      d = await this._fetchJson("https://graphql.anilist.co", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ query, variables: q ? { q } : {} }) }),
+      raw = [...((d && d.data && d.data.Media && d.data.Media.characters && d.data.Media.characters.nodes) || []), ...((d && d.data && d.data.Page && d.data.Page.characters) || [])], seen = {};
+    return raw.filter(c => c && c.image && c.image.large && !/default\.jpg/.test(c.image.large) && !seen[c.image.large] && (seen[c.image.large] = 1)).map(c => ({ name: c.name && c.name.full || "", url: c.image.large }));
+  },
+  async _wikiCharacters(q) {
+    const d = await this._fetchJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=12&prop=pageimages&piprop=thumbnail&pithumbsize=400&gsrsearch=" + encodeURIComponent(q));
+    return Object.values((d && d.query && d.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0)).filter(p => p.thumbnail && p.thumbnail.source).map(p => ({ name: p.title || "", sub: "", url: p.thumbnail.source }));
+  },
+  /* Známé postavy: Wikipedie vrátí hlavní obrázek stránky postavy (jedním dotazem pro celou skupinu). */
+  async _wikiByTitles(titles) {
+    const d = await this._fetchJson("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=400&titles=" + encodeURIComponent(titles.join("|")));
+    return Object.values((d && d.query && d.query.pages) || {}).filter(p => p.thumbnail && p.thumbnail.source).map(p => ({ name: String(p.title || "").replace(/ \(.*\)$/, ""), url: p.thumbnail.source }));
+  },
+  /* TVmaze (zdarma, bez klíče): obsazení seriálu včetně obrázků POSTAV. Hledání názvu seriálu → řada postav za každý nalezený seriál. */
+  async _tvmazeRows(q) {
+    const found = await this._fetchJson("https://api.tvmaze.com/search/shows?q=" + encodeURIComponent(q));
+    const shows = (Array.isArray(found) ? found : []).slice(0, 3).map(x => x && x.show).filter(Boolean);
+    const rows = await Promise.all(shows.map(async sh => {
+      const cast = await this._fetchJson("https://api.tvmaze.com/shows/" + sh.id + "/cast"), seen = {};
+      const list = (Array.isArray(cast) ? cast : []).map(c => c && c.character).filter(c => c && c.image && (c.image.medium || c.image.original) && !seen[c.name] && (seen[c.name] = 1))
+        .map(c => ({ name: c.name || "", url: String(c.image.original || c.image.medium).replace(/^http:/, "https:") }));
+      return { title: "Postavy: " + (sh.name || ""), list };
+    }));
+    return rows.filter(r => r.list.length);
+  },
+  /* Fandom wiki: hlavní obrázek stránky postavy je záběr/ilustrace postavy (psáno „z pohledu vesmíru“), ne fotka herce. */
+  FANDOM_WIKIS: [["Marvel", "marvel"], ["DC", "dc"], ["Star Wars", "starwars"], ["Harry Potter", "harrypotter"], ["Game of Thrones", "gameofthrones"], ["Stranger Things", "strangerthings"], ["Breaking Bad", "breakingbad"], ["Disney", "disney"]],
+  async _fandomRow(label, wiki, q) {
+    const base = "https://" + wiki + ".fandom.com/api/v1/";
+    const found = await this._fetchJson(base + "Search/List?limit=8&namespaces=0&query=" + encodeURIComponent(q));
+    const ids = ((found && found.items) || []).map(i => i && i.id).filter(Boolean);
+    if (!ids.length) return [];
+    const det = await this._fetchJson(base + "Articles/Details?width=300&height=300&abstract=0&ids=" + ids.join(","));
+    return Object.values((det && det.items) || {}).filter(i => i && i.thumbnail && i.title).map(i => ({ name: i.title, url: String(i.thumbnail).replace(/^http:/, "https:") }));
+  },
+  /* Wikidata: fiktivní postavy (Q95074) s obrázkem – jedna SPARQL otázka */
+  async _wikidataCharacters(q) {
+    const esc = q.replace(/["\\]/g, "");
+    const sparql = `SELECT ?itemLabel ?image WHERE { SERVICE wikibase:mwapi { bd:serviceParam wikibase:api "EntitySearch"; wikibase:endpoint "www.wikidata.org"; mwapi:search "${esc}"; mwapi:language "en"; ?item wikibase:apiOutputItem mwapi:item. } ?item wdt:P31/wdt:P279* wd:Q95074; wdt:P18 ?image. SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } } LIMIT 16`;
+    const d = await this._fetchJson("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(sparql));
+    return ((d && d.results && d.results.bindings) || []).filter(b => b.image && b.itemLabel).map(b => ({
+      name: b.itemLabel.value, url: String(b.image.value).replace(/^http:/, "https:") + (/\?/.test(b.image.value) ? "&" : "?") + "width=400"
+    }));
+  },
+  /* Superhrdinové (Marvel, DC …) ze statického souboru akabab/superhero-api */
+  async _heroCharacters(q) {
+    if (!this._heroes) { const all = await this._fetchJson("https://akabab.github.io/superhero-api/api/all.json"); this._heroes = Array.isArray(all) ? all : []; }
+    const n = q.toLowerCase();
+    return this._heroes.filter(h => h && h.name && h.images && h.images.md && h.name.toLowerCase().includes(n)).slice(0, 16)
+      .map(h => ({ name: h.name + (h.biography && h.biography.publisher ? " (" + h.biography.publisher + ")" : ""), url: h.images.md }));
+  },
+  /* Disney postavy */
+  async _disneyCharacters(q) {
+    const d = await this._fetchJson("https://api.disneyapi.dev/character?pageSize=16&name=" + encodeURIComponent(q));
+    const arr = d && d.data ? (Array.isArray(d.data) ? d.data : [d.data]) : [];
+    return arr.filter(c => c && c.imageUrl && c.name).map(c => ({ name: c.name, url: String(c.imageUrl).replace(/^http:/, "https:") }));
+  },
+  /* Nejoblíbenější anime: řada postav za každé anime (název + jeho hlavní postavy). */
+  async _anilistByAnime() {
+    const d = await this._fetchJson("https://graphql.anilist.co", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ query: "query{Page(perPage:12){media(sort:POPULARITY_DESC,type:ANIME){title{english romaji} characters(perPage:12,sort:FAVOURITES_DESC){nodes{name{full} image{large}}}}}}" }) });
+    return ((d && d.data && d.data.Page && d.data.Page.media) || []).map(m => ({
+      title: m.title && (m.title.english || m.title.romaji) || "",
+      list: ((m.characters && m.characters.nodes) || []).filter(c => c && c.image && c.image.large && !/default\.jpg/.test(c.image.large)).map(c => ({ name: c.name && c.name.full || "", url: c.image.large }))
+    })).filter(m => m.title && m.list.length);
+  },
+  _charRowHtml(title, list) {
+    if (!list.length) return "";
+    return `<section class="pc-av-row"><h4>${escapeHTML(title)}</h4><div class="pc-av-strip">${list.slice(0, 16).map(c => `
+      <button type="button" class="pc-avatar-option pc-character-option" title="${escapeHTML(c.name)}" data-url="${escapeHTML(c.url)}" data-name="${escapeHTML(c.name)}" onclick="window.ProfileGate?.pickAvatarEl(this)">
+        <img src="${escapeHTML(c.url)}" alt="${escapeHTML(c.name)}" loading="lazy" referrerpolicy="no-referrer">
+        <span class="pc-av-cap">${escapeHTML(c.name)}</span>
+      </button>`).join("")}</div></section>`;
+  },
+  async loadAvatarPicker() {
+    const grid = document.getElementById("pcAvatarGrid");
+    if (!grid) return;
+    grid.innerHTML = '<div class="pc-avatar-loading">Načítám postavy…</div>';
+    const run = this._avRun = (this._avRun || 0) + 1;
+    const groups = [
+      ["Breaking Bad", ["Walter White (Breaking Bad)", "Jesse Pinkman", "Saul Goodman", "Skyler White", "Hank Schrader", "Gus Fring", "Mike Ehrmantraut"]],
+      ["Game of Thrones", ["Daenerys Targaryen", "Jon Snow (character)", "Tyrion Lannister", "Arya Stark", "Cersei Lannister", "Sansa Stark", "Jaime Lannister", "Bran Stark", "Petyr Baelish"]],
+      ["Stranger Things", ["Eleven (Stranger Things)", "Mike Wheeler", "Dustin Henderson", "Lucas Sinclair", "Will Byers", "Max Mayfield", "Steve Harrington", "Jim Hopper", "Joyce Byers", "Eddie Munson", "Vecna (Stranger Things)"]],
+      ["Další seriály", ["Wednesday Addams", "Sherlock Holmes", "Tommy Shelby", "Dexter Morgan", "Michael Scott (The Office)", "Geralt of Rivia", "Yennefer of Vengerberg", "Joel Miller", "Ellie (The Last of Us)", "Billy Butcher", "Homelander", "Din Djarin", "Grogu"]],
+      ["Přátelé", ["Rachel Green", "Ross Geller", "Monica Geller", "Chandler Bing", "Joey Tribbiani", "Phoebe Buffay"]],
+      ["Marvel", ["Spider-Man", "Iron Man", "Captain America", "Thor (Marvel Comics)", "Deadpool", "Wolverine (character)", "Venom (character)", "Loki (Marvel Cinematic Universe)", "Black Panther (character)", "Doctor Strange", "Groot", "Thanos"]],
+      ["DC", ["Batman", "Joker (character)", "Superman", "Wonder Woman", "Harley Quinn", "Aquaman", "The Flash", "Catwoman", "Robin (character)"]],
+      ["Star Wars", ["Darth Vader", "Yoda", "Luke Skywalker", "Princess Leia", "Han Solo", "Obi-Wan Kenobi", "Ahsoka Tano", "Kylo Ren", "Chewbacca", "R2-D2"]],
+      ["Harry Potter", ["Harry Potter (character)", "Hermione Granger", "Ron Weasley", "Albus Dumbledore", "Severus Snape", "Draco Malfoy", "Rubeus Hagrid", "Sirius Black", "Luna Lovegood"]],
+      ["Animované", ["Homer Simpson", "Bart Simpson", "Lisa Simpson", "Marge Simpson", "Rick Sanchez", "Morty Smith", "Peter Griffin", "Eric Cartman", "SpongeBob SquarePants", "Elsa (Frozen)", "Simba", "Woody (Toy Story)", "Buzz Lightyear", "Shrek (character)", "Stitch (Lilo & Stitch)", "Mickey Mouse"]],
+      ["Další seriály 2", ["Raymond Reddington", "Eleven Hopper", "Lucifer Morningstar (TV series)", "Ragnar Lothbrok", "Rick Grimes", "Daryl Dixon", "Negan", "Sam Winchester", "Dean Winchester", "The Doctor (Doctor Who)", "Spock", "James T. Kirk", "Jean-Luc Picard", "Frank Underwood", "Don Draper", "Carmy Berzatto", "Mandalorian"]],
+      ["Pán prstenů a fantasy", ["Frodo Baggins", "Aragorn", "Legolas", "Gollum", "Sauron", "Galadriel", "Bilbo Baggins", "Jon Snow (character)", "Geralt of Rivia", "Jaskier"]],
+      ["Filmové postavy", ["Gandalf", "Jack Sparrow", "Indiana Jones (character)", "John Wick (character)", "Forrest Gump (character)", "Neo (The Matrix)", "Terminator (character)", "Mario", "Hannibal Lecter", "James Bond", "Ellen Ripley", "Jason Bourne"]]
+    ];
+    /* Řady se kreslí postupně, jak který zdroj odpoví (pomalý nebo zablokovaný zdroj nezdržuje ostatní), anime postavy jsou vždy nahoře
+       a poslední úspěšný výsledek se na 12 hodin uloží, takže se picker neprázdní, když sítě zrovna něco nevyjde. */
+    const CK = "mf_avatar_rows_v1", rows = {};
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(CK) || "null"); } catch (e) { cached = null; }
+    if (cached && Array.isArray(cached.rows)) cached.rows.forEach(r => { if (r && r.title && Array.isArray(r.list) && r.list.length) rows[r.title] = { title: r.title, list: r.list, anime: !!r.anime, i: r.i || 0 }; });
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const retry = async fn => { let r = await fn(); if (!r || !r.length) { await wait(1200); r = await fn(); } return r || []; };
+    let timer = 0, live = 0, finished = false;
+    const paint = () => {
+      if (run !== this._avRun) return;
+      const all = Object.values(rows);
+      let good = all.filter(r => r.list.length >= 5);
+      good.length || (good = all);
+      good.sort((a, b) => (b.anime ? 1 : 0) - (a.anime ? 1 : 0) || (a.anime ? a.i - b.i : Math.min(b.list.length, 16) - Math.min(a.list.length, 16) || a.i - b.i));
+      grid.innerHTML = (good.length ? good.map(r => this._charRowHtml(r.title, r.list)).join("") : '<div class="pc-avatar-loading">Načítám postavy…</div>') + (finished && !all.some(r => r.anime) ? '<div class="pc-avatar-loading">Anime postavy se teď nepodařilo načíst (AniList neodpovídá). <button type="button" class="pc-av-retry" onclick="window.ProfileGate?.loadAvatarPicker()">Zkusit znovu</button></div>' : "");
+    };
+    const later = () => { clearTimeout(timer); timer = setTimeout(paint, 250); };
+    const put = (title, list, anime, i) => { if (list && list.length) { rows[title] = { title, list, anime, i }; later(); } };
+    if (Object.keys(rows).length) paint();
+    const jobs = [
+      retry(() => this._anilistCharacters("")).then(l => put("Anime postavy", l, true, 0)),
+      retry(() => this._anilistByAnime()).then(l => (l || []).slice(0, 3).forEach((m, k) => put(m.title, m.list, true, k + 1)))
+    ];
+    // ostatní řady po čtyřech najednou (Wikipedie při 13 souběžných dotazech občas odmítne)
+    const queue = groups.map((g, i) => ({ g, i }));
+    const worker = async () => {
+      for (let it = queue.shift(); it; it = queue.shift()) {
+        if (run !== this._avRun) return;
+        const l = await retry(() => this._wikiByTitles(it.g[1])).catch(() => []);
+        put(it.g[0], l, false, 10 + it.i);
+      }
+    };
+    for (let k = 0; k < 4; k++) jobs.push(worker());
+    await Promise.allSettled(jobs);
+    clearTimeout(timer);
+    if (run !== this._avRun) return;
+    finished = true;
+    paint();
+    live = Object.values(rows).length;
+    if (!live) { grid.innerHTML = '<div class="pc-avatar-loading">Postavy se nepodařilo načíst. Zkus je vyhledat jménem.</div>'; return; }
+    try { localStorage.setItem(CK, JSON.stringify({ t: Date.now(), rows: Object.values(rows).map(r => ({ title: r.title, list: r.list.slice(0, 16), anime: r.anime, i: r.i })) })); } catch (e) { void e; }
+  },
+  searchAvatarTitles(e) {
+    const q = e.trim();
+    clearTimeout(this._avatarSearchTimer);
+    if (!q) return this.loadAvatarPicker();
+    this._avatarSearchTimer = setTimeout(() => this._searchAvatarTitles(q), 320);
+  },
+  async _searchAvatarTitles(q) {
+    const grid = document.getElementById("pcAvatarGrid");
+    if (!grid) return;
+    grid.innerHTML = '<div class="pc-avatar-loading">Hledám…</div>';
+    const run = this._avRun = (this._avRun || 0) + 1;
+    // výsledky se průběžně doplňují podle toho, jak který zdroj odpoví (pomalý zdroj nezdržuje ostatní)
+    const keys = ["tv", "fandom", "heroes", "disney", "wikidata", "wiki", "ani"], res = {};
+    const paint = done => {
+      if (run !== this._avRun) return;
+      const html = keys.map(k => res[k] || "").join("");
+      grid.innerHTML = html || (done ? '<div class="pc-avatar-loading">Nic jsme nenašli. Zkus anglické jméno postavy nebo seriálu.</div>' : '<div class="pc-avatar-loading">Hledám…</div>');
+    };
+    const rows = (title, list) => this._charRowHtml(title, list);
+    const jobs = [
+      this._tvmazeRows(q).then(r => { res.tv = r.map(x => rows(x.title, x.list)).join(""); }),
+      Promise.all(this.FANDOM_WIKIS.map(w => this._fandomRow(w[0], w[1], q).then(l => rows("Fandom · " + w[0], l)))).then(r => { res.fandom = r.join(""); }),
+      this._heroCharacters(q).then(l => { res.heroes = rows("Superhrdinové (Marvel, DC …)", l); }),
+      this._disneyCharacters(q).then(l => { res.disney = rows("Disney", l); }),
+      this._wikidataCharacters(q).then(l => { res.wikidata = rows("Fiktivní postavy (Wikidata)", l); }),
+      this._wikiCharacters(q).then(l => { res.wiki = rows("Wikipedie", l); }),
+      this._anilistCharacters(q).then(l => { res.ani = rows("Anime postavy", l); })
+    ];
+    jobs.forEach(j => j.then(() => paint(!1), () => {}));
+    await Promise.allSettled(jobs);
+    paint(!0);
+  },
+  pickAvatarEl(el) {
+    if (/^https:\/\//i.test(el.dataset.url || "")) this.pickAvatar(el.dataset.url, el.dataset.name, el);
+  },
+  pickAvatar(e, t, n) {
+    this._selectedAvatar = e;
+    const preview = document.getElementById("pcAvatarPreview");
+    preview && (preview.innerHTML = `<img src="${e}" alt="">`);
+    const label = document.getElementById("pcAvatarPickerLabel");
+    label && (label.textContent = t || "Vybraný obrázek");
+    document.querySelectorAll(".pc-avatar-option").forEach(e => e.classList.remove("selected"));
+    n && n.classList.add("selected");
+    // výběr se potvrdí sám: picker se zavře a vrátí se formulář s novým avatarem
+    const picker = document.getElementById("pcAvatarPicker");
+    picker && !picker.hidden && (picker.hidden = !0, this._syncPickerClass());
+  },
+  _pickColor(e, t) {
+    this._selectedColor = e, document.querySelectorAll(".pc-color-swatch").forEach(e => e.classList.remove("selected")), t.classList.add("selected")
+  },
+  pinDigitNav(e, t) {
+    if (e.value && t < 3) {
+      const e = document.getElementById("pcPin" + (t + 1));
+      e && e.focus()
+    }
+  },
+  saveProfile() {
+    const e = (document.getElementById("pcName")?.value || "").trim();
+    if (!e) {
+      const e = document.getElementById("pcName");
+      return void(e && (e.style.borderColor = "rgba(255,80,80,0.5)", e.focus()))
+    }
+    const t = ["pcPin0", "pcPin1", "pcPin2", "pcPin3"].map(e => document.getElementById(e)?.value || "").join(""),
+      n = 4 === t.length && /^\d{4}$/.test(t) ? t : null,
+      o = _getProfiles();
+    if (this._editingId) {
+      const t = o.findIndex(e => e.id === this._editingId);
+      t >= 0 && (o[t].name = e, o[t].avatar = this._selectedAvatar, (document.getElementById("pcPinRemove")?.checked ? delete o[t].pin : n && (o[t].pin = n)), _saveProfiles(o)), this.closeCreate(), this.renderGate(), this.renderBadge()
+    } else {
+      const t = this.createProfile({
+        name: e,
+        avatar: this._selectedAvatar,
+        color: this._selectedColor,
+        pin: n
+      });
+      this.openOnboarding(t), this.closeCreate(), this.activateProfile(t)
+    }
+  },
+  createProfile({
+    name: e,
+    avatar: t,
+    color: n,
+    pin: o
+  }) {
+    const i = "p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+      a = _getProfiles();
+    return a.push({
+      id: i,
+      name: e,
+      avatar: t || "🎬",
+      color: n || PROFILE_COLORS[0],
+      pin: o || null,
+      created: Date.now(),
+      history: [],
+      likedGenres: [],
+      prefs: {
+        algo: {
+          trending: .4,
+          topRated: .3,
+          watchlistBased: .3
+        },
+        features: {
+          showTrailer: !0,
+          showRating: !0,
+          confettiOnWin: !0,
+          darkGold: !0
+        },
+        contentPref: "all",
+        lang: "cs"
+      },
+      trakt: null
+    }), _saveProfiles(a), i
+  },
+  openOnboarding(e) {
+    const t = document.getElementById("mfProfileWelcome"),
+      n = document.getElementById("pwGenres");
+    if (!t || !n) return;
+    const o = [
+      ["28", "Akce"], ["35", "Komedie"], ["18", "Drama"],
+      ["878", "Sci-Fi"], ["27", "Horor"], ["16", "Animované"], ["anime", "Anime"],
+      ["10749", "Romantika"], ["14", "Fantasy"], ["53", "Thriller"]
+    ];
+    n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" onclick="this.classList.toggle('selected')">${t}</button>`).join("");
+    const ao = document.getElementById("pwAnimeOnly");
+    ao && (ao.checked = !1);
+    const ag = document.getElementById("pwAge");
+    ag && (ag.onclick = ev => { const b = ev.target.closest(".pw-agebtn"); b && (ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x === b))); }, ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x.dataset.age === "0")));
+    t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");
+  },
+  /** 3 kroky, pokud jde propojení nabídnout (je nastavené a zařízení ještě není propojené); jinak 2. */
+  _obTotal() {
+    return window.MFSync && window.MFSync.available() && !window.MFSync.isLinked() ? 3 : 2;
+  },
+  _onboardingStep(n) {
+    const total = this._obTotal();
+    [1, 2, 3].forEach(i => {
+      const st = document.getElementById("pwStep" + i);
+      if (st) st.style.display = i === n ? "" : "none";
+    });
+    document.querySelectorAll("#mfProfileWelcome [data-ob-step]").forEach(k => {
+      k.textContent = "MůjFlix · " + k.dataset.obStep + "/" + total;
+    });
+    const btn = document.getElementById("pwStep2Btn");
+    if (btn) btn.textContent = total === 3 ? "Pokračovat" : "Začít sledovat";
+    if (2 === n) {
+      const l = document.getElementById("pwAdblockLink");
+      if (l && window.mfAdblock) l.innerHTML = window.mfAdblock.linkHtml();
+    }
+    const w = document.getElementById("mfProfileWelcome");
+    w && w.scrollTo && w.scrollTo(0, 0);
+  },
+  onboardingNext() {
+    this._obTotal() === 3 ? this._onboardingStep(3) : this.closeOnboarding();
+  },
+  onboardingLink(screen) {
+    window.MFSyncUI && window.MFSyncUI.open(screen);
+  },
+  skipOnboardingGenres() {
+    const e = document.getElementById("mfProfileWelcome");
+    e && e.classList.contains("show") && this._onboardingStep(2);
+  },
+  closeOnboarding() {
+    const e = document.getElementById("mfProfileWelcome");
+    e && (e.classList.remove("show"), e.setAttribute("aria-hidden", "true"));
+  },
+  finishOnboarding() {
+    const e = document.getElementById("mfProfileWelcome");
+    if (!e) return;
+    const t = e.dataset.profileId || getActiveProfileId(),
+      sel = [...e.querySelectorAll(".pw-genre.selected")].map(e => e.dataset.genre),
+      animeOnlyBox = !!(document.getElementById("pwAnimeOnly") && document.getElementById("pwAnimeOnly").checked),
+      ageBtn = e.querySelector("#pwAge .pw-agebtn.pw-on"),
+      maxAge = ageBtn ? Number(ageBtn.dataset.age) || 0 : 0,
+      likesAnime = sel.includes("anime") || animeOnlyBox,
+      n = [...new Set(sel.map(Number).filter(Number.isFinite))];
+    if (t) {
+      const o = _getProfiles(), i = o.find(e => e.id === t);
+      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, maxAge ? i.prefs.maxAge = maxAge : delete i.prefs.maxAge, animeOnlyBox || (likesAnime && !n.length) ? i.prefs.animeOnly = !0 : delete i.prefs.animeOnly, _saveProfiles(o));
+      if (getActiveProfileId() === t && void 0 !== aiBrain) n.forEach(e => aiBrain.boostGenreIds([e], .12));
+      try { if (typeof window.renderHomepage === "function") window.renderHomepage(); } catch (e) {}
+    }
+    this._onboardingStep(2);
+  },
+  renderBadge() {
+    try { window.nfRenderProfile && window.nfRenderProfile() } catch (e) {}
+    const e = getActiveProfile(),
+      t = document.getElementById("_mfUserBadge");
+    t && t.remove();
+    let n = document.getElementById("mfProfileBadge");
+    if (!n) {
+      n = document.createElement("div");
+      n.id = "mfProfileBadge";
+      n.onclick = () => ProfileGate.show();
+      document.body.appendChild(n);
+    }
+    if (e) {
+      const avatar = /^https?:\/\//i.test(e.avatar || "")
+        ? `<img src="${escapeHTML(e.avatar)}" alt="">`
+        : escapeHTML(e.avatar || "🎬");
+      n.style.borderColor = (e.color || "#007AFF") + "44";
+      n.innerHTML = `
+        <div class="mpb-avatar" style="border-color:${escapeHTML(e.color || "#007AFF")}88">${avatar}</div>
+        <span class="mpb-name">${escapeHTML(e.name)}</span>
+        <span class="mpb-arrow">▼</span>
+      `;
+    } else {
+      n.style.borderColor = "rgba(255,255,255,0.1)";
+      n.innerHTML = '<div class="mpb-avatar">👤</div><span class="mpb-name">Profil</span><span class="mpb-arrow">▼</span>';
+    }
+  }
+};
+
+window.ProfileGate = ProfileGate;
+
+/* ── Klávesnice pro PIN ───────────────────────────────────────────────────────
+   1) okno „Zadej PIN“: číslice (řada nad písmeny i numerická klávesnice, NumLock zapnutý), Backspace, Esc
+   2) pole PIN při vytváření profilu: jen číslice, Backspace přeskočí zpět, vložení 4 číslic ze schránky */
+document.addEventListener("keydown", e => {
+  const modal = document.getElementById("mfPinModal");
+  if (!modal || !modal.classList.contains("show")) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  let handled = true;
+  if (/^[0-9]$/.test(e.key)) ProfileGate.pinInput(e.key);
+  else if (e.key === "Backspace" || e.key === "Delete") ProfileGate.pinInput("back");
+  else if (e.key === "Escape") ProfileGate.closePin();
+  else handled = false;
+  if (handled) { e.preventDefault(); e.stopImmediatePropagation(); }
+}, true);
+
+(function wirePinInputs() {
+  const ids = ["pcPin0", "pcPin1", "pcPin2", "pcPin3"];
+  const inputs = () => ids.map(id => document.getElementById(id));
+  document.addEventListener("input", e => {
+    const i = ids.indexOf(e.target && e.target.id);
+    if (i < 0) return;
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 1);
+  }, true);
+  document.addEventListener("keydown", e => {
+    const i = ids.indexOf(e.target && e.target.id);
+    if (i < 0) return;
+    const all = inputs();
+    if (e.key === "Backspace" && !e.target.value && i > 0) { all[i - 1].value = ""; all[i - 1].focus(); e.preventDefault(); }
+    else if (e.key === "ArrowLeft" && i > 0) { all[i - 1].focus(); e.preventDefault(); }
+    else if (e.key === "ArrowRight" && i < 3) { all[i + 1].focus(); e.preventDefault(); }
+  }, true);
+  document.addEventListener("paste", e => {
+    const i = ids.indexOf(e.target && e.target.id);
+    if (i < 0) return;
+    const digits = ((e.clipboardData && e.clipboardData.getData("text")) || "").replace(/\D/g, "").slice(0, 4);
+    if (!digits) { e.preventDefault(); return; }
+    const all = inputs();
+    digits.split("").forEach((d, k) => { if (all[k]) all[k].value = d; });
+    all[Math.min(digits.length, 3)].focus();
+    e.preventDefault();
+  }, true);
+})();
+
+/* Verze aplikace vpravo dole na obrazovce „Kdo se dívá?“ (po nasazení hned vidíš, že běží nová) */
+(function () {
+  function show() { var v = document.getElementById("pgVersion"); if (v) v.textContent = "v" + (window.MF_VERSION || "?") + (window.MF_BUILD ? " · " + window.MF_BUILD : ""), v.title = window.MF_BUILD_DATE ? "Sestaveno " + window.MF_BUILD_DATE : ""; }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", show); else show();
+})();
