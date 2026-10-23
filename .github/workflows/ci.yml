@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# Když se soubory nahrávají po jednom (každý = jeden commit), každý nový commit zruší předchozí rozběhnutou kontrolu.
+# Doběhne tak jen ta poslední – po tom, co 3 minuty nepřijde další commit – a nehlásí se chyby z napůl nahraného stavu.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Počkej, jestli nepřijde další commit
+        if: github.event_name == 'push'
+        run: sleep 180
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm run lint
+      - run: npm test
