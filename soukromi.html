@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141414">
+  <title>Soukromí a podmínky | MůjFlix</title>
+  <meta name="description" content="Co MůjFlix ukládá, kam posílá data a na co je dobré si dát pozor.">
+  <link rel="icon" href="icons/favicon.ico" sizes="any">
+  <style>
+    :root { color-scheme: dark; --bg: #141414; --fg: #e5e5e5; --muted: #9a9a9a; --accent: #0a84ff; --line: rgba(255,255,255,.12); }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 24px 16px 72px; }
+    a { color: var(--accent); }
+    .back { display: inline-block; margin-bottom: 8px; text-decoration: none; font-size: 15px; }
+    .brand { font-weight: 800; font-size: 28px; letter-spacing: -.02em; margin: 8px 0 0; }
+    .brand i { color: var(--accent); font-style: normal; }
+    h1 { font-size: 1.6rem; line-height: 1.25; margin: 20px 0 6px; }
+    h2 { font-size: 1.15rem; margin: 34px 0 6px; padding-top: 22px; border-top: 1px solid var(--line); }
+    p, li { color: var(--fg); }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    .muted { color: var(--muted); font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 15px; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .note { background: #1f1f1f; border-left: 3px solid var(--accent); padding: 12px 14px; border-radius: 4px; margin: 14px 0; }
+  </style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">‹ Zpět do aplikace</a>
+  <p class="brand">Můj<i>Flix</i></p>
+  <h1>Soukromí a podmínky</h1>
+  <p class="muted">Platí pro MůjFlix na této adrese. Poslední úprava: 28. 10. 2026.</p>
+
+  <h2>Co MůjFlix je</h2>
+  <p>MůjFlix je osobní tracker filmů a seriálů. Pomáhá ti najít, co sledovat, pamatuje si, co jsi viděl, a nabízí odkazy na místa, kde se titul dá pustit. Sám <strong>žádná videa nehostuje, nestahuje ani nevysílá</strong>. Nemáš tu účet, heslo ani e-mail.</p>
+
+  <h2>Co se ukládá a kde</h2>
+  <table>
+    <thead><tr><th>Co</th><th>Kde</th><th>Jak dlouho</th></tr></thead>
+    <tbody>
+      <tr><td>Profily, oblíbené, co jsi viděl, hodnocení, nastavení</td><td>V tvém prohlížeči (localStorage). Neposílá se nikam, pokud nezapneš propojení zařízení.</td><td>Dokud je nesmažeš (smazání profilu, smazání dat webu v prohlížeči).</td></tr>
+      <tr><td>Kopie těchto dat při <strong>propojení zařízení</strong> (volitelné)</td><td>V úložišti Cloudflare KV pod náhodným dlouhým ID. Neukládá se tam API klíč, aktivní profil ani stav PIN zámku.</td><td>Nejdéle 365 dní od poslední synchronizace. Jednorázový propojovací kód platí 10 minut.</td></tr>
+      <tr><td>Zdroj, který pro titul fungoval (sdílená paměť zdrojů, volitelná)</td><td>Cloudflare KV. Posílá se jen „titul + název zdroje“, nic o tobě.</td><td>90 dní.</td></tr>
+    </tbody>
+  </table>
+  <p>Aplikace nepoužívá <strong>cookies, reklamní ani analytické nástroje</strong>.</p>
+
+  <h2>Co se posílá cizím službám</h2>
+  <ul>
+    <li><strong>TMDB (themoviedb.org)</strong>: názvy, plakáty, popisy a hodnocení. Dotazy jdou přes náš server (Cloudflare Worker), který přidá API klíč. Posílá se jen to, co hledáš nebo otevíráš, a technické údaje běžné u každého spojení (třeba IP adresa).</li>
+    <li><strong>Obrázky avatarů</strong> (Wikipedie, AniList, TVmaze, Fandom, Wikidata a další): posílá se jen hledané jméno postavy.</li>
+    <li><strong>Ověření zdrojů</strong>: náš server se před přehráním podívá na stránky zdrojů, jestli titul mají. Posílá se jen název titulu.</li>
+    <li><strong>Externí weby</strong> (viz níže): až když na odkaz klikneš nebo si přehrávač otevřeš, spojení navazuje tvůj prohlížeč přímo s nimi a platí jejich podmínky.</li>
+  </ul>
+
+  <h2>Externí weby a autorská práva</h2>
+  <div class="note">
+    MůjFlix <strong>jen odkazuje</strong> na externí weby s filmy a seriály (například Bombuj, SvetSerialu, Uzi.la, NajSerialy, Prehrajto) a na legální streamovací služby (Netflix, Disney+, Max, Apple TV+, Prime Video a další). Za obsah těchto webů neodpovídáme a nemáme na něj vliv. Některé z nich mohou nabízet obsah, který nemusí být v souladu s autorským právem ve tvé zemi. <strong>Za to, co si pustíš, odpovídáš ty.</strong> Pokud je to pro tebe důležité, používej legální služby. Aplikace ukazuje, kde je titul legálně dostupný.
+  </div>
+  <p>Reklamy a vyskakovací okna na externích webech nejsou naše. Doporučujeme blokátor reklam (třeba uBlock Origin).</p>
+
+  <h2>PIN a věkové omezení</h2>
+  <p>PIN zámek profilu a věkové omezení jsou <strong>jen pojistka pro domácí použití, ne skutečné zabezpečení</strong> ani rodičovská kontrola. Věk se řídí americkým hodnocením z TMDB, titul bez hodnocení se skryje.</p>
+
+  <h2>Tvoje data a jejich smazání</h2>
+  <ul>
+    <li><strong>Záloha:</strong> v menu profilu je export a import do souboru.</li>
+    <li><strong>Smazání profilu</strong> smaže jeho sledování, hodnocení a nastavení z tohoto zařízení.</li>
+    <li><strong>Odpojení zařízení</strong> (menu profilu → Propojit zařízení) přestane data sdílet. Kopie v Cloudflare KV zmizí sama nejpozději po 365 dnech. Chceš ji smazat dřív, napiš nám (kontakt níže).</li>
+    <li><strong>Úplné smazání</strong> dat v prohlížeči: nastavení prohlížeče → data webu <code>mujflix.pages.dev</code>.</li>
+  </ul>
+
+  <h2>Poděkování a značky</h2>
+  <p>Tento produkt používá TMDB API, ale není TMDB schválen ani certifikován. Metadata filmů a seriálů pocházejí z <a href="https://www.themoviedb.org/" rel="noopener" target="_blank">TMDB</a>. Obrázky avatarů z veřejných služeb (Wikipedie, AniList, TVmaze, Fandom, Wikidata). Názvy a loga služeb patří jejich majitelům.</p>
+
+  <h2>Bez záruky</h2>
+  <p>MůjFlix je osobní projekt a poskytuje se tak, jak je, bez záruky dostupnosti nebo správnosti. Odkazy na zdroje se mohou kdykoli změnit nebo přestat fungovat.</p>
+
+  <h2>Kontakt</h2>
+  <p>Dotazy, žádosti o smazání dat nebo hlášení problémů: <a href="https://github.com/mujflix-team/mujflix/issues" rel="noopener" target="_blank">GitHub – Issues</a>.</p>
+</main>
+</body>
+</html>
