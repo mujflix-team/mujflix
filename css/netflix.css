@@ -1,0 +1,1643 @@
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Th.woff2") format("woff2"); font-weight: 100 200; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Lt.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Rg.woff2") format("woff2"); font-weight: 400 450; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Md.woff2") format("woff2"); font-weight: 500 650; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Bd.woff2") format("woff2"); font-weight: 700 850; font-style: normal; font-display: swap; }
+@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Blk.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
+/* MůjFlix — domovská stránka a navigace ve stylu streamovací služby */
+:root {
+  --nf-bg: #141414;
+  --nf-pad: clamp(16px, 4vw, 56px);
+  --nf-accent: var(--accent, #0a84ff);
+  --nf-text: #fff;
+  --nf-dim: #b3b3b3;
+  --nf-bar-h: 68px;
+}
+
+/* ───────── Horní lišta ───────── */
+#nfTop {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9990;
+  height: calc(var(--nf-bar-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--nf-pad) 0;
+  display: none; align-items: center; gap: 4px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+  transition: background-color 0.3s ease;
+}
+html.mfh-home-on #nfTop { display: flex; }
+html.mfh-home-on #nfTop.nf-top-hidden,
+body.modal-open #nfTop,
+body.discover-open #nfTop { display: none; }
+#nfTop.nf-top-solid { background: var(--nf-bg); }
+html.mfh-home-on #mfHeader { display: none !important; }
+
+#nfTop .nf-logo {
+  background: none; border: 0; padding: 0; margin: 0 8px 0 0; cursor: pointer; color: var(--nf-text);
+  font: 900 clamp(1.45rem, 2.4vw, 1.9rem)/1 -apple-system, "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -1.2px; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+#nfTop .nf-logo span { color: var(--nf-accent); }
+#nfTop .nf-top-gap { flex: 1; }
+#nfTop .nf-icon-btn {
+  position: relative; width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer; padding: 0;
+  background: none;  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+#nfTop .nf-icon-btn { color: #fff !important; }
+#nfTop .nf-icon-btn svg { stroke: currentColor !important; fill: none !important; }
+#nfTop .nf-icon-btn:hover { background: rgba(255, 255, 255, 0.12); }
+#nfTop .nf-icon-btn:active { transform: scale(0.92); }
+#nfTop .nf-avatar {
+  width: 34px; height: 34px; margin-left: 8px; border: 0; border-radius: 6px; cursor: pointer; padding: 0;
+  background: var(--nf-avatar, #0a84ff); font-size: 1.15rem; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 2px transparent; transition: box-shadow 0.15s;
+}
+#nfTop .nf-avatar:hover { box-shadow: 0 0 0 2px #fff; }
+
+/* ───────── Dock (odkazy navigace) ───────── */
+html body #mfDock.mf-dock {
+  position: fixed !important; z-index: 10000 !important; margin: 0 !important; transform: none !important;
+  display: flex; align-items: center; flex-direction: row;
+  background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important; overflow: visible;
+}
+html body #mfDock .mf-dock-pill { display: none !important; }
+html body #mfDock .dock-btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
+  min-width: 0; margin: 0; font-family: inherit; color: var(--nf-dim) !important; transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+html body #mfDock .dock-btn::before, html body #mfDock .dock-btn::after { display: none !important; }
+html body #mfDock .dock-btn svg { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+html body #mfDock .dock-btn.active { color: var(--nf-text) !important; }
+html body #mfDock .dock-btn svg, html body #mfDock .dock-btn.active svg { stroke: currentColor !important; filter: none !important; }
+html body #mfDock .dock-label { opacity: 1 !important; transform: none !important; color: inherit !important; letter-spacing: 0; }
+html body #mfDock .dock-badge { display: none !important; }
+
+/* počítač: odkazy v horní liště */
+@media (min-width: 900px) {
+  html body #mfDock.mf-dock {
+    top: 0 !important; bottom: auto !important; right: auto !important;
+    left: calc(var(--nf-pad) + clamp(112px, 9vw, 150px)) !important;
+    width: auto !important; height: calc(var(--nf-bar-h) + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) 0 0 !important; gap: 2px !important;
+  }
+  html body #mfDock .dock-btn { padding: 10px 14px; font-size: 0.95rem; font-weight: 500; }
+  html body #mfDock .dock-btn svg { display: none; }
+  html body #mfDock .dock-label { font-size: 0.95rem; font-weight: inherit; display: inline; }
+  html body #mfDock .dock-btn:hover { color: #e5e5e5; }
+  html body #mfDock .dock-btn.active { font-weight: 700; }
+  html body #mfDock #dockProfile { display: none !important; }
+}
+
+/* telefon: spodní lišta záložek */
+@media (max-width: 899px) {
+  html body #mfDock.mf-dock {
+    left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important; width: 100% !important;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) !important; gap: 0 !important;
+    justify-content: space-around;
+    background: rgba(18, 18, 18, 0.97) !important; border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  html body #mfDock .dock-btn { flex: 1 1 0; flex-direction: column; gap: 3px; padding: 6px 0; }
+  html body #mfDock .dock-btn svg { width: 24px; height: 24px; }
+  html body #mfDock .dock-label { font-size: 0.66rem; font-weight: 600; }
+  #nfTop .nf-avatar { display: none; }
+  #nfTop { --nf-bar-h: 56px; }
+}
+html body.discover-open #mfDock { display: none !important; }
+
+/* ───────── Domovská stránka ───────── */
+#mfSectionHome { overscroll-behavior: contain; }
+.nf-hero {
+  position: relative; height: clamp(440px, 80vh, 780px); display: flex; align-items: flex-end; overflow: hidden;
+  background: var(--nf-bg);
+}
+.nf-hero-empty { background: linear-gradient(180deg, #1d1d22, var(--nf-bg)); }
+.nf-hero-none { height: calc(var(--nf-bar-h) + 40px + env(safe-area-inset-top, 0px)); }
+.nf-hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 18%;
+  animation: nfHeroIn 0.9s ease both;
+}
+@keyframes nfHeroIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
+.nf-hero-shade {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(0deg, var(--nf-bg) 2%, rgba(20, 20, 20, 0) 40%),
+    linear-gradient(77deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 24%);
+}
+.nf-hero-body { position: relative; z-index: 1; width: min(660px, 100%); padding: 0 var(--nf-pad) clamp(110px, 16vh, 180px); }
+.nf-hero-eyebrow { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--nf-dim); margin-bottom: 8px; }
+.nf-hero-title {
+  margin: 0 0 12px; font: 800 clamp(2rem, 5.2vw, 4.2rem)/1.02 -apple-system, "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -0.04em; color: var(--nf-text); text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+}
+.nf-hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 14px; font-size: 0.95rem; color: #d2d2d2; font-weight: 500; }
+.nf-hero-badge { padding: 2px 8px; border-radius: 4px; background: var(--nf-accent); color: #fff; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.nf-hero-rating { color: #ffd60a; font-weight: 700; }
+.nf-hero-bar { height: 4px; width: min(320px, 70%); border-radius: 2px; background: rgba(255, 255, 255, 0.28); margin-bottom: 14px; overflow: hidden; }
+.nf-hero-bar > div { height: 100%; background: var(--nf-accent); border-radius: 2px; }
+.nf-hero-desc {
+  margin: 0 0 20px; font-size: clamp(0.95rem, 1.25vw, 1.15rem); line-height: 1.45; color: #f0f0f0; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nf-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.nf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 48px; padding: 0 28px;
+  border: 0; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 1.05rem; font-weight: 700; line-height: 1;
+  transition: background 0.15s, transform 0.1s;
+}
+.nf-btn:active { transform: scale(0.97); }
+.nf-btn-primary { background: #fff; color: #000; }
+.nf-btn-primary:hover { background: rgba(255, 255, 255, 0.78); }
+.nf-btn-ghost { background: rgba(109, 109, 110, 0.7); color: #fff; }
+.nf-btn-ghost:hover { background: rgba(109, 109, 110, 0.45); }
+.nf-btn-ghost.on svg { fill: #ff453a; stroke: #ff453a; }
+
+/* řady */
+.nf-rows { position: relative; z-index: 2; margin-top: -36px; padding-bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
+.nf-hero-empty + .nf-rows, .nf-hero-none + .nf-rows { margin-top: 0; }
+.nf-row { margin: 0 0 clamp(14px, 2.4vw, 32px); }
+.nf-row[hidden] { display: none; }
+.nf-row-head { display: flex; align-items: baseline; gap: 12px; padding: 0 var(--nf-pad); margin-bottom: 4px; }
+.nf-row-title { margin: 0; font: 700 clamp(1.05rem, 1.5vw, 1.4rem)/1.2 -apple-system, "SF Pro Display", "Inter", sans-serif; color: #e5e5e5; letter-spacing: -0.01em; }
+.nf-row-sub { font-size: 0.82rem; color: #808080; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nf-see-all { margin-left: auto; flex: none; font-size: 0.85rem; font-weight: 600; color: var(--nf-accent); text-decoration: none; opacity: 0; transition: opacity 0.2s; }
+.nf-row:hover .nf-see-all, .nf-see-all:focus-visible { opacity: 1; }
+@media (hover: none) { .nf-see-all { opacity: 1; } }
+.nf-scroller { position: relative; }
+.nf-track {
+  display: flex; gap: clamp(6px, 0.7vw, 10px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity;
+  padding: 16px var(--nf-pad) 22px; scroll-padding-left: var(--nf-pad); scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.nf-track::-webkit-scrollbar { display: none; }
+.nf-arrow {
+  position: absolute; top: 16px; bottom: 22px; width: clamp(36px, 3.4vw, 56px); border: 0; padding: 0; cursor: pointer; z-index: 3;
+  display: flex; align-items: center; justify-content: center; color: #fff; opacity: 0; transition: opacity 0.2s, background 0.2s;
+}
+.nf-arrow-l { left: 0; background: rgba(20, 20, 20, 0.6); border-radius: 0 6px 6px 0; }
+.nf-arrow-r { right: 0; background: rgba(20, 20, 20, 0.6); border-radius: 6px 0 0 6px; }
+.nf-arrow:hover { background: rgba(20, 20, 20, 0.88); }
+.nf-scroller:hover .nf-arrow { opacity: 1; }
+@media (hover: none) { .nf-arrow { display: none; } }
+
+/* karta */
+.nf-card { position: relative; flex: none; width: clamp(118px, 12.5vw, 196px); scroll-snap-align: start; cursor: pointer; outline: none; min-width: 0; }
+.nf-poster {
+  position: relative; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: #222;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.nf-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.nf-card:hover { z-index: 4; }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(1.08); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
+.nf-card:focus-visible .nf-poster { outline: 2px solid #fff; outline-offset: 2px; }
+.nf-card-info { padding: 8px 2px 0; }
+.nf-card-title {
+  margin: 0; font-size: 0.82rem; font-weight: 600; line-height: 1.25; color: #e5e5e5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nf-card-ep { margin: 2px 0 0; font-size: 0.72rem; color: #808080; }
+.nf-skeleton { background: linear-gradient(100deg, #1f1f1f 30%, #2c2c2c 50%, #1f1f1f 70%); background-size: 200% 100%; animation: nfShimmer 1.3s linear infinite; }
+@keyframes nfShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Top 10 s velkými čísly */
+.nf-row-ranked .nf-card { width: clamp(190px, 21vw, 300px); }
+.nf-row-ranked .nf-poster { margin-left: 42%; }
+.nf-row-ranked .nf-card-info { display: none; }
+.nf-rank {
+  position: absolute; left: 0; bottom: -6px; font: 900 clamp(100px, 11vw, 170px)/0.8 -apple-system, "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -0.09em; color: var(--nf-bg); -webkit-text-stroke: 3px #6a6a6a; pointer-events: none; user-select: none;
+  padding-right: 0.06em;
+}
+
+/* „Zobrazit vše“ */
+.mfh-h2 { margin: 0; font: 700 1.2rem/1.2 -apple-system, "SF Pro Display", "Inter", sans-serif; color: #fff; }
+.mfh-seeall-grid .nf-card { width: 100%; }
+.mfh-seeall-grid { gap: 18px 12px; }
+
+/* telefon */
+@media (max-width: 899px) {
+  .nf-hero { height: clamp(420px, 72vh, 640px); }
+  .nf-hero-body { padding-bottom: 72px; }
+  .nf-hero-title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+  .nf-hero-desc { -webkit-line-clamp: 2; }
+  .nf-hero-actions { gap: 10px; }
+  .nf-btn { height: 44px; padding: 0 20px; font-size: 0.98rem; flex: 1 1 0; }
+  .nf-hero-body { width: 100%; }
+  .nf-rows { margin-top: -28px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }
+  .nf-card { width: 108px; }
+  .nf-row-ranked .nf-card { width: 168px; }
+  .nf-rank { font-size: 110px; }
+  .nf-card-title { font-size: 0.74rem; }
+  .nf-row-title { font-size: 1.05rem; white-space: nowrap; }
+  .nf-row-sub { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nf-hero-bg, .nf-skeleton { animation: none !important; }
+  .nf-poster { transition: none !important; }
+}
+
+/* ═════════ Společný vzhled ostatních obrazovek ═════════ */
+html body { background: var(--nf-bg); }
+.adaptive-bg, .bg-glow, #particles { display: none !important; }
+
+/* výběr profilu */
+html body #mfProfileGate { background: var(--nf-bg) !important; }
+#mfProfileGate .pg-logo {
+  position: absolute; top: 22px; left: var(--nf-pad); margin: 0 !important;
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem) !important; letter-spacing: -1.2px;
+}
+#mfProfileGate .pg-title { font-size: clamp(2rem, 3.6vw, 3.4rem) !important; font-weight: 500 !important; letter-spacing: -0.01em !important; margin-bottom: 0.5em !important; }
+#mfProfileGate .pg-subtitle { display: none !important; }
+#mfProfileGate .pg-profiles { gap: clamp(14px, 2.4vw, 32px) !important; }
+#mfProfileGate .pg-avatar {
+  width: clamp(84px, 10vw, 150px) !important; height: clamp(84px, 10vw, 150px) !important; border-radius: 6px !important;
+  background: var(--pg-color, #0a84ff) !important; border: 3px solid transparent !important; box-shadow: none !important;
+  font-size: clamp(2.4rem, 4.2vw, 4.2rem) !important; transition: border-color 0.15s ease;
+}
+#mfProfileGate .pg-profile-item:hover .pg-avatar { border-color: #fff !important; transform: none !important; }
+#mfProfileGate .pg-name { color: #808080 !important; font-size: clamp(0.9rem, 1.2vw, 1.15rem) !important; font-weight: 500 !important; transition: color 0.15s; }
+#mfProfileGate .pg-profile-item:hover .pg-name { color: #fff !important; }
+#mfProfileGate .pg-add-btn { border-radius: 6px !important; border: 0 !important; background: #2a2a2a !important; color: #b3b3b3 !important; width: clamp(84px, 10vw, 150px) !important; height: clamp(84px, 10vw, 150px) !important; font-size: 2.6rem !important; }
+#mfProfileGate .pg-profile-item:hover .pg-add-btn { background: #fff !important; color: #141414 !important; }
+#mfProfileGate .pg-manage-btn {
+  margin-top: 40px !important; padding: 0.75em 1.8em !important; border: 1px solid #808080 !important; border-radius: 0 !important; background: none !important;
+  color: #808080 !important; text-decoration: none !important; letter-spacing: 0.18em; text-transform: uppercase; font-size: clamp(0.78rem, 1vw, 1rem) !important; font-weight: 500 !important;
+}
+#mfProfileGate .pg-manage-btn:hover, #mfProfileGate .pg-manage-btn.active { border-color: #fff !important; color: #fff !important; }
+
+/* detail seriálu */
+html body #seriesModal .modal-content { background: var(--nf-bg) !important; border-radius: 0 !important; box-shadow: none !important; border: 0 !important; }
+html body #seriesModal .modal-hero { min-height: clamp(300px, 50vh, 520px); }
+html body #seriesModal .modal-hero-overlay {
+  background: linear-gradient(0deg, var(--nf-bg) 2%, rgba(20, 20, 20, 0) 55%), linear-gradient(77deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 65%) !important;
+}
+html body #seriesModal .modal-hero-left h2 { font-size: clamp(2rem, 4.6vw, 3.6rem) !important; font-weight: 800 !important; letter-spacing: -0.04em !important; line-height: 1.02 !important; color: #fff !important; }
+html body #seriesModal .modal-meta-text { color: #d2d2d2 !important; font-size: 0.95rem !important; }
+html body #seriesModal .tmdb-badge { background: none !important; border: 1px solid #808080 !important; color: #d2d2d2 !important; border-radius: 3px !important; font-size: 0.7rem !important; }
+html body #seriesModal .panel-progress-bar { height: 4px !important; background: rgba(255, 255, 255, 0.28) !important; border-radius: 2px !important; }
+html body #seriesModal .panel-progress-fill { background: var(--nf-accent) !important; box-shadow: none !important; }
+html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle {
+  height: 44px; padding: 0 22px !important; border: 0 !important; border-radius: 6px !important; box-shadow: none !important;
+  font-size: 0.98rem !important; font-weight: 700 !important; text-shadow: none !important; filter: none !important; transform: none;
+}
+html body #seriesModal .btn-continue { background: #fff !important; color: #000 !important; }
+html body #seriesModal .btn-continue:hover { background: rgba(255, 255, 255, 0.78) !important; }
+html body #seriesModal .btn-shuffle { background: rgba(109, 109, 110, 0.7) !important; color: #fff !important; }
+html body #seriesModal .btn-shuffle:hover { background: rgba(109, 109, 110, 0.45) !important; }
+html body #seriesModal #modalFindBtn { color: #fff !important; }
+html body #seriesModal .close-btn { background: #181818 !important; border: 0 !important; box-shadow: none !important; color: #fff !important; }
+html body #seriesModal .ssv-card { border: 0 !important; border-radius: 6px !important; box-shadow: none !important; background: #2a2a2a !important; transition: transform 0.2s ease !important; }
+html body #seriesModal .ssv-card:hover { transform: scale(1.05) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important; }
+html body #seriesModal .ssv-card.ssv-active { outline: 2px solid #fff; outline-offset: 0; box-shadow: none !important; }
+html body #seriesModal .ep-view-bar { background: var(--nf-bg) !important; border: 0 !important; box-shadow: none !important; }
+html body #seriesModal .ep-view-back, html body #seriesModal .season-all-btn, html body #seriesModal .ep-view-season-badge {
+  background: rgba(109, 109, 110, 0.4) !important; border: 0 !important; border-radius: 4px !important; color: #fff !important; box-shadow: none !important;
+}
+html body #seriesModal .episode-card {
+  background: transparent !important; border: 0 !important; border-bottom: 1px solid #333 !important; border-radius: 0 !important;
+  box-shadow: none !important; transition: background 0.15s !important;
+}
+html body #seriesModal .episode-card:hover { background: #1f1f1f !important; transform: none !important; }
+html body #seriesModal .episode-card.next-ep { background: #2a2a2a !important; }
+html body #seriesModal .ep-thumb { border-radius: 4px !important; overflow: hidden; }
+html body #seriesModal .ep-num { color: #b3b3b3 !important; }
+html body #seriesModal .ep-title { color: #fff !important; font-weight: 600 !important; }
+html body #seriesModal .ep-btn-play-hbo {
+  background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important;
+}
+html body #seriesModal .ep-btn-play-hbo:hover { background: rgba(255, 255, 255, 0.78) !important; }
+html body #seriesModal .ep-btn-mark { background: transparent !important; border: 1px solid #808080 !important; color: #fff !important; box-shadow: none !important; }
+html body #seriesModal .ep-next-tag { background: var(--nf-accent) !important; color: #fff !important; border-radius: 3px !important; }
+
+/* Můj seznam (oblíbené) – celá obrazovka */
+html body .watchlist-overlay { background: var(--nf-bg) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; padding: 0 !important; align-items: stretch !important; justify-content: stretch !important; }
+html body .watchlist-box {
+  width: 100% !important; max-width: none !important; height: 100% !important; max-height: none !important; border-radius: 0 !important;
+  background: var(--nf-bg) !important; border: 0 !important; box-shadow: none !important; padding: 28px var(--nf-pad) 100px !important; overflow-y: auto !important;
+}
+html body .wl-title { font-size: clamp(1.7rem, 3.2vw, 2.6rem) !important; font-weight: 800 !important; letter-spacing: -0.03em !important; color: #fff !important; }
+html body .wl-count { color: #808080 !important; }
+html body .wl-close { background: #2a2a2a !important; border: 0 !important; color: #fff !important; }
+html body .wl-search { background: #2a2a2a !important; border: 0 !important; border-radius: 4px !important; color: #fff !important; box-shadow: none !important; }
+html body .wl-tab { background: transparent !important; border: 1px solid #404040 !important; border-radius: 4px !important; color: #d2d2d2 !important; box-shadow: none !important; }
+html body .wl-tab.active { background: #fff !important; border-color: #fff !important; color: #000 !important; }
+html body .wl-empty-btn { background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; }
+
+/* oznámení, nastavení a další okna */
+html body .notif-panel {
+  top: calc(var(--nf-bar-h) + 6px + env(safe-area-inset-top, 0px)) !important; right: var(--nf-pad) !important; left: auto !important;
+   background: #181818 !important; border: 1px solid #333 !important; border-radius: 6px !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8) !important; backdrop-filter: none !important;
+}
+html body .customize-box { background: #181818 !important; border: 1px solid #333 !important; border-radius: 8px !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85) !important; backdrop-filter: none !important; }
+html body .customize-section-title { font-size: 0.8rem !important; letter-spacing: 0.08em; color: #b3b3b3 !important; }
+html body .customize-tab.active { color: #fff !important; border-bottom-color: #fff !important; }
+html body .genre-editor-box, html body .pm-box { background: #181818 !important; border: 1px solid #333 !important; border-radius: 8px !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85) !important; backdrop-filter: none !important; }
+html body #mf-toast { background: #333 !important; border: 0 !important; border-radius: 4px !important; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6) !important; backdrop-filter: none !important; font-weight: 600 !important; }
+
+@media (max-width: 899px) {
+  html body .notif-panel { right: 8px !important; top: calc(56px + env(safe-area-inset-top, 0px)) !important; }
+  html body .watchlist-box { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 100px) !important; }
+  #mfProfileGate .pg-logo { top: 16px; }
+  html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle { height: 40px; padding: 0 14px !important; font-size: 0.88rem !important; }
+}
+html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchlistOverlay .watchlist-box {
+  width: 100% !important; max-width: none !important; height: 100% !important; max-height: none !important; margin: 0 !important;
+  border-radius: 0 !important; background: var(--nf-bg) !important; border: 0 !important; box-shadow: none !important; transform: none !important;
+}
+#mfProfileGate .pg-avatar::before, #mfProfileGate .pg-avatar::after { display: none !important; }
+
+/* ═════════ Cinema mode (přehrávač) ═════════ */
+#mfStandaloneCinema {
+  display: none; position: fixed; inset: 0; z-index: 1000000; flex-direction: column;
+  background: #000; color: #fff; font-family: inherit;
+}
+#mfStandaloneCinema.open { display: flex; }
+#mfStandaloneCinema .mf-standalone-cinema-top {
+  position: relative; z-index: 3; flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) clamp(12px, 2vw, 28px) 10px;
+  background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.92) 100%);
+}
+#mfStandaloneCinemaClose {
+  flex: none; width: 44px; height: 44px; margin: 0 2px 0 -8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: none; color: #fff; display: inline-flex; align-items: center; justify-content: center; transition: background 0.15s, transform 0.1s;
+}
+#mfStandaloneCinemaClose:hover { background: rgba(255, 255, 255, 0.14); }
+#mfStandaloneCinemaClose:active { transform: scale(0.92); }
+#mfStandaloneCinema .mf-standalone-cinema-top strong {
+  font-size: clamp(1rem, 1.4vw, 1.25rem); font-weight: 700; letter-spacing: -0.01em; color: #fff;
+  max-width: min(36vw, 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#mfStandaloneCinema .mf-cin-src-label { font-size: 0.78rem; color: #b3b3b3; font-weight: 600; white-space: nowrap; }
+#mfStandaloneCinema .mf-cin-src-counter { font-size: 0.72rem; color: #808080; white-space: nowrap; }
+
+/* tlačítka v liště */
+#mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn,
+#mfStandaloneCinema .mf-cin-external-btn {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border: 0; border-radius: 4px;
+  background: rgba(109, 109, 110, 0.55); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; text-decoration: none; white-space: nowrap;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+}
+#mfStandaloneCinema .mf-cin-ep-btn:hover, #mfStandaloneCinema .mf-cin-fav-btn:hover, #mfStandaloneCinema .mf-cin-switch-btn:hover,
+#mfStandaloneCinema .mf-cin-external-btn:hover { background: rgba(109, 109, 110, 0.85); }
+#mfStandaloneCinema .mf-cin-ep-btn:active, #mfStandaloneCinema .mf-cin-fav-btn:active, #mfStandaloneCinema .mf-cin-switch-btn:active { transform: scale(0.97); }
+#mfStandaloneCinema .mf-cin-ep-pick, #mfStandaloneCinema #mfCinNextEp { background: #fff; color: #000; }
+#mfStandaloneCinema .mf-cin-ep-pick:hover, #mfStandaloneCinema #mfCinNextEp:hover { background: rgba(255, 255, 255, 0.78); }
+#mfStandaloneCinema .mf-cin-fav-btn.faved { background: rgba(255, 255, 255, 0.16); color: #fff; }
+#mfStandaloneCinema .mf-cin-tvbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: 4px; padding-left: 14px; border-left: 1px solid #333; }
+#mfStandaloneCinema .mf-cin-ep-current { font-size: 0.9rem; font-weight: 700; color: #fff; padding: 0 2px; white-space: nowrap; }
+#mfStandaloneCinema .mf-cin-ep-btn.mf-cin-next-series { margin-left: 0; }
+
+/* výběr epizod */
+#mfStandaloneCinema .mf-cin-epgrid {
+  position: relative; z-index: 3; flex: none; display: flex; flex-direction: column; gap: 14px; max-height: 44vh; overflow-y: auto;
+  padding: 16px clamp(12px, 2vw, 28px) 20px; background: #141414; border-top: 1px solid #262626; border-bottom: 1px solid #262626;
+}
+#mfStandaloneCinema .mf-cin-epgrid-seasons { display: flex; gap: 4px; flex-wrap: wrap; }
+#mfStandaloneCinema .mf-cin-season-chip {
+  box-shadow: none !important;
+  padding: 8px 14px; border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: #b3b3b3;
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: color 0.15s;
+}
+#mfStandaloneCinema .mf-cin-season-chip:hover { color: #fff; }
+#mfStandaloneCinema .mf-cin-season-chip.active { color: #fff; background: none !important; border-bottom-color: var(--nf-accent); }
+#mfStandaloneCinema .mf-cin-epgrid-body { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+#mfStandaloneCinema .mf-cin-ep-chip {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 52px; border: 0; border-radius: 4px;
+  background: #2a2a2a; color: #d2d2d2; font: inherit; font-size: 0.85rem; cursor: pointer; transition: background 0.15s, transform 0.1s;
+}
+#mfStandaloneCinema .mf-cin-ep-chip:hover { background: #3a3a3a; }
+#mfStandaloneCinema .mf-cin-ep-chip.watched { background: #1f1f1f; color: #808080; }
+#mfStandaloneCinema .mf-cin-ep-chip.current { background: #fff; color: #000; }
+#mfStandaloneCinema .mf-cin-ep-chip-num { font-weight: 700; }
+#mfStandaloneCinema .mf-cin-ep-chip-mark { font-size: 0.75rem; color: inherit; min-height: 0.9em; line-height: 1; }
+
+/* přehrávač */
+#mfStandaloneCinema .mf-standalone-cinema-frame { flex: 1; min-height: 0; }
+#mfStandaloneCinemaFrame, #mfStandaloneCinemaFrame iframe { width: 100%; height: 100%; border: 0; }
+#mfStandaloneCinemaFrame { position: relative; overflow: hidden; background: #000; }
+#mfStandaloneCinemaFrame iframe { position: relative; z-index: 1; display: block; opacity: 0; transition: opacity 0.3s ease; }
+#mfStandaloneCinemaFrame.mf-cinema-ready iframe { opacity: 1; }
+.mf-cinema-skeleton {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: #000; color: #b3b3b3; font-size: 0.9rem; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.mf-cinema-skeleton[aria-hidden="true"] { opacity: 0; visibility: hidden; }
+.mf-cinema-skeleton-mark {
+  width: 56px; height: 56px; border-radius: 50%; border: 4px solid #2a2a2a; border-top-color: var(--nf-accent); font-size: 0;
+  animation: nfSpin 0.9s linear infinite;
+}
+.mf-cinema-skeleton-line { display: none; }
+@keyframes nfSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .mf-cinema-skeleton-mark { animation: none; } }
+
+@media (max-width: 700px) {
+  #mfStandaloneCinema .mf-standalone-cinema-top { gap: 8px; }
+  #mfStandaloneCinema .mf-standalone-cinema-top strong { max-width: calc(100vw - 90px); font-size: 1rem; }
+  #mfStandaloneCinema .mf-cin-src-label { order: 5; }
+  #mfStandaloneCinema .mf-cin-src-counter { display: none; }
+  #mfStandaloneCinema .mf-cin-tvbar { order: 6; flex: 1 0 100%; margin: 0; padding: 0; border: 0; gap: 6px; }
+  #mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn,
+  #mfStandaloneCinema .mf-cin-external-btn { height: 34px; padding: 0 11px; font-size: 0.78rem; }
+    #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn, #mfStandaloneCinema .mf-cin-external-btn { order: 7; }
+  #mfStandaloneCinema .mf-cin-epgrid { max-height: 50vh; }
+  #mfStandaloneCinema .mf-cin-epgrid-body { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
+}
+
+/* ============================================================
+   Nový profil + úvodní výběr žánrů (styl Netflix "Přidat profil")
+   ============================================================ */
+html body #mfProfileCreate { background: #141414 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; align-items: flex-start !important; overflow-y: auto; padding: 0 !important; }
+html body #mfProfileCreate .pc-logo { position: absolute; left: var(--nf-pad); top: 18px; font-weight: 900; font-size: clamp(1.5rem, 2.4vw, 2rem); letter-spacing: -0.04em; color: #fff; }
+html body #mfProfileCreate .pc-logo span { color: var(--nf-accent); }
+html body #mfProfileCreate::after { content: none; }
+html body #mfProfileCreate .pc-box {
+  background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; animation: none !important;
+  width: min(620px, 100%) !important; max-height: none !important; overflow: visible !important; margin: 0 auto; padding: clamp(84px, 14vh, 140px) 20px 60px !important;
+}
+html body #mfProfileCreate .pc-heading { display: block; position: relative; }
+html body #mfProfileCreate .pc-eyebrow { display: none !important; }
+html body #mfProfileCreate .pc-title { font-size: clamp(2rem, 5vw, 3.4rem) !important; font-weight: 500 !important; letter-spacing: -0.02em !important; color: #fff !important; line-height: 1.1; }
+html body #mfProfileCreate .pc-subtitle { color: #808080 !important; font-size: 1.15rem !important; margin: 10px 0 8px !important; padding-bottom: 22px; border-bottom: 1px solid #333; }
+html body #mfProfileCreate .pc-close { position: fixed; top: 14px; right: var(--nf-pad); background: transparent !important; border: 0 !important; color: #b3b3b3 !important; font-size: 2rem !important; width: 44px; height: 44px; }
+html body #mfProfileCreate .pc-close:hover { color: #fff !important; }
+html body #mfProfileCreate .pc-label { color: #b3b3b3 !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.95rem !important; font-weight: 600 !important; margin-top: 26px !important; }
+html body #mfProfileCreate .pc-label-note { color: #666 !important; font-weight: 400; text-transform: none; }
+html body #mfProfileCreate .pc-hint { color: #808080 !important; text-align: left !important; font-size: 0.85rem !important; }
+html body #mfProfileCreate .pc-input, html body #mfProfileCreate .pc-avatar-search {
+  background: #666 !important; border: 1px solid transparent !important; border-radius: 4px !important; box-shadow: none !important; color: #fff !important; font-size: 1.05rem !important; height: 48px; padding: 0 14px !important;
+}
+html body #mfProfileCreate .pc-input::placeholder, html body #mfProfileCreate .pc-avatar-search::placeholder { color: #d0d0d0; }
+html body #mfProfileCreate .pc-input:focus, html body #mfProfileCreate .pc-avatar-search:focus { outline: 2px solid #fff !important; outline-offset: 0; border-color: transparent !important; }
+html body #mfProfileCreate .pc-avatar-picker-toggle { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; gap: 18px !important; }
+html body #mfProfileCreate .pc-avatar-preview { width: 104px !important; height: 104px !important; border-radius: 4px !important; background: #333 !important; font-size: 3rem !important; overflow: hidden; display: grid; place-items: center; box-shadow: none !important; }
+html body #mfProfileCreate .pc-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+html body #mfProfileCreate .pc-avatar-picker-toggle strong { color: #fff !important; font-size: 1.05rem; }
+html body #mfProfileCreate .pc-avatar-picker-toggle small { color: #808080 !important; }
+html body #mfProfileCreate .pc-avatar-picker-arrow { margin-left: auto; color: #b3b3b3 !important; }
+html body #mfProfileCreate .pc-avatar-picker { background: #181818 !important; border: 1px solid #333 !important; border-radius: 4px !important; box-shadow: none !important; padding: 14px !important; }
+html body #mfProfileCreate .pc-avatar-tabs button { background: transparent !important; border: 1px solid #404040 !important; border-radius: 4px !important; color: #d2d2d2 !important; box-shadow: none !important; }
+html body #mfProfileCreate .pc-avatar-tabs button.active { background: #fff !important; border-color: #fff !important; color: #000 !important; }
+html body #mfProfileCreate .pc-avatar-option { background: transparent !important; border: 2px solid transparent !important; border-radius: 4px !important; box-shadow: none !important; color: #b3b3b3 !important; }
+html body #mfProfileCreate .pc-avatar-option img { border-radius: 4px !important; }
+html body #mfProfileCreate .pc-avatar-option:hover { color: #fff !important; }
+html body #mfProfileCreate .pc-avatar-option.selected { border-color: #fff !important; color: #fff !important; }
+html body #mfProfileCreate .pc-avatar-back { background: transparent !important; border: 0 !important; color: #b3b3b3 !important; }
+html body #mfProfileCreate .pc-pin-row { justify-content: flex-start !important; gap: 10px !important; }
+html body #mfProfileCreate .pc-pin-digit { background: #666 !important; border: 1px solid transparent !important; border-radius: 4px !important; box-shadow: none !important; color: #fff !important; width: 52px !important; height: 52px !important; }
+html body #mfProfileCreate .pc-pin-digit:focus { outline: 2px solid #fff !important; }
+html body #mfProfileCreate .pc-btn-row { display: flex !important; flex-direction: row-reverse; justify-content: flex-end; gap: 14px !important; margin-top: 34px !important; padding-top: 22px; border-top: 1px solid #333; }
+html body #mfProfileCreate .pc-btn-save { flex: 0 0 auto !important; background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; font-size: 1.05rem !important; padding: 0 28px !important; height: 46px; letter-spacing: 0.02em; }
+html body #mfProfileCreate .pc-btn-save:hover { background: #e50914 !important; color: #fff !important; }
+html body #mfProfileCreate .pc-btn-cancel { flex: 0 0 auto !important; background: transparent !important; color: #808080 !important; border: 1px solid #808080 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; padding: 0 24px !important; height: 46px; font-size: 1.05rem !important; text-transform: none; }
+html body #mfProfileCreate .pc-btn-cancel:hover { color: #fff !important; border-color: #fff !important; }
+
+html body #mfProfileWelcome { background: #141414 !important; backdrop-filter: none !important; align-items: flex-start !important; overflow-y: auto; padding: 0 !important; }
+html body #mfProfileWelcome .pw-box { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; width: min(720px, 100%) !important; max-width: none !important; margin: 0 auto; padding: clamp(84px, 14vh, 140px) 20px 60px !important; }
+html body #mfProfileWelcome .pw-kicker { color: var(--nf-accent) !important; font-weight: 900; letter-spacing: 0.02em; text-transform: none; font-size: 1.2rem; }
+html body #mfProfileWelcome .pw-title { font-size: clamp(2rem, 5vw, 3.2rem) !important; font-weight: 500 !important; letter-spacing: -0.02em; }
+html body #mfProfileWelcome .pw-subtitle { color: #808080 !important; font-size: 1.1rem !important; margin-bottom: 28px !important; }
+html body #mfProfileWelcome .pw-genre { background: transparent !important; border: 1px solid #595959 !important; border-radius: 4px !important; color: #d2d2d2 !important; font-size: 1rem !important; padding: 12px 18px !important; box-shadow: none !important; }
+html body #mfProfileWelcome .pw-genre:hover { border-color: #fff !important; color: #fff !important; background: transparent !important; }
+html body #mfProfileWelcome .pw-genre.selected { background: #fff !important; border-color: #fff !important; color: #000 !important; font-weight: 700; }
+html body #mfProfileWelcome .pw-actions { justify-content: flex-end !important; flex-direction: row-reverse; gap: 14px !important; margin-top: 36px !important; padding-top: 22px; border-top: 1px solid #333; }
+html body #mfProfileWelcome .pw-save { background: #fff !important; color: #000 !important; border-radius: 4px !important; padding: 0 28px; height: 46px; font-weight: 700 !important; font-size: 1.05rem; }
+html body #mfProfileWelcome .pw-skip { border: 1px solid #808080 !important; border-radius: 4px !important; color: #808080 !important; padding: 0 24px; height: 46px; font-size: 1.05rem; }
+html body #mfProfileWelcome .pw-skip:hover { color: #fff !important; border-color: #fff !important; }
+@media (max-width: 699px) {
+  html body #mfProfileCreate .pc-avatar-preview { width: 84px !important; height: 84px !important; }
+  html body #mfProfileCreate .pc-btn-row, html body #mfProfileWelcome .pw-actions { flex-direction: column-reverse; }
+  html body #mfProfileCreate .pc-btn-save, html body #mfProfileCreate .pc-btn-cancel, html body #mfProfileWelcome .pw-save, html body #mfProfileWelcome .pw-skip { width: 100%; }
+}
+
+/* ============================================================
+   Novinky (zvonek)
+   ============================================================ */
+html body .notif-panel { width: min(420px, calc(100vw - 24px)) !important; max-height: min(640px, calc(100vh - var(--nf-bar-h) - 24px)) !important; display: none; flex-direction: column; overflow: hidden; padding: 0 !important; }
+html body .notif-panel.open { display: flex !important; }
+
+/* ============================================================
+   Notebooky (13–15", cca 1024–1600 px) – nic se nepřekrývá
+   ============================================================ */
+@media (min-width: 900px) and (max-width: 1599px) {
+  html body #seriesModal .modal-hero-content { flex-direction: column !important; align-items: flex-start !important; justify-content: flex-end !important; gap: 14px !important; }
+  html body #seriesModal .modal-hero-left { flex: 0 0 auto !important; width: 100%; }
+  html body #seriesModal .panel-btns { flex-wrap: wrap !important; width: 100%; gap: 8px !important; }
+  html body #seriesModal .panel-btns > * { white-space: nowrap; }
+}
+@media (min-width: 900px) and (max-height: 860px) {
+  .nf-hero { height: clamp(400px, 70vh, 600px); }
+  .nf-hero-body { padding-bottom: clamp(100px, 15vh, 130px); }
+  .nf-hero-title { font-size: clamp(2rem, 4.2vw, 3.4rem); }
+  html body #seriesModal .modal-hero { min-height: clamp(250px, 42vh, 380px); }
+  .nf-row { margin-bottom: 18px; }
+}
+@media (min-width: 900px) and (max-width: 1099px) {
+  html body #mfDock .dock-btn { padding: 10px 10px; font-size: 0.9rem; }
+  .nf-hero-body { width: min(560px, 100%); }
+}
+html body .mf-cin-season-chip.active, html body .mf-cin-season-chip.active:hover { color: #fff !important; }
+
+/* Scroll-hide docku (js/shell/dock.js přepíná třídu mf-dock-hidden) */
+html body #mfDock.mf-dock { transition: transform .3s ease; }
+html body #mfDock.mf-dock.mf-dock-hidden { transform: translateY(130%); }
+
+/* Cinema: tlačítko Oblíbené je jen srdíčko, drží se vpravo (dřív tam tlačilo odsazení tlačítko s varováním) */
+#mfStandaloneCinema .mf-cin-fav-btn { margin-left: auto; width: 40px; padding: 0; font-size: 1.25rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+#mfStandaloneCinema .mf-cin-fav-btn.faved { color: #ff375f; }
+
+/* ═════════ Okno seriálu – výběr epizod v Netflix stylu (seznam řádků + výběr sezóny) ═════════ */
+#seriesModal .ep-view-bar {
+  display: flex !important; align-items: center !important; gap: 14px !important;
+  padding: 18px clamp(16px, 3vw, 40px) 10px !important; background: transparent !important; border: 0 !important;
+}
+#seriesModal .ep-view-title { display: none !important; }
+#seriesModal .ep-view-back {
+  background: transparent !important; border: 0 !important; color: #bcbcbc !important; font-size: 0.85rem !important;
+  display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px 6px 0 !important; cursor: pointer;
+}
+#seriesModal .ep-view-back:hover { color: #fff !important; }
+#seriesModal .ep-view-back svg { width: 16px; height: 16px; }
+#seriesModal .nfx-season-select {
+  margin-left: auto; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background: #242424 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23fff' stroke-width='2'/></svg>") no-repeat right 12px center;
+  color: #fff; border: 1px solid #4d4d4d; border-radius: 4px; padding: 9px 34px 9px 14px; font: 600 0.95rem/1 inherit; font-family: inherit;
+}
+#seriesModal .nfx-season-select:hover, #seriesModal .nfx-season-select:focus-visible { border-color: #fff; outline: 0; }
+#seriesModal .nfx-season-select:disabled { opacity: 0.45; cursor: default; }
+#seriesModal .season-all-btn {
+  background: transparent !important; border: 0 !important; color: #bcbcbc !important; font-size: 0.82rem !important; padding: 6px 4px !important; cursor: pointer;
+}
+#seriesModal .season-all-btn:hover { color: #fff !important; }
+
+#seriesModal #episodesGrid.episode-grid {
+  display: flex !important; flex-direction: column; gap: 0 !important; padding: 0 clamp(8px, 3vw, 40px) 90px !important; background: transparent !important;
+}
+#seriesModal #episodesGrid .episode-card {
+  position: relative; display: grid !important; grid-template-columns: 44px 168px minmax(0, 1fr); align-items: center; column-gap: 18px;
+  width: auto !important; max-width: none !important; min-height: 0 !important; height: auto !important; margin: 0 !important;
+  padding: 18px 16px !important; background: transparent !important; border: 0 !important; border-bottom: 1px solid #404040 !important;
+  border-radius: 6px !important; box-shadow: none !important; transform: none !important; cursor: pointer; transition: background 0.15s;
+  counter-increment: none;
+}
+#seriesModal #episodesGrid .episode-card:last-child { border-bottom: 0 !important; }
+#seriesModal #episodesGrid .episode-card:hover { background: #333 !important; }
+#seriesModal #episodesGrid .episode-card::before,
+#seriesModal #episodesGrid .episode-card.next-ep::before {
+  position: static !important; inset: auto !important; width: auto !important; height: auto !important; background: none !important; border: 0 !important; box-shadow: none !important; transform: none !important; border-radius: 0 !important; opacity: 1 !important; animation: none !important; display: block;
+  content: attr(data-n); grid-column: 1; font-size: 1.5rem; font-weight: 500; color: #d2d2d2; text-align: center;
+}
+#seriesModal #episodesGrid .ep-thumb {
+  grid-column: 2; position: relative; width: 168px !important; height: 94px !important; aspect-ratio: 16 / 9; border-radius: 4px !important; overflow: hidden; background: #1a1a1a;
+}
+#seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#seriesModal #episodesGrid .ep-body { grid-column: 3; min-width: 0; padding: 0 !important; background: transparent !important; display: flex; flex-direction: column; gap: 6px; }
+#seriesModal #episodesGrid .ep-meta-row { order: 2; display: flex; gap: 10px; font-size: 0.78rem; color: #a3a3a3; align-items: center; }
+#seriesModal #episodesGrid .ep-num { display: none; }
+#seriesModal #episodesGrid .ep-title { order: 1; font-size: 1.05rem !important; font-weight: 600 !important; color: #fff !important; letter-spacing: 0; }
+#seriesModal #episodesGrid .ep-desc {
+  order: 3; font-size: 0.88rem !important; line-height: 1.45; color: #d2d2d2 !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+#seriesModal #episodesGrid .ep-actions { order: 4; display: flex; gap: 10px; align-items: center; margin-top: 4px; }
+#seriesModal #episodesGrid .ep-btn-play-hbo {
+  display: inline-flex; align-items: center; gap: 8px; background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important;
+  padding: 7px 16px !important; font-weight: 700 !important; font-size: 0.82rem !important; cursor: pointer;
+}
+#seriesModal #episodesGrid .ep-btn-play-hbo:hover { background: rgba(255, 255, 255, 0.78) !important; }
+#seriesModal #episodesGrid .ep-btn-mark {
+  width: 34px; height: 34px; border-radius: 50% !important; border: 1px solid #808080 !important; background: rgba(42, 42, 42, 0.6) !important; color: #fff !important; cursor: pointer; font-size: 0.95rem;
+}
+#seriesModal #episodesGrid .ep-btn-mark:hover { border-color: #fff !important; }
+#seriesModal #episodesGrid .episode-card.watched .ep-title,
+#seriesModal #episodesGrid .episode-card.watched .ep-desc { opacity: 0.55; }
+#seriesModal #episodesGrid .episode-card.next-ep { background: rgba(255, 255, 255, 0.07) !important; }
+#seriesModal #episodesGrid .ep-next-tag { position: absolute; left: 6px; top: 6px; background: var(--accent); color: #fff; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+#seriesModal #episodesGrid .ep-hover-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; background: rgba(0, 0, 0, 0.35); transition: opacity 0.15s; cursor: pointer; }
+#seriesModal #episodesGrid .episode-card:hover .ep-hover-play { opacity: 1; }
+#seriesModal #episodesGrid .ep-play-ring { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); }
+#seriesModal #episodesGrid .ep-play-ring svg { width: 12px; height: 14px; fill: #fff; margin-left: 3px; }
+#seriesModal #episodesGrid .ep-seen-dot { display: none; }
+#seriesModal #episodesGrid .episode-card.watched .ep-seen-dot { display: flex; position: absolute; right: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%; background: #46d369; color: #000; font-size: 0.72rem; font-weight: 800; align-items: center; justify-content: center; }
+#seriesModal #episodesGrid .ep-progress-bar-wrap { height: 3px; background: #4d4d4d; border-radius: 2px; overflow: hidden; }
+#seriesModal #episodesGrid .ep-progress-bar-fill { height: 100%; background: var(--accent); }
+@media (max-width: 700px) {
+  #seriesModal #episodesGrid .episode-card { grid-template-columns: 112px minmax(0, 1fr); column-gap: 12px; padding: 14px 6px !important; }
+  #seriesModal #episodesGrid .episode-card::before, #seriesModal #episodesGrid .episode-card.next-ep::before { display: none !important; }
+  #seriesModal #episodesGrid .ep-thumb { grid-column: 1; width: 112px !important; height: 63px !important; }
+  #seriesModal #episodesGrid .ep-body { grid-column: 2; }
+  #seriesModal #episodesGrid .ep-desc { -webkit-line-clamp: 2; font-size: 0.8rem !important; }
+  #seriesModal #episodesGrid .ep-btn-play-hbo { padding: 6px 12px !important; }
+}
+
+/* Epizody: číslo vlevo, bez šipek ze starého stylu */
+html body #seriesModal #episodesGrid .episode-card::after,
+html body #seriesModal #episodesGrid .episode-card .ep-actions::after { display: none !important; content: none !important; }
+
+/* Vytvoření profilu – avatar vedle jmen, výběr avatara na celou obrazovku (styl Netflix "Přidat profil") */
+html body #mfProfileCreate .pc-box { width: min(760px, 100%) !important; }
+html body #mfProfileCreate .pc-edit-row { display: flex; gap: 28px; align-items: flex-start; margin-top: 8px; }
+html body #mfProfileCreate .pc-fields { flex: 1; min-width: 0; }
+html body #mfProfileCreate .pc-fields .pc-label:first-child { margin-top: 0 !important; }
+html body #mfProfileCreate .pc-avatar-picker-toggle { position: relative; flex: none; margin-top: 4px; cursor: pointer; }
+html body #mfProfileCreate .pc-avatar-picker-toggle:hover .pc-avatar-preview { outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-avatar-edit {
+  position: absolute; right: -8px; bottom: -8px; width: 34px; height: 34px; border-radius: 50%; background: #141414; border: 2px solid #fff;
+  color: #fff; display: grid; place-items: center; font-size: 0.95rem;
+}
+html body #mfProfileCreate .pc-avatar-picker {
+  position: fixed !important; inset: 0 !important; z-index: 20; background: #141414 !important; border: 0 !important; border-radius: 0 !important;
+  padding: 0 var(--nf-pad) 40px !important; overflow-y: auto; display: block;
+}
+html body #mfProfileCreate .pc-avatar-picker[hidden] { display: none !important; }
+html body #mfProfileCreate .pc-picker-head { display: flex; align-items: center; gap: 14px; padding: 22px 0 18px; font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 600; color: #fff; }
+html body #mfProfileCreate .pc-picker-back { background: transparent; border: 0; color: #fff; font-size: 2.4rem; line-height: 1; cursor: pointer; padding: 0 8px; }
+html body #mfProfileCreate .pc-avatar-search { max-width: 420px; margin-bottom: 18px; }
+html body #mfProfileCreate .pc-avatar-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 16px; max-height: none !important; overflow: visible !important; }
+html body #mfProfileCreate .pc-avatar-option { padding: 0 !important; display: flex; flex-direction: column; gap: 8px; text-align: left; font-size: 0.85rem; cursor: pointer; }
+html body #mfProfileCreate .pc-avatar-option img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; }
+html body #mfProfileCreate .pc-avatar-option.pc-character-option img { aspect-ratio: 1; }
+html body #mfProfileCreate .pc-avatar-option:hover img, html body #mfProfileCreate .pc-avatar-option:focus-visible img { outline: 3px solid #fff; }
+@media (max-width: 640px) {
+  html body #mfProfileCreate .pc-edit-row { flex-direction: column; gap: 22px; }
+  html body #mfProfileCreate .pc-avatar-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+}
+
+/* Zadání PIN profilu – celá obrazovka, čtyři políčka */
+html body #mfPinModal { background: #141414 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html body #mfPinModal .pm-box {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; width: min(380px, 100%) !important;
+  padding: 24px 20px !important; display: flex; flex-direction: column; align-items: center; animation: none !important;
+}
+html body #mfPinModal .pm-avatar {
+  width: 112px !important; height: 112px !important; border-radius: 6px !important; background: #333 !important; border: 0 !important; box-shadow: none !important;
+  font-size: 3.4rem !important; display: grid; place-items: center; overflow: hidden;
+}
+html body #mfPinModal .pm-title { font-size: 1.3rem !important; font-weight: 600 !important; color: #fff !important; margin-top: 14px; }
+html body #mfPinModal .pm-sub { font-size: 1.55rem !important; font-weight: 500; color: #fff !important; margin: 18px 0 14px !important; }
+html body #mfPinModal .pm-dots { display: flex; gap: 10px; margin-bottom: 22px; }
+html body #mfPinModal .pm-dot {
+  width: 54px !important; height: 64px !important; border-radius: 4px !important; border: 2px solid #808080 !important; background: transparent !important; box-shadow: none !important;
+  display: grid; place-items: center; transition: border-color 0.15s;
+}
+html body #mfPinModal .pm-dot.filled { border-color: #fff !important; }
+html body #mfPinModal .pm-dot.filled::after { content: "•"; color: #fff; font-size: 2.2rem; line-height: 1; }
+html body #mfPinModal .pm-dot.error { border-color: #e50914 !important; animation: nfPinShake 0.35s; }
+html body #mfPinModal .pm-dot.error::after { content: "•"; color: #e50914; font-size: 2.2rem; line-height: 1; }
+@keyframes nfPinShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+html body #mfPinModal .pm-numpad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; justify-content: center; }
+html body #mfPinModal .pm-num {
+  width: 72px !important; height: 52px !important; border-radius: 4px !important; background: #2a2a2a !important; border: 0 !important; box-shadow: none !important;
+  color: #fff !important; font-size: 1.3rem !important; font-weight: 600 !important; transform: none !important;
+}
+html body #mfPinModal .pm-num:hover { background: #3a3a3a !important; }
+html body #mfPinModal .pm-num:active { background: #555 !important; }
+html body #mfPinModal .pm-cancel { margin-top: 22px; background: transparent !important; border: 1px solid #808080 !important; color: #b3b3b3 !important; border-radius: 4px !important; padding: 9px 26px !important; font-size: 0.95rem !important; cursor: pointer; }
+html body #mfPinModal .pm-cancel:hover { color: #fff !important; border-color: #fff !important; }
+html body #mfProfileCreate .pc-avatar-picker-toggle { width: auto !important; max-width: none !important; display: block !important; }
+html body #mfProfileCreate .pc-avatar-picker { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; z-index: 50 !important; box-sizing: border-box; }
+html body #mfProfileCreate .pc-picker-head { padding-top: 84px; }
+
+/* Výběr série – mřížka plakátů ve stylu Netflix */
+html body #seriesModal #ssvGrid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: 14px !important; padding: 0 var(--nf-pad, 24px) 32px !important; }
+html body #seriesModal #ssvGrid .ssv-card {
+  position: relative; aspect-ratio: 2 / 3; width: auto !important; height: auto !important; min-width: 0 !important; border: 0 !important; border-radius: 6px !important;
+  background: #2a2a2a !important; box-shadow: none !important; overflow: hidden; cursor: pointer; outline: none; transition: transform 0.2s !important;
+}
+html body #seriesModal #ssvGrid .ssv-card::after { display: none !important; content: none !important; }
+html body #seriesModal #ssvGrid .ssv-card img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important; filter: none !important; transform: none !important; }
+html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(1.04) !important; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important; z-index: 2; }
+html body #seriesModal #ssvGrid .ssv-card.ssv-active { outline: 2px solid #fff !important; outline-offset: -2px; }
+html body #seriesModal #ssvGrid .ssv-info {
+  position: absolute !important; left: 0; right: 0; bottom: 0; padding: 36px 12px 12px !important; background: linear-gradient(to top, rgba(0, 0, 0, 0.88), transparent) !important; text-align: left;
+}
+html body #seriesModal #ssvGrid .ssv-num { color: #fff !important; font-size: 1rem !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; }
+html body #seriesModal #ssvGrid .ssv-name { display: none !important; }
+html body #seriesModal #ssvGrid .ssv-ep-count { color: #b3b3b3 !important; font-size: 0.78rem !important; font-weight: 400 !important; margin-top: 2px; }
+html body #seriesModal #ssvGrid .ssv-play-overlay { position: absolute !important; inset: 0 !important; display: flex !important; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.35) !important; opacity: 0; transition: opacity 0.2s; }
+html body #seriesModal #ssvGrid .ssv-card:hover .ssv-play-overlay, html body #seriesModal #ssvGrid .ssv-card:focus-visible .ssv-play-overlay { opacity: 1; }
+html body #seriesModal #ssvGrid .ssv-play-btn {
+  width: 52px !important; height: 52px !important; padding: 0 !important; border-radius: 50% !important; border: 2px solid #fff !important; background: rgba(0, 0, 0, 0.55) !important;
+  box-shadow: none !important; display: grid !important; place-items: center; font-size: 0 !important; transform: none !important; min-width: 0 !important;
+}
+html body #seriesModal #ssvGrid .ssv-play-btn svg { width: 20px !important; height: 20px !important; fill: #fff !important; margin: 0 0 0 3px !important; }
+html body #seriesModal #ssvGrid .ssv-active-badge {
+  top: 8px !important; right: 8px !important; left: auto !important; width: 24px !important; height: 24px !important; border-radius: 50% !important;
+  background: #46d369 !important; box-shadow: none !important; border: 0 !important;
+}
+html body #seriesModal #ssvGrid .ssv-active-badge svg { width: 14px !important; height: 14px !important; stroke: #fff !important; }
+@media (max-width: 640px) { html body #seriesModal #ssvGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; } }
+html body #seriesModal #ssvGrid .ssv-info { z-index: 3 !important; }
+html body #mfProfileCreate.picker-open .pc-logo, html body #mfProfileCreate.picker-open .pc-close { display: none !important; }
+
+/* Hvězdička v kině a okno hodnocení nad kinem */
+#mfStandaloneCinema .mf-cin-rate-btn { margin-left: auto; opacity: 0.6; }
+#mfStandaloneCinema #mfCinFavBtn { margin-left: 0; }
+#mfStandaloneCinema .mf-cin-rate-btn:hover { opacity: 1; }
+#mfStandaloneCinema .mf-cin-rate-btn:hover { color: #ffd60a; }
+html body #epRatingOverlay { z-index: 1000002 !important; }
+
+/* Řezy Netflix Sans: Thin 100–200, Light 300, Regular 400–450, Medium 500–650 (štítky, tlačítka, chipy), Bold 700–850 (nadpisy), Black 900.
+   Dřív 600 → Bold a 800 → Black, takže Medium se skoro nepoužíval a vše vypadalo stejně těžce. */
+html { font-weight: 400 !important; }
+.nf-hero-desc { font-weight: 300; }
+/* Písmo Netflix Sans (složka fonts/); když chybí, nastoupí systémové */
+:root { --nf-font: "Netflix Sans", "Helvetica Neue", Helvetica, "Segoe UI", Roboto, Arial, sans-serif; }
+html body, html body button, html body input, html body select, html body textarea,
+html body *:not(svg):not(svg *):not(code):not(pre):not(#mfFontLock) { font-family: var(--nf-font) !important; } /* :not(#id) zvedne váhu selektoru, aby přebil třídy se starým Inter/Sora */
+
+/* Mobil: tlačítko zavřít okno seriálu níž (pod výřez/notch) */
+@media (max-width: 899px) {
+  html body #seriesModal .close-btn { top: calc(env(safe-area-inset-top, 0px) + 46px) !important; right: 14px !important; }
+}
+
+/* Hover méně rušivý: na dotykových zařízeních vůbec, na myši jen jemně a bez zachytávání kliků */
+#seriesModal .ssv-play-overlay, #seriesModal .ep-hover-play { pointer-events: none; }
+@media (hover: none), (pointer: coarse) {
+  html body #seriesModal #ssvGrid .ssv-card:hover { transform: none !important; box-shadow: none !important; }
+  html body #seriesModal #ssvGrid .ssv-card:hover .ssv-play-overlay, html body #seriesModal #episodesGrid .episode-card:hover .ep-hover-play { opacity: 0 !important; }
+  html body #seriesModal #episodesGrid .episode-card:hover { background: transparent !important; }
+}
+@media (hover: hover) and (pointer: fine) {
+  html body #seriesModal #ssvGrid .ssv-card:hover { transform: scale(1.02) !important; }
+  html body #seriesModal #ssvGrid .ssv-play-overlay { background: rgba(0, 0, 0, 0.18) !important; }
+}
+
+/* Výkon: dlouhé seznamy se vykreslují až při zobrazení, rozmazání pozadí (drahé na GPU) jen na stolním počítači */
+#seriesModal #episodesGrid .episode-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+@media (max-width: 899px), (pointer: coarse) {
+  html body *, html body *::before, html body *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body *, html body *::before, html body *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Okno seriálu: nižší hlavička v klidu, při scrollování seznamu se ještě zmenší (třída nf-compact) */
+html body #seriesModal .modal-hero { min-height: clamp(220px, 34vh, 360px) !important; transition: min-height 0.25s ease; }
+html body #seriesModal.nf-compact .modal-hero { min-height: 0 !important; height: 112px !important; }
+html body #seriesModal.nf-compact .modal-hero-content { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important; padding-top: 0 !important; padding-bottom: 12px !important; }
+html body #seriesModal.nf-compact .modal-hero-left h2 { font-size: clamp(1.1rem, 2.4vw, 1.6rem) !important; margin: 0 !important; }
+html body #seriesModal.nf-compact .modal-meta-row, html body #seriesModal.nf-compact .panel-progress-wrap { display: none !important; }
+html body #seriesModal.nf-compact .panel-btns { width: auto !important; flex-wrap: nowrap !important; }
+html body #seriesModal.nf-compact .panel-btns > * { padding: 6px 12px !important; font-size: 0.8rem !important; }
+html body #seriesModal.nf-compact .btn-shuffle { display: none !important; }
+@media (max-width: 899px) { html body #seriesModal .modal-hero { min-height: clamp(200px, 30vh, 300px) !important; } html body #seriesModal.nf-compact .modal-hero { height: 96px !important; } }
+html body #seriesModal.nf-compact .modal-hero-content { padding-right: 64px !important; box-sizing: border-box !important; width: 100% !important; }
+html body #seriesModal.nf-compact .modal-hero-left { min-width: 0 !important; flex: 1 1 auto !important; width: auto !important; }
+html body #seriesModal.nf-compact .modal-hero-left h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html body #seriesModal.nf-compact .panel-btns { flex: none !important; }
+
+/* Hodnocení epizody: malý popover, nic nezakrývá a neblokuje klikání (overlay propouští kliky, jen bublina je klikací) */
+html body #epRatingOverlay.er-pop { pointer-events: none !important; background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; align-items: flex-start !important; }
+html body #epRatingOverlay.er-pop #epRatingSheet {
+  pointer-events: auto; position: absolute !important; max-width: none !important; border-radius: 12px !important; padding: 12px 16px 12px !important; background: #181818 !important;
+  border: 1px solid #333; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65); opacity: 0; transform: scale(0.6) !important;
+  transition: transform 0.25s cubic-bezier(0.2, 1.15, 0.4, 1), opacity 0.2s ease !important;
+}
+html body #epRatingOverlay.er-pop.er-corner #epRatingSheet { right: 16px; bottom: calc(92px + env(safe-area-inset-bottom)); top: auto !important; left: auto !important; width: min(300px, calc(100vw - 32px)); transform-origin: 100% 100%; }
+html body #epRatingOverlay.er-pop.open #epRatingSheet { opacity: 1; transform: scale(1) !important; }
+html body #epRatingOverlay.er-pop .er-handle, html body #epRatingOverlay.er-pop .er-label, html body #epRatingOverlay.er-pop .er-actions { display: none !important; }
+html body #epRatingOverlay.er-pop .er-ep-name { margin-bottom: 8px; font-size: 0.9rem; }
+html body #epRatingOverlay.er-pop .er-series-name { font-size: 0.64rem; }
+html body #epRatingOverlay.er-pop .er-star { font-size: 1.5rem; }
+
+/* Dlouhé názvy nesmí zasahovat do horní lišty: max. 2 řádky, menší písmo */
+html body .nf-hero-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: clamp(1.8rem, 4.4vw, 3.6rem) !important; }
+html body .nf-hero-title.nf-long { font-size: clamp(1.5rem, 3.2vw, 2.6rem) !important; line-height: 1.08; }
+html body .nf-hero-body { max-height: calc(100% - var(--nf-bar-h, 64px) - 24px); }
+
+/* Průvodce novým profilem se objeví hned a celý neprůhledný – pod ním nesmí problikávat domovská stránka */
+html body #mfProfileWelcome.show { animation: none !important; }
+
+/* Výkon: Netflix vzhled nepotřebuje rozmazání pozadí (drahé na GPU, zejména ve Firefoxu a na monitorech s vysokým Hz) */
+html body *, html body *::before, html body *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+/* Výběr avatara ve stylu Netflixu: řady podle titulů, v nich čtvercové obrázky */
+html body #mfProfileCreate .pc-avatar-grid { display: block !important; }
+html body #mfProfileCreate .pc-av-row { margin: 0 0 26px; }
+html body #mfProfileCreate .pc-av-row[hidden] { display: none; }
+html body #mfProfileCreate .pc-av-row h4 { margin: 0 0 10px; font-size: 1.15rem; font-weight: 600; color: #e5e5e5; }
+html body #mfProfileCreate .pc-av-strip { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x proximity; scrollbar-width: none; }
+html body #mfProfileCreate .pc-av-strip::-webkit-scrollbar { display: none; }
+html body #mfProfileCreate .pc-av-strip .pc-avatar-option { flex: none; width: clamp(84px, 9vw, 120px); scroll-snap-align: start; border-radius: 4px !important; overflow: hidden; }
+html body #mfProfileCreate .pc-av-strip .pc-avatar-option img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px !important; transition: transform 0.15s; }
+html body #mfProfileCreate .pc-av-strip .pc-avatar-option:hover img, html body #mfProfileCreate .pc-av-strip .pc-avatar-option:focus-visible img { transform: scale(1.06); outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-av-strip .pc-avatar-option { display: flex; flex-direction: column; gap: 6px; overflow: visible; }
+html body #mfProfileCreate .pc-av-cap { display: block; font-size: 0.72rem; color: #b3b3b3; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+/* Zdroj, který nejde vložit (X-Frame-Options): místo prázdné stránky vysvětlení a tlačítko */
+#mfStandaloneCinema .mf-cin-noembed { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; color: #e5e5e5; }
+#mfStandaloneCinema .mf-cin-noembed strong { font-size: 1.2rem; }
+#mfStandaloneCinema .mf-cin-noembed span { color: #b3b3b3; max-width: 420px; }
+#mfStandaloneCinema .mf-cin-noembed-btn { margin-top: 8px; background: #fff; color: #000; border-radius: 4px; padding: 11px 22px; font-weight: 700; text-decoration: none; }
+
+/* PIN obrazovka: na notebookech (nízké okno) menší, ať se vejde bez scrollu */
+@media (max-height: 820px) {
+  html body #mfPinModal .pm-box { padding: 12px 20px !important; }
+  html body #mfPinModal .pm-avatar { width: 76px !important; height: 76px !important; font-size: 2.3rem !important; }
+  html body #mfPinModal .pm-title { font-size: 1.05rem !important; margin-top: 8px; }
+  html body #mfPinModal .pm-sub { font-size: 1.15rem !important; margin: 10px 0 10px !important; }
+  html body #mfPinModal .pm-dots { gap: 8px; margin-bottom: 14px; }
+  html body #mfPinModal .pm-dot { width: 42px !important; height: 50px !important; }
+  html body #mfPinModal .pm-dot.filled::after, html body #mfPinModal .pm-dot.error::after { font-size: 1.8rem; }
+  html body #mfPinModal .pm-numpad { grid-template-columns: repeat(3, 60px); gap: 8px; }
+  html body #mfPinModal .pm-num { width: 60px !important; height: 42px !important; font-size: 1.1rem !important; }
+  html body #mfPinModal .pm-cancel { margin-top: 14px; padding: 7px 22px !important; font-size: 0.88rem !important; }
+}
+
+/* Avatar vyplní celý čtverec (ne kruh) – Kdo se dívá, PIN, odznak */
+html body #mfProfileGate .pg-avatar { overflow: hidden !important; padding: 0 !important; }
+html body #mfProfileGate .pg-avatar-image, html body #mfProfileGate .pg-avatar img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important; display: block; }
+html body #mfPinModal .pm-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 0; }
+/* starý odznak profilu vlevo/nahoře už se nepoužívá (profil je v horní liště) */
+html body #mfProfileBadge { display: none !important; }
+
+/* PIN: zbývající pokusy / zámek */
+html body #mfPinModal .pm-msg { min-height: 1.4em; margin: -8px 0 12px; font-size: 0.95rem; color: #b3b3b3; text-align: center; }
+html body #mfPinModal .pm-msg.err { color: #ff6b6b; }
+html body #mfPinModal .pm-msg.lock { color: #ffb84d; font-weight: 600; }
+html body #mfPinModal .pm-numpad.locked { opacity: 0.35; pointer-events: none; }
+
+/* Pojistka proti prázdnému rámečku v rohu: uvítací poznámka a odznak se na obrazovkách profilu nikdy nezobrazí */
+html body #mfWelcomeNote { display: none !important; }
+html body #mfWelcomeNote:empty, html body #mfProfileCreate.show ~ #mfWelcomeNote { display: none !important; }
+
+/* ===== Správa profilů ===== */
+/* Kdo se dívá → Upravit: bez třesení, avatar má tmavý překryv s tužkou, červené „−“ je větší */
+html body #mfProfileGate .pg-profile-item.pg-manage-mode .pg-avatar, html body #mfProfileGate .pg-manage-mode .pg-avatar { animation: none !important; transform: none !important; }
+html body #mfProfileGate .pg-avatar-wrap { position: relative; }
+html body #mfProfileGate .pg-edit-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.5); color: #fff; border-radius: inherit; pointer-events: none; }
+html body #mfProfileGate .pg-profile-item.pg-manage-mode { cursor: pointer; }
+html body #mfProfileGate .pg-profile-item.pg-manage-mode:hover .pg-avatar { border-color: #fff !important; }
+html body #mfProfileGate .pg-remove-btn {
+  width: 40px !important; height: 40px !important; top: -14px !important; right: -14px !important; border-radius: 50% !important;
+  background: #e50914 !important; color: #fff !important; border: 3px solid #141414 !important; font-size: 1.9rem !important; line-height: 32px !important; padding: 0 !important;
+  display: grid; place-items: center; cursor: pointer; z-index: 5; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+}
+html body #mfProfileGate .pg-remove-btn:hover { background: #ff2a35 !important; transform: scale(1.08); }
+@media (max-width: 640px) { html body #mfProfileGate .pg-remove-btn { width: 44px !important; height: 44px !important; top: -16px !important; right: -16px !important; } }
+/* Smazat profil v úpravě */
+html body #mfProfileCreate .pc-btn-delete { background: transparent !important; border: 1px solid #5a1a1f !important; color: #ff6b6b !important; border-radius: 4px !important; padding: 0 22px; height: 46px; font-size: 1rem; cursor: pointer; margin-right: auto; }
+html body #mfProfileCreate .pc-btn-delete:hover { background: #3a1014 !important; border-color: #e50914 !important; }
+/* Menu profilu vpravo nahoře */
+#nfProfileMenu {
+  position: fixed; z-index: 10050; min-width: 230px; padding: 8px 0; background: rgba(20, 20, 20, 0.97); border: 1px solid #333; border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7); animation: nfPmIn 0.14s ease both;
+}
+#nfProfileMenu::before { content: ""; position: absolute; top: -7px; right: 18px; width: 12px; height: 12px; background: rgba(20, 20, 20, 0.97); border-left: 1px solid #333; border-top: 1px solid #333; transform: rotate(45deg); }
+@keyframes nfPmIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+#nfProfileMenu .nf-pm-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 16px; background: none; border: 0; color: #e5e5e5; font: inherit; font-size: 0.95rem; text-align: left; cursor: pointer; }
+#nfProfileMenu .nf-pm-item:hover { text-decoration: underline; color: #fff; }
+#nfProfileMenu .nf-pm-av { width: 32px; height: 32px; border-radius: 4px; background: var(--c, #0a84ff); display: grid; place-items: center; overflow: hidden; font-size: 1.2rem; flex: none; }
+#nfProfileMenu .nf-pm-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#nfProfileMenu .nf-pm-act svg { flex: none; width: 24px; }
+#nfProfileMenu .nf-pm-sep { height: 1px; background: #333; margin: 6px 0; }
+
+/* Kde legálně sledovat – Netflix vzhled (tlačítko vpravo dole + panel) */
+html body #legalProvidersBadge {
+  background: rgba(42, 42, 42, 0.9) !important; border: 0 !important; border-radius: 4px !important; padding: 9px 16px 9px 12px !important; gap: 9px !important;
+  color: #fff !important; font: 700 0.9rem/1 var(--nf-font, sans-serif) !important; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html body #legalProvidersBadge:hover { background: rgba(70, 70, 70, 0.95) !important; }
+html body #legalProvidersBadge svg { stroke: #fff !important; width: 20px !important; height: 20px !important; }
+html body #legalProvidersPanel {
+  background: #181818 !important; border: 1px solid #333 !important; border-radius: 4px !important; padding: 16px 18px !important; gap: 10px !important; max-width: min(340px, 86vw) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html body #legalProvidersPanel > div:first-child { font: 700 1rem/1.2 var(--nf-font, sans-serif) !important; letter-spacing: 0 !important; text-transform: none !important; color: #fff !important; }
+html body #legalProvidersPanel > div:nth-child(2) { justify-content: flex-start !important; gap: 8px !important; }
+html body #legalProvidersPanel > div:nth-child(2) > div { text-align: left !important; font: 700 0.78rem/1 var(--nf-font, sans-serif) !important; letter-spacing: 0 !important; text-transform: none !important; color: #b3b3b3 !important; margin-top: 8px !important; }
+html body #legalProvidersPanel a { background: #2a2a2a !important; border: 0 !important; border-radius: 4px !important; padding: 8px 12px !important; gap: 9px !important; }
+html body #legalProvidersPanel a:hover { background: #3a3a3a !important; }
+html body #legalProvidersPanel a img { width: 28px !important; height: 28px !important; border-radius: 6px !important; }
+html body #legalProvidersPanel a span { font: 600 0.88rem/1 var(--nf-font, sans-serif) !important; color: #fff !important; }
+
+/* Propojení zařízení */
+#mfProfileGate .pg-sync-btn {
+  display: inline-flex; align-items: center; gap: 9px; margin-top: 18px !important; padding: 0.55em 1.1em !important; background: none !important; border: 0 !important;
+  color: #808080 !important; font: 500 clamp(0.85rem, 1vw, 1rem) var(--nf-font, sans-serif) !important; cursor: pointer;
+}
+#mfProfileGate .pg-sync-btn:hover { color: #fff !important; }
+html body #mfProfileWelcome .pw-actions.pw-actions-col { flex-direction: column !important; align-items: stretch; border-top: 0; margin-top: 24px !important; padding-top: 0; }
+html body #mfProfileWelcome .pw-actions.pw-actions-col button { width: 100%; }
+html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margin-top: 18px; }
+#mfSyncModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+#mfSyncModal.show { display: flex; }
+#mfSyncModal .sy-box { position: relative; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: auto; background: #181818; border: 1px solid #333; border-radius: 6px; padding: 34px 28px 28px; text-align: center; color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8); }
+#mfSyncModal .sy-x { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: #b3b3b3; font-size: 1.9rem; line-height: 1; cursor: pointer; padding: 6px 10px; }
+#mfSyncModal .sy-x:hover { color: #fff; }
+#mfSyncModal .sy-back { position: absolute; top: 12px; left: 14px; background: none; border: 0; color: #b3b3b3; font: 600 0.95rem var(--nf-font, sans-serif); cursor: pointer; padding: 6px; }
+#mfSyncModal .sy-back:hover { color: #fff; }
+#mfSyncModal .sy-ico { color: #e50914; margin: 0 auto 10px; display: grid; place-items: center; }
+#mfSyncModal .sy-ico.sy-ok { color: #46d369; }
+#mfSyncModal .sy-title { font-size: 1.6rem; font-weight: 700; margin: 6px 0 10px; letter-spacing: -0.01em; }
+#mfSyncModal .sy-text { color: #b3b3b3; font-size: 1rem; line-height: 1.5; margin: 0 0 20px; }
+#mfSyncModal .sy-choices { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+#mfSyncModal .sy-choice { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 14px 18px; background: #2a2a2a; border: 1px solid transparent; border-radius: 4px; color: #fff; font: inherit; cursor: pointer; }
+#mfSyncModal .sy-choice strong { font-size: 1.08rem; }
+#mfSyncModal .sy-choice span { color: #b3b3b3; font-size: 0.9rem; }
+#mfSyncModal .sy-choice:hover, #mfSyncModal .sy-choice:focus-visible { background: #3a3a3a; border-color: #fff; outline: 0; }
+#mfSyncModal .sy-code { font: 800 clamp(2.4rem, 11vw, 3.4rem)/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.12em; margin: 14px 0 16px; color: #fff; }
+#mfSyncModal .sy-qr { width: 170px; height: 170px; margin: 0 auto 16px; padding: 8px; background: #fff; border-radius: 4px; }
+#mfSyncModal .sy-qr svg { width: 100%; height: 100%; display: block; }
+#mfSyncModal .sy-steps { text-align: left; color: #b3b3b3; font-size: 0.95rem; line-height: 1.55; margin: 0 0 12px; padding-left: 22px; }
+#mfSyncModal .sy-steps b { color: #fff; }
+#mfSyncModal .sy-timer { color: #808080; font-size: 0.9rem; margin: 4px 0 14px; }
+#mfSyncModal .sy-msg { min-height: 1.3em; margin: 8px 0; font-size: 0.95rem; color: #b3b3b3; }
+#mfSyncModal .sy-msg.sy-ok { color: #46d369; }
+#mfSyncModal .sy-input { width: 100%; box-sizing: border-box; text-align: center; background: #333; border: 1px solid #555; border-radius: 4px; color: #fff; font: 800 2rem ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.2em; padding: 14px 10px; text-transform: uppercase; }
+#mfSyncModal .sy-input:focus { outline: 0; border-color: #fff; }
+#mfSyncModal .sy-btn { display: block; width: 100%; height: 46px; margin-top: 10px; border-radius: 4px; border: 1px solid #808080; background: none; color: #fff; font: 700 1.05rem var(--nf-font, sans-serif); cursor: pointer; }
+#mfSyncModal .sy-btn:hover { border-color: #fff; }
+#mfSyncModal .sy-primary { background: #fff; color: #000; border-color: #fff; }
+#mfSyncModal .sy-primary:hover { background: #e6e6e6; }
+#mfSyncModal .sy-primary:disabled { opacity: 0.6; cursor: default; }
+#mfSyncModal .sy-ghost { color: #b3b3b3; }
+#mfSyncModal .sy-link { border: 0; color: #808080; font-weight: 500; font-size: 0.95rem; height: auto; padding: 10px; margin-top: 14px; }
+#mfSyncModal .sy-link:hover { color: #ff6b6b; }
+@media (max-height: 640px) { #mfSyncModal .sy-qr { width: 120px; height: 120px; } #mfSyncModal .sy-ico svg { width: 40px; height: 40px; } }
+#mfSyncBanner { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000005; display: flex; align-items: center; gap: 14px; padding: 11px 14px 11px 18px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #fff; font: 600 0.95rem var(--nf-font, sans-serif); box-shadow: 0 10px 34px rgba(0, 0, 0, 0.7); max-width: calc(100vw - 24px); }
+#mfSyncBanner button { background: #fff; color: #000; border: 0; border-radius: 4px; padding: 8px 14px; font: 700 0.9rem var(--nf-font, sans-serif); cursor: pointer; white-space: nowrap; }
+#mfStandaloneCinema .mf-cin-bad-btn { background: transparent; box-shadow: inset 0 0 0 1px #555; color: #b3b3b3; }
+#mfStandaloneCinema .mf-cin-bad-btn:hover { background: rgba(229, 9, 20, 0.2); color: #fff; }
+
+/* ── Zaměření a žánry (MFPrefs) a přepínač „Jen anime“ při zakládání profilu ── */
+#mfPrefsModal, #mfSettingsModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+#mfPrefsModal.show, #mfSettingsModal.show { display: flex; }
+#mfPrefsModal .pf-box, #mfSettingsModal .pf-box { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: auto; background: #181818; border: 1px solid #333; border-radius: 6px; padding: 30px 26px 24px; color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8); }
+#mfPrefsModal .pf-x, #mfSettingsModal .pf-x { position: absolute; top: 8px; right: 12px; background: none; border: 0; color: #b3b3b3; font-size: 1.9rem; line-height: 1; cursor: pointer; padding: 6px 10px; }
+#mfPrefsModal .pf-x:hover, #mfSettingsModal .pf-x:hover { color: #fff; }
+#mfPrefsModal .pf-title, #mfSettingsModal .pf-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+#mfPrefsModal .pf-text, #mfSettingsModal .pf-text { color: #b3b3b3; font-size: 0.95rem; line-height: 1.5; margin: 0 0 18px; }
+#mfPrefsModal .pf-text b, #mfSettingsModal .pf-text b { color: #fff; }
+#mfPrefsModal .pf-label { font-weight: 700; font-size: 0.95rem; margin: 16px 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
+#mfPrefsModal .pf-count { color: #808080; font-weight: 600; font-size: 0.85rem; }
+#mfPrefsModal .pf-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #595959; border-radius: 4px; overflow: hidden; }
+#mfPrefsModal .pf-segbtn { background: transparent; border: 0; color: #d2d2d2; font: 700 1rem var(--nf-font, sans-serif); padding: 12px 10px; cursor: pointer; }
+#mfPrefsModal .pf-segbtn + .pf-segbtn { border-left: 1px solid #595959; }
+#mfPrefsModal .pf-segbtn.pf-on { background: #fff; color: #000; }
+#mfPrefsModal .pf-note { margin: 10px 0 0; color: #b3b3b3; font-size: 0.9rem; line-height: 1.45; }
+#mfPrefsModal .pf-mix { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; color: #d2d2d2; font-size: 0.95rem; cursor: pointer; }
+#mfPrefsModal .pf-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+#mfPrefsModal .pf-tags.pf-dim { opacity: 0.45; }
+#mfPrefsModal .pf-tag { background: transparent; border: 1px solid #595959; border-radius: 4px; color: #d2d2d2; font: 500 0.98rem var(--nf-font, sans-serif); padding: 10px 14px; cursor: pointer; }
+#mfPrefsModal .pf-tag:hover { border-color: #fff; color: #fff; }
+#mfPrefsModal .pf-tag.pf-on { background: #fff; border-color: #fff; color: #000; font-weight: 700; }
+#mfPrefsModal .pf-msg { min-height: 1.3em; margin: 12px 0 2px; font-size: 0.92rem; color: #b3b3b3; }
+#mfPrefsModal .pf-msg.pf-err { color: #ff6b6b; }
+#mfPrefsModal .pf-save, #mfPrefsModal .pf-cancel { display: block; width: 100%; height: 46px; margin-top: 10px; border-radius: 4px; font: 700 1.05rem var(--nf-font, sans-serif); cursor: pointer; }
+#mfPrefsModal .pf-save { background: #fff; color: #000; border: 1px solid #fff; }
+#mfPrefsModal .pf-cancel { background: none; color: #fff; border: 1px solid #808080; }
+#mfPrefsModal .pf-cancel:hover { border-color: #fff; }
+#mfPrefsModal button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body #mfProfileWelcome .pw-only-anime { display: flex; align-items: flex-start; gap: 12px; margin: 16px 0 4px; padding: 12px 14px; border: 1px solid #595959; border-radius: 4px; cursor: pointer; text-align: left; }
+html body #mfProfileWelcome .pw-only-anime input { margin-top: 4px; width: 18px; height: 18px; flex: none; }
+html body #mfProfileWelcome .pw-only-anime strong { display: block; font-size: 1rem; color: #fff; }
+html body #mfProfileWelcome .pw-only-anime small { display: block; color: #b3b3b3; font-size: 0.85rem; line-height: 1.4; margin-top: 2px; }
+#mfSettingsModal .pf-rows { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+#mfSettingsModal .pf-row { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #2a2a2a; border: 1px solid transparent; border-radius: 4px; color: #fff; font: inherit; padding: 14px 16px; cursor: pointer; }
+#mfSettingsModal .pf-row:hover, #mfSettingsModal .pf-row:focus-visible { background: #3a3a3a; border-color: #fff; outline: 0; }
+#mfSettingsModal .pf-row-ico { flex: none; width: 24px; height: 24px; color: #d2d2d2; }
+#mfSettingsModal .pf-row-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+#mfSettingsModal .pf-row-txt strong { font-size: 1.05rem; }
+#mfSettingsModal .pf-row-txt small { color: #b3b3b3; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#mfSettingsModal .pf-row-go { flex: none; color: #808080; font-size: 1.6rem; line-height: 1; }
+#mfPrefsModal .pf-seg4 { grid-template-columns: repeat(4, 1fr); }
+#mfPrefsModal .pf-seg4 .pf-segbtn { font-size: 0.92rem; padding: 12px 4px; }
+#mfPrefsModal .pf-pin { display: block; width: 100%; box-sizing: border-box; margin: 10px 0 0; text-align: center; background: #333; border: 1px solid #555; border-radius: 4px; color: #fff; font: 700 1.1rem var(--nf-font, sans-serif); letter-spacing: 0.3em; padding: 12px; }
+#mfPrefsModal .pf-pin:focus { outline: 0; border-color: #fff; }
+
+html body #mfProfileWelcome .pw-age { margin: 14px 0 4px; text-align: left; }
+html body #mfProfileWelcome .pw-age-t strong { color: #fff; }
+html body #mfProfileWelcome .pw-age-t small { color: #b3b3b3; font-size: 0.85rem; }
+html body #mfProfileWelcome .pw-age-row { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 8px; border: 1px solid #595959; border-radius: 4px; overflow: hidden; }
+html body #mfProfileWelcome .pw-agebtn { background: transparent; border: 0; color: #d2d2d2; font: 700 0.95rem var(--nf-font, sans-serif); padding: 11px 4px; cursor: pointer; }
+html body #mfProfileWelcome .pw-agebtn + .pw-agebtn { border-left: 1px solid #595959; }
+html body #mfProfileWelcome .pw-agebtn.pw-on { background: #fff; color: #000; }
+
+#mfProfileGate .pg-version { position: fixed; right: 16px; bottom: 12px; font-size: 12px; color: rgba(255,255,255,0.62); letter-spacing: 0.02em; user-select: none; }
+
+/* Bez titulu pro banner (např. omezený věk nenechal nic s obrázkem): banner se sbalí, neřídí ho výška z media query výše */
+html body .nf-hero.nf-hero-none { height: calc(var(--nf-bar-h) + 40px + env(safe-area-inset-top, 0px)); min-height: 0; }
+
+/* Skrytý náhled epizody (bez spoilerů): bez těžkého blur filtru na stovkách obrázků, jen tmavý panel s ikonou; po najetí se náhled ukáže */
+html body .spoiler-blur .ep-thumb { background: linear-gradient(135deg, #1b1b1f, #121214); }
+html body .spoiler-blur .ep-thumb img { filter: none; opacity: 0; transition: opacity 0.2s ease; }
+html body .spoiler-blur .ep-thumb:hover img { opacity: 1; }
+html body .spoiler-label { gap: 5px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); transition: opacity 0.2s ease; pointer-events: none; }
+html body .spoiler-blur .ep-thumb:hover .spoiler-label { opacity: 0; }
+
+/* Šipky u řad musí být nad zvětšenou kartou, jinak je při najetí přebije a kliknutí propadne na kartu pod nimi */
+html body .nf-arrow { z-index: 6; }
+
+/* Šipka oznámení míří na zvonek (stejně jako u menu profilu) */
+html body .notif-panel::before { content: ""; position: absolute; top: -7px; left: var(--notif-arrow-x, calc(100% - 96px)); width: 12px; height: 12px; background: #181818; border-left: 1px solid #333; border-top: 1px solid #333; transform: rotate(45deg); pointer-events: none; }
+html body .notif-panel { overflow: visible !important; }
+
+/* Miniatury epizod bez filtru brightness/saturate (stovky obrázků s filtrem zbytečně zatěžují grafiku); hover jen jemně přiblíží */
+html body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-thumb img,
+html body:not(.tv-mode):not(.appletv-mode) .episode-card:hover .ep-thumb img { filter: none !important; }
+html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb img { opacity: 0; }
+html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb:hover img { opacity: 1; }
+
+/* Šipka panelu Novinky se při zavírání hned schová (žádná „druhá šipka“) */
+html body .notif-panel:not(.visible)::before { opacity: 0; transition: none; }
+.dv-brand { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* ===== Dávka C: načítání, Oblíbené jako ostatní řady ===== */
+.nf-skeleton { background: linear-gradient(100deg, #141414 30%, #232323 50%, #141414 70%); background-size: 200% 100%; animation: nfShimmer 1.8s ease-in-out infinite; }
+.nf-poster { background: linear-gradient(160deg, #1d1d1d, #131313); }
+.nf-img, #watchlistOverlay .wl-card-poster img { transition: opacity 0.45s ease; }
+.nf-img:not(.is-loaded), #watchlistOverlay .wl-card-poster img:not(.is-loaded) { opacity: 0; animation: nfImgSafety 0s 4s forwards; }
+@keyframes nfImgSafety { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .nf-img, #watchlistOverlay .wl-card-poster img { transition: none; } }
+
+html body #watchlistOverlay .watchlist-box { padding: calc(var(--nf-bar-h, 64px) + 16px) var(--nf-pad, 4%) 40px !important; gap: 14px !important; }
+html body #watchlistOverlay .wl-list { grid-template-columns: repeat(auto-fill, minmax(clamp(118px, 12.5vw, 196px), 1fr)); gap: 22px 12px; padding: 8px 4px 90px; }
+html body #watchlistOverlay .wl-card { gap: 0; }
+html body #watchlistOverlay .wl-card-poster { border-radius: 6px; border: 0; background: linear-gradient(160deg, #1d1d1d, #131313); transition: transform 0.22s ease, box-shadow 0.22s ease; }
+html body #watchlistOverlay .wl-card:hover { z-index: 4; position: relative; }
+html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(1.08); border: 0; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
+html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { outline: 2px solid #fff; outline-offset: 2px; }
+html body #watchlistOverlay .wl-card-name { margin: 0; padding: 8px 2px 0; font-size: 0.82rem; font-weight: 600; line-height: 1.25; color: #e5e5e5; }
+html body #watchlistOverlay .wl-card-badge { border-radius: 3px; background: rgba(0, 0, 0, 0.7); backdrop-filter: none; font-size: 0.62rem; padding: 3px 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+html body #watchlistOverlay .wl-card-remove { width: 28px; height: 28px; border-radius: 50%; background: rgba(20, 20, 20, 0.8); backdrop-filter: none; border: 1px solid rgba(255, 255, 255, 0.35); }
+html body #watchlistOverlay .wl-card-play { background: rgba(0, 0, 0, 0.25); }
+html body #watchlistOverlay .wl-empty-btn { border-radius: 4px; }
+@media (max-width: 899px) {
+  html body #watchlistOverlay .wl-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 8px; }
+  html body #watchlistOverlay .wl-card-name { font-size: 0.74rem; }
+  html body #watchlistOverlay .wl-card:hover .wl-card-poster { transform: none; }
+}
+
+/* ===== Mini přehrávač traileru v banneru ===== */
+.nf-hero { overflow: hidden; }
+.nf-trailer { position: absolute; z-index: 3; right: var(--nf-pad); top: calc(var(--nf-bar-h) + 22px + env(safe-area-inset-top, 0px)); width: clamp(150px, 24vw, 360px); aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.14); transition: opacity 0.3s ease, transform 0.3s ease; }
+.nf-trailer.away { opacity: 0; transform: translateY(-8px) scale(0.96); pointer-events: none; }
+.nf-tr-open { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; color: #fff; }
+.nf-tr-open img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.2s, transform 0.3s; }
+.nf-tr-open:hover img { opacity: 1; transform: scale(1.04); }
+.nf-tr-play { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(255, 255, 255, 0.85); display: flex; align-items: center; justify-content: center; }
+.nf-tr-label { position: absolute; left: 8px; bottom: 6px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; text-shadow: 0 1px 4px #000; }
+.nf-trailer.playing .nf-tr-open { display: none; }
+.nf-tr-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.nf-tr-ctl { position: absolute; top: 6px; right: 6px; z-index: 2; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+.nf-trailer:hover .nf-tr-ctl, .nf-trailer:focus-within .nf-tr-ctl { opacity: 1; }
+@media (hover: none) { .nf-tr-ctl { opacity: 1; } }
+.nf-tr-ctl button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(20, 20, 20, 0.8); color: #fff; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.nf-tr-ctl button:hover { background: #fff; color: #000; }
+@media (max-width: 899px) { .nf-trailer { width: min(46vw, 210px); top: calc(var(--nf-bar-h) + 10px + env(safe-area-inset-top, 0px)); } }
+
+/* ===== Hromádka rozkoukaných v banneru ===== */
+.nf-cstack { position: absolute; z-index: 3; right: var(--nf-pad); top: calc(var(--nf-bar-h) + 22px + env(safe-area-inset-top, 0px)); width: clamp(150px, 22vw, 320px); aspect-ratio: 16 / 12; }
+.nf-cs-card { position: absolute; left: 0; top: 0; width: calc(100% - 28px); aspect-ratio: 16 / 9; padding: 0; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 8px; overflow: hidden; background: #1b1b1b; cursor: pointer; color: #fff; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6); transform: translate(calc(var(--k) * 14px), calc(var(--k) * 12px)); z-index: calc(10 - var(--k)); filter: brightness(calc(1 - var(--k) * 0.18)); transition: transform 0.25s ease; }
+.nf-cs-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.nf-cs-card:hover { transform: translate(calc(var(--k) * 14px), calc(var(--k) * 12px - 6px)); }
+.nf-cs-t { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 6px; font-size: 0.74rem; font-weight: 700; text-align: left; background: linear-gradient(transparent, rgba(0, 0, 0, 0.85)); display: block; }
+.nf-cs-t small { display: block; font-weight: 500; color: #cfcfcf; font-size: 0.66rem; }
+.nf-cs-count { position: absolute; left: 0; bottom: -4px; font-size: 0.72rem; font-weight: 700; color: #d2d2d2; letter-spacing: 0.04em; text-shadow: 0 1px 4px #000; }
+@media (max-width: 899px) { .nf-cstack { width: min(44vw, 190px); top: calc(var(--nf-bar-h) + 10px + env(safe-area-inset-top, 0px)); } }
+
+/* ===== Detail seriálu: popis a herci ===== */
+html body #seriesModal .sd-overview { margin: 10px 0 0; max-width: 640px; font-size: 0.95rem; line-height: 1.45; color: #e5e5e5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8); }
+html body #seriesModal .sd-overview[hidden], html body #seriesModal .sd-cast[hidden] { display: none; }
+html body #seriesModal .sd-cast { margin-top: 8px; max-width: 640px; font-size: 0.82rem; color: #a8a8a8; }
+html body #seriesModal.nf-compact .sd-overview, html body #seriesModal.nf-compact .sd-cast { display: none !important; }
+@media (max-width: 899px) { html body #seriesModal .sd-overview { -webkit-line-clamp: 2; font-size: 0.86rem; } }
+html body #seriesModal:not(.nf-compact) .modal-hero { min-height: clamp(360px, 52vh, 480px) !important; }
+html body #seriesModal:not(.nf-compact) .panel-progress-wrap { margin-top: 12px; }
+@media (max-width: 899px) { html body #seriesModal:not(.nf-compact) .modal-hero { min-height: clamp(330px, 50vh, 420px) !important; } }
+@media (max-width: 899px) {
+  html body #seriesModal .btn-shuffle .kb { display: none; }
+  html body #seriesModal .btn-continue { padding: 0 12px !important; font-size: 0.84rem !important; }
+}
+.nf-cs-card:not(:first-of-type) .nf-cs-t { display: none; }
+
+/* Odkazy pod tlačítky v detailu seriálu (Další epizody / Podobné) */
+html body #seriesModal .sd-links { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-top: 4px; }
+html body #seriesModal .sd-link { display: inline-flex; align-items: center; gap: 12px; padding: 9px 4px; border: 0; background: transparent; color: #fff; font: inherit; font-size: 0.98rem; font-weight: 700; cursor: pointer; border-radius: 6px; }
+html body #seriesModal .sd-link:hover, html body #seriesModal .sd-link.on { background: rgba(255, 255, 255, 0.12); }
+html body #seriesModal.nf-compact .sd-links { display: none; }
+html body #seriesModal .sd-similar { padding: 20px var(--nf-pad, 4%) 90px; }
+html body #seriesModal .sd-similar[hidden] { display: none; }
+html body #seriesModal .sd-sim-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 14px; color: #fff; }
+html body #seriesModal .sd-sim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(110px, 12vw, 170px), 1fr)); gap: 18px 12px; }
+html body #seriesModal .sd-sim-card { padding: 0; border: 0; background: transparent; color: #e5e5e5; text-align: left; cursor: pointer; font: inherit; }
+html body #seriesModal .sd-sim-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 6px; display: block; background: #1d1d1d; transition: transform 0.2s; }
+html body #seriesModal .sd-sim-card:hover img { transform: scale(1.05); }
+html body #seriesModal .sd-sim-card span { display: block; margin-top: 6px; font-size: 0.8rem; font-weight: 600; }
+
+/* ===== Detail seriálu na celou obrazovku (jako na TV): vlevo název, popis, tlačítka; díly až po „Další epizody“ ===== */
+html body #seriesModal.sd-detail #modalBody { display: none !important; }
+html body #seriesModal.sd-detail .modal-content { overflow: hidden !important; }
+html body #seriesModal.sd-detail .modal-hero { height: 100vh !important; height: 100dvh !important; min-height: 100vh !important; max-height: none !important; }
+html body #seriesModal.sd-detail .modal-hero-img { object-position: center 20%; }
+html body #seriesModal.sd-detail .modal-hero-overlay { background: linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0.05) 72%), linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 35%) !important; }
+html body #seriesModal.sd-detail .modal-hero-content { top: 0; bottom: 0; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; gap: 0 !important; padding: 80px var(--nf-pad, 5%) 40px !important; }
+html body #seriesModal.sd-detail .modal-hero-left { flex: 0 0 auto !important; width: min(560px, 100%) !important; }
+html body #seriesModal.sd-detail .panel-progress-wrap { max-width: 340px; }
+html body #seriesModal.sd-detail .panel-btns { display: grid !important; grid-template-columns: auto auto 1fr; gap: 10px !important; align-items: center; width: min(340px, 100%); margin-top: 16px; flex-wrap: nowrap !important; }
+html body #seriesModal.sd-detail .panel-btns > .btn-shuffle { grid-row: 1; }
+html body #seriesModal.sd-detail .panel-btns > .btn-continue { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; height: 46px; border-radius: 24px !important; padding: 0 20px !important; font-size: 1rem !important; }
+html body #seriesModal.sd-detail .sd-links { margin-top: 8px; }
+@media (max-width: 899px) {
+  html body #seriesModal.sd-detail .modal-hero-overlay { background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.15) 100%) !important; }
+  html body #seriesModal.sd-detail .modal-hero-content { justify-content: flex-end !important; padding: 70px 18px 28px !important; }
+}
+/* Seznam dílů / Podobné: menší hlavička (název, metadata, tlačítka), ať je vidět co nejvíc dílů */
+html body #seriesModal:not(.sd-detail):not(.nf-compact) .modal-hero { min-height: clamp(190px, 27vh, 260px) !important; }
+html body #seriesModal:not(.sd-detail) .sd-overview, html body #seriesModal:not(.sd-detail) .sd-cast, html body #seriesModal:not(.sd-detail) .sd-links { display: none !important; }
+html body #seriesModal:not(.sd-detail):not(.nf-compact) .modal-hero-left h2 { font-size: clamp(1.6rem, 3.4vw, 2.6rem) !important; }
+
+/* Logo titulu místo textu */
+.sd-has-logo, .nf-hero-title.has-logo { font-size: 0 !important; line-height: 0 !important; }
+.nf-hero-title.has-logo { margin-bottom: 14px; }
+.nf-hero-logo { display: block; max-width: min(420px, 70vw); max-height: clamp(70px, 16vh, 150px); width: auto; height: auto; object-fit: contain; object-position: left; filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6)); }
+html body #seriesModal .sd-logo { display: block; max-width: min(460px, 74vw); max-height: clamp(80px, 20vh, 170px); width: auto; height: auto; object-fit: contain; object-position: left; margin-bottom: 10px; filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6)); }
+html body #seriesModal:not(.sd-detail) .sd-logo { max-height: clamp(50px, 10vh, 90px); }
+html body #seriesModal.nf-compact .sd-logo { max-height: 44px; margin: 0; }
+html body #seriesModal .modal-hero-left h2.sd-has-logo, html body .nf-hero-title.has-logo { position: static; }
+html body #seriesModal .modal-hero-left h2.sd-has-logo { font-size: 0 !important; line-height: 0 !important; height: 0; margin: 0 !important; overflow: hidden; }
+html body #nfHero .nf-hero-title.has-logo { font-size: 0 !important; line-height: 0 !important; }
+
+/* Trailer: žádné ovládání YouTube, jen tři malá tlačítka a klepnutí = pauza */
+.nf-tr-frame { pointer-events: none; }
+.nf-tr-tap { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.nf-trailer.paused::after { content: "❚❚"; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #fff; background: rgba(0, 0, 0, 0.55); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1; }
+.nf-tr-ctl { z-index: 2; opacity: 1 !important; }
+.nf-tr-ctl button { width: 26px; height: 26px; background: rgba(20, 20, 20, 0.7); }
+.nf-tr-snd .on { display: block; } .nf-tr-snd .off { display: none; }
+.nf-tr-snd.muted .on { display: none; } .nf-tr-snd.muted .off { display: block; }
+.nf-trailer:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; border: 0; }
+.nf-trailer:fullscreen .nf-tr-ctl { top: 18px; right: 18px; }
+.nf-trailer:fullscreen .nf-tr-ctl button { width: 40px; height: 40px; }
+
+/* Karty řad: při najetí se zvětšený plakát a stín neoříznou do obdélníku */
+html body .nf-track { padding: 32px var(--nf-pad) 48px; margin: -16px 0 -26px; }
+html body .nf-arrow { top: 32px; bottom: 48px; }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6); }
+
+/* Výběr epizod: velké seriály (Simpsonovi ~800 dílů) se nevykreslují celé najednou – mimo obrazovku se karty přeskočí */
+#seriesModal #episodesGrid .episode-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+#seriesModal #episodesGrid .episode-card:hover { will-change: auto; }
+
+/* Popis se po kliknutí rozbalí celý (jinak končí „…“) */
+html body .nf-hero-desc, html body #seriesModal .sd-overview { cursor: pointer; }
+html body .nf-hero-desc.is-open, html body #seriesModal .sd-overview.is-open { display: block; -webkit-line-clamp: unset; overflow: visible; max-height: none; }
+html body #seriesModal .sd-overview.is-open { max-height: 40vh; overflow-y: auto; }
+
+/* Mini přehrávač traileru: tlačítka dole vpravo, ať nepřekrývají název videa, který YouTube ukazuje nahoře */
+.nf-tr-ctl { top: auto; bottom: 8px; right: 8px; }
+.nf-trailer:fullscreen .nf-tr-ctl { top: auto; bottom: 22px; right: 22px; }
+
+/* Hláška o nové verzi */
+#mfUpdateBar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 99999;
+  display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 24px); padding: 10px 12px 10px 16px;
+  background: #1f1f1f; color: #fff; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem; animation: nfHeroIn 0.3s ease both;
+}
+#mfUpdateBar .mf-upd-go { height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: #fff; color: #000; font: inherit; font-weight: 700; cursor: pointer; }
+#mfUpdateBar .mf-upd-go:hover { background: rgba(255, 255, 255, 0.8); }
+#mfUpdateBar .mf-upd-x { width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: #aaa; font-size: 0.9rem; cursor: pointer; }
+#mfUpdateBar .mf-upd-x:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
+@media (max-width: 899px) { #mfUpdateBar { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } }
+
+/* ═════════ Cinema mode: úklid lišty – tři skupiny (název · epizody · akce), stejné tlačítka na PC i v telefonu ═════════ */
+html body #mfStandaloneCinema .mf-standalone-cinema-top { gap: 10px 14px; }
+html body #mfStandaloneCinema .mf-cin-titlebox { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 0; flex: 0 1 auto; max-width: min(34vw, 420px); }
+html body #mfStandaloneCinema .mf-cin-titlebox strong { max-width: 100%; line-height: 1.2; }
+html body #mfStandaloneCinema .mf-cin-submeta { display: flex; align-items: baseline; gap: 8px; min-width: 0; overflow: hidden; }
+html body #mfStandaloneCinema .mf-cin-src-label { overflow: hidden; text-overflow: ellipsis; }
+html body #mfStandaloneCinema .mf-cin-src-counter { overflow: hidden; text-overflow: ellipsis; }
+
+html body #mfStandaloneCinema .mf-cin-ep-btn, html body #mfStandaloneCinema .mf-cin-fav-btn, html body #mfStandaloneCinema .mf-cin-switch-btn {
+  height: 36px; border-radius: 6px; font-size: 0.84rem; font-weight: 600; padding: 0 14px;
+}
+/* epizody: Další je hlavní akce (bílá), ostatní tmavé */
+html body #mfStandaloneCinema .mf-cin-ep-pick { background: rgba(109, 109, 110, 0.55); color: #fff; }
+html body #mfStandaloneCinema .mf-cin-ep-pick:hover { background: rgba(109, 109, 110, 0.85); }
+html body #mfStandaloneCinema .mf-cin-tvbar { gap: 8px; align-items: center; margin-left: 0; }
+html body #mfStandaloneCinema .mf-cin-ep-current { min-width: 64px; text-align: center; }
+
+/* akce vpravo: ikony (hodnocení, oblíbené, hledání) + Jiný zdroj + Nefunguje to */
+html body #mfStandaloneCinema .mf-cin-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: none; }
+html body #mfStandaloneCinema .mf-cin-actions .mf-cin-fav-btn { margin: 0; width: 36px; padding: 0; font-size: 1.15rem; }
+html body #mfStandaloneCinema .mf-cin-actions .mf-cin-rate-btn { opacity: 0.85; }
+html body #mfStandaloneCinema .mf-cin-actions .mf-cin-bad-btn { box-shadow: inset 0 0 0 1px #5a5a5a; }
+
+@media (max-width: 900px) {
+  html body #mfStandaloneCinema .mf-cin-titlebox { max-width: none; flex: 1 1 0; }
+  html body #mfStandaloneCinema .mf-cin-tvbar { order: 5; flex: 1 0 100%; gap: 6px; }
+  html body #mfStandaloneCinema .mf-cin-tvbar .mf-cin-ep-btn { flex: 1 1 0; padding: 0 8px; }
+  html body #mfStandaloneCinema .mf-cin-tvbar .mf-cin-ep-current { flex: 0 0 auto; min-width: 58px; }
+  html body #mfStandaloneCinema .mf-cin-tvbar { flex-wrap: wrap; }
+  html body #mfStandaloneCinema .mf-cin-tvbar .mf-cin-next-series { flex: 1 0 100%; }
+  html body #mfStandaloneCinema .mf-cin-actions { order: 6; flex: 1 0 100%; margin-left: 0; gap: 6px; }
+  html body #mfStandaloneCinema .mf-cin-actions .mf-cin-switch-btn { flex: 1 1 0; padding: 0 8px; }
+  html body #mfStandaloneCinema .mf-cin-ep-btn, html body #mfStandaloneCinema .mf-cin-fav-btn, html body #mfStandaloneCinema .mf-cin-switch-btn { height: 36px; font-size: 0.8rem; }
+}
+
+/* Výběr avatara: tlačítko „Zkusit znovu“ u hlášky o anime postavách */
+.pc-av-retry { margin-left: 8px; padding: 6px 12px; border: 0; border-radius: 6px; background: rgba(109, 109, 110, 0.55); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.pc-av-retry:hover { background: rgba(109, 109, 110, 0.85); }
+
+/* ───────── v2.8 – přehlednější navigace ───────── */
+#nfTop .nf-search-pill {
+  width: auto; min-width: 0; height: 38px; padding: 0 12px; gap: 8px; border-radius: 6px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: #d6d6d6 !important; font: inherit; font-size: .9rem;
+}
+#nfTop .nf-search-pill:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.35); }
+#nfTop .nf-search-txt { white-space: nowrap; }
+@media (max-width: 899px) {
+  #nfTop .nf-search-pill { width: 44px; height: 44px; padding: 0; border-radius: 50%; background: none; border: 0; }
+  #nfTop .nf-search-txt, #nfTop .nf-search-key { display: none; }
+}
+@media (min-width: 900px) and (max-width: 1100px) { #nfTop .nf-search-txt { display: none; } }
+.nf-quick {
+  display: flex; gap: 8px; overflow-x: auto; padding: 14px var(--nf-pad, 4%) 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  position: relative; z-index: 3;
+}
+.nf-quick::-webkit-scrollbar { display: none; }
+.nf-chip {
+  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: .88rem; font-weight: 600; color: #e5e5e5; white-space: nowrap;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: 999px; padding: 8px 16px;
+  transition: background .15s, border-color .15s;
+}
+.nf-chip:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.5); }
+.nf-chip-main { background: #fff; color: #111; border-color: #fff; }
+.nf-chip-main:hover { background: #e6e6e6; }
+.nf-quick { margin-top: -44px; }
+.nf-quick + .nf-rows { margin-top: 0; }
+.nf-hero-empty ~ .nf-quick, .nf-hero-none ~ .nf-quick { margin-top: 0; padding-top: 72px; }
+@media (max-width: 899px) { .nf-quick { margin-top: -36px; } }
+.nf-quick { margin-top: 0 !important; padding-bottom: 14px; background: #141414; }
+.nf-rows { background: #141414; }
+.nf-hero-empty ~ .nf-quick, .nf-hero-none ~ .nf-quick { padding-top: 72px; }
+@media (max-width: 899px) { .nf-hero-actions .nf-btn { white-space: nowrap; padding-left: 14px; padding-right: 14px; font-size: .95rem; } .nf-hero-actions .nf-btn span:empty { display: none; } }
+html body nav.nf-quick { background: #141414 !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; }
+
+/* ───────── v2.9 – profesionálnější dojem ───────── */
+/* kostra úvodního banneru (než dorazí data) */
+.nf-hero-empty { position: relative; overflow: hidden; }
+.nf-hero-empty::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.05) 50%, transparent 70%); background-size: 200% 100%;
+  animation: nfShimmer 1.8s ease-in-out infinite;
+}
+.nf-hero-empty::after {
+  content: ""; position: absolute; left: var(--nf-pad, 4%); bottom: 18%; width: min(46%, 420px); height: 120px; border-radius: 8px;
+  background:
+    linear-gradient(#2a2a2e, #2a2a2e) 0 0 / 70% 34px no-repeat,
+    linear-gradient(#232327, #232327) 0 52px / 100% 12px no-repeat,
+    linear-gradient(#232327, #232327) 0 74px / 85% 12px no-repeat,
+    linear-gradient(#2e2e32, #2e2e32) 0 100px / 130px 20px no-repeat;
+}
+/* jednotný prázdný / chybový stav */
+.mf-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 56px 20px 40px; color: #b3b3b3; }
+.mf-empty svg, #universeOverlay .dv-empty-icon svg, #watchlistOverlay .wl-empty-icon svg { color: #7a7a80; }
+.mf-empty-title { font-size: 1.15rem; font-weight: 700; color: #fff; }
+.mf-empty-sub { font-size: .92rem; max-width: 380px; }
+.mf-empty-btn, #watchlistOverlay .wl-empty-btn, #universeOverlay .dv-empty-btn {
+  margin-top: 8px; cursor: pointer; font: inherit; font-weight: 700; background: #fff; color: #000; border: 0; border-radius: 4px; padding: 10px 22px;
+}
+.mf-empty-btn:hover { background: #e6e6e6; }
+/* chipy s ikonou */
+.nf-chip { display: inline-flex; align-items: center; gap: 7px; }
+.nf-chip svg { flex: none; }
+/* jemné přechody */
+@keyframes mfFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.nf-row, .nf-quick { animation: mfFadeUp .35s ease both; }
+#universeOverlay, #seriesModal, .modal-overlay { transition-timing-function: cubic-bezier(.2,.7,.2,1); }
+@media (prefers-reduced-motion: reduce) {
+  .nf-row, .nf-quick, .nf-hero-empty::before { animation: none !important; }
+}
+
+/* ───────── Designový systém (v3.0) – jedna sada hodnot pro celou aplikaci ─────────
+   tvary: ovládací prvky 4px · karty a plakáty 6px · panely a okna 8px · filtry (chipy) kapsle
+   výška tlačítek 44px (v banneru 48px) · vybraná položka = bílá výplň (stejně v menu, filtrech i chipech) */
+:root {
+  --mf-r-ctl: 4px; --mf-r-card: 6px; --mf-r-panel: 8px; --mf-btn-h: 44px;
+  --mf-surface: #1f1f1f; --mf-surface-2: #2a2a2a; --mf-line: rgba(255, 255, 255, 0.12);
+}
+/* tlačítka */
+.nf-btn { border-radius: var(--mf-r-ctl); height: 48px; }
+#universeOverlay .dv-btn { border-radius: var(--mf-r-ctl); height: 48px; padding: 0 28px; font-size: 1.05rem; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+#universeOverlay .dv-btn-primary { color: #000; }
+#universeOverlay .dv-btn-ghost, .nf-btn-ghost { background: rgba(109, 109, 110, 0.7); }
+.mf-empty-btn, #watchlistOverlay .wl-empty-btn, #universeOverlay .dv-empty-btn, .nf-tip-ok { border-radius: var(--mf-r-ctl); height: var(--mf-btn-h); padding: 0 22px; display: inline-flex; align-items: center; }
+/* pole, seznamy, přepínače v Procházení */
+#universeOverlay .dv-search { border-radius: var(--mf-r-ctl); height: 44px; }
+#universeOverlay .dv-sel, #universeOverlay .dv-select, #universeOverlay .dv-reset { border-radius: var(--mf-r-ctl); }
+#universeOverlay .dv-seg { border-radius: var(--mf-r-ctl); padding: 2px; }
+#universeOverlay .dv-seg-btn { border-radius: 3px; }
+#universeOverlay .dv-seg-btn.active { background: #fff; color: #000; }
+#universeOverlay .dv-chip.active { color: #000; }
+#universeOverlay .dv-card .dv-poster, #universeOverlay .dv-poster { border-radius: var(--mf-r-card); }
+/* chipy: stejná velikost na úvodní stránce i v Procházení */
+.nf-chip, #universeOverlay .dv-chip { font-size: .88rem; font-weight: 600; padding: 8px 16px; line-height: 1.2; }
+/* okna */
+#mfSyncModal .sy-box, #mfPrefsModal .pf-box, #mfSettingsModal .pf-box, html body .genre-editor-box, html body .pm-box { border-radius: var(--mf-r-panel) !important; width: min(480px, 100%); }
+#nfProfileMenu { border-radius: var(--mf-r-panel); }
+/* hodnocení na plakátech a štítky */
+.nf-hero-badge { border-radius: 3px; }
+
+/* ───────── Pevná stavba obrazovek (v3.1) ─────────
+   Každá obrazovka přes celou stránku (Procházení, Oblíbené, detail, přehrávač, kalendář, kolekce)
+   i každé okno má stejné tlačítko zavřít: kruh 44 px (na telefonu 40 px) vpravo nahoře, křížek stejné tloušťky.
+   Hlavička přes celou stránku: vlevo logo / nadpis, vpravo zavřít; okraje jako na úvodní stránce (--nf-pad). */
+:root { --mf-x: 44px; }
+@media (max-width: 899px) { :root { --mf-x: 40px; } }
+html body .wl-close, html body #universeOverlay .dv-close, html body #seriesModal .close-btn, html body .premiere-close,
+html body .collections-close, html body .customize-close, html body .mfh-seeall-close, html body #mfStandaloneCinemaClose,
+html body #mfSyncModal .sy-x, html body #mfPrefsModal .pf-x, html body #mfSettingsModal .pf-x, html body .pc-close {
+  width: var(--mf-x) !important; height: var(--mf-x) !important; min-width: var(--mf-x) !important; padding: 0 !important; margin: 0;
+  border: 0 !important; border-radius: 50% !important; background: rgba(42, 42, 42, 0.92) !important; color: #fff !important;
+  font-size: 0 !important; line-height: 0 !important; cursor: pointer; position: relative; flex: none;
+  display: inline-flex !important; align-items: center; justify-content: center;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important;
+  transition: background 0.15s, transform 0.1s;
+}
+html body .wl-close::before, html body .wl-close::after, html body #universeOverlay .dv-close::before, html body #universeOverlay .dv-close::after,
+html body #seriesModal .close-btn::before, html body #seriesModal .close-btn::after, html body .premiere-close::before, html body .premiere-close::after,
+html body .collections-close::before, html body .collections-close::after, html body .customize-close::before, html body .customize-close::after,
+html body .mfh-seeall-close::before, html body .mfh-seeall-close::after, html body #mfStandaloneCinemaClose::before, html body #mfStandaloneCinemaClose::after,
+html body #mfSyncModal .sy-x::before, html body #mfSyncModal .sy-x::after, html body #mfPrefsModal .pf-x::before, html body #mfPrefsModal .pf-x::after,
+html body #mfSettingsModal .pf-x::before, html body #mfSettingsModal .pf-x::after, html body .pc-close::before, html body .pc-close::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 18px; height: 2px; margin: -1px 0 0 -9px; border-radius: 1px; background: currentColor; display: block !important;
+}
+html body .wl-close::before, html body #universeOverlay .dv-close::before, html body #seriesModal .close-btn::before, html body .premiere-close::before,
+html body .collections-close::before, html body .customize-close::before, html body .mfh-seeall-close::before, html body #mfStandaloneCinemaClose::before,
+html body #mfSyncModal .sy-x::before, html body #mfPrefsModal .pf-x::before, html body #mfSettingsModal .pf-x::before, html body .pc-close::before { transform: rotate(45deg); }
+html body .wl-close::after, html body #universeOverlay .dv-close::after, html body #seriesModal .close-btn::after, html body .premiere-close::after,
+html body .collections-close::after, html body .customize-close::after, html body .mfh-seeall-close::after, html body #mfStandaloneCinemaClose::after,
+html body #mfSyncModal .sy-x::after, html body #mfPrefsModal .pf-x::after, html body #mfSettingsModal .pf-x::after, html body .pc-close::after { transform: rotate(-45deg); }
+html body #mfStandaloneCinemaClose svg, html body .premiere-close svg, html body .collections-close svg { display: none !important; }
+html body .wl-close:hover, html body #universeOverlay .dv-close:hover, html body #seriesModal .close-btn:hover, html body .premiere-close:hover,
+html body .collections-close:hover, html body .customize-close:hover, html body .mfh-seeall-close:hover, html body #mfStandaloneCinemaClose:hover,
+html body #mfSyncModal .sy-x:hover, html body #mfPrefsModal .pf-x:hover, html body #mfSettingsModal .pf-x:hover, html body .pc-close:hover { background: rgba(80, 80, 80, 0.95) !important; }
+/* okna: křížek vpravo nahoře ve stejné vzdálenosti */
+html body #mfSyncModal .sy-x, html body #mfPrefsModal .pf-x, html body #mfSettingsModal .pf-x { position: absolute; top: 12px; right: 12px; }
+/* přehrávač: křížek vpravo nahoře (název a ovládání jsou vlevo) */
+html body #mfStandaloneCinema .mf-standalone-cinema-top { padding-right: calc(var(--mf-x) + clamp(12px, 2vw, 28px) + 12px); }
+html body #mfStandaloneCinemaClose { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: clamp(12px, 2vw, 28px); margin: 0; z-index: 4; }
+/* hlavičky obrazovek přes celou stránku mají stejné okraje jako úvodní stránka */
+#universeOverlay { --dv-pad: var(--nf-pad); }
+html body #seriesModal .close-btn { position: absolute !important; top: 14px; right: 14px; }
+@media (max-width: 899px) { html body #seriesModal .close-btn { top: calc(env(safe-area-inset-top, 0px) + 46px) !important; right: 14px !important; } }
+
+/* ───────── Jedna navigace pro celou aplikaci (v3.2) ─────────
+   Horní lišta (logo · Domů · Seriály · Filmy · Oblíbené · hledání · profil) zůstává vidět i v Procházení,
+   takže se člověk nikdy neocitne na obrazovce bez navigace. V telefonu zůstává spodní lišta. */
+html.mfh-home-on body.discover-open #nfTop { display: flex; background: var(--nf-bg); z-index: 9991; }
+html body.discover-open #mfDock { display: flex !important; }
+#universeOverlay .dv-brand { display: none !important; }
+#universeOverlay .dv-top { padding-top: calc(env(safe-area-inset-top, 0px) + var(--nf-bar-h) + 8px); border-bottom: 0; }
+#universeOverlay .dv-body { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }
+@media (min-width: 900px) { #universeOverlay .dv-body { padding-bottom: 40px; } }
+html body.mf-section-protebe #nfTop, html body:has(#watchlistOverlay.visible) #nfTop, html body:has(#watchlistOverlay.open) #nfTop { display: flex; background: var(--nf-bg); z-index: 9991; }
+
+/* ───────── Klidnější aplikace (v3.3) – nic se nehýbe, dokud o to člověk nestojí ───────── */
+.nf-row, .nf-quick { animation: none !important; }
+.nf-hero { animation: none; }
+@keyframes nfHeroIn { from { opacity: 0; } to { opacity: 1; } }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(1.03); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(1.03); }
+html body #seriesModal .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(1.02) !important; }
+.nf-tr-open:hover img { transform: none; }
+html body #mfDock.mf-dock.mf-dock-hidden { transform: none !important; }
+.nf-hero-bg { animation-duration: 0.3s; }
+
+/* ───────── Opravy (v3.4) ───────── */
+/* Tlačítka v detailu seriálu: bez barevné záře a skákání */
+html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle, html body #seriesModal .btn-continue:hover, html body #seriesModal .btn-shuffle:hover {
+  box-shadow: none !important; transform: none !important; filter: none !important;
+}
+html body #seriesModal .btn-continue { background: #fff !important; color: #000 !important; }
+/* Kontejner žánrů dostával šedou plochu při najetí myší (obecné pravidlo pro „-chip“) */
+html body [class*="-chips"], html body [class*="-chips"]:hover, html body [class*="-chips"].active,
+html body [class*="-chips"][class*="-chips"]:hover:not(.active) { background: transparent !important; color: inherit !important; font-weight: inherit !important; }
+/* Vodorovné posuvníky se nezobrazují – posouvá se šipkami (nebo tažením prstem); svislý posuvník stránky zůstává */
+html body .nf-track, html body .nf-scroller, html body .nf-quick, html body #universeOverlay .dv-chips, html body #universeOverlay .dv-track,
+html body .pc-av-strip, html body .wl-tabs, html body .dv-hchips { scrollbar-width: none !important; -ms-overflow-style: none; }
+html body .nf-track::-webkit-scrollbar, html body .nf-quick::-webkit-scrollbar, html body #universeOverlay .dv-chips::-webkit-scrollbar,
+html body #universeOverlay .dv-track::-webkit-scrollbar, html body .pc-av-strip::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+/* Šipky pro vodorovné posouvání (stejné jako v řadách na úvodní stránce) */
+.mf-arr-host { position: relative; }
+.mf-arr {
+  position: absolute; z-index: 5; width: 36px; border: 0; padding: 0; cursor: pointer; display: none; align-items: center; justify-content: center;
+  background: linear-gradient(90deg, rgba(20,20,20,.92), rgba(20,20,20,0)); color: #fff;
+}
+.mf-arr.r { right: 0; background: linear-gradient(270deg, rgba(20,20,20,.92), rgba(20,20,20,0)); }
+.mf-arr.l { left: 0; }
+.mf-arr svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.mf-arr.show { display: flex; }
+@media (hover: none) { .mf-arr { display: none !important; } }
+/* Popis v detailu seriálu se po kliknutí rozbalí do šířky (ne do výšky), tlačítka zůstávají na místě */
+html body #seriesModal .sd-overview.is-open { max-width: min(92%, 1040px); max-height: 7.2em; overflow-y: auto; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85); transition: max-width .2s ease; }
+html body #seriesModal .modal-hero-left { max-width: none; }
+
+/* Pokračovat ve sledování: ukazatel postupu na plakátu */
+.nf-cprog { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255, 255, 255, 0.28); z-index: 2; }
+.nf-cprog i { display: block; height: 100%; background: var(--nf-accent, #0a84ff); }
+/* Dokoukal jsem: jen ikona (název je ve vodítku a pro čtečky) */
+.nf-btn-icon { width: 48px; padding: 0; flex: none; }
+/* Telefon: nižší banner, aby po otevření byla vidět i první řada */
+@media (max-width: 899px) {
+  html body .nf-hero { height: clamp(380px, 60vh, 540px); }
+  html body .nf-hero-body { padding-bottom: 28px; }
+}
+/* Telefon: když je v banneru i „Dokoukal jsem“, je srdíčko jen ikona, ať se tři tlačítka vejdou do jednoho řádku */
+@media (max-width: 899px) {
+  html body .nf-hero-actions:has(#nfHeroDone) #nfHeroFav { width: 48px; padding: 0; flex: none; }
+  html body .nf-hero-actions:has(#nfHeroDone) #nfHeroFav span { display: none; }
+  html body .nf-hero-actions:has(#nfHeroDone) #nfHeroPlay { flex: 1 1 auto; }
+}
+/* Karta v řadě Pokračovat: malé tlačítko „Dokoukal jsem“ v rohu plakátu */
+.nf-cx {
+  position: absolute; top: 6px; right: 6px; z-index: 3; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; color: #fff; background: rgba(20, 20, 20, 0.8);
+  opacity: 0; transition: opacity 0.15s, background 0.15s;
+}
+.nf-card:hover .nf-cx, .nf-card:focus-within .nf-cx { opacity: 1; }
+.nf-cx:hover { background: rgba(60, 60, 60, 0.95); }
+@media (hover: none) { .nf-cx { opacity: 0.7; width: 24px; height: 24px; top: 5px; right: 5px; } .nf-cx svg { width: 13px; height: 13px; } }
+
+/* ===== v3.6: přehlednost ===== */
+/* viditelný focus při ovládání klávesnicí */
+:is(button, a, [role="button"], input, select, [tabindex]):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* dostatečně velké klikací plochy na dotykových zařízeních */
+@media (hover: none) and (pointer: coarse) {
+  .dock-btn, .nf-btn, .wl-empty-btn, .close-btn, #mfStandaloneCinemaClose { min-height: 44px; min-width: 44px; }
+}
+/* pruh offline */
+#mfOffline { position: fixed; top: 0; left: 0; right: 0; z-index: 99999; padding: 8px 16px; text-align: center; font-size: 13px; background: #2a2a2e; color: #fff; border-bottom: 1px solid rgba(255,255,255,.12); }
+
+/* Karta v řadě Pokračovat má stejný popisek jako ostatní: jeden řádek, bez zalamování */
+.nf-card-ep { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nf-new { position: absolute; left: 6px; top: 6px; z-index: 2; padding: 2px 7px; border-radius: 4px; font-size: 0.66rem; font-weight: 700; letter-spacing: .01em; color: #fff; background: var(--nf-accent, #0a84ff); }
+
+/* Odkaz na Soukromí a podmínky na obrazovce „Kdo se dívá?“ */
+#mfProfileGate .pg-legal { position: fixed; left: 16px; bottom: 12px; font-size: 12px; color: rgba(255,255,255,0.62); text-decoration: none; letter-spacing: 0.02em; }
+#mfProfileGate .pg-legal:hover, #mfProfileGate .pg-legal:focus-visible { color: #fff; text-decoration: underline; }
+@media (max-width: 520px) { #mfProfileGate .pg-legal { left: 14px; bottom: 12px; font-size: 11px; } #mfProfileGate .pg-version { right: 14px; bottom: 12px; font-size: 11px; } }
+
+/* Srdíčko „Do oblíbených“ na kartách úvodní stránky (stejné jako v Procházení) */
+.nf-fav { position: absolute; z-index: 3; top: 6px; right: 6px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #fff; background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity 0.15s, background 0.15s; }
+.nf-fav.on { opacity: 1; }
+.nf-fav.on svg { fill: #ff453a; stroke: #ff453a; }
+.nf-card:hover .nf-fav, .nf-card:focus-within .nf-fav { opacity: 1; }
+.nf-fav:hover { background: rgba(0, 0, 0, 0.85); }
+@media (hover: none) { .nf-fav { opacity: 1; width: 28px; height: 28px; } .nf-fav svg { width: 15px; height: 15px; } }
+.nf-ranked .nf-fav { right: 6px; }
+
+/* Patička úvodní stránky */
+.nf-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; padding: 36px var(--nf-pad, 16px) calc(110px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: rgba(255, 255, 255, 0.45); }
+.nf-foot a { color: inherit; text-decoration: none; }
+.nf-foot a:hover, .nf-foot a:focus-visible { color: #fff; text-decoration: underline; }
+
+/* Nabídka „Načíst změny“: křížek a nenápadnost */
+#mfSyncBanner button.sy-x { background: transparent; color: rgba(255, 255, 255, 0.6); padding: 6px 8px; font-weight: 400; font-size: 1rem; }
+#mfSyncBanner button.sy-x:hover { color: #fff; }
+@media (max-width: 899px) { #mfSyncBanner { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); } }
+
+/* ═════════ Detail seriálu 3.12 ═════════
+   Hlavička: velký název, bílé hlavní tlačítko a dvě kulaté ikony. Pod ní nadpisy „Epizody / Podobné“ a výběr sezóny.
+   PC: mřížka karet s velkým obrázkem, telefon: řádky. Jediná akcentní barva jen u postupu rozkoukané epizody. */
+html body #seriesModal:not(.sd-detail) .modal-body, html body #seriesModal:not(.sd-detail) .modal-content { background: #141414 !important; }
+html body #seriesModal .modal-hero-overlay { background: linear-gradient(0deg, #141414 0%, rgba(20, 20, 20, 0.55) 30%, rgba(20, 20, 20, 0) 65%), linear-gradient(90deg, rgba(20, 20, 20, 0.7) 0%, transparent 58%) !important; }
+
+/* Záložky (Epizody / Podobné / Popis) a pod nimi řádek sezón: přilepené nahoře při posouvání */
+html body #seriesModal .sd-head { position: sticky; top: 0; z-index: 6; background: #141414; padding: 14px clamp(16px, 3vw, 40px) 10px; }
+html body #seriesModal .sd-tabs { display: flex; align-items: center; gap: 8px; padding: 0; background: transparent; border: 0; position: static; }
+html body #seriesModal .sd-tab { appearance: none; border: 0; background: rgba(109, 109, 110, 0.35); color: #e5e5e5; padding: 0 18px; min-height: 40px; margin: 0; border-radius: 8px; font: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; }
+html body #seriesModal .sd-tab:hover { background: rgba(109, 109, 110, 0.6); color: #fff; }
+html body #seriesModal .sd-tab.active { background: #fff; color: #141414; border: 0; }
+html body #seriesModal .sd-tools { margin-left: auto; display: flex; align-items: center; }
+html body #seriesModal .sd-tools[hidden] { display: none; }
+html body #seriesModal .season-all-btn, html body #seriesModal .season-all-btn.active { background: transparent !important; border: 0 !important; box-shadow: none !important; color: rgba(255, 255, 255, 0.6) !important; font-size: 0.85rem !important; padding: 0 !important; min-height: 40px; white-space: nowrap; cursor: pointer; }
+html body #seriesModal .season-all-btn:hover { color: #fff !important; }
+html body #seriesModal .sd-seasons { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding: 1px 0; }
+html body #seriesModal .sd-seasons::-webkit-scrollbar { display: none; }
+html body #seriesModal .sd-seasons[hidden] { display: none; }
+html body #seriesModal .sd-head-plain .sd-seasons { display: none; }
+html body #seriesModal .sd-season { flex: 0 0 auto; min-width: 48px; height: 42px; padding: 0 14px; border: 0; border-radius: 8px; background: rgba(109, 109, 110, 0.35); color: #e5e5e5; font: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; }
+html body #seriesModal .sd-season:hover { background: rgba(109, 109, 110, 0.6); color: #fff; }
+html body #seriesModal .sd-season.done::after { content: "✓"; margin-left: 5px; font-size: 0.72rem; opacity: 0.65; }
+html body #seriesModal .sd-season.active { background: #fff; color: #141414; }
+html body #seriesModal .sd-tab:focus-visible, html body #seriesModal .sd-season:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Popis seriálu (záložka) */
+html body #seriesModal .sd-info { padding: 8px clamp(16px, 3vw, 40px) 96px; max-width: 760px; }
+html body #seriesModal .sd-info[hidden] { display: none; }
+html body #seriesModal #sdInfo .sd-overview:not([hidden]) { display: block !important; -webkit-line-clamp: unset; overflow: visible; margin: 0; max-width: none; font-size: 1.02rem; line-height: 1.6; color: #e5e5e5; text-shadow: none; }
+html body #seriesModal #sdInfo .sd-cast:not([hidden]) { display: block !important; margin-top: 16px; font-size: 0.92rem; color: rgba(255, 255, 255, 0.6); }
+html body #seriesModal .sd-info-empty { color: rgba(255, 255, 255, 0.6); }
+
+/* Epizody: karty s velkým obrázkem v mřížce (PC) */
+html body #seriesModal #episodesGrid.episode-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; gap: 26px 16px !important; padding: 8px clamp(16px, 3vw, 40px) 96px !important; }
+html body #seriesModal #episodesGrid .episode-card {
+  display: flex !important; flex-direction: column !important; align-items: stretch; position: relative; padding: 0 !important; background: transparent !important; border: 0 !important; border-radius: 0 !important;
+  opacity: 1 !important; transform: none; cursor: pointer; content-visibility: visible; contain-intrinsic-size: auto;
+}
+html body #seriesModal #episodesGrid .episode-card:hover, html body #seriesModal #episodesGrid .episode-card.next-ep, html body #seriesModal #episodesGrid .episode-card.watched { background: transparent !important; }
+html body #seriesModal #episodesGrid .episode-card::before, html body #seriesModal #episodesGrid .episode-card::after { display: none !important; content: none !important; }
+html body #seriesModal #episodesGrid .ep-thumb { width: 100% !important; max-width: none !important; min-width: 0 !important; height: auto !important; aspect-ratio: 16 / 9; border-radius: 8px !important; overflow: hidden; background: #1f1f1f; box-shadow: none; position: relative; }
+html body #seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease, filter 0.2s; }
+html body #seriesModal #episodesGrid .episode-card:hover .ep-thumb img { transform: scale(1.04); }
+html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb img { filter: brightness(0.5) !important; }
+html body #seriesModal #episodesGrid .ep-body { padding: 10px 2px 0 !important; gap: 3px; display: flex; flex-direction: column; min-width: 0; grid-column: auto; }
+html body #seriesModal #episodesGrid .ep-title { order: 1; font-size: 0.98rem !important; font-weight: 600 !important; color: #fff !important; line-height: 1.3; display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden !important; white-space: normal !important; text-overflow: clip !important; opacity: 1 !important; }
+html body #seriesModal #episodesGrid .episode-card.watched .ep-title { color: #8c8c8c !important; }
+html body #seriesModal #episodesGrid .ep-meta-row { order: 2; display: flex; gap: 8px; align-items: center; font-size: 0.8rem; color: #8c8c8c; }
+html body #seriesModal #episodesGrid .ep-meta-row .ep-num { display: inline !important; color: #8c8c8c !important; }
+html body #seriesModal #episodesGrid .ep-meta-row .ep-runtime, html body #seriesModal #episodesGrid .ep-meta-row .ep-rating { display: inline; font-size: 0.8rem; color: #8c8c8c; }
+html body #seriesModal #episodesGrid .ep-desc { order: 3; margin-top: 2px; color: #9a9a9a !important; font-size: 0.84rem !important; line-height: 1.4; display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; opacity: 1 !important; }
+html body #seriesModal #episodesGrid .ep-btn-play-hbo, html body #seriesModal #episodesGrid .ep-next-tag, html body #seriesModal #episodesGrid .ep-seen-dot, html body #seriesModal #episodesGrid .episode-card.watched .ep-seen-dot, html body #seriesModal #episodesGrid .ep-dur { display: none !important; }
+html body #seriesModal #episodesGrid .ep-hover-play { border-radius: 8px; }
+/* Další epizoda: tenký bílý rámeček kolem obrázku, nic víc */
+html body #seriesModal #episodesGrid .episode-card.next-ep .ep-thumb { outline: 2px solid #fff; outline-offset: -2px; }
+/* Odškrtnutí vpravo nahoře na obrázku */
+html body #seriesModal #episodesGrid .ep-actions { position: absolute; top: 8px; right: 8px; margin: 0; z-index: 3; transform: none; }
+html body #seriesModal #episodesGrid .ep-btn-mark { width: 32px; height: 32px; border-radius: 50% !important; border: 0 !important; background: rgba(0, 0, 0, 0.6) !important; color: #fff !important; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.15s, background 0.15s; }
+html body #seriesModal #episodesGrid .ep-btn-mark:hover { opacity: 1; background: rgba(0, 0, 0, 0.85) !important; }
+html body #seriesModal #episodesGrid .episode-card.watched .ep-btn-mark { background: #fff !important; color: #141414 !important; opacity: 1; }
+html body #seriesModal #episodesGrid .ep-thumb .ep-progress-bar-wrap { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; margin: 0; border-radius: 0; background: rgba(255, 255, 255, 0.3); z-index: 2; }
+html body #seriesModal #episodesGrid .ep-thumb .ep-progress-bar-fill { background: var(--accent, #0a84ff); }
+
+/* Telefon: řádky (obrázek vlevo), ať se vejde víc epizod */
+@media (max-width: 700px) {
+  html body #seriesModal .sd-head { padding: 12px 12px 8px; }
+  html body #seriesModal .sd-tab { padding: 0 14px; font-size: 0.9rem; }
+  html body #seriesModal .season-all-btn { display: none !important; }
+  html body #seriesModal .panel-btns { flex-wrap: nowrap !important; gap: 8px !important; }
+  html body #seriesModal .panel-btns .btn-continue { flex: 1 1 auto; min-width: 0; padding: 0 12px !important; white-space: nowrap; }
+  html body #seriesModal .panel-btns .btn-shuffle { flex: 0 0 auto; }
+  html body #seriesModal .sd-season { min-width: 44px; height: 40px; padding: 0 12px; }
+  html body #seriesModal #episodesGrid.episode-grid { display: flex !important; flex-direction: column !important; grid-template-columns: none !important; gap: 0 !important; padding: 0 12px 96px !important; }
+  html body #seriesModal #episodesGrid .episode-card { flex-direction: row !important; align-items: center; gap: 12px; padding: 10px 44px 10px 0 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important; }
+  html body #seriesModal #episodesGrid .episode-card:last-child { border-bottom: 0 !important; }
+  html body #seriesModal #episodesGrid .ep-thumb { width: 124px !important; max-width: 124px !important; flex: 0 0 124px; border-radius: 6px !important; }
+  html body #seriesModal #episodesGrid .ep-body { padding: 0 !important; flex: 1 1 auto; }
+  html body #seriesModal #episodesGrid .ep-desc { display: none !important; }
+  html body #seriesModal #episodesGrid .ep-actions { top: 50%; right: 0; transform: translateY(-50%); }
+  html body #seriesModal #episodesGrid .ep-btn-mark { background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; opacity: 1; }
+  html body #seriesModal #episodesGrid .episode-card.watched .ep-btn-mark { background: #fff !important; border-color: #fff !important; }
+  html body #seriesModal #episodesGrid .episode-card.next-ep .ep-thumb { outline-offset: -2px; }
+}
+html body #seriesModal #episodesGrid .ep-meta-row { justify-content: flex-start !important; }
+html body #seriesModal #episodesGrid .ep-meta-row > * { margin: 0 !important; }
+/* Sjednocení hodnot: poloměr rohů 12 px u obrázků epizod, druhotný text 60 % bílé */
+html body #seriesModal #episodesGrid .ep-thumb { border-radius: 12px !important; }
+html body #seriesModal #episodesGrid .ep-desc, html body #seriesModal #episodesGrid .ep-meta-row, html body #seriesModal #episodesGrid .ep-meta-row .ep-num, html body #seriesModal #episodesGrid .ep-meta-row .ep-runtime, html body #seriesModal #episodesGrid .ep-meta-row .ep-rating { color: rgba(255, 255, 255, 0.6) !important; }
+@media (max-width: 700px) { html body #seriesModal #episodesGrid .ep-thumb { border-radius: 8px !important; } }
+/* Podobné: stejné odsazení jako záložky, nadpis netřeba (je v záložce) */
+html body #seriesModal .sd-similar { padding: 8px clamp(16px, 3vw, 40px) 96px; }
+html body #seriesModal .sd-sim-title { display: none; }
+
+/* Popis: fakty, trailer, herci */
+html body #seriesModal .sd-info { max-width: none; }
+html body #seriesModal #sdInfo .sd-overview:not([hidden]) { max-width: 760px; }
+html body #seriesModal .sd-facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 22px; margin: 22px 0 0; max-width: 760px; font-size: 0.92rem; }
+html body #seriesModal .sd-facts[hidden] { display: none; }
+html body #seriesModal .sd-facts dt { color: rgba(255, 255, 255, 0.6); }
+html body #seriesModal .sd-facts dd { margin: 0; color: #e5e5e5; }
+html body #seriesModal .sd-section { margin-top: 30px; }
+html body #seriesModal .sd-section[hidden] { display: none; }
+html body #seriesModal .sd-h { margin: 0 0 12px; font-size: 1.1rem; font-weight: 700; color: #fff; }
+html body #seriesModal .sd-trailer { position: relative; width: min(100%, 760px); aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #1f1f1f; }
+html body #seriesModal .sd-trailer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+html body #seriesModal .sd-trailer-btn { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; }
+html body #seriesModal .sd-trailer-btn img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.15s; }
+html body #seriesModal .sd-trailer-btn:hover img { opacity: 1; }
+html body #seriesModal .sd-trailer-play { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; }
+html body #seriesModal .sd-trailer-play svg { width: 18px; height: 22px; fill: #fff; margin-left: 4px; }
+html body #seriesModal .sd-trailer-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body #seriesModal .sd-castrow { display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+html body #seriesModal .sd-castrow::-webkit-scrollbar { display: none; }
+html body #seriesModal .sd-actor { flex: 0 0 104px; min-width: 0; }
+html body #seriesModal .sd-actor-photo { width: 104px; aspect-ratio: 2 / 3; border-radius: 12px; overflow: hidden; background: #262626; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: rgba(255, 255, 255, 0.4); }
+html body #seriesModal .sd-actor-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+html body #seriesModal .sd-actor-name { margin-top: 8px; font-size: 0.85rem; font-weight: 600; color: #fff; line-height: 1.25; }
+html body #seriesModal .sd-actor-role { margin-top: 2px; font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 700px) {
+  html body #seriesModal .sd-info { padding-left: 16px; padding-right: 0; }
+  html body #seriesModal .sd-info > p, html body #seriesModal .sd-info > dl, html body #seriesModal .sd-trailer { margin-right: 16px; }
+  html body #seriesModal .sd-actor { flex-basis: 92px; }
+  html body #seriesModal .sd-actor-photo { width: 92px; }
+}
+
+/* Herec: klepnutí otevře filmografii v záložce Popis */
+html body #seriesModal button.sd-actor { appearance: none; background: transparent; border: 0; padding: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+html body #seriesModal button.sd-actor:hover .sd-actor-photo { outline: 2px solid #fff; outline-offset: -2px; }
+html body #seriesModal button.sd-actor:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 12px; }
+html body #seriesModal .sd-actor-view { padding: 8px clamp(16px, 3vw, 40px) 96px; }
+html body #seriesModal .sd-actor-view[hidden] { display: none; }
+html body #seriesModal .sd-actor-back { appearance: none; border: 0; background: transparent; color: rgba(255, 255, 255, 0.6); font: inherit; font-size: 0.9rem; font-weight: 600; padding: 8px 0; min-height: 40px; cursor: pointer; }
+html body #seriesModal .sd-actor-back:hover { color: #fff; }
+html body #seriesModal .sd-actor-title { margin: 4px 0 2px; font-size: 1.5rem; font-weight: 800; color: #fff; }
+html body #seriesModal .sd-actor-sub { color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-bottom: 14px; }
+html body #seriesModal .sd-actor-filter { display: flex; gap: 8px; margin-bottom: 16px; }
+html body #seriesModal .sd-actor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(104px, 12vw, 160px), 1fr)); gap: 18px 12px; }
+@media (max-width: 700px) { html body #seriesModal .sd-actor-view { padding-left: 16px; padding-right: 16px; } }
