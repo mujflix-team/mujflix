@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141414">
+  <meta name="robots" content="noindex">
+  <title>Jsi offline | MůjFlix</title>
+  <link rel="icon" href="icons/favicon.ico" sizes="any">
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #141414; color: #e5e5e5; font: 16px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; text-align: center; padding: 24px 16px; }
+    .brand { font-weight: 800; font-size: 34px; letter-spacing: -.02em; margin: 0 0 28px; }
+    .brand i { color: #0a84ff; font-style: normal; }
+    h1 { font-size: 1.5rem; margin: 0 0 8px; font-weight: 600; }
+    p { margin: 0 0 24px; color: #9a9a9a; }
+    .btn { border: 0; font: inherit; cursor: pointer; display: inline-block; padding: 12px 28px; border-radius: 4px; background: #fff; color: #141414; font-weight: 700; text-decoration: none; }
+    .btn:focus-visible { outline: 2px solid #0a84ff; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="brand">Můj<i>Flix</i></p>
+    <h1>Jsi offline</h1>
+    <p>Nepodařilo se připojit k internetu. Zkontroluj Wi-Fi nebo data, stránka se načte sama, jakmile se spojení vrátí.</p>
+    <button class="btn" type="button" onclick="location.reload()">Zkusit znovu</button>
+    <script>window.addEventListener("online", function () { location.reload(); });</script>
+  </main>
+</body>
+</html>
