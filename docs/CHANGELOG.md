@@ -1,6 +1,7 @@
 # Changelog
 
 ## 3.20.13
+- **README:** přepsáno podle skutečného kódu (jen dokumentace, kód beze změny). Opraveno: smazané soubory a funkce (`premiere.js`, `collections.js`, `customize.js`, Nálada), iframe přehrávače **nemá** `sandbox`, doporučování (nic jako „momentum“ ani Bayesovská korekce nejede), `PROBE_HOSTS` je konstanta (ne proměnná Workeru), záložky a řazení v Oblíbených. Doplněno: architektura, tabulka zdrojů (`noEmbed`), adresy `/s/` `/f/` `/c/`, propojení zařízení (třícestné slučování, limity), PIN a věk, service worker, limity Workeru, `TMDB_READ_TOKEN`, starší Finder a jeho klíče, testy, CI, nová sekce „Známá omezení a technický dluh“.
 - **Výkon (hlavně Firefox a slabší zařízení):** měřeno v Chromiu s 4× zpomaleným CPU.
   - **Shimmer plakátů:** `.nf-skeleton`, `dvShimmer` a `mfImgShimmer` animovaly `background-position` nekonečně, i u karet mimo obrazovku, a každý snímek přepočítaly styly. Plakáty před načtením mají statickou barvu (jedna definice místo tří), v okně seriálu jemně pulzuje `opacity` (mimo hlavní vlákno) jen u nenačtených obrázků, úvodní prázdný banner posouvá lesk přes `transform`. `prefers-reduced-motion` platí dál.
   - **Schování filtrů v Procházení:** už se neanimuje `max-height` a `margin-top` (rozložení každý snímek). Řádek se plynule zprůhlední (`opacity` + `transform`), potom se jednorázově vyjme z rozložení a posuv těla se opraví o jeho výšku, takže obsah neposkočí. Třídy se přepínají jen při skutečné změně stavu.
