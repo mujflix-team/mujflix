@@ -1,11 +1,12 @@
 name: CI
+# Spouští se při pull requestu a při změně na main (větev s pull requestem se tak nekontroluje dvakrát).
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
-# Když se soubory nahrávají po jednom (každý = jeden commit), každý nový commit zruší předchozí rozběhnutou kontrolu.
-# Doběhne tak jen ta poslední – po tom, co 3 minuty nepřijde další commit – a nehlásí se chyby z napůl nahraného stavu.
+# Nový commit ve stejné větvi zruší rozběhnutou kontrolu, doběhne jen ta poslední.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -14,13 +15,21 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Počkej, jestli nepřijde další commit
-        if: github.event_name == 'push'
-        run: sleep 180
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: npm install
-      - run: npx playwright install --with-deps chromium
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      # Prohlížeč Playwrightu se ukládá do cache podle verze; při shodě se nestahuje znovu
+      - id: pw
+        run: echo "v=$(node -p \"require('playwright/package.json').version\")" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: pwcache
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}
+      - if: steps.pwcache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pwcache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - run: npm run lint
       - run: npm test
