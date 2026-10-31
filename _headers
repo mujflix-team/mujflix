@@ -1,0 +1,10 @@
+# Cloudflare Pages: hlavičky. Písma a ikony se nemění → dlouhá cache; kód zůstává „vždy zrevaliduj“ (řeší sw.js).
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/icons/*
+  Cache-Control: public, max-age=86400
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
