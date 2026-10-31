@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.20.13
+- **Výkon (hlavně Firefox a slabší zařízení):** měřeno v Chromiu s 4× zpomaleným CPU.
+  - **Shimmer plakátů:** `.nf-skeleton`, `dvShimmer` a `mfImgShimmer` animovaly `background-position` nekonečně, i u karet mimo obrazovku, a každý snímek přepočítaly styly. Plakáty před načtením mají statickou barvu (jedna definice místo tří), v okně seriálu jemně pulzuje `opacity` (mimo hlavní vlákno) jen u nenačtených obrázků, úvodní prázdný banner posouvá lesk přes `transform`. `prefers-reduced-motion` platí dál.
+  - **Schování filtrů v Procházení:** už se neanimuje `max-height` a `margin-top` (rozložení každý snímek). Řádek se plynule zprůhlední (`opacity` + `transform`), potom se jednorázově vyjme z rozložení a posuv těla se opraví o jeho výšku, takže obsah neposkočí. Třídy se přepínají jen při skutečné změně stavu.
+  - **Naměřeno (PC 1280 px, 5 s klidu / 4 s posuvu):** klid na úvodní stránce 1240 → 152 ms práce vlákna a 312 → 21 přepočtů stylů; klid v Procházení 1092 → 58 ms a 306 → 2 přepočtů; posuv v Procházení: přepočtů rozložení 47 → 36 (z toho schování filtrů jen 1–4, zbytek je dotahování obsahu), nejhorší snímek 100 → 83 ms, snímků nad 33 ms 15 → 13. Telefon (390 px): klid 1246 → 134 ms (úvodní stránka) a 1220 → 49 ms (Procházení); posuv v Procházení: rozložení 3 → 6, snímků nad 33 ms 5 → 3, nejhorší snímek 83 → 50 ms.
+  - **Neověřeno:** Firefox (jen Chromium s CDP), skutečná zařízení a GPU; plynulost posuvu v Procházení se měřila s generovanými daty.
+
 ## 3.20.12
 - **Podivana.xyz:** web vložení zakazuje, takže zpět tlačítko „Otevřít v novém okně“ (`noEmbed`); pořadí zdrojů: seriály SvětSeriálů, Bombuj, Uzi.la, Podivana, …; filmy Bombuj, Uzi.la, Podivana, …
 

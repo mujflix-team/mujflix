@@ -198,8 +198,6 @@ html body.discover-open #mfDock { display: none !important; }
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .nf-card-ep { margin: 2px 0 0; font-size: 0.72rem; color: #808080; }
-.nf-skeleton { background: linear-gradient(100deg, #1f1f1f 30%, #2c2c2c 50%, #1f1f1f 70%); background-size: 200% 100%; animation: nfShimmer 1.3s linear infinite; }
-@keyframes nfShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
 /* Top 10 s velkými čísly */
 .nf-row-ranked .nf-card { width: clamp(190px, 21vw, 300px); }
@@ -1043,7 +1041,8 @@ html body .notif-panel:not(.visible)::before { opacity: 0; transition: none; }
 .dv-brand { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
 /* ===== Dávka C: načítání, Oblíbené jako ostatní řady ===== */
-.nf-skeleton { background: linear-gradient(100deg, #141414 30%, #232323 50%, #141414 70%); background-size: 200% 100%; animation: nfShimmer 1.8s ease-in-out infinite; }
+/* Plakát před načtením: statická barva. Nekonečný shimmer (background-position) přepočítával styly každý snímek u všech karet, i mimo obrazovku. */
+.nf-skeleton { background: #1c1c1c; }
 .nf-poster { background: linear-gradient(160deg, #1d1d1d, #131313); }
 .nf-img, #watchlistOverlay .wl-card-poster img { transition: opacity 0.45s ease; }
 .nf-img:not(.is-loaded), #watchlistOverlay .wl-card-poster img:not(.is-loaded) { opacity: 0; animation: nfImgSafety 0s 4s forwards; }
@@ -1280,9 +1279,10 @@ html body nav.nf-quick { background: #141414 !important; border: 0 !important; b
 .nf-hero-empty { position: relative; overflow: hidden; }
 .nf-hero-empty::before {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.05) 50%, transparent 70%); background-size: 200% 100%;
-  animation: nfShimmer 1.8s ease-in-out infinite;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.05) 50%, transparent 70%);
+  transform: translateX(-100%); animation: nfShimmerX 1.8s ease-in-out infinite;
 }
+@keyframes nfShimmerX { to { transform: translateX(100%); } }
 .nf-hero-empty::after {
   content: ""; position: absolute; left: var(--nf-pad, 4%); bottom: 18%; width: min(46%, 420px); height: 120px; border-radius: 8px;
   background:
@@ -1725,11 +1725,14 @@ html body #seriesModal .modal-hero { transition: none; }
 html body #seriesModal.sd-morph .modal-hero-content { animation: sdMorphIn 0.4s ease both; }
 @keyframes sdMorphIn { from { opacity: 0.15; } to { opacity: 1; } }
 
-/* Procházení: plynulé schování filtrů a žánrů při posouvání */
-#universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { max-height: 120px; overflow-y: hidden; transition: max-height 0.35s cubic-bezier(.4, 0, .2, 1), opacity 0.25s ease, margin-top 0.35s ease; }
-#universeOverlay.dv-collapsed .dv-top .dv-filters, #universeOverlay.dv-collapsed .dv-top .dv-chips { max-height: 0; margin-top: 0; opacity: 0; pointer-events: none; }
+/* Procházení: schování filtrů a žánrů při posouvání. Bez animace rozložení (max-height a margin-top přepočítávaly rozložení každý snímek):
+   řádek se nejdřív plynule zprůhlední (opacity + transform, běží mimo hlavní vlákno), poté ho polish.js jednorázově vyjme z rozložení (dv-gone)
+   a posuv těla opraví o jeho výšku, takže obsah pod ním neposkočí. */
+#universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { transition: opacity 0.2s ease, transform 0.2s ease; animation: dvFilterIn 0.25s ease backwards; }
+#universeOverlay.dv-collapsed .dv-top .dv-filters, #universeOverlay.dv-collapsed .dv-top .dv-chips { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+#universeOverlay.dv-gone .dv-top .dv-filters, #universeOverlay.dv-gone .dv-top .dv-chips { display: none; }
 #universeOverlay.dv-collapsed .dv-top .mf-arr { opacity: 0; pointer-events: none; }
-#universeOverlay .dv-top { transition: padding 0.35s ease; }
+@keyframes dvFilterIn { from { opacity: 0; transform: translateY(-8px); } }
 
 /* Výběr profilu: verze se ukáže až po najetí myší (na dotykovém displeji jen jemně) */
 #mfProfileGate .pg-version { padding: 14px 16px; right: 0; bottom: 0; opacity: 0; transition: opacity 0.2s ease; }
@@ -1737,10 +1740,10 @@ html body #seriesModal.sd-morph .modal-hero-content { animation: sdMorphIn 0.4s 
 @media (hover: none) { #mfProfileGate .pg-version { opacity: 0.4; } }
 
 /* Načítání obrázků: shimmer v rámečku, po načtení plynulé rozsvícení (postupně podle pořadí karty) */
-@keyframes mfImgShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-html.mf-imgfx .ep-thumb, html.mf-imgfx .sd-sim-poster, html.mf-imgfx .sd-actor-photo, html.mf-imgfx #universeOverlay .dv-poster {
-  background: linear-gradient(100deg, #1a1a1a 30%, #2a2a2a 50%, #1a1a1a 70%) 0 0 / 200% 100%; animation: mfImgShimmer 1.4s linear infinite;
-}
+/* Statická barva; v okně seriálu (omezený počet prvků) jemné pulzování přes opacity – běží mimo hlavní vlákno, žádné přepočty stylů */
+@keyframes mfImgPulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+html.mf-imgfx .ep-thumb, html.mf-imgfx .sd-sim-poster, html.mf-imgfx .sd-actor-photo, html.mf-imgfx #universeOverlay .dv-poster { background: #1a1a1a; }
+html.mf-imgfx #seriesModal .ep-thumb:not(:has(img.is-loaded)), html.mf-imgfx #seriesModal .sd-sim-poster:not(:has(img.is-loaded)), html.mf-imgfx #seriesModal .sd-actor-photo:not(:has(img.is-loaded)) { animation: mfImgPulse 1.4s ease-in-out infinite; }
 html.mf-imgfx .ep-thumb:has(img.is-loaded), html.mf-imgfx .sd-sim-poster:has(img.is-loaded), html.mf-imgfx .sd-actor-photo:has(img.is-loaded), html.mf-imgfx #universeOverlay .dv-poster:has(img.is-loaded) { animation: none; background: #1d1d1d; }
 html.mf-imgfx .ep-thumb img, html.mf-imgfx .sd-sim-poster img, html.mf-imgfx .sd-actor-photo img, html.mf-imgfx #universeOverlay .dv-poster img { transition: opacity 0.5s ease calc(var(--i, 0) * 45ms), transform 0.5s ease calc(var(--i, 0) * 45ms); }
 html.mf-imgfx .ep-thumb img:not(.is-loaded), html.mf-imgfx .sd-sim-poster img:not(.is-loaded), html.mf-imgfx .sd-actor-photo img:not(.is-loaded), html.mf-imgfx #universeOverlay .dv-poster img:not(.is-loaded) { opacity: 0; transform: scale(1.04); animation: nfImgSafety 0s 4s forwards; }
@@ -1770,7 +1773,7 @@ html::-webkit-scrollbar { display: none !important; width: 0 !important; }
 
 /* Epizody, které se ještě načítají: shimmer místo dočasného plakátu a názvu „Epizoda N“ */
 html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-thumb img { opacity: 0 !important; }
-html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-thumb { background: linear-gradient(100deg, #1a1a1a 30%, #2a2a2a 50%, #1a1a1a 70%) 0 0 / 200% 100%; animation: mfImgShimmer 1.4s linear infinite; }
+html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-thumb { background: #1a1a1a; animation: mfImgPulse 1.4s ease-in-out infinite; }
 html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-title { color: transparent !important; background: rgba(255, 255, 255, 0.12); border-radius: 6px; width: 62%; height: 1.05em; align-self: flex-start; }
 html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-btn-mark { opacity: 0.4; }
 

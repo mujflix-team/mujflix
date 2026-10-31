@@ -89,19 +89,40 @@
   window.addEventListener('online', netBar); window.addEventListener('offline', netBar);
 
 
-  /* Procházení: řada filtrů a žánrů se při posouvání dolů plynule schová, při posunu nahoru nebo po chvíli klidu se vrátí */
+  /* Procházení: řada filtrů a žánrů se při posouvání dolů schová (nejdřív plynule zprůhlední, pak se jednorázově vyjme z rozložení
+     a posuv se opraví o její výšku, ať obsah neposkočí), při posunu nahoru nebo po chvíli klidu se vrátí. Třídy se mění jen při skutečné změně stavu. */
   (function () {
-    var last = 0, idle = 0;
+    var last = 0, idle = 0, gone = 0;
+    function setGone(root, body, on) {
+      var top = root.querySelector('.dv-top');
+      if (!top || root.classList.contains('dv-gone') === on) return;
+      var h0 = top.offsetHeight;
+      root.classList.toggle('dv-gone', on);
+      var d = h0 - top.offsetHeight;
+      if (d && body) { body.scrollTop += d; last = body.scrollTop; }
+    }
+    function collapse(root, body) {
+      if (root.classList.contains('dv-collapsed')) return;
+      root.classList.add('dv-collapsed');
+      clearTimeout(gone);
+      gone = setTimeout(function () { if (root.classList.contains('dv-collapsed')) setGone(root, body, true); }, 230);
+    }
+    function expand(root, body) {
+      if (!root.classList.contains('dv-collapsed') && !root.classList.contains('dv-gone')) return;
+      clearTimeout(gone);
+      setGone(root, body, false);
+      root.classList.remove('dv-collapsed');
+    }
     document.addEventListener('scroll', function (e) {
       var t = e.target;
       if (!t || t.id !== 'dvBody') return;
       var root = document.getElementById('universeOverlay'); if (!root) return;
       var y = t.scrollTop, dy = y - last;
-      if (y > 70 && dy > 5) root.classList.add('dv-collapsed');
-      else if (dy < -5 || y <= 10) root.classList.remove('dv-collapsed');
-      last = y;
+      if (y > 70 && dy > 5) collapse(root, t);
+      else if (dy < -5 || y <= 10) expand(root, t);
+      last = t.scrollTop;
       clearTimeout(idle);
-      idle = setTimeout(function () { root.classList.remove('dv-collapsed'); }, 1400);
+      if (root.classList.contains('dv-collapsed')) idle = setTimeout(function () { expand(root, t); }, 1400);
     }, true);
   })();
 

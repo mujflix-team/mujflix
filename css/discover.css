@@ -218,9 +218,8 @@
 #universeOverlay .dv-empty-sub { font-size: 0.9rem; color: var(--dv-dim); max-width: 380px; }
 
 /* načítání */
-#universeOverlay .dv-skel { background: linear-gradient(100deg, var(--dv-surface) 30%, var(--dv-surface-2) 50%, var(--dv-surface) 70%); background-size: 200% 100%; animation: dvShimmer 1.3s linear infinite; }
+#universeOverlay .dv-skel { background: var(--dv-surface-2); }
 #universeOverlay .dv-skel-line { height: 12px; width: 70%; margin-top: 10px; border-radius: 6px; background: var(--dv-surface); }
-@keyframes dvShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) {
   #universeOverlay, #universeOverlay * { animation: none !important; transition: none !important; }
 }
