@@ -21,7 +21,9 @@ jobs:
       - run: npm ci
       # Prohlížeč Playwrightu se ukládá do cache podle verze; při shodě se nestahuje znovu
       - id: pw
-        run: echo "v=$(node -p \"require('playwright/package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          V=$(node -p 'require("playwright/package.json").version')
+          echo "v=$V" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v4
         id: pwcache
         with:
