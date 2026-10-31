@@ -14,9 +14,12 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Ověřit, jestli NajSerialy.io nebrání vložení do iframe; pokud ano, označit zdroj jako `noEmbed`.
 - Úklid dál: zbylé zmínky `.ps-tile-wrapper` v JS a inline stylech v `index.html`; starý přehrávač `cinema-legacy.js` (nejde jen smazat: `CINEMA_SOURCES`, `_cinState`, `openMovieInCinema` používají sections.js, finder.js, home.js a testy – nejdřív přesunout do nového přehrávače).
 - Vyměnit TMDB klíč (starý byl v historii GitHubu) a nový dát jen do secretu ve Workeru.
+- Nepoužitý kód: `getMomentumCached()` / `getRatingSignalCached()` v `js/app/core.js` nikdo nevolá – buď je zapojit do doporučování, nebo smazat.
+- Třída `html.mf-low-power` (nastavuje ji `index.html` na slabých zařízeních) nemá žádné CSS – dodělat úsporný režim, nebo odstranit.
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.20.13: README přepsáno podle skutečného kódu (jen dokumentace).
 - 3.20.6: Worker ověřuje i Podivana.xyz.
 - 3.20.5: zdroj Podivana.xyz (kotva #player), oprava schované horní lišty po reloadu.
 - 3.20.4: řady úvodní stránky bez blikání, smazané mrtvé CSS, jednotná barva v Nastavení.
