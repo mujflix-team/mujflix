@@ -133,8 +133,8 @@
     return "https://www.najserialy.io/serial/" + slug + "/s" + pad2(season) + "e" + pad2(episode);
   }
 
-  /* Podivana.xyz: zkouší se vložit do přehrávače (dřív s chybnými adresami web hlásil „odmítl připojení“). Kdyby vložení web zakázal,
-     stačí tady a u zdrojů níže vrátit noEmbed: true (jako Uzi.la) a ukáže se tlačítko do nového okna.
+  /* Podivana.xyz: web vložení do cizí stránky zakazuje („odmítl připojení“), proto noEmbed (tlačítko do nového okna) jako u Uzi.la.
+     Kdyby vložení někdy povolil, stačí u zdrojů níže noEmbed: true zrušit.
      Přehrávač je na stránce hluboko dole a pokaždé jinde; kotva #player ho vyscrolluje na místo. */
   function podivanaUrl(title, year, season, episode, section) {
     var slug = daslug(title);
@@ -146,17 +146,17 @@
 
   var MOVIE_SOURCES = [
     { id: "bombuj", label: "Bombuj", build: function (t, y) { return bombujMovieUrl(t, y); } },
-    { id: "podivana", label: "Podivana", build: function (t, y) { return podivanaUrl(t, y); } },
     { id: "uzila", label: "Uzi.la", noEmbed: true, build: function (t) { return uziMovieUrl(t); } },
+    { id: "podivana", label: "Podivana", noEmbed: true, build: function (t, y) { return podivanaUrl(t, y); } },
     { id: "prehrajto", label: "Prehrajto.cz", build: function (t) { return prehrajtoUrl(t); } },
     { id: "bombuj-noyear", label: "Bombuj (bez roku)", build: function (t) { return bombujMovieUrlNoYear(t); } }
   ];
 
   var TV_SOURCES = [
     { id: "svetserialu", label: "SvetSerialu", build: function (t, s, e, slug) { return svetSerialuUrl(t, s, e, slug); } },
-    { id: "podivana", label: "Podivana", build: function (t, s, e) { return podivanaUrl(t, current && (current.firstYear || current.year), s, e); } },
     { id: "bombuj", label: "Bombuj", build: function (t, s, e) { return bombujTvUrl(t, s, e); } },
     { id: "uzila", label: "Uzi.la", noEmbed: true, build: function (t, s, e) { return uziTvUrl(t, s, e); } },
+    { id: "podivana", label: "Podivana", noEmbed: true, build: function (t, s, e) { return podivanaUrl(t, current && (current.firstYear || current.year), s, e); } },
     { id: "najserialy", label: "NajSerialy", build: function (t, s, e) { return najTvUrl(t, s, e, false); } },
     { id: "prehrajto", label: "Prehrajto.cz", build: function (t, s, e) { return prehrajtoTvUrl(t, s, e); } },
     { id: "najserialy-year", label: "NajSerialy (s rokem)", build: function (t, s, e) { return najTvUrl(t, s, e, true); } }

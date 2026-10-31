@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.20.12
+- **Podivana.xyz:** web vložení zakazuje, takže zpět tlačítko „Otevřít v novém okně“ (`noEmbed`); pořadí zdrojů: seriály SvětSeriálů, Bombuj, Uzi.la, Podivana, …; filmy Bombuj, Uzi.la, Podivana, …
+
 ## 3.20.11
 - **Podivana.xyz:** znovu se zkouší vložit přímo do přehrávače (s opravenými adresami). Kdyby web vložení zakázal, vrátí se `noEmbed: true` (tlačítko do nového okna).
 

@@ -1126,7 +1126,7 @@ const persistT = await page.evaluate(() => {
 check("seriál z Objevovat se po zhlédnutí uloží (pokračování po restartu)", persistT.saved && persistT.light && persistT.notDiscover && persistT.counts === 1, JSON.stringify(persistT));
 
 const uziT = await page.evaluate(() => { return [window.MFCinemaPlayer.sourceIds("tv"), window.MFCinemaPlayer.sourceIds("movie")]; });
-check("zdroje: pořadí seriály SvetSerialu, Podivana, Bombuj, Uzi.la, NajSerialy, Prehrajto (varianty až za nimi); filmy Bombuj, Podivana, Uzi.la, Prehrajto", JSON.stringify(uziT) === JSON.stringify([["svetserialu", "podivana", "bombuj", "uzila", "najserialy", "prehrajto", "najserialy-year"], ["bombuj", "podivana", "uzila", "prehrajto", "bombuj-noyear"]]), JSON.stringify(uziT));
+check("zdroje: pořadí seriály SvetSerialu, Bombuj, Uzi.la, Podivana, NajSerialy, Prehrajto (varianty až za nimi); filmy Bombuj, Uzi.la, Podivana, Prehrajto", JSON.stringify(uziT) === JSON.stringify([["svetserialu", "bombuj", "uzila", "podivana", "najserialy", "prehrajto", "najserialy-year"], ["bombuj", "uzila", "podivana", "prehrajto", "bombuj-noyear"]]), JSON.stringify(uziT));
 const pdT = await page.evaluate(() => {
   MFCinemaPlayer.open("1", "Mentalista", "tv_ep", { season: 1, episode: 2 });
   const out = [];
@@ -1136,7 +1136,7 @@ const pdT = await page.evaluate(() => {
 });
 check("zdroj Podivana: tvar /serial/{slug}[-rok]/serie-1/dil-2#player, u filmu mezi zdroji", pdT.out.length > 0 && /^https:\/\/podivana\.xyz\/serial\/mentalista(-\d{4})?\/serie-1\/dil-2#player$/.test(pdT.out[0]) && pdT.movie.includes("podivana"), JSON.stringify(pdT));
 const uziL = await page.evaluate(() => window.MFCinemaPlayer.sourceLabels("tv", ["Anglický", "Slovenský", "Český"]));
-check("zdroje: s víc názvy jdou zdroje popořadě, další názvy Uzi.la a NajSerialy až za Prehrajto", JSON.stringify(uziL.slice(0, 6)) === JSON.stringify(["SvetSerialu", "Podivana (Anglický, serial)", "Bombuj", "Uzi.la (Anglický)", "NajSerialy (Anglický)", "Prehrajto.cz"]) && uziL.slice(6).every(l => /^(Uzi\.la|NajSerialy|Podivana)/.test(l)) && uziL.length === 18, JSON.stringify(uziL));
+check("zdroje: s víc názvy jdou zdroje popořadě, další názvy Uzi.la a NajSerialy až za Prehrajto", JSON.stringify(uziL.slice(0, 6)) === JSON.stringify(["SvetSerialu", "Bombuj", "Uzi.la (Anglický)", "Podivana (Anglický, serial)", "NajSerialy (Anglický)", "Prehrajto.cz"]) && uziL.slice(6).every(l => /^(Uzi\.la|NajSerialy|Podivana)/.test(l)) && uziL.length === 18, JSON.stringify(uziL));
 
 await page.evaluate(() => history.pushState(null, "", "#filmy"));
 await page.waitForTimeout(400);
