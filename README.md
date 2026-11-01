@@ -1,3 +1,5 @@
+<div align="center">
+
 # 🎬 MůjFlix
 
 **Osobní filmový a seriálový tracker ve stylu Netflixu.**
@@ -128,7 +130,7 @@ Okno se třemi záložkami:
 
 ### 🔗 Zdroje a legální streamování
 
-- **České a slovenské weby** – URL se sestaví z názvu, roku, sezóny a epizody; u anime se použije romaji z AniList:
+- **České a slovenské weby** (výchozí skupina) – URL se sestaví z názvu, roku, sezóny a epizody; u anime se použije romaji z AniList:
 
   | Zdroj | Filmy | Seriály | Vložení do přehrávače |
   |---|:-:|:-:|---|
@@ -138,12 +140,22 @@ Okno se třemi záložkami:
   | Prehraj.to (`prehrajto.cz`, hledání) | ✓ | ✓ | ano |
   | Uzi.la (`uzi.la`) | ✓ | ✓ | ne, tlačítko *Otevřít v novém okně* (`noEmbed`) |
 
+- **Zahraniční weby** (anglicky; druhá skupina zdrojů, přepíná se ikonou přeškrtnuté české vlajky v liště přehrávače):
+
+  | Zdroj | Filmy | Seriály | Adresa | Vložení do přehrávače |
+  |---|:-:|:-:|---|---|
+  | Movy (`movy.sx`) | ✓ | ✓ | z TMDB ID: `/movie/<id>`, `/tv/<id>/<s>/<e>` | ne (`noEmbed`) |
+  | Cinejoy (`cinejoy.pk`) | ✓ | ✓ | z TMDB ID: `/watch/movie/<id>`, `/watch/tv/<id>/<s>/<e>` | ne (`noEmbed`) |
+
+  Adresa se skládá přímo z TMDB ID, takže se nic neodhaduje z názvu. Worker tyto weby **neověřuje** (příznak `noProbe`, nejsou v `PROBE_HOSTS`), takže pro ně nebyl potřeba nový deploy Workeru.
+
 - **Legální služby** (Netflix, Disney+, Max, Apple TV+, Prime Video, SkyShowtime, Voyo, Canal+, O2 TV, Crunchyroll …) přes *TMDB Watch Providers* pro ČR/SK
 - **Alternativní názvy** – appka z TMDB načte český, slovenský, anglický a původní název a zkouší je postupně (weby pojmenovávají tituly různě, např. *Family Guy* = `griffinovi-1999`)
-- **Paměť zdrojů** – appka si pamatuje, který zdroj u titulu fungoval, a zvlášť poslední použitý zdroj pro filmy a seriály (`mf_src_last_movie`, `mf_src_last_tv`)
+- **Paměť zdrojů** – appka si pamatuje, který zdroj u titulu fungoval, a zvlášť poslední použitý zdroj pro filmy a seriály (`mf_src_last_movie`, `mf_src_last_tv`, u zahraniční skupiny s příponou `_en`); zvolená skupina (česká / zahraniční) je v `mf_src_lang`
 - **Sdílená paměť zdrojů** (volitelná) – zdroj, který fungoval ostatním, se zkusí první; posílá se jen „titul + název zdroje“
 - **Ověření zdrojů** (Worker) – před přehráním se zkontroluje, jestli web titul opravdu má ; zdroj bez titulu se automaticky přeskočí
-- **Lupa v přehrávači** – hledání titulu přímo na aktuálním zdroji
+- **Lupa v přehrávači** – hledání titulu přímo na aktuálním zdroji (jen u českých zdrojů)
+- **Zdroj nejde** – malé tlačítko v liště označí aktuální zdroj jako nefunkční (14 dní) a zkusí další ve stejné skupině; když se titul nenajde na žádném českém zdroji, toast doporučí zahraniční skupinu
 
 ### 🧠 Doporučování
 
@@ -406,6 +418,7 @@ Vše v `localStorage`. Většina klíčů má příponu s ID profilu (`uKey("mf_
 | `mf_streak_v1`, `mf_streak_today_v1` | Série dní |
 | `mf_search_history_v2`, `mf_pt_chips` | Historie hledání, poslední hledané názvy ve Finderu |
 | `mf_src_pref` | Paměť zdrojů: který zdroj u titulu fungoval / nefungoval (max. 300 titulů) |
+| `mf_src_last_movie`, `mf_src_last_tv` (+ `_en`), `mf_src_lang` | Poslední použitý zdroj pro filmy / seriály a zvolená skupina zdrojů (česká / zahraniční) |
 | `mf_newep_<id>` | Cache „Nová epizoda“ (12 h) |
 | `mfx_age_cache`, `mfx_src_*`, `mf_jw_*` | Cache: věkové značky (60 dní), sdílená paměť zdrojů, watch providers – jen na tomto zařízení |
 | `mf_sync_*` | Stav propojení zařízení |
@@ -444,7 +457,7 @@ Přehrávač (`js/pages/cinema.js`) z názvu, roku, sezóny a epizody složí UR
 2. Worker (`/src/probe`) dá osm adres najednou ověřit: stáhne stránku a vyhodnotí `true` (titul tam je), `false` (404, „nenalezeno“, přesměrování na úvod, nebo **měkká 404** – 200 a obecná stránka, kde není nic z názvu titulu) nebo `null` (nevíme – např. web za ochranou, 403). Výsledek se cachuje 30 min.
 3. Zdroj označený `false` přehrávač krátce po otevření přeskočí a přepne na první, který titul má.
 4. Úvodní zdroj se vybírá takto: zdroj, který u titulu fungoval (vlastní zkušenost – zůstal jsi na něm aspoň minutu – má přednost před sdílenou pamětí z Workeru), pokud není označený jako špatný a ověření ho nezamítlo → poslední použitý zdroj pro film / seriál → první zdroj, který ověření potvrdilo → první neoznačený → výchozí pořadí.
-5. Weby, které vložení do iframe zakazují, mají příznak `noEmbed` – místo přehrávání v okně se zobrazí tlačítko *Otevřít v novém okně*.
+5. Zdroje se dělí na dvě skupiny podle jazyka (`lang`: česká, `en` zahraniční); každá má vlastní řadu zdrojů i vlastní „poslední použitý“. Weby, které vložení do iframe zakazují (Uzi.la, Movy, Cinejoy), mají příznak `noEmbed` – místo přehrávání v okně se zobrazí tlačítko *Otevřít v novém okně*. Zdroje s příznakem `noProbe` (Movy, Cinejoy) se přes Worker neověřují.
 
 Přehrávač vkládá zdroje do `<iframe>` **bez atributu `sandbox`** (hostingy videa jako Filemoon uvnitř SvětSeriálů sandbox detekují a odmítnou přehrávat), takže vyskakovací okna a reklamy cizích webů se tím nezablokují – proto aplikace v úvodním průvodci doporučuje blokátor reklam podle prohlížeče (`core/adblock.js`). Skript `npm run check-sources` zkontroluje, že tvary adres a ověření pořád odpovídají skutečným webům (testovací dotazy mají vyjít `true`, vymyšlené `false`).
 
@@ -576,7 +589,7 @@ Co se při studiu kódu ukázalo; část je i v [`docs/TASKS.md`](docs/TASKS.md)
 
 **Kód pro propojení nefunguje.** Platí jen 10 minut a jde použít jednou. Po 10 neúspěšných pokusech z jedné IP se zadávání na 10 minut zablokuje.
 
-**Zdroj se neotevře v přehrávači.** Některé weby odmítají vložení do iframe (Uzi.la) – zobrazí se tlačítko *Otevřít v novém okně*. Když zdroj titul nemá nebo nefunguje, zkus lupu (hledání titulu na aktuálním webu). Značka ✗ v liště zdrojů znamená, že ověření (Worker) titul na webu nenašlo.
+**Zdroj se neotevře v přehrávači.** Některé weby odmítají vložení do iframe (Uzi.la, Movy, Cinejoy) – zobrazí se tlačítko *Otevřít v novém okně*. Když zdroj titul nemá nebo nefunguje, zkus lupu (hledání titulu na aktuálním webu). Značka ✗ v liště zdrojů znamená, že ověření (Worker) titul na webu nenašlo.
 
 **V přehrávači vyskakují reklamy.** Iframe nemá `sandbox` (jinak by hostingy videa odmítly přehrávat). Nainstaluj blokátor reklam – appka v průvodci nabídne správný pro tvůj prohlížeč.
 
@@ -615,4 +628,3 @@ MůjFlix je osobní tracker – **neposkytuje ani nehostuje žádný obsah** a n
   <strong>🎬 MůjFlix</strong><br />
   <em>Protože sledovat jen tak bez plánu je barbarství.</em>
 </p>
-
