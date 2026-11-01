@@ -425,6 +425,23 @@ const prT = await page.evaluate(async () => {
   } finally { MFCinemaPlayer.close(); await w(400); window.fetch = of; window.TMDB_PROXY_URL = oUrl; }
   return out;
 });
+const autoLangT = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
+  const of = window.fetch, oUrl = window.TMDB_PROXY_URL; window.TMDB_PROXY_URL = "https://w.workers.dev";
+  window.fetch = async (u, o) => {
+    if (/w\.workers\.dev\/src\/probe/.test(String(u))) return { ok: true, json: async () => ({ results: JSON.parse(o.body).urls.map(() => false) }) };
+    return /w\.workers\.dev/.test(String(u)) ? { ok: false, json: async () => null } : of(u, o);
+  };
+  try {
+    localStorage.removeItem("mfx_src_pref");
+    MFCinemaPlayer.open("98761", "Titul Jen Zahraničí", "tv", { season: 1, episode: 1 }); await w(1800);
+    out.auto = MFCinemaPlayer.lang() === "en" && /movy\.sx\/tv\/98761\/1\/1/.test(MFCinemaPlayer.currentUrl());
+    document.getElementById("mfCinLangCs").click(); await w(1500); // ruční návrat na české zdroje automatika nepřepíše
+    out.manual = MFCinemaPlayer.lang() === "cs";
+  } finally { MFCinemaPlayer.close(); await w(400); window.fetch = of; window.TMDB_PROXY_URL = oUrl; }
+  return out;
+});
+check("zdroje: když titul nemá žádný český zdroj, přepne se samo na zahraniční; ruční volba má přednost", autoLangT.auto && autoLangT.manual, JSON.stringify(autoLangT));
 const barT = await page.evaluate(async () => {
   const w = ms => new Promise(r => setTimeout(r, ms));
   MFCinemaPlayer.open("98765", "Nějaký Seriál s dlouhým názvem", "tv", { season: 1, episode: 4 }); await w(900);
@@ -984,6 +1001,54 @@ const favFixT = await page.evaluate(async () => {
   return out;
 });
 check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
+
+const recProfT = await page.evaluate(async () => {
+  const origId = window.getActiveProfileId, origKey = window.getTmdbKey, origFetch = window.fetch, out = {};
+  const fake = url => { const pg = +((/[?&]page=(\d+)/.exec(url) || [])[1] || 1), tv = /discover\/tv/.test(url);
+    return new Response(JSON.stringify({ results: Array.from({ length: 20 }, (_, i) => ({ id: (tv ? 1000 : 5000) + pg * 100 + i, title: "T" + i, name: "N" + i, poster_path: "/p.jpg", backdrop_path: "/b.jpg", overview: "o", genre_ids: [18], vote_average: 7, original_language: "en", first_air_date: "2020-01-01", release_date: "2020-01-01" })) }), { status: 200, headers: { "Content-Type": "application/json" } }); };
+  window.fetch = (u, o) => /discover\//.test(String(u)) ? Promise.resolve(fake(String(u))) : origFetch(u, o);
+  window.getTmdbKey = () => "k";
+  try {
+    const run = async id => { window.getActiveProfileId = () => id; return (await mfhFetchForYou({ tv: [], movies: [] })).slice(0, 20).map(x => x.tmdbId).join(","); };
+    out.a = await run("profil-A"); out.b = await run("profil-B"); out.a2 = await run("profil-A");
+  } finally { window.getActiveProfileId = origId; window.getTmdbKey = origKey; window.fetch = origFetch; }
+  return out;
+});
+check("doporučení: dva profily se stejnými (žádnými) žánry dostanou různý výběr, každý profil ale stabilní", recProfT.a && recProfT.a !== recProfT.b && recProfT.a === recProfT.a2 && recProfT.a.split(",").length === 20, JSON.stringify(recProfT));
+
+const heroPickT = await page.evaluate(() => {
+  const origId = window.getActiveProfileId; window.getActiveProfileId = () => "pid-hero";
+  try {
+    const pool = Array.from({ length: 6 }, (_, i) => ({ mediaType: "tv", tmdbId: 100 + i }));
+    localStorage.setItem("mf_hero_hist_pid-hero", JSON.stringify(pool.slice(0, 5).map(x => "tv:" + x.tmdbId)));
+    const first = mfhPickHero(pool), again = mfhPickHero(pool);
+    return { first: first.tmdbId, same: again.tmdbId === first.tmdbId, hist: JSON.parse(localStorage.getItem("mf_hero_hist_pid-hero")).length };
+  } finally { window.getActiveProfileId = origId; localStorage.removeItem("mf_hero_hist_pid-hero"); }
+});
+check("banner: nevybírá nedávno ukázané tituly a v rámci jednoho otevření se nemění", heroPickT.first === 105 && heroPickT.same && heroPickT.hist === 6, JSON.stringify(heroPickT));
+
+const verDisp = async () => page.evaluate(() => getComputedStyle(document.getElementById("pgVersion")).display);
+const verPc = await verDisp();
+await page.setViewportSize({ width: 400, height: 800 });
+const verPhone = await verDisp();
+await page.setViewportSize({ width: 1280, height: 800 });
+check("výběr profilu: číslo verze je na telefonu schované, na počítači zůstává", verPhone === "none" && verPc !== "none", JSON.stringify({ verPc, verPhone }));
+
+const simT = await page.evaluate(async () => {
+  const box = document.getElementById("sdSimilar"); if (!box) return { skip: true };
+  const slug = Object.keys(db)[0], keep = [db[slug].tmdbId, db[slug]._genreIds], orig = window.tmdbGet;
+  db[slug].tmdbId = 456; db[slug]._genreIds = [16, 35];
+  const mk = (id, g, vc, va) => ({ id, name: "S" + id, poster_path: "/p.jpg", genre_ids: g, vote_count: vc, vote_average: va });
+  window.tmdbGet = async p => /page=2/.test(p) ? { results: [mk(5, [16], 100, 6), mk(6, [35], 100, 6)] }
+    : /recommendations/.test(p) ? { results: [mk(1, [16, 35], 500, 8), mk(2, [99], 500, 9), mk(3, [16], 5, 9), mk(7, [16], 80, 7)] }
+    : /similar/.test(p) ? { results: [mk(1, [16, 35], 500, 8), mk(4, [16, 35], 300, 7), mk(8, [35], 60, 6)] } : null;
+  try {
+    activeSeries = slug; box.hidden = false; delete box.dataset.for; box.textContent = "";
+    await _sdLoadSimilar();
+    return { ids: [...box.querySelectorAll(".sd-sim-card")].map(c => c.getAttribute("aria-label")) };
+  } finally { window.tmdbGet = orig; box.hidden = true; db[slug].tmdbId = keep[0]; db[slug]._genreIds = keep[1]; }
+});
+check("podobné seriály: doporučení + podobné spojené, shoda v obou seznamech a žánrů první, bez titulů s pár hlasy, víc než 4", simT.skip || (simT.ids[0] === "S1" && simT.ids.indexOf("S3") < 0 && simT.ids.length >= 7), JSON.stringify(simT));
 
 const arrT = await page.evaluate(async () => {
   const row = document.getElementById("sdCastRow"); if (!row) return null;

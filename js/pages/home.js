@@ -925,6 +925,23 @@
             .slice(0, 3);
         } catch (e) { return []; }
       }
+      /* Osivo profilu: v rámci týdne stabilní, mezi profily různé. Díky němu má každý profil vlastní výběr a pořadí doporučení
+         i při stejných žánrech (jinak by všechny profily dostaly stejný seznam „nejpopulárnější v žánru“). */
+      function mfhProfileSeed() {
+        var id = 'default', h = 0;
+        try { id = (typeof getActiveProfileId === 'function' && getActiveProfileId()) || 'default'; } catch (e) {}
+        var str = id + '|' + Math.floor(Date.now() / (7 * 864e5));
+        for (var i = 0; i < str.length; i++) h = (Math.imul(h, 31) + str.charCodeAt(i)) >>> 0;
+        return h;
+      }
+      function mfhSeededShuffle(list, seed) {
+        var a = list.slice(), r = seed >>> 0;
+        function rnd() { r = (r + 0x6D2B79F5) >>> 0; var t = r; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+        for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), x = a[i]; a[i] = a[j]; a[j] = x; }
+        return a;
+      }
+      window.mfhProfileSeed = mfhProfileSeed; window.mfhSeededShuffle = mfhSeededShuffle; // pro testy
+
       function mfhTopGenreIdsWithProfile() {
         var ids = mfhTopGenreIds();
         if (ids.length) return ids;
@@ -977,7 +994,7 @@
         var genres = mfhTopGenreIdsWithProfile();
         var key = getTmdbKey();
         var toItem = function (type) { return function (item) { return nfItem(item, type); }; };
-        if (!genres.length || !key) {
+        if (!key) {
           var pop = [];
           var tvs = (tmdb && tmdb.tv) || [], mvs = (tmdb && tmdb.movies) || [];
           for (var i = 0; i < Math.max(tvs.length, mvs.length); i++) {
@@ -986,15 +1003,21 @@
           }
           return Promise.resolve(pop);
         }
-        return Promise.all(['tv', 'movie'].map(function (type) {
+        var seed = mfhProfileSeed(), p1 = 1 + seed % 4; // každý profil začíná na jiné stránce výsledků a pořadí si zamíchá po svém
+        return Promise.all(['tv', 'movie'].map(function (type, ti) {
           // Filmy a seriály mají v TMDB částečně jiná ID žánrů (např. Akční 28 vs. 10759)
-          var ids = window.mfGenreIdsFor ? window.mfGenreIdsFor(genres, type) : genres;
-          if (!ids.length) return Promise.resolve([]);
-          var q = '&language=cs-CZ&sort_by=popularity.desc&vote_count.gte=100&with_genres=' + encodeURIComponent(ids.join('|'));
+          var ids = genres.length ? (window.mfGenreIdsFor ? window.mfGenreIdsFor(genres, type) : genres) : [];
+          if (genres.length && !ids.length) return Promise.resolve([]);
+          var q = 'language=cs-CZ&sort_by=popularity.desc&vote_count.gte=' + (ids.length ? 100 : 300) + (ids.length ? '&with_genres=' + encodeURIComponent(ids.join('|')) : '');
           var gp = function (p) { return fetch(TMDB_BASE + p + (p.indexOf('?') < 0 ? '?' : '&') + 'api_key=' + encodeURIComponent(key)).then(function (r) { return r.json(); }); };
-          return (window.MFAge ? window.MFAge.wide('/discover/' + type + '?' + q.slice(1), gp) : gp('/discover/' + type + '?' + q.slice(1)))
-            .then(function (d) { return (d.results || []).filter(function (r) { return !(window.mfIsAnime && window.mfIsAnime(r)); }).map(toItem(type)); })
-            .catch(function () { return []; });
+          var page = function (n) {
+            var path = '/discover/' + type + '?' + q + '&page=' + n;
+            return (window.MFAge ? window.MFAge.wide(path, gp) : gp(path)).then(function (d) { return d.results || []; }).catch(function () { return []; });
+          };
+          return Promise.all([page(p1), page(p1 + 1)]).then(function (r) {
+            var seenId = {}, all = r[0].concat(r[1]).filter(function (x) { return x && !seenId[x.id] && (seenId[x.id] = 1); });
+            return mfhSeededShuffle(all.filter(function (x) { return !(window.mfIsAnime && window.mfIsAnime(x)); }).map(toItem(type)), seed + ti);
+          });
         })).then(function (lists) {
           var out = [], max = Math.max(lists[0].length, lists[1].length);
           for (var i = 0; i < max; i++) { if (lists[0][i]) out.push(lists[0][i]); if (lists[1][i]) out.push(lists[1][i]); }
@@ -1037,6 +1060,24 @@
       window.mfhShowResumeChip = function () {};
 
       window.mfhFetchForYou = mfhFetchForYou;
+      window.mfhPickHero = function (pool) { return mfhPickHero(pool); }; // pro testy
+
+      /* Banner: nedávno ukázané tituly (na profil) se vynechají; v rámci jednoho otevření aplikace zůstává stejný titul */
+      var _heroOpenPick = null;
+      function mfhPickHero(pool) {
+        if (!pool.length) return null;
+        var hkey = 'mf_hero_hist_' + ((typeof getActiveProfileId === 'function' && getActiveProfileId()) || 'default'), hist = [];
+        try { hist = JSON.parse(localStorage.getItem(hkey) || '[]'); if (!Array.isArray(hist)) hist = []; } catch (e) { hist = []; }
+        var idOf = function (it) { return (it.mediaType || '') + ':' + it.tmdbId; };
+        if (_heroOpenPick) { var again = pool.filter(function (it) { return idOf(it) === _heroOpenPick; })[0]; if (again) return again; }
+        var rest = pool.filter(function (it) { return hist.indexOf(idOf(it)) < 0; });
+        if (!rest.length) rest = pool;
+        var pick = rest[Math.floor(_heroSeed * rest.length)];
+        _heroOpenPick = idOf(pick);
+        hist = hist.filter(function (x) { return x !== _heroOpenPick; }); hist.push(_heroOpenPick);
+        try { localStorage.setItem(hkey, JSON.stringify(hist.slice(-8))); } catch (e) {}
+        return pick;
+      }
 
       function renderHomepage() {
         nfRenderProfile();
@@ -1137,12 +1178,10 @@
           if (myRun !== _nfRun) return;
           items = fresh(items.filter(function (it) { return it.image; })).slice(0, 20);
           nfFillRow('mfhForYou', items);
-          /* Banner: titul z nabídky pro tebe; při každém otevření aplikace jiný (během jednoho otevření se nepřeskakuje), u profilu s vkusem jen z nejlepších shod */
-          var cands = items.filter(function (it) { return it.backdrop && it.overview; }).slice(0, (genres.length || oa) ? 4 : 8);
-          var pick = null;
-          if (cands.length) {
-            pick = cands[Math.floor(_heroSeed * cands.length)];
-          }
+          /* Banner: titul z nabídky pro tebe. Vybírá se z širší nabídky (14 titulů) a mimo posledních 8 ukázaných, ať se neopakuje;
+             během jednoho otevření aplikace se nemění. */
+          var pool = items.filter(function (it) { return it.backdrop && it.overview; }).slice(0, 14);
+          var pick = mfhPickHero(pool);
           if (pick) nfHeroFromTmdb(pick);
           else { var hh = document.getElementById('nfHero'); if (hh) hh.className = 'nf-hero nf-hero-none'; }
         }).catch(function () {

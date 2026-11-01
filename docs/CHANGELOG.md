@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.21.2
+- **Doporučení zvlášť pro každý profil:** řada „Vybráno pro tebe“ / „Populární právě teď“ se dřív brala jen jako nejpopulárnější tituly v žánrech, takže profily se stejnými (nebo žádnými) žánry dostaly totéž. Teď má každý profil vlastní osivo (stabilní v rámci týdne): začíná na jiné stránce výsledků TMDB a pořadí si zamíchá po svém. Žánry zůstávají, bez žánrů se bere obecná nabídka.
+- **Banner na úvodní stránce se neopakuje:** vybírá se z 14 titulů (dřív ze 4) a vynechávají se naposledy ukázané (paměť na profil, posledních 8). Během jednoho otevření aplikace se nemění.
+- **Podobné seriály:** spojují se doporučení TMDB a podobné (2 stránky z každého), řadí se podle shody v obou seznamech, shody žánrů a hodnocení; tituly s pár hlasy se vynechají. Místo 18 jich je až 30.
+- **Výběr profilu:** na telefonu se už neukazuje číslo verze.
+- **Zdroje:** když titul nemá žádný český zdroj (ověření ve Workeru), přehrávač se sám přepne na zahraniční. Zahraniční zdroje se neověřují, berou se podle TMDB ID. Ruční volba skupiny (ikony vlajek) má přednost.
+
 ## 3.21.1
 - **Oblíbené:** položky už nejsou „[object Object]“. Název se vždy bere jako text (starší záznamy s objektem se opraví, chybějící názvy se doplní z TMDB). Klik na položku nikdy neotevře starý dialog *Přímé vyhledávání*, ale normální detail; bez ID a bez místního seriálu se titul dohledá v TMDB podle názvu.
 - **Srdíčko:** seriál uložený pod místním slugem (okno seriálu) se na úvodní stránce pozná jako oblíbený (červené srdíčko, odebrání funguje) i podle TMDB ID.
