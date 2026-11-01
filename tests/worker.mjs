@@ -95,4 +95,9 @@ await pullT(); const first = ttlPuts.filter(k => k === "d:" + id || k === "r:" +
 await pullT();
 check("worker: čtení obnoví platnost dat nejvýš jednou týdně", first >= 2 && ttlPuts.length === 0, JSON.stringify({ first, again: ttlPuts }));
 
+
+// --- Audit A4: bezpečnostní hlavičky i na odpovědích Workeru
+const hdr = await w.fetch(new Request("https://w/sync/pull", { method: "POST", headers: { Origin: "https://a.b" }, body: "{}" }), env, {});
+check("worker: odpovědi mají nosniff, X-Frame-Options DENY a Cache-Control no-store", hdr.headers.get("X-Content-Type-Options") === "nosniff" && hdr.headers.get("X-Frame-Options") === "DENY" && hdr.headers.get("Cache-Control") === "no-store", JSON.stringify([...hdr.headers.entries()]));
+
 finish();
