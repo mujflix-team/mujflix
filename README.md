@@ -1,5 +1,3 @@
-<div align="center">
-
 # 🎬 MůjFlix
 
 **Osobní filmový a seriálový tracker ve stylu Netflixu.**
@@ -12,6 +10,8 @@ Najdi, co sledovat, pamatuj si, kde jsi skončil, a měj profily, hodnocení a s
 ![PWA](https://img.shields.io/badge/PWA-ano-5A0FC8)
 ![Build](https://img.shields.io/badge/build-žádný-lightgrey)
 ![Závislosti](https://img.shields.io/badge/runtime_závislosti-0-success)
+
+> 👉 **Nic instalovat ani spouštět nemusíš.** Aplikace už běží na **<https://mujflix.pages.dev>** – otevři ji v prohlížeči (na telefonu ji jde přidat na plochu). Zbytek tohoto README je pro ty, kdo si ji chtějí nasadit vlastní nebo na ní vyvíjet.
 
 [Co to umí](#-co-to-umí) ·
 [Rychlý start](#-rychlý-start) ·
@@ -61,6 +61,22 @@ Celé řešení se skládá ze tří částí:
 Metadata o filmech a seriálech (plakáty, popisy, herci, trailery, hodnocení, kde se dá legálně sledovat) pocházejí z [TMDB](https://www.themoviedb.org/). Aplikace **nehostuje žádná videa** – jen tě navede na streamovací služby nebo externí weby.
 
 **Pro koho je:** pro rodinu a přátele, kteří chtějí jedno místo pro „co jsem rozkoukal“, „co chci vidět“ a „co mi doporučíš“, s oddělenými profily (každý má vlastní vkus, hodnocení a případně PIN).
+
+### 📸 Ukázky
+
+> ℹ️ **Provizorní obrázky.** Jsou pořízené z aplikace se **smyšlenými tituly a zástupnými plakáty** (data z TMDB jsou nahrazená), takže ukazují jen rozložení a vzhled. Až bude čas, nahradí se skutečnými snímky z [mujflix.pages.dev](https://mujflix.pages.dev) (soubory v [`docs/screenshots/`](docs/screenshots), stačí je přepsat pod stejným názvem).
+
+| Kdo se dívá? | Úvodní stránka |
+|:-:|:-:|
+| ![Výběr profilu](docs/screenshots/profily.png) | ![Úvodní stránka](docs/screenshots/uvod.png) |
+
+| Procházení | Oblíbené |
+|:-:|:-:|
+| ![Procházení seriálů](docs/screenshots/prochazeni.png) | ![Oblíbené](docs/screenshots/oblibene.png) |
+
+| Detail seriálu | Telefon |
+|:-:|:-:|
+| ![Detail seriálu](docs/screenshots/detail-serialu.png) | <img src="docs/screenshots/uvod-mobil.png" alt="Úvodní stránka na telefonu" width="220"> <img src="docs/screenshots/detail-mobil.png" alt="Detail seriálu na telefonu" width="220"> |
 
 ---
 
@@ -152,7 +168,9 @@ Lokální algoritmus `AIBrain` (žádná externí AI, žádný odesílaný profi
 
 ## 🚀 Rychlý start
 
-Potřebuješ jen prohlížeč, Node.js 20+ (kvůli testům) a [TMDB API klíč](https://www.themoviedb.org/settings/api) (zdarma).
+**Jen používáš?** Otevři **<https://mujflix.pages.dev>** – nic se neinstaluje, nic nespouštíš lokálně, nepotřebuješ žádný klíč. Vytvoř si profil a můžeš sledovat. (Volitelně ji v prohlížeči přidej na plochu jako aplikaci.)
+
+**Chceš vlastní kopii nebo upravovat kód?** Pak potřebuješ jen prohlížeč, Node.js 20+ (kvůli testům) a [TMDB API klíč](https://www.themoviedb.org/settings/api) (zdarma).
 
 ```bash
 git clone https://github.com/mujflix-team/mujflix.git
@@ -597,3 +615,4 @@ MůjFlix je osobní tracker – **neposkytuje ani nehostuje žádný obsah** a n
   <strong>🎬 MůjFlix</strong><br />
   <em>Protože sledovat jen tak bez plánu je barbarství.</em>
 </p>
+
