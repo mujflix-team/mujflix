@@ -1,0 +1,12 @@
+# Dependabot hlídá zranitelnosti ve vývojářských závislostech (lint a testy) a verze akcí v CI.
+# Do appky, kterou vidí uživatel, se žádná závislost nedostává (čisté HTML/CSS/JS bez buildu).
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -234,7 +234,13 @@ function corsHeaders(request, env) {
 function json(body, status, cors) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json; charset=utf-8", ...cors },
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Cache-Control": "no-store", // chyby, sync a hlášení zdrojů se nikde po cestě necachují (TMDB odpovědi mají vlastní Cache-Control)
+      ...cors,
+    },
   });
 }
 
@@ -286,6 +292,7 @@ export default {
     }
     const out = new Response(res.body, res);
     Object.entries(cors).forEach(([k, v]) => out.headers.set(k, v));
+    out.headers.set("X-Content-Type-Options", "nosniff");
     return out;
   },
 };
