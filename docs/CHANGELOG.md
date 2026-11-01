@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.6
+- **Service worker (audit F):** název cache se odvozuje z verze aplikace. Skript se registruje jako `/sw.js?v=<verze>`, takže nová verze = nový service worker i nová cache a jeho aktivace smaže starou. Dřív byla cache natvrdo `mujflix-shell-v1` a nikdy se nemazala.
+- Neřešeno: generování parametrů `?v=` z hashe obsahu (zůstávají ruční).
+
 ## 3.21.5
 - **Worker (audit C1, C4, C5), nutné znovu nasadit `worker/tmdb-proxy.js`:**
   - **CORS už není „otevřený všem“, když chybí `ALLOWED_ORIGINS`:** bez proměnné se povolí jen `mujflix.pages.dev` (včetně náhledů PR) a localhost. Máš-li vlastní doménu, vypiš ji do `ALLOWED_ORIGINS`, jinak ji Worker odmítne (403). Kontrola Originu chrání před cizími weby v prohlížeči, ne před skripty.

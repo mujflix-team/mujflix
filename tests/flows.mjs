@@ -980,6 +980,17 @@ const favFixT = await page.evaluate(async () => {
 });
 check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
 
+const swT = await page.evaluate(async () => {
+  if (!("serviceWorker" in navigator)) return { none: true };
+  for (let i = 0; i < 30; i++) {
+    const r = await navigator.serviceWorker.getRegistration("/"), sw = r && (r.active || r.installing || r.waiting);
+    if (sw) return { url: sw.scriptURL, v: window.MF_VERSION };
+    await new Promise(x => setTimeout(x, 200));
+  }
+  return { none: true };
+});
+check("service worker: adresa skriptu nese verzi aplikace (nová verze = nová cache)", swT.none || swT.url.endsWith("/sw.js?v=" + encodeURIComponent(swT.v)), JSON.stringify(swT));
+
 const heartT = await page.evaluate(async () => {
   const out = { pageErr: [] }, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
   const onErr = e => out.pageErr.push(String(e.message || e)); window.addEventListener("error", onErr);

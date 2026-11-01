@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.6: cache service workeru podle verze aplikace (audit F).
 - 3.21.5: Worker: CORS bez otevřeného výchozího stavu, limit těla a obnova platnosti dat (audit C1, C4, C5).
 - 3.21.4: úklid po Finderu, AI klíčích a mrtvých funkcích (audit B2–B5, D2–D3).
 - 3.21.3: srdíčko na kartě a [object Object] v Oblíbených (duplicitní mfhToggleFav), zahazování poškozených záznamů Oblíbených.
