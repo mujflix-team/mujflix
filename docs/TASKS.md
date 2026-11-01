@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.1: Oblíbené bez [object Object] a bez starého vyhledávacího dialogu, prolnutí banneru s pozadím, srdíčko podle TMDB ID, čeština vždy první.
 - 3.21.0: README – poznámka, že nic není třeba spouštět lokálně, a provizorní screenshoty v `docs/screenshots/` (později nahradit skutečnými z mujflix.pages.dev).
 - 3.21.0: přehrávač má skupiny zdrojů česky / zahraničí (dvě ikony), malé „Zdroj nejde“, nové zdroje Movy a Cinejoy (adresa z TMDB ID).
 - 3.20.14: Podivana pryč, jednodušší lišta přehrávače, poslední zdroj zvlášť pro filmy a seriály, banner zešedne do černa.

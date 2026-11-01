@@ -167,10 +167,8 @@
     { id: "cinejoy", lang: "en", noProbe: true, noEmbed: true, label: "Cinejoy", build: function (t, s, e) { return cinejoyUrl("tv", s, e); } }
   ];
 
-  /* Skupina zdrojů: „cs“ (české weby) nebo „en“ (zahraniční); volba se pamatuje. */
-  var LANG_KEY = "mf_src_lang";
-  function langLoad() { try { return localStorage.getItem(LANG_KEY) === "en" ? "en" : "cs"; } catch (e) { return "cs"; } }
-  var srcLang = langLoad();
+  /* Skupina zdrojů: „cs“ (české weby) nebo „en“ (zahraniční). Každý titul začíná českými zdroji; zahraniční jsou jen ruční volba. */
+  var srcLang = "cs";
   function inLang(src) { return (src.lang || "cs") === srcLang; }
 
   function sourcesFor(type) {
@@ -645,7 +643,6 @@
     if (!current || l === srcLang) return;
     noteGoodIfStayed();
     srcLang = l;
-    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
     current._manual = false; current._noneToast = false;
     current.sourceIdx = startIndex();
     renderCurrent();
@@ -934,6 +931,7 @@
     document.body.style.overflow = "hidden";
 
     if (current.type === "movie" && typeof window.mfRecordContinueMovie === "function") window.mfRecordContinueMovie(current.tmdbId, current.title);
+    srcLang = "cs";
     current.sourceIdx = startIndex();
     var first = sourcesFor(current.type)[current.sourceIdx], opened = current;
     var wait = !!shBase() && !!first && isCheckable(srcUrl(first)) && probeState(first) === undefined && !prefEntry().good;

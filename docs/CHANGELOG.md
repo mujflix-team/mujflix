@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.1
+- **Oblíbené:** položky už nejsou „[object Object]“. Název se vždy bere jako text (starší záznamy s objektem se opraví, chybějící názvy se doplní z TMDB). Klik na položku nikdy neotevře starý dialog *Přímé vyhledávání*, ale normální detail; bez ID a bez místního seriálu se titul dohledá v TMDB podle názvu.
+- **Srdíčko:** seriál uložený pod místním slugem (okno seriálu) se na úvodní stránce pozná jako oblíbený (červené srdíčko, odebrání funguje) i podle TMDB ID.
+- **Banner:** výměna titulu je plynulé prolnutí s pozadím: starý titul zůstane navrch jako snímek a zprůhlední, nový se pod ním rozjasní. Žádné zčernání.
+- **Zdroje:** každý titul začíná českými zdroji; zahraniční skupina se už nepamatuje mezi tituly (zůstává jen ruční volba v daném přehrávači).
+
 ## 3.21.0
 - **README:** nahoře i v Rychlém startu je napsáno, že nic není potřeba spouštět lokálně (stačí <https://mujflix.pages.dev>), a nová sekce *Ukázky* s provizorními screenshoty (smyšlené tituly a zástupné plakáty) ve `docs/screenshots/`. Jen dokumentace.
 - **Zdroje ve dvou skupinách:** v liště přehrávače jsou vpravo dvě malé ikony – česká vlajka (české zdroje) a přeškrtnutá česká vlajka (zahraniční, anglicky). Volba se pamatuje; poslední použitý zdroj se pamatuje zvlášť pro každou skupinu.

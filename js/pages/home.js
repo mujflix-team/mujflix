@@ -594,13 +594,17 @@
           var hero = document.getElementById('nfHero');
           var key = (h.title || '') + '|' + (h.image || '');
           if (hero && hero.querySelector('.nf-hero-body') && hero.dataset.key !== key) {
-            /* Výměna banneru: starý titul zešedne až do černa, potom se rozjasní nový */
-            hero.classList.add('nf-hero-out');
-            setTimeout(function () {
-              if (tok !== _heroTok) return;
-              hero.classList.remove('nf-hero-out');
-              nfHeroPaint(h, true);
-            }, 420);
+            /* Výměna banneru: starý zůstane navrch jako snímek a plynule zprůhlední, nový se pod ním zároveň rozjasní
+               (prolnutí přes pozadí, žádné škubnutí) */
+            var ghost = document.createElement('div');
+            ghost.className = 'nf-hero-ghost';
+            ghost.setAttribute('aria-hidden', 'true');
+            ghost.innerHTML = hero.innerHTML;
+            [].forEach.call(ghost.querySelectorAll('.nf-hero-ghost, video, iframe'), function (el) { el.remove(); });
+            [].forEach.call(ghost.querySelectorAll('[id]'), function (el) { el.removeAttribute('id'); });
+            nfHeroPaint(h, true);
+            hero.appendChild(ghost);
+            setTimeout(function () { if (ghost.parentNode) ghost.remove(); }, 800);
           } else nfHeroPaint(h);
         }
         if (h.image) {

@@ -1,8 +1,21 @@
 /* Oblíbené: seznam, filtry, hodnocení. Část původního app.js, načítá se v tomto pořadí (viz index.html). */
+/* Název oblíbené položky vždy jako text (starší záznamy mohly mít místo názvu objekt → „[object Object]“) */
+function mfFavName(w) {
+  const n = w && w.name;
+  if ("string" == typeof n) return n;
+  if (n && "object" == typeof n) {
+    const t = n.title || n.name || n.cs || n.original || n.en;
+    if ("string" == typeof t) return t
+  }
+  const d = "undefined" != typeof db && w && db[w.slug];
+  return d && "string" == typeof d.name ? d.name : ""
+}
+
 function getWatchlist() {
   try {
     // Poškozené záznamy (null, čísla, objekty bez slugu) se přeskočí, aby nespadl seznam ani přidávání
     return safeLS(uKey("mf_watchlist"), "[]").filter(w => w && "object" == typeof w && !Array.isArray(w) && null != w.slug)
+      .map(w => "string" == typeof w.name ? w : Object.assign({}, w, { name: mfFavName(w) }))
   } catch {
     return []
   }
@@ -17,7 +30,7 @@ let _mfPosterFixBusy = false;
 async function mfBackfillFavPosters() {
   if (_mfPosterFixBusy) return;
   const list = getWatchlist();
-  const miss = list.filter(w => w && w.tmdbId && !w.poster);
+  const miss = list.filter(w => w && w.tmdbId && (!w.poster || !w.name));
   if (!miss.length) return;
   _mfPosterFixBusy = true;
   try {
@@ -26,7 +39,7 @@ async function mfBackfillFavPosters() {
       try {
         const kind = w.type === "series" ? "tv" : "movie";
         const d = await tmdbGet("/" + kind + "/" + w.tmdbId + "?language=cs-CZ");
-        if (d && d.poster_path) found[w.slug + "|" + w.tmdbId] = "https://image.tmdb.org/t/p/w342" + d.poster_path;
+        if (d) found[w.slug + "|" + w.tmdbId] = { p: d.poster_path ? "https://image.tmdb.org/t/p/w342" + d.poster_path : "", n: d.title || d.name || "" };
       } catch (e) {}
     }
     // seznam mezitím mohl uživatel změnit (odebrat položku) – načti ho znovu, ať ji nevrátíme zpět
@@ -34,7 +47,8 @@ async function mfBackfillFavPosters() {
     let changed = false;
     fresh.forEach(w => {
       const u = found[w.slug + "|" + w.tmdbId];
-      if (u && !w.poster) { w.poster = u; changed = true; }
+      if (u && u.p && !w.poster) { w.poster = u.p; changed = true }
+      if (u && u.n && !w.name) { w.name = u.n; changed = true }
     });
     if (changed) {
       saveWatchlistData(fresh);
@@ -44,28 +58,36 @@ async function mfBackfillFavPosters() {
   } finally { _mfPosterFixBusy = false; }
 }
 window.mfBackfillFavPosters = mfBackfillFavPosters;
+setTimeout(() => { try { mfBackfillFavPosters() } catch (e) {} }, 3000); // doplní chybějící názvy a plakáty ze starších záznamů
 
 function tmdbFavSlug(id, mediaType) {
   return "__tmdbfav_" + ("tv" === mediaType ? "tv" : "movie") + "_" + id
 }
 
+/* Je položka záznamem o titulu z TMDB? Platí i pro seriál uložený pod místním slugem (srdíčko v okně seriálu) */
+function _mfFavMatches(w, id, mediaType) {
+  const kind = "tv" === mediaType ? "series" : "movie";
+  if (w.slug === tmdbFavSlug(id, mediaType)) return true;
+  if (w.tmdbId && String(w.tmdbId) === String(id) && w.type === kind) return true;
+  return "series" === kind && "undefined" != typeof db && !!db[w.slug] && String(db[w.slug].tmdbId) === String(id)
+}
+
 function isTmdbFavorite(id, mediaType) {
-  const slug = tmdbFavSlug(id, mediaType);
-  return getWatchlist().some(w => w.slug === slug)
+  return getWatchlist().some(w => _mfFavMatches(w, id, mediaType))
 }
 
 function toggleTmdbFavorite(id, mediaType, name, poster, btn) {
   if (!id) return;
   const slug = tmdbFavSlug(id, mediaType),
     list = getWatchlist(),
-    idx = list.findIndex(w => w.slug === slug);
+    idx = list.findIndex(w => _mfFavMatches(w, id, mediaType));
   if (idx >= 0) {
-    list.splice(idx, 1);
+    for (let i = list.length - 1; i >= 0; i--) _mfFavMatches(list[i], id, mediaType) && list.splice(i, 1);
     if (typeof showToast === "function") showToast("Odebráno z Oblíbených");
   } else {
     list.push({
       slug,
-      name: name || "",
+      name: "string" == typeof name ? name : mfFavName({ name }),
       type: "tv" === mediaType ? "series" : "movie",
       poster: poster || "",
       tmdbId: id
@@ -203,14 +225,27 @@ function openFavoriteItem(e) {
       if (e.slug && e.slug.startsWith("__dtv_") && typeof openDiscoverTv === "function") {
         return void openDiscoverTv(e.slug.slice(6), e.name);
       }
-      if (e.slug && typeof openSeries === "function") {
+      if (e.slug && typeof openSeries === "function" && "undefined" != typeof db && db[e.slug]) {
         return void openSeries(e.slug);
       }
-      openWithCopy(e.name, "series" === e.type ? "tv" : "movie");
+      mfFavFind(e)
     } catch (err) {
-      openWithCopy(e.name, "series" === e.type ? "tv" : "movie");
+      mfFavFind(e)
     }
   }, 300);
+}
+
+/* Položka bez ID i místního seriálu: dohledá se v TMDB podle názvu a otevře se normální detail (žádný vyhledávací dialog) */
+async function mfFavFind(e) {
+  const name = mfFavName(e), kind = "series" === e.type ? "tv" : "movie";
+  try {
+    if (name) {
+      const d = await tmdbGet("/search/" + kind + "?language=cs-CZ&query=" + encodeURIComponent(name)),
+        r = d && d.results && d.results[0];
+      if (r) return void ("tv" === kind ? openDiscoverTv(r.id, r.name || name) : _showCinemaOrFinderChoice(r.id, r.title || name, "movie"))
+    }
+  } catch (err) {}
+  "function" == typeof showToast && showToast("Tenhle titul se nepodařilo otevřít", 3000)
 }
 
 function toggleWatchlistItem(e) {
