@@ -1,6 +1,7 @@
 # Changelog
 
 ## 3.21.0
+- **README:** nahoře i v Rychlém startu je napsáno, že nic není potřeba spouštět lokálně (stačí <https://mujflix.pages.dev>), a nová sekce *Ukázky* s provizorními screenshoty (smyšlené tituly a zástupné plakáty) ve `docs/screenshots/`. Jen dokumentace.
 - **Zdroje ve dvou skupinách:** v liště přehrávače jsou vpravo dvě malé ikony – česká vlajka (české zdroje) a přeškrtnutá česká vlajka (zahraniční, anglicky). Volba se pamatuje; poslední použitý zdroj se pamatuje zvlášť pro každou skupinu.
 - **Nové zahraniční zdroje Movy.sx a Cinejoy.pk** (filmy i seriály). Adresa se skládá přímo z TMDB ID (`/tv/456/1/2`, `/movie/155`), takže se nic neodhaduje ze slugu. Weby zakazují vložení do rámečku, proto se otevírají v nové kartě (jako Uzi.la). Worker je neověřuje, takže ho není potřeba znovu nasazovat.
 - **Zdroj nejde:** malé tlačítko s ikonou v liště označí zdroj jako nefunkční (14 dní) a zkusí další ve stejné skupině. Hledání (lupa) je jen u českých zdrojů.
