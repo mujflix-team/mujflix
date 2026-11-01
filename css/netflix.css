@@ -1771,10 +1771,10 @@ html body #seriesModal .sd-head-plain .sd-seasons-wrap { display: none; }
 /* Banner na úvodní stránce: první zobrazení plynule naběhne, výměna za jiný titul je bez probliknutí */
 @keyframes nfHeroIn { from { opacity: 0 } to { opacity: 1 } }
 html body .nf-hero.nf-hero-in > * { animation: nfHeroIn .7s ease both; }
-/* Výměna banneru: starý zešedne do černa (opacity), pak se nový rozjasní (nf-hero-in) */
-html body .nf-hero.nf-hero-out, html body .nf-hero.nf-hero-in { background: #000; }
-html body .nf-hero.nf-hero-out > * { opacity: 0; transition: opacity .4s ease; pointer-events: none; }
-@media (prefers-reduced-motion: reduce) { html body .nf-hero.nf-hero-in > * { animation: none; } }
+/* Výměna banneru: starý titul zůstane navrch jako snímek a zprůhlední, nový se pod ním rozjasní (nf-hero-in) */
+html body .nf-hero > .nf-hero-ghost { position: absolute; inset: 0; z-index: 6; pointer-events: none; animation: nfGhostOut .6s ease forwards !important; }
+@keyframes nfGhostOut { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { html body .nf-hero.nf-hero-in > * { animation: none; } html body .nf-hero > .nf-hero-ghost { display: none; } }
 
 /* ═════════ Cinema 3.21: přepínač zdrojů (česky / zahraničí) a „Zdroj nejde“ – malé ikony, bez textu ═════════ */
 html body #mfStandaloneCinema .mf-cin-lang { display: flex; align-items: center; gap: 4px; }

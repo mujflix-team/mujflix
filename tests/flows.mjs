@@ -955,14 +955,35 @@ const heroFadeT = await page.evaluate(async () => {
   const hero = document.getElementById("nfHero"); if (!hero) return { skip: true };
   mfhHeroShow(mk("První")); await w(100);
   mfhHeroShow(mk("Druhý")); await w(120);
-  const out = hero.classList.contains("nf-hero-out") && getComputedStyle(hero.firstElementChild).opacity !== "1";
-  await w(900);
-  const done = !hero.classList.contains("nf-hero-out") && /Druhý/.test(hero.textContent) && hero.classList.contains("nf-hero-in");
+  const g = hero.querySelector(".nf-hero-ghost");
+  const ghost = !!g && /První/.test(g.textContent) && !g.querySelector("[id]") && getComputedStyle(hero).backgroundColor !== "rgb(0, 0, 0)";
+  const newOn = /Druhý/.test(hero.querySelector(".nf-hero-title").textContent) && hero.classList.contains("nf-hero-in");
+  await w(1000);
+  const gone = !hero.querySelector(".nf-hero-ghost");
   mfhHeroShow(mk("Druhý")); await w(100);
-  const same = !hero.classList.contains("nf-hero-out");
-  return { out, done, same };
+  const same = !hero.querySelector(".nf-hero-ghost");
+  return { ghost, newOn, gone, same };
 });
-check("banner: při výměně titulu starý zešedne do černa a nový se rozjasní, stejný titul se nevyměňuje", heroFadeT.skip || (heroFadeT.out && heroFadeT.done && heroFadeT.same), JSON.stringify(heroFadeT));
+check("banner: při výměně titulu se starý plynule prolne do nového přes pozadí (bez černé), stejný titul se nevyměňuje", heroFadeT.skip || (heroFadeT.ghost && heroFadeT.newOn && heroFadeT.gone && heroFadeT.same), JSON.stringify(heroFadeT));
+
+const favFixT = await page.evaluate(async () => {
+  const out = {}, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
+  const slug = Object.keys(db)[0], id = db[slug].tmdbId;
+  localStorage.setItem(key, JSON.stringify([{ slug: "stary-objekt", name: { title: "Starý film" }, type: "movie", poster: "" }, { slug, name: db[slug].name, type: "series", poster: "" }]));
+  const l = getWatchlist();
+  out.nameStr = typeof l[0].name === "string" && l[0].name === "Starý film";
+  out.localIsFav = isTmdbFavorite(id, "tv"); // seriál uložený pod místním slugem se pozná i podle tmdbId
+  toggleTmdbFavorite(id, "tv", "X", "", null);
+  out.removed = !isTmdbFavorite(id, "tv") && getWatchlist().length === 1;
+  toggleTmdbFavorite(777001, "movie", { title: "Objekt" }, "", null);
+  out.nameFromObj = getWatchlist().some(w => w.slug === "__tmdbfav_movie_777001" && w.name === "Objekt");
+  openFavoriteItem({ slug: "neexistuje", name: "Nic Takového", type: "movie" });
+  await new Promise(r => setTimeout(r, 900));
+  out.noFinder = !document.getElementById("mfFinderModal");
+  localStorage.setItem(key, keep === null ? "[]" : keep);
+  return out;
+});
+check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
 
 const arrT = await page.evaluate(async () => {
   const row = document.getElementById("sdCastRow"); if (!row) return null;
@@ -1158,7 +1179,6 @@ check("zdroje: s víc názvy jdou zdroje popořadě, další názvy Uzi.la a Naj
 
 const langT = await page.evaluate(() => {
   const out = {};
-  try { localStorage.removeItem("mf_src_lang"); } catch { /* bez úložiště */ }
   MFCinemaPlayer.open(456, "The Simpsons", "tv", { localSlug: "the-simpsons", season: 1, episode: 2 });
   const q = (id) => document.getElementById(id);
   out.csOn = q("mfCinLangCs").getAttribute("aria-pressed") === "true" && q("mfCinLangEn").getAttribute("aria-pressed") === "false";
@@ -1167,8 +1187,9 @@ const langT = await page.evaluate(() => {
   out.tv1 = MFCinemaPlayer.currentUrl(); out.ids = MFCinemaPlayer.sourceIds("tv"); out.noSearch = q("mfCinSearchSrc").style.display === "none";
   q("mfCinBadSrc").click();
   out.tv2 = MFCinemaPlayer.currentUrl();
-  out.saved = localStorage.getItem("mf_src_lang");
-  q("mfCinLangCs").click();
+  MFCinemaPlayer.close(); MFCinemaPlayer.open(456, "The Simpsons", "tv", { localSlug: "the-simpsons", season: 1, episode: 3 });
+  out.reopen = MFCinemaPlayer.lang(); // nový titul začíná zase češtinou
+  MFCinemaPlayer.lang("en"); q("mfCinLangCs").click();
   out.back = MFCinemaPlayer.lang(); out.search = q("mfCinSearchSrc").style.display !== "none"; out.csIds = MFCinemaPlayer.sourceIds("tv");
   MFCinemaPlayer.close();
   const recOrig = window.mfRecordContinueMovie; window.mfRecordContinueMovie = () => {}; // film se nemá zapsat do „Pokračovat“
@@ -1176,10 +1197,9 @@ const langT = await page.evaluate(() => {
   MFCinemaPlayer.lang("en");
   out.m1 = MFCinemaPlayer.currentUrl(); MFCinemaPlayer.nextSource(); out.m2 = MFCinemaPlayer.currentUrl();
   MFCinemaPlayer.lang("cs"); MFCinemaPlayer.close(); window.mfRecordContinueMovie = recOrig;
-  try { localStorage.removeItem("mf_src_lang"); } catch { /* bez úložiště */ }
   return out;
 });
-check("zdroje: tlačítka česky / zahraničí přepínají skupinu a pamatují si ji", langT.csOn && langT.enOn && langT.back === "cs" && langT.saved === "en" && langT.noSearch && langT.search, JSON.stringify(langT));
+check("zdroje: tlačítka česky / zahraničí přepínají skupinu; nový titul začíná vždy českými zdroji", langT.csOn && langT.enOn && langT.back === "cs" && langT.reopen === "cs" && langT.noSearch && langT.search, JSON.stringify(langT));
 check("zdroje: zahraničí = Movy a Cinejoy z TMDB ID (seriál i film), česká skupina beze změny", JSON.stringify(langT.ids) === JSON.stringify(["movy", "cinejoy"]) && langT.tv1 === "https://www.movy.sx/tv/456/1/2?play=true" && langT.tv2 === "https://cinejoy.pk/watch/tv/456/1/2" && langT.m1 === "https://www.movy.sx/movie/155" && langT.m2 === "https://cinejoy.pk/watch/movie/155" && JSON.stringify(langT.csIds) === JSON.stringify(["svetserialu", "bombuj", "uzila", "najserialy", "prehrajto", "najserialy-year"]), JSON.stringify(langT));
 
 await page.evaluate(() => history.pushState(null, "", "#filmy"));
