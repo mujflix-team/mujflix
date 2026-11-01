@@ -202,8 +202,8 @@ window.addEventListener("load", () => {
 async function initPWA() {
   if ("serviceWorker" in navigator) try {
     if (!/^https:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
-    let e = await navigator.serviceWorker.getRegistration("/");
-    if (!e) e = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+    /* Adresa skriptu nese verzi aplikace: po nasazení se service worker vymění a jeho aktivace smaže starou cache */
+    const e = await navigator.serviceWorker.register("/sw.js?v=" + encodeURIComponent(window.MF_VERSION || "0"), { scope: "/" });
     if (!e) return;
     window._swReg = e
   } catch (e) {

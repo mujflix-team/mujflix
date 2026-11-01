@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.21.6
+- **Service worker (audit F):** název cache se odvozuje z verze aplikace. Skript se registruje jako `/sw.js?v=<verze>`, takže nová verze = nový service worker i nová cache a jeho aktivace smaže starou. Dřív byla cache natvrdo `mujflix-shell-v1` a nikdy se nemazala.
+- Neřešeno: generování parametrů `?v=` z hashe obsahu (zůstávají ruční).
+
+## 3.21.5
+- **Worker (audit C1, C4, C5), nutné znovu nasadit `worker/tmdb-proxy.js`:**
+  - **CORS už není „otevřený všem“, když chybí `ALLOWED_ORIGINS`:** bez proměnné se povolí jen `mujflix.pages.dev` (včetně náhledů PR) a localhost. Máš-li vlastní doménu, vypiš ji do `ALLOWED_ORIGINS`, jinak ji Worker odmítne (403). Kontrola Originu chrání před cizími weby v prohlížeči, ne před skripty.
+  - **`/sync/*` odmítne obří tělo** podle hlavičky `Content-Length` (413) ještě před čtením.
+  - **Data propojení se při čtení obnoví** (nejvýš 1× týdně), takže zařízení, které jen čte, platnost dat neztratí.
+- Neřešeno záměrně: C2 (limity v KV nebo Rate Limiting) a C3 (verze `rev`/409 u `/sync/push`) vyžadují změnu i na straně appky; C6 (výměna TMDB klíče) udělej ty v Cloudflare.
+
 ## 3.21.4
 - **Úklid po starém Finderu (audit B2–B5, D2–D3):**
   - Smazán `js/finder/finder.js` (624 řádků, dialog *Přímé vyhledávání* a AI hledání) a jeho `<script>`; nikdo jiný ho nevolal. Pryč je i obal `openWithCopy` v `dock-overlays.js`, zavírání Finderu klávesou Esc, `window._mfFinderTmdbId` a skryté hledání `ptFinder*` v `sections.js`.

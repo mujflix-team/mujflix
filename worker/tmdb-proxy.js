@@ -2,7 +2,8 @@
  * MůjFlix — Cloudflare Worker: TMDB proxy.
  *
  * Secret (povinné):   TMDB_API_KEY      (v3 API key)   NEBO  TMDB_READ_TOKEN (v4 bearer)
- * Proměnná (volitelné): ALLOWED_ORIGINS  (čárkou oddělené, např. "https://mujflix.pages.dev,http://localhost:8080")
+ * Proměnná (volitelné): ALLOWED_ORIGINS  (čárkou oddělené, např. "https://mujflix.pages.dev,http://localhost:8080").
+ *                        Bez ní se povolí jen mujflix.pages.dev (včetně náhledů) a localhost; vlastní doménu je nutné vypsat sem.
  *
  * Volání: GET https://<worker>/3/trending/all/week?language=cs-CZ
  *
@@ -150,6 +151,8 @@ function makeCode() {
 
 async function handleSync(request, env, cors, url) {
   if (!env.SYNC) return json({ error: "Sync is not configured" }, 501, cors);
+  // velké tělo se odmítne ještě před čtením (pozor: bez hlavičky Content-Length se kontroluje až po přečtení)
+  if (parseInt(request.headers.get("Content-Length") || "0", 10) > SYNC_MAX_BYTES + 65536) return json({ error: "Too large" }, 413, cors);
   let body;
   try { body = JSON.parse(await request.text()); } catch { return json({ error: "Bad JSON" }, 400, cors); }
   if (!body || typeof body !== "object") return json({ error: "Bad body" }, 400, cors);
@@ -188,6 +191,16 @@ async function handleSync(request, env, cors, url) {
     const key = "d:" + body.id;
     if (route === "/sync/pull") {
       const raw = await env.SYNC.get(key);
+      if (raw) {
+        // čtení prodlouží platnost dat, nejvýš jednou týdně (zápisy do KV jsou na free tarifu omezené)
+        const rk = "r:" + body.id;
+        try {
+          if (!(await env.SYNC.get(rk))) {
+            await env.SYNC.put(key, raw, { expirationTtl: SYNC_DATA_TTL });
+            await env.SYNC.put(rk, "1", { expirationTtl: 60 * 60 * 24 * 7 });
+          }
+        } catch { /* obnova platnosti nesmí shodit čtení */ }
+      }
       return json({ data: raw ? JSON.parse(raw) : null }, 200, cors);
     }
     const raw = JSON.stringify(body.data || {});
@@ -205,7 +218,9 @@ const CACHE_TTL = 3600; // sekund
 function corsHeaders(request, env) {
   const origin = request.headers.get("Origin") || "";
   const allowed = (env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
-  const ok = allowed.length === 0 ? "*" : (allowed.includes(origin) ? origin : "");
+  // Bez proměnné ALLOWED_ORIGINS se povolí jen web na mujflix.pages.dev (i náhledy PR) a localhost, Worker se nikdy neotevře celému webu.
+  const dflt = /^https:\/\/([a-z0-9-]+\.)?mujflix\.pages\.dev$/.test(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  const ok = allowed.length === 0 ? (dflt ? origin : "") : (allowed.includes(origin) ? origin : "");
   const h = {
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
