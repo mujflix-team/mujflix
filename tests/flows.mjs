@@ -1156,6 +1156,32 @@ check("zdroje: pořadí seriály SvetSerialu, Bombuj, Uzi.la, NajSerialy, Prehra
 const uziL = await page.evaluate(() => window.MFCinemaPlayer.sourceLabels("tv", ["Anglický", "Slovenský", "Český"]));
 check("zdroje: s víc názvy jdou zdroje popořadě, další názvy Uzi.la a NajSerialy až za Prehrajto", JSON.stringify(uziL.slice(0, 5)) === JSON.stringify(["SvetSerialu", "Bombuj", "Uzi.la (Anglický)", "NajSerialy (Anglický)", "Prehrajto.cz"]) && uziL.slice(5).every(l => /^(Uzi\.la|NajSerialy)/.test(l)) && uziL.length === 12, JSON.stringify(uziL));
 
+const langT = await page.evaluate(() => {
+  const out = {};
+  try { localStorage.removeItem("mf_src_lang"); } catch { /* bez úložiště */ }
+  MFCinemaPlayer.open(456, "The Simpsons", "tv", { localSlug: "the-simpsons", season: 1, episode: 2 });
+  const q = (id) => document.getElementById(id);
+  out.csOn = q("mfCinLangCs").getAttribute("aria-pressed") === "true" && q("mfCinLangEn").getAttribute("aria-pressed") === "false";
+  q("mfCinLangEn").click();
+  out.enOn = q("mfCinLangEn").getAttribute("aria-pressed") === "true";
+  out.tv1 = MFCinemaPlayer.currentUrl(); out.ids = MFCinemaPlayer.sourceIds("tv"); out.noSearch = q("mfCinSearchSrc").style.display === "none";
+  q("mfCinBadSrc").click();
+  out.tv2 = MFCinemaPlayer.currentUrl();
+  out.saved = localStorage.getItem("mf_src_lang");
+  q("mfCinLangCs").click();
+  out.back = MFCinemaPlayer.lang(); out.search = q("mfCinSearchSrc").style.display !== "none"; out.csIds = MFCinemaPlayer.sourceIds("tv");
+  MFCinemaPlayer.close();
+  const recOrig = window.mfRecordContinueMovie; window.mfRecordContinueMovie = () => {}; // film se nemá zapsat do „Pokračovat“
+  MFCinemaPlayer.open(155, "The Dark Knight", "movie");
+  MFCinemaPlayer.lang("en");
+  out.m1 = MFCinemaPlayer.currentUrl(); MFCinemaPlayer.nextSource(); out.m2 = MFCinemaPlayer.currentUrl();
+  MFCinemaPlayer.lang("cs"); MFCinemaPlayer.close(); window.mfRecordContinueMovie = recOrig;
+  try { localStorage.removeItem("mf_src_lang"); } catch { /* bez úložiště */ }
+  return out;
+});
+check("zdroje: tlačítka česky / zahraničí přepínají skupinu a pamatují si ji", langT.csOn && langT.enOn && langT.back === "cs" && langT.saved === "en" && langT.noSearch && langT.search, JSON.stringify(langT));
+check("zdroje: zahraničí = Movy a Cinejoy z TMDB ID (seriál i film), česká skupina beze změny", JSON.stringify(langT.ids) === JSON.stringify(["movy", "cinejoy"]) && langT.tv1 === "https://www.movy.sx/tv/456/1/2?play=true" && langT.tv2 === "https://cinejoy.pk/watch/tv/456/1/2" && langT.m1 === "https://www.movy.sx/movie/155" && langT.m2 === "https://cinejoy.pk/watch/movie/155" && JSON.stringify(langT.csIds) === JSON.stringify(["svetserialu", "bombuj", "uzila", "najserialy", "prehrajto", "najserialy-year"]), JSON.stringify(langT));
+
 await page.evaluate(() => history.pushState(null, "", "#filmy"));
 await page.waitForTimeout(400);
 const hashT = await page.evaluate(() => location.hash);
@@ -1613,10 +1639,10 @@ const lastT = await page.evaluate(async () => {
   MFCinemaPlayer.open("888003", "Jiný seriál", "tv_ep", { season: 1, episode: 1 }); await wait(50);
   out.def = MFCinemaPlayer.sourceLabel(); MFCinemaPlayer.close();
   const bar = document.querySelector("#mfStandaloneCinema");
-  out.noSrcUi = !bar.querySelector("#mfCinSwitchSrc, #mfCinBadSrc, #mfCinSrcLabel, .mf-cin-submeta");
+  out.noSrcUi = !bar.querySelector("#mfCinSwitchSrc, #mfCinSrcLabel, .mf-cin-submeta");
   return out;
 });
-check("kino: začíná posledním použitým zdrojem zvlášť pro seriály a filmy; v liště není název zdroje ani tlačítka Jiný zdroj / Nefunguje to", /^NajSerialy/.test(lastT.tv) && /^Prehrajto/.test(lastT.movie) && lastT.def === "SvetSerialu" && lastT.noSrcUi, JSON.stringify(lastT));
+check("kino: začíná posledním použitým zdrojem zvlášť pro seriály a filmy; v liště není název zdroje ani textové tlačítko Jiný zdroj", /^NajSerialy/.test(lastT.tv) && /^Prehrajto/.test(lastT.movie) && lastT.def === "SvetSerialu" && lastT.noSrcUi, JSON.stringify(lastT));
 
 // --- Sdílená paměť zdrojů (Worker): nápověda pro začátek, vlastní zkušenost má přednost, hlášení jednou za titul
 const shr = await page.evaluate(async () => {

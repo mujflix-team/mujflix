@@ -1775,3 +1775,9 @@ html body .nf-hero.nf-hero-in > * { animation: nfHeroIn .7s ease both; }
 html body .nf-hero.nf-hero-out, html body .nf-hero.nf-hero-in { background: #000; }
 html body .nf-hero.nf-hero-out > * { opacity: 0; transition: opacity .4s ease; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { html body .nf-hero.nf-hero-in > * { animation: none; } }
+
+/* ═════════ Cinema 3.21: přepínač zdrojů (česky / zahraničí) a „Zdroj nejde“ – malé ikony, bez textu ═════════ */
+html body #mfStandaloneCinema .mf-cin-lang { display: flex; align-items: center; gap: 4px; }
+html body #mfStandaloneCinema .mf-cin-lang-btn { opacity: 0.55; }
+html body #mfStandaloneCinema .mf-cin-lang-btn svg { display: block; border-radius: 2px; }
+html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba(10, 132, 255, 0.28); }

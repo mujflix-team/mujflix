@@ -106,7 +106,7 @@ Okno se třemi záložkami:
 
 - Vestavěný přehrávač s výběrem sezóny a epizody, tlačítkem **Další ›** (na konci seriálu i **další seriál**)
 - Jedna kompaktní lišta ovládání (na telefonu i počítači se nezalamuje), pod názvem titulu není nic navíc
-- **Zdroj se vybírá sám:** začíná se naposledy použitým zdrojem zvlášť pro filmy a seriály (weby mají vlastní přehrávač, který si pamatuje, kde jsi skončil); zdroj, který titul nemá, se přeskočí. Ruční přepínání zdrojů v liště není
+- **Zdroj se vybírá sám:** začíná se naposledy použitým zdrojem zvlášť pro filmy a seriály (weby mají vlastní přehrávač, který si pamatuje, kde jsi skončil); zdroj, který titul nemá, se přeskočí. V liště jsou dvě ikony skupin zdrojů (česká vlajka = české weby, přeškrtnutá = zahraniční Movy a Cinejoy, adresa z TMDB ID) a malé tlačítko *Zdroj nejde*, které zkusí další zdroj ve skupině.
 - Hodnocení epizody / filmu hvězdičkou, srdce do Oblíbených, ikona „kde to legálně sledovat“
 - Zdroje se vkládají do `<iframe>` **bez `sandbox`** (hostingy videa sandbox odmítají), takže vyskakovací reklamy cizích webů neblokuje; proto tip na blokovač reklam podle prohlížeče
 
