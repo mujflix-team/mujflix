@@ -134,7 +134,7 @@
   }
 
   /* Movy.sx a Cinejoy.pk: adresa se skládá přímo z TMDB ID (žádný slug ani rok), takže jde postavit pro každý titul.
-     Weby jsou anglické, proto jsou ve vlastní skupině „zahraničí“ a Worker je neověřuje (nemají stránku titulu k ověření). */
+     Weby jsou anglické, proto jsou ve vlastní skupině „zahraničí“ a Weby zakazují vložení do rámečku, proto se otevírají v nové kartě; Worker je neověřuje. */
   function tmdbIdOf() { var id = current ? parseInt(current.tmdbId, 10) : 0; return id > 0 ? id : 0; }
   function movyUrl(type, season, episode) {
     var id = tmdbIdOf();
@@ -152,8 +152,8 @@
     { id: "uzila", label: "Uzi.la", noEmbed: true, build: function (t) { return uziMovieUrl(t); } },
     { id: "prehrajto", label: "Prehrajto.cz", build: function (t) { return prehrajtoUrl(t); } },
     { id: "bombuj-noyear", label: "Bombuj (bez roku)", build: function (t) { return bombujMovieUrlNoYear(t); } },
-    { id: "movy", lang: "en", noProbe: true, label: "Movy", build: function () { return movyUrl("movie"); } },
-    { id: "cinejoy", lang: "en", noProbe: true, label: "Cinejoy", build: function () { return cinejoyUrl("movie"); } }
+    { id: "movy", lang: "en", noProbe: true, noEmbed: true, label: "Movy", build: function () { return movyUrl("movie"); } },
+    { id: "cinejoy", lang: "en", noProbe: true, noEmbed: true, label: "Cinejoy", build: function () { return cinejoyUrl("movie"); } }
   ];
 
   var TV_SOURCES = [
@@ -163,8 +163,8 @@
     { id: "najserialy", label: "NajSerialy", build: function (t, s, e) { return najTvUrl(t, s, e, false); } },
     { id: "prehrajto", label: "Prehrajto.cz", build: function (t, s, e) { return prehrajtoTvUrl(t, s, e); } },
     { id: "najserialy-year", label: "NajSerialy (s rokem)", build: function (t, s, e) { return najTvUrl(t, s, e, true); } },
-    { id: "movy", lang: "en", noProbe: true, label: "Movy", build: function (t, s, e) { return movyUrl("tv", s, e); } },
-    { id: "cinejoy", lang: "en", noProbe: true, label: "Cinejoy", build: function (t, s, e) { return cinejoyUrl("tv", s, e); } }
+    { id: "movy", lang: "en", noProbe: true, noEmbed: true, label: "Movy", build: function (t, s, e) { return movyUrl("tv", s, e); } },
+    { id: "cinejoy", lang: "en", noProbe: true, noEmbed: true, label: "Cinejoy", build: function (t, s, e) { return cinejoyUrl("tv", s, e); } }
   ];
 
   /* Skupina zdrojů: „cs“ (české weby) nebo „en“ (zahraniční); volba se pamatuje. */
