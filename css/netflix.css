@@ -1781,3 +1781,6 @@ html body #mfStandaloneCinema .mf-cin-lang { display: flex; align-items: center;
 html body #mfStandaloneCinema .mf-cin-lang-btn { opacity: 0.55; }
 html body #mfStandaloneCinema .mf-cin-lang-btn svg { display: block; border-radius: 2px; }
 html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba(10, 132, 255, 0.28); }
+
+/* Výběr profilu na telefonu: číslo verze se neukazuje */
+@media (hover: none), (max-width: 520px) { html body #mfProfileGate .pg-version { display: none; } }

@@ -571,7 +571,8 @@
     if (!current || !modal || !modal.classList.contains("open")) return;
     var sources = sourcesFor(current.type);
     var cs = sources[current.sourceIdx], state = cs ? probeState(cs) : undefined;
-    if (state === false && !current._manual && Date.now() - (current._srcSince || 0) < 30000) {
+    if (current._manual || Date.now() - (current._srcSince || 0) >= 30000) return;
+    if (state === false) {
       var found = -1;
       for (var n = 1; n <= sources.length; n++) {
         var i = (current.sourceIdx + n) % sources.length;
@@ -584,12 +585,19 @@
         renderCurrent();
         return;
       }
-      var anyTrue = sources.some(function (x) { return probeState(x) === true; });
-      var allKnown = sources.every(function (x) { var st = probeState(x); return st === true || st === false || !isCheckable(srcUrl(x)); });
-      if (!anyTrue && allKnown && !current._noneToast) {
-        current._noneToast = true;
-        if (typeof showToast === "function") showToast("Na českých zdrojích se titul nenašel, zkus zahraniční (vlajka vpravo nahoře)", 3800);
-      }
+    }
+    if (state === true) return;
+    /* Ověřitelné zdroje titul nemají (a zbylé jdou jen hledat) → zahraniční zdroje; ty se neověřují, berou se podle TMDB ID.
+       Ruční volba skupiny má přednost. */
+    var anyTrue = sources.some(function (x) { return probeState(x) === true; });
+    var anyFalse = sources.some(function (x) { return probeState(x) === false; });
+    var allKnown = sources.every(function (x) { var st = probeState(x); return st === true || st === false || !isCheckable(srcUrl(x)); });
+    if (!anyTrue && anyFalse && allKnown && !current._noneToast) {
+      current._noneToast = true;
+      if (srcLang === "cs" && !current._langManual) {
+        setLang("en", true);
+        if (typeof showToast === "function") showToast("Na českých zdrojích se titul nenašel, zkouším zahraniční", 3800);
+      } else if (typeof showToast === "function") showToast("Tenhle titul se na žádném zdroji nenašel", 3500);
     }
   }
 
@@ -639,8 +647,9 @@
   }
 
   /** Přepne skupinu zdrojů (česky / zahraničí) a začne prvním použitelným zdrojem té skupiny. */
-  function setLang(l) {
+  function setLang(l, auto) {
     if (!current || l === srcLang) return;
+    if (!auto) current._langManual = true; // ruční volba: automatika už skupinu nepřepíná
     noteGoodIfStayed();
     srcLang = l;
     current._manual = false; current._noneToast = false;

@@ -406,8 +406,20 @@ async function _sdLoadSimilar() {
   let list = [];
   try {
     if (t.tmdbId) {
-      const d = await tmdbGet(`/tv/${t.tmdbId}/similar?language=cs-CZ`);
-      list = ((d && d.results) || []).filter(x => x && x.id && x.poster_path).slice(0, 18)
+      /* Doporučení TMDB (podle chování diváků) + podobné (žánry a klíčová slova), dvě stránky z každého. Pořadí: shoda v obou
+         seznamech, shoda žánrů s tímto seriálem a hodnocení; bez titulů s téměř žádnými hlasy. */
+      const id = t.tmdbId, get = p => tmdbGet(p).catch(() => null),
+        r = await Promise.all([`/tv/${id}/recommendations?language=cs-CZ`, `/tv/${id}/recommendations?language=cs-CZ&page=2`, `/tv/${id}/similar?language=cs-CZ`, `/tv/${id}/similar?language=cs-CZ&page=2`].map(get).concat(t._genreIds ? [null] : [get(`/tv/${id}?language=cs-CZ`)])),
+        mine = new Set((t._genreIds || ((r[4] && r[4].genres) || []).map(g => g.id)).map(Number)), byId = {};
+      [[r[0], 3], [r[1], 2], [r[2], 2], [r[3], 1]].forEach(([d, w]) => ((d && d.results) || []).forEach(x => {
+        if (!x || !x.id || !x.poster_path || String(x.id) === String(id)) return;
+        (byId[x.id] || (byId[x.id] = { x, s: 0 })).s += w
+      }));
+      const all = Object.values(byId), good = all.filter(e => (e.x.vote_count || 0) >= 30);
+      list = (good.length >= 6 ? good : all).map(e => {
+        const g = e.x.genre_ids || [], overlap = mine.size ? g.filter(i => mine.has(i)).length / Math.max(mine.size, g.length || 1) : 0;
+        return { x: e.x, sc: e.s + overlap * 4 + (e.x.vote_average || 0) / 5 }
+      }).sort((a, b) => b.sc - a.sc).map(e => e.x).slice(0, 30)
     }
   } catch (e) {}
   try {
