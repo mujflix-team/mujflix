@@ -8,7 +8,7 @@
          Vlastní TMDB proxy musí být na *.workers.dev / *.pages.dev, jinak ji přidej do connect-src. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; frame-src https:; connect-src 'self' https://api.themoviedb.org https://*.workers.dev https://*.pages.dev https://svetserialu.to https://*.svetserialu.to https://bombuj.si https://*.bombuj.si https://prehraj.to https://*.prehraj.to https://prehrajto.cz https://*.prehrajto.cz https://uzi.la https://*.uzi.la https://graphql.anilist.co https://en.wikipedia.org https://api.tvmaze.com https://akabab.github.io https://api.disneyapi.dev https://*.fandom.com https://query.wikidata.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; frame-src https://svetserialu.to https://*.svetserialu.to https://bombuj.si https://*.bombuj.si https://prehraj.to https://*.prehraj.to https://prehrajto.cz https://*.prehrajto.cz https://najserialy.io https://*.najserialy.io https://www.youtube-nocookie.com; connect-src 'self' https://api.themoviedb.org https://*.workers.dev https://*.pages.dev https://svetserialu.to https://*.svetserialu.to https://bombuj.si https://*.bombuj.si https://prehraj.to https://*.prehraj.to https://prehrajto.cz https://*.prehrajto.cz https://uzi.la https://*.uzi.la https://graphql.anilist.co https://en.wikipedia.org https://api.tvmaze.com https://akabab.github.io https://api.disneyapi.dev https://*.fandom.com https://query.wikidata.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
     <meta
       name="viewport"
@@ -1395,7 +1395,6 @@
         >
           <select
             id="cinemaSeasonSel"
-            onchange="cinemaSwitchSeason()"
             style="
               background: rgba(20, 20, 30, 0.85);
               border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -1425,7 +1424,6 @@
           >
           <select
             id="cinemaEpSel"
-            onchange="cinemaSwitchEp()"
             style="
               background: rgba(20, 20, 30, 0.85);
               border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -1793,8 +1791,8 @@
     <script src="js/ai/brain.js?v=1" defer></script>
     <script src="js/profiles/gate.js?v=6" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
-    <script src="js/app/core.js?v=3" defer></script>
-    <script src="js/app/series.js?v=9" defer></script>
+    <script src="js/app/core.js?v=4" defer></script>
+    <script src="js/app/series.js?v=10" defer></script>
     <script src="js/app/watchlist.js?v=4" defer></script>
     <script src="js/app/interaction.js?v=3" defer></script>
     <script src="js/app/notify.js?v=5" defer></script>
@@ -1802,10 +1800,10 @@
     <script src="js/app/streak-mood.js?v=2" defer></script>
     <script src="js/app/dock-overlays.js?v=4" defer></script>
     <script src="js/app/tmdb-avatar.js?v=2" defer></script>
-    <script src="js/app/sections.js?v=2" defer></script>
-    <script src="js/app/cinema-legacy.js?v=1" defer></script>
+    <script src="js/app/sections.js?v=3" defer></script>
+    <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
-    <script src="js/pages/discover.js?v=3" defer></script>
+    <script src="js/pages/discover.js?v=4" defer></script>
 
     <script id="mf-img-patch">
       (function () {

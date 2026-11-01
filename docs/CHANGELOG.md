@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.21.8
+- **Úklid starého přehrávače (audit B1):** `js/app/cinema-legacy.js` má z 491 řádků 12 – zůstaly jen `openMovieInCinema` (předá věc novému přehrávači) a `closeCinema`. Smazán záložní přehrávač, který se po zavedení `MFCinemaPlayer` nikdy nespustil, včetně pole `CINEMA_SOURCES`.
+- Smazán `CinAI` (hodnocení zdrojů pro starý přehrávač) a blok **„AI Source statistiky“ v Nastavení**, protože data pro něj sbíral jen starý přehrávač. Klíč `mf_cin_ai_stats` se jednorázově odstraní z úložiště.
+- V `index.html` odstraněny inline `onchange` starého výběru řady a dílu.
+- Z testů odstraněn test smazané pomocné funkce `_cinJs`.
+
+## 3.21.7
+- **Bezpečnostní audit (zapracováno, dle souboru `mujflix-bezpecnostni-audit.md`):**
+  - **`_headers`:** přidány `Strict-Transport-Security` (bez `preload`) a `Cross-Origin-Opener-Policy: same-origin`.
+  - **CSP `frame-src`:** z „kterýkoli https web“ zúžena na weby zdrojů (SvetSerialu, Bombuj, Prehraj.to / Prehrajto.cz, **NajSerialy**, které v návrhu auditu chybělo) a `www.youtube-nocookie.com` pro trailery. Nový test ověří, že všechny české zdroje i YouTube v seznamu jsou, takže změna domény zdroje test zachytí. Uzi.la, Movy a Cinejoy se otevírají v nové kartě, do rámečku nejdou.
+  - **Worker:** odpovědi mají `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` a (chyby, sync, hlášení) `Cache-Control: no-store`. **Nutné znovu nasadit Worker.** CORS bez `ALLOWED_ORIGINS` zůstává jako v 3.21.5 (povolí `mujflix.pages.dev` a localhost), ne „nic“, aby se appka po zapomenuté proměnné nerozbila včetně náhledů PR.
+  - **Mrtvý kód:** smazán nepoužívaný alternativní proxy režim `window.MF_PROXY` v `core.js` a jeho zmínky.
+  - **`SECURITY.md`** (soukromé hlášení zranitelností přes GitHub Security Advisories), **`.github/dependabot.yml`** (npm a GitHub Actions, týdně), v Soukromí hlášení bezpečnostních nálezů a upřesnění, že přehrávání běží přes cizí weby.
+- Neprovedeno záměrně (zapsáno v `docs/TASKS.md`): odstranění `'unsafe-inline'` z CSP, `sandbox` na iframe (nejde ověřit bez ručního zkoušení všech zdrojů), rate-limit v KV (každý požadavek by byl zápis a vyčerpal by denní kvótu 1000 zápisů), `npm audit` v CI a pinování akcí na SHA.
+
 ## 3.21.6
 - **Service worker (audit F):** název cache se odvozuje z verze aplikace. Skript se registruje jako `/sw.js?v=<verze>`, takže nová verze = nový service worker i nová cache a jeho aktivace smaže starou. Dřív byla cache natvrdo `mujflix-shell-v1` a nikdy se nemazala.
 - Neřešeno: generování parametrů `?v=` z hashe obsahu (zůstávají ruční).

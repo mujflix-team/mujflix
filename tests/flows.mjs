@@ -2,16 +2,6 @@ import { startApp, check, finish } from "./helpers.mjs";
 
 const { page, errors, close } = await startApp();
 
-// --- Escapování v inline onclick
-const esc = await page.evaluate(() => {
-  const s = `https://x.cz/a'b\\c"d</script>`;
-  const holder = document.createElement("div");
-  holder.innerHTML = `<button onclick="window.__v=${_cinJs(s)}">x</button>`;
-  holder.querySelector("button").click();
-  return window.__v === s;
-});
-check("onclick: URL se zvláštními znaky přežije round-trip", esc);
-
 // --- Hodnocení ukládá žánry a AI se z něj učí
 const rating = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
@@ -979,6 +969,26 @@ const favFixT = await page.evaluate(async () => {
   return out;
 });
 check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
+
+const cspT = await page.evaluate(() => {
+  const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]').content;
+  const pats = ((/frame-src ([^;]*)/.exec(csp) || [])[1] || "").split(/\s+/).filter(Boolean);
+  const ok = h => pats.some(p => { const m = /^https:\/\/(\*\.)?([^/]+)$/.exec(p); return !!m && (m[1] ? h.endsWith("." + m[2]) : h === m[2]); });
+  const recOrig = window.mfRecordContinueMovie; window.mfRecordContinueMovie = () => {};
+  const hosts = {};
+  try {
+    for (const type of ["tv", "movie"]) {
+      MFCinemaPlayer.open("98771", "Test Titul", type, { season: 1, episode: 1, year: 2020 });
+      MFCinemaPlayer.lang("cs");
+      for (let i = 0; i < MFCinemaPlayer.sourceIds(type).length + 1; i++) { hosts[new URL(MFCinemaPlayer.currentUrl()).hostname] = 1; MFCinemaPlayer.nextSource(); }
+      MFCinemaPlayer.close();
+    }
+  } finally { window.mfRecordContinueMovie = recOrig; }
+  // Uzi.la se otevírá v nové kartě (noEmbed), do rámečku nejde; ostatní české zdroje a YouTube trailer ano
+  const bad = Object.keys(hosts).filter(h => h !== "uzi.la" && !ok(h));
+  return { bad, hosts: Object.keys(hosts), yt: ok("www.youtube-nocookie.com"), any: ok("evil.example"), strict: !/frame-src https:;/.test(csp) };
+});
+check("CSP: frame-src je jen seznam webů; všechny české zdroje videa i YouTube trailer v něm jsou, cizí web ne", cspT.bad.length === 0 && cspT.yt && !cspT.any && cspT.strict, JSON.stringify(cspT));
 
 const swT = await page.evaluate(async () => {
   if (!("serviceWorker" in navigator)) return { none: true };

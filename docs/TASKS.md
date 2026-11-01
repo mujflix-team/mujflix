@@ -14,11 +14,13 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Ověřit, jestli NajSerialy.io nebrání vložení do iframe; pokud ano, označit zdroj jako `noEmbed`.
 - Úklid dál: zbylé zmínky `.ps-tile-wrapper` v JS a inline stylech v `index.html`; starý přehrávač `cinema-legacy.js` (nejde jen smazat: `CINEMA_SOURCES`, `_cinState`, `openMovieInCinema` používají sections.js, finder.js, home.js a testy – nejdřív přesunout do nového přehrávače).
 - Vyměnit TMDB klíč (starý byl v historii GitHubu) a nový dát jen do secretu ve Workeru.
-- Nepoužitý kód: `getMomentumCached()` / `getRatingSignalCached()` v `js/app/core.js` nikdo nevolá – buď je zapojit do doporučování, nebo smazat.
-- Třída `html.mf-low-power` (nastavuje ji `index.html` na slabých zařízeních) nemá žádné CSS – dodělat úsporný režim, nebo odstranit.
+- Nepoužitý kód: `getRatingSignalCached()` v `js/app/core.js` – buď zapojit do doporučování, nebo smazat. Dál `window.MFProfilesDB` v `js/app/profiles-util.js` (nikde není definované, vždy se použije `localStorage`) a pole `trakt: null` v profilu (`js/profiles/gate.js`) – buď dodělat, nebo smazat.
+- Bezpečnost (dluh): CSP `script-src 'unsafe-inline'` kvůli inline `onclick` v generovaném HTML – postupně nahradit `addEventListener` a pak přepnout na `script-src 'self'`. Iframe přehrávače běží bez `sandbox` (hostingy ho detekují); zkusit užší `sandbox` zdroj od zdroje a ručně ověřit všechny 4 zdroje. Limity ve Workeru (`probeHits`, `srcHits`) jsou v paměti jedné instance; do KV až při skutečném zneužití (KV zápis na free tarifu max. 1000/den, každý požadavek jako zápis by kvótu vyčerpal). Opatření mimo kód: branch protection na `main`, ověřit hlavičky na securityheaders.com a observatory.mozilla.org.
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.8: úklid starého přehrávače (`cinema-legacy.js` 491 → 12 řádků), smazán `CinAI` a „AI Source statistiky“ v Nastavení (audit B1).
+- 3.21.7: bezpečnostní audit: HSTS a COOP v `_headers`, zúžené `frame-src` v CSP (jen weby zdrojů a YouTube), bezpečnostní hlavičky odpovědí Workeru, smazaný nepoužitý režim `MF_PROXY`, `SECURITY.md`, Dependabot, upřesněné Soukromí.
 - 3.21.6: cache service workeru podle verze aplikace (audit F).
 - 3.21.5: Worker: CORS bez otevřeného výchozího stavu, limit těla a obnova platnosti dat (audit C1, C4, C5).
 - 3.21.4: úklid po Finderu, AI klíčích a mrtvých funkcích (audit B2–B5, D2–D3).
