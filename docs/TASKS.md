@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.0: přehrávač má skupiny zdrojů česky / zahraničí (dvě ikony), malé „Zdroj nejde“, nové zdroje Movy a Cinejoy (adresa z TMDB ID).
 - 3.20.14: Podivana pryč, jednodušší lišta přehrávače, poslední zdroj zvlášť pro filmy a seriály, banner zešedne do černa.
 - 3.20.13: README přepsáno podle skutečného kódu (jen dokumentace).
 - 3.20.5: oprava schované horní lišty po reloadu.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.0
+- **Zdroje ve dvou skupinách:** v liště přehrávače jsou vpravo dvě malé ikony – česká vlajka (české zdroje) a přeškrtnutá česká vlajka (zahraniční, anglicky). Volba se pamatuje; poslední použitý zdroj se pamatuje zvlášť pro každou skupinu.
+- **Nové zahraniční zdroje Movy.sx a Cinejoy.pk** (filmy i seriály). Adresa se skládá přímo z TMDB ID (`/tv/456/1/2`, `/movie/155`), takže se nic neodhaduje ze slugu. Worker je neověřuje (nemá stránku titulu k ověření), takže ho není potřeba znovu nasazovat.
+- **Zdroj nejde:** malé tlačítko s ikonou v liště označí zdroj jako nefunkční (14 dní) a zkusí další ve stejné skupině. Hledání (lupa) je jen u českých zdrojů.
+- Když se titul nenajde na žádném českém zdroji, toast doporučí zahraniční skupinu.
+
 ## 3.20.14
 - **Zdroj Podivana.xyz odstraněn** (kód, ověřování ve Workeru, hlídač zdrojů, testy).
 - **Přehrávač jednodušší:** pod názvem titulu už není název zdroje ani počet ověřených zdrojů a pryč jsou tlačítka *Jiný zdroj* a *Nefunguje to* (zdroj se vybírá sám). Smazané i úpravy v CSS a tip v prvních krocích.
