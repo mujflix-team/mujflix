@@ -2,28 +2,6 @@ import { startApp, check, finish } from "./helpers.mjs";
 
 const { page, errors, close } = await startApp();
 
-// --- Validace URL zdrojů
-const urls = await page.evaluate(() => ({
-  good: _isValidStreamUrl("https://www.bombuj.si/film/abc"),
-  sub: _isValidStreamUrl("https://serialy.bombuj.si/serial/abc"),
-  evil: _isValidStreamUrl("https://evilbombuj.si/film/abc"),
-  search: _isValidStreamUrl("https://www.bombuj.si/?s=abc"),
-  js: _isValidStreamUrl("javascript:alert(1)"),
-}));
-check("validace: bombuj.si projde", urls.good);
-check("validace: subdoména projde", urls.sub);
-check("validace: evilbombuj.si neprojde", !urls.evil);
-check("validace: vyhledávací URL neprojde", !urls.search);
-check("validace: javascript: neprojde", !urls.js);
-
-// --- Finder modul
-const fin = await page.evaluate(() => ({
-  slug: _slugify("Pán prstenů: Společenstvo"),
-  fns: ["runFinder", "openWithCopy", "showFinderModal", "verifyAndOpen"].every(n => typeof window[n] === "function"),
-}));
-check("finder: slug je ASCII bez diakritiky", /^[a-z0-9-]+$/.test(fin.slug), fin.slug);
-check("finder: veřejné funkce jsou dostupné", fin.fns);
-
 // --- Escapování v inline onclick
 const esc = await page.evaluate(() => {
   const s = `https://x.cz/a'b\\c"d</script>`;
@@ -1002,6 +980,30 @@ const favFixT = await page.evaluate(async () => {
 });
 check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
 
+const heartT = await page.evaluate(async () => {
+  const out = { pageErr: [] }, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
+  const onErr = e => out.pageErr.push(String(e.message || e)); window.addEventListener("error", onErr);
+  localStorage.setItem(key, "[]");
+  const track = document.createElement("div"); track.id = "tHeartTrack"; track._mfhItems = [{ tmdbId: 603, mediaType: "movie", title: "Matrix", image: "" }];
+  document.body.appendChild(track);
+  const btn = document.createElement("button"); btn.className = "nf-fav"; btn.setAttribute("onclick", "event.stopPropagation(); mfhToggleFav(this, 'tHeartTrack', 0)");
+  track.appendChild(btn);
+  out.sig = window.mfhToggleFav.length; // jediná definice (btn, cid, idx); druhá (slug, btn) ze starého MůjFlixu dřív platila místo ní
+  btn.click();
+  const l1 = JSON.parse(localStorage.getItem(key));
+  out.added = l1.length === 1 && typeof l1[0].slug === "string" && typeof l1[0].name === "string" && l1[0].name === "Matrix" && btn.classList.contains("on");
+  btn.click();
+  out.removed = JSON.parse(localStorage.getItem(key)).length === 0 && !btn.classList.contains("on");
+  // poškozené záznamy (slug není text) se zahodí i z úložiště a toggleWatchlistItem s ne-textem nic nepřidá
+  localStorage.setItem(key, JSON.stringify([{ slug: {}, name: {}, type: "series", poster: "" }, { slug: "ok-slug", name: "Dobrý", type: "series", poster: "" }]));
+  out.healed = getWatchlist().length === 1 && JSON.parse(localStorage.getItem(key)).length === 1;
+  toggleWatchlistItem(btn); out.noBad = getWatchlist().length === 1;
+  window.removeEventListener("error", onErr); track.remove();
+  localStorage.setItem(key, keep === null ? "[]" : keep);
+  return out;
+});
+check("srdíčko na kartě: jedna definice mfhToggleFav, uloží text (slug i název), druhý klik odebere, poškozené záznamy se zahodí", heartT.sig === 3 && heartT.added && heartT.removed && heartT.healed && heartT.noBad && heartT.pageErr.length === 0, JSON.stringify(heartT));
+
 const recProfT = await page.evaluate(async () => {
   const origId = window.getActiveProfileId, origKey = window.getTmdbKey, origFetch = window.fetch, out = {};
   const fake = url => { const pg = +((/[?&]page=(\d+)/.exec(url) || [])[1] || 1), tv = /discover\/tv/.test(url);
@@ -1066,23 +1068,6 @@ check("detail: řada herců má šipky (vpravo viditelná, vlevo ne) a bez posuv
 const ver = await page.evaluate(() => { MFSettings.open(); const t = document.getElementById("mfVersionLine")?.textContent; document.getElementById("mfBeautifulSettings")?.remove(); return t; });
 const pkgVer = JSON.parse((await import("node:fs")).readFileSync("package.json", "utf8")).version;
 check("verze v Nastavení = package.json a je tam odkaz na Soukromí a podmínky", ver === "MůjFlix v" + pkgVer + " · Soukromí a podmínky", String(ver) + " vs " + pkgVer);
-
-const fz = await page.evaluate(() => {
-  const evil = `Film "X" '</b><img src=x onerror="window.__finderXss=1"> \\`;
-  window._mfFinderTmdbId = "123"; window._mfFinderType = "movie";
-  showFinderModal(evil, "movie", "2020");
-  showFinderResults([{ url: "https://bombuj.si/film-a'b?x=\"1\"", title: evil }, { url: "https://svetserialu.to/x'y", title: evil }], evil, "movie");
-  const c = document.getElementById("mfFinderContent");
-  const btns = [...c.querySelectorAll("button[onclick]")];
-  let opened = [], oc = null;
-  const origOpen = window.open, origCin = window.openMovieInCinema;
-  window.open = u => { opened.push(u); }; window.openMovieInCinema = (...a) => { oc = a; };
-  btns.forEach(b => { try { b.click(); } catch (e) { opened.push("ERR " + e.message); } });
-  window.open = origOpen; window.openMovieInCinema = origCin;
-  return { xss: window.__finderXss || 0, imgs: c.querySelectorAll("img[src='x']").length, btns: btns.length, opened, oc, evil };
-});
-check("finder: hostilní název nevytvoří HTML/XSS", fz.xss === 0 && fz.imgs === 0, JSON.stringify(fz));
-check("finder: tlačítka fungují i s uvozovkami v názvu", fz.btns >= 3 && fz.opened.length >= 2 && !fz.opened.some(u => /^ERR/.test(u)) && fz.oc && fz.oc[0] === "123" && fz.oc[1] === fz.evil, JSON.stringify(fz));
 
 const cm = await page.evaluate(async () => {
   MFCinemaPlayer.open("1399", "Hra o trůny", "tv", { season: 1, episode: 1 });

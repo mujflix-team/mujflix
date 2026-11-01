@@ -8,7 +8,7 @@
          Vlastní TMDB proxy musí být na *.workers.dev / *.pages.dev, jinak ji přidej do connect-src. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; frame-src https:; connect-src 'self' https://api.themoviedb.org https://*.workers.dev https://*.pages.dev https://api.anthropic.com https://api.groq.com https://generativelanguage.googleapis.com https://api.tavily.com https://r.jina.ai https://svetserialu.to https://*.svetserialu.to https://bombuj.si https://*.bombuj.si https://prehraj.to https://*.prehraj.to https://prehrajto.cz https://*.prehrajto.cz https://uzi.la https://*.uzi.la https://graphql.anilist.co https://en.wikipedia.org https://api.tvmaze.com https://akabab.github.io https://api.disneyapi.dev https://*.fandom.com https://query.wikidata.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; frame-src https:; connect-src 'self' https://api.themoviedb.org https://*.workers.dev https://*.pages.dev https://svetserialu.to https://*.svetserialu.to https://bombuj.si https://*.bombuj.si https://prehraj.to https://*.prehraj.to https://prehrajto.cz https://*.prehrajto.cz https://uzi.la https://*.uzi.la https://graphql.anilist.co https://en.wikipedia.org https://api.tvmaze.com https://akabab.github.io https://api.disneyapi.dev https://*.fandom.com https://query.wikidata.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
     <meta
       name="viewport"
@@ -46,20 +46,12 @@
 
     <link rel="manifest" href="manifest.webmanifest?v=3" />
 
-    <link rel="stylesheet" href="css/styles.css?v=6" />
+    <link rel="stylesheet" href="css/styles.css?v=7" />
     <link rel="stylesheet" href="css/patches.css" />
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
     <link rel="stylesheet" href="css/netflix.css?v=22" />
-    <script>
-      (function () {
-        var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        var lowPower = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
-        var reducedData = connection && connection.saveData;
-        if (lowPower || reducedData) document.documentElement.classList.add("mf-low-power");
-      })();
-    </script>
 
     <style>
       .key-hint { display: none !important; }
@@ -1799,22 +1791,21 @@
     <script src="js/core/sync.js" defer></script>
     <script src="js/core/sync-ui.js" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
-    <script src="js/profiles/gate.js?v=5" defer></script>
+    <script src="js/profiles/gate.js?v=6" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
-    <script src="js/finder/finder.js?v=1" defer></script>
-    <script src="js/app/core.js?v=2" defer></script>
-    <script src="js/app/series.js?v=8" defer></script>
-    <script src="js/app/watchlist.js?v=3" defer></script>
-    <script src="js/app/interaction.js?v=2" defer></script>
-    <script src="js/app/notify.js?v=3" defer></script>
+    <script src="js/app/core.js?v=3" defer></script>
+    <script src="js/app/series.js?v=9" defer></script>
+    <script src="js/app/watchlist.js?v=4" defer></script>
+    <script src="js/app/interaction.js?v=3" defer></script>
+    <script src="js/app/notify.js?v=4" defer></script>
     <script src="js/app/profiles-util.js?v=2" defer></script>
     <script src="js/app/streak-mood.js?v=2" defer></script>
-    <script src="js/app/dock-overlays.js?v=3" defer></script>
-    <script src="js/app/tmdb-avatar.js?v=1" defer></script>
-    <script src="js/app/sections.js?v=1" defer></script>
+    <script src="js/app/dock-overlays.js?v=4" defer></script>
+    <script src="js/app/tmdb-avatar.js?v=2" defer></script>
+    <script src="js/app/sections.js?v=2" defer></script>
     <script src="js/app/cinema-legacy.js?v=1" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
-    <script src="js/pages/discover.js?v=2" defer></script>
+    <script src="js/pages/discover.js?v=3" defer></script>
 
     <script id="mf-img-patch">
       (function () {
@@ -2011,7 +2002,7 @@
     </script>
     
     <script src="js/pages/cinema.js?v=13" defer></script>
-    <script src="js/pages/home.js?v=8" defer></script>
+    <script src="js/pages/home.js?v=9" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/polish.js?v=2" defer></script>

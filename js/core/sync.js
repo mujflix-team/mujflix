@@ -354,7 +354,6 @@
       return r;
     }
     if (mode === "poll") { banner(); return r; }
-    try { sessionStorage.setItem("mf_sync_reloaded", String(now())); } catch (e) {}
     if (typeof showToast === "function") showToast("Načtena data z jiného zařízení", 1800);
     setTimeout(function () { location.reload(); }, 900);
     return r;

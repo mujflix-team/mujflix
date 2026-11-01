@@ -48,7 +48,7 @@ window._tmdbSetTab = function(e) {
         }, t.appendChild(o)
       })
     } catch (e) {
-      t.innerHTML = '<div class="tmdb-av-loading">⚠ Chyba při hledání: ' + e.message + "</div>"
+      t.innerHTML = '<div class="tmdb-av-loading">⚠ Chyba při hledání: ' + escapeHTML(e.message) + "</div>"
     } else t.innerHTML = '<div class="tmdb-av-loading">⚠ Nastav TMDB API klíč v nastavení, aby šlo hledat.</div>'
   }, window._tmdbAvConfirm = function() {
     _tmdbAvSelectedUrl ? (_tmdbAvCallback && _tmdbAvCallback(_tmdbAvSelectedUrl, _tmdbAvSelectedName), _tmdbAvClose()) : "function" == typeof showToast && showToast("⚠ Vyber nejdřív obrázek")

@@ -58,7 +58,6 @@ const SERIES_COLORS = {
 /* class AIBrain → js/ai/brain.js */
 const aiBrain = new AIBrain;
 
-/* Finder → js/finder/finder.js */
 function setKbEpFocus(e) {
   const t = Array.from(document.querySelectorAll("#episodesGrid .episode-card"));
   t.length && (t.forEach(e => e.classList.remove("kb-focus")), kbEpIndex = Math.max(0, Math.min(e, t.length - 1)), t[kbEpIndex]?.classList.add("kb-focus"), t[kbEpIndex]?.scrollIntoView({
@@ -70,8 +69,7 @@ function setKbEpFocus(e) {
 document.addEventListener("keydown", e => {
   if ("INPUT" !== e.target.tagName && "TEXTAREA" !== e.target.tagName) {
     if ("Escape" === e.key) {
-      const e = document.getElementById("mfFinderModal");
-      return e && "none" !== e.style.pointerEvents && "none" !== e.style.display ? void closeFinderModal() : modalOpen ? void closeModal() : document.getElementById("watchlistOverlay").classList.contains("open") ? void closeWatchlist() : document.getElementById("universeOverlay").classList.contains("open") ? void closeSearch() : document.getElementById("ratingOverlay")?.classList.contains("open") ? void closeRating() : document.getElementById("genreEditorOverlay")?.classList.contains("open") ? void closeGenreEditor() : void 0
+      return modalOpen ? void closeModal() : document.getElementById("watchlistOverlay").classList.contains("open") ? void closeWatchlist() : document.getElementById("universeOverlay").classList.contains("open") ? void closeSearch() : document.getElementById("ratingOverlay")?.classList.contains("open") ? void closeRating() : document.getElementById("genreEditorOverlay")?.classList.contains("open") ? void closeGenreEditor() : void 0
     }
     if (!("/" !== e.key && "." !== e.key || modalOpen || aiPanelOpen)) return e.preventDefault(), void openSearch();
     if ("menu" !== kbLayer || modalOpen || aiPanelOpen) {

@@ -43,10 +43,6 @@ document.addEventListener("keydown", function(e) {
     void n
   }),
   function() {
-    const e = window.openWithCopy;
-    "function" == typeof e && (window.openWithCopy = function(...t) {
-      return incrementTodayEp(), e.apply(this, t)
-    });
     const t = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(e, n) {
       t(e, n), e && String(e).includes("watched") && setTimeout(updateStreak, 100)

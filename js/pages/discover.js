@@ -187,7 +187,6 @@
       if (it.genreIds.length) aiBrain.boostGenreIds(it.genreIds, 0.05);
       aiBrain.recordTmdbSeen(it.id);
     } catch (e) {}
-    window._mfFinderTmdbId = it.id;
     window._cinYear = it.year || null;
     if (it.type === 'tv') {
       if (typeof openDiscoverTv === 'function') openDiscoverTv(it.id, it.title);

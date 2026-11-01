@@ -1251,18 +1251,6 @@
         }
         if (item.tmdbId) mfhOpenCard(item.title, item.tmdbId, item.mediaType || 'movie');
       };
-      window.mfhToggleFav = function (slug, btn) {
-        if (typeof toggleWatchlistItem === 'function') toggleWatchlistItem(slug);
-        var inList = false;
-        try {
-          inList = typeof getWatchlist === 'function' &&
-            getWatchlist().some(function (w) { return w.slug === slug; });
-        } catch (e) {}
-        if (btn) {
-          btn.textContent = inList ? '✓ V oblíbených' : '+ Oblíbené';
-          btn.style.background = inList ? 'rgba(0,122,255,0.15)' : '';
-        }
-      };
       function mfhUnlockCinema() {
         var cinema = document.getElementById('cinemaModal') ||
                      document.getElementById('mfStandaloneCinema');
