@@ -13,9 +13,12 @@ function mfFavName(w) {
 
 function getWatchlist() {
   try {
-    // Poškozené záznamy (null, čísla, objekty bez slugu) se přeskočí, aby nespadl seznam ani přidávání
-    return safeLS(uKey("mf_watchlist"), "[]").filter(w => w && "object" == typeof w && !Array.isArray(w) && null != w.slug)
-      .map(w => "string" == typeof w.name ? w : Object.assign({}, w, { name: mfFavName(w) }))
+    // Poškozené záznamy (null, čísla, objekty bez textového slugu) se zahodí i z úložiště, aby v Oblíbených nezůstaly prázdné karty
+    const raw = safeLS(uKey("mf_watchlist"), "[]"),
+      list = raw.filter(w => w && "object" == typeof w && !Array.isArray(w) && "string" == typeof w.slug && w.slug)
+        .map(w => "string" == typeof w.name ? w : Object.assign({}, w, { name: mfFavName(w) }));
+    list.length !== raw.length && saveWatchlistData(list);
+    return list
   } catch {
     return []
   }
@@ -249,6 +252,7 @@ async function mfFavFind(e) {
 }
 
 function toggleWatchlistItem(e) {
+  if ("string" != typeof e || !e) return;
   const t = getWatchlist(),
     n = t.findIndex(t => t.slug === e);
   if (n >= 0) t.splice(n, 1), showToast("Odebráno z Oblíbených");

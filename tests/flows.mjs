@@ -1002,6 +1002,30 @@ const favFixT = await page.evaluate(async () => {
 });
 check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
 
+const heartT = await page.evaluate(async () => {
+  const out = { pageErr: [] }, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
+  const onErr = e => out.pageErr.push(String(e.message || e)); window.addEventListener("error", onErr);
+  localStorage.setItem(key, "[]");
+  const track = document.createElement("div"); track.id = "tHeartTrack"; track._mfhItems = [{ tmdbId: 603, mediaType: "movie", title: "Matrix", image: "" }];
+  document.body.appendChild(track);
+  const btn = document.createElement("button"); btn.className = "nf-fav"; btn.setAttribute("onclick", "event.stopPropagation(); mfhToggleFav(this, 'tHeartTrack', 0)");
+  track.appendChild(btn);
+  out.sig = window.mfhToggleFav.length; // jediná definice (btn, cid, idx); druhá (slug, btn) ze starého MůjFlixu dřív platila místo ní
+  btn.click();
+  const l1 = JSON.parse(localStorage.getItem(key));
+  out.added = l1.length === 1 && typeof l1[0].slug === "string" && typeof l1[0].name === "string" && l1[0].name === "Matrix" && btn.classList.contains("on");
+  btn.click();
+  out.removed = JSON.parse(localStorage.getItem(key)).length === 0 && !btn.classList.contains("on");
+  // poškozené záznamy (slug není text) se zahodí i z úložiště a toggleWatchlistItem s ne-textem nic nepřidá
+  localStorage.setItem(key, JSON.stringify([{ slug: {}, name: {}, type: "series", poster: "" }, { slug: "ok-slug", name: "Dobrý", type: "series", poster: "" }]));
+  out.healed = getWatchlist().length === 1 && JSON.parse(localStorage.getItem(key)).length === 1;
+  toggleWatchlistItem(btn); out.noBad = getWatchlist().length === 1;
+  window.removeEventListener("error", onErr); track.remove();
+  localStorage.setItem(key, keep === null ? "[]" : keep);
+  return out;
+});
+check("srdíčko na kartě: jedna definice mfhToggleFav, uloží text (slug i název), druhý klik odebere, poškozené záznamy se zahodí", heartT.sig === 3 && heartT.added && heartT.removed && heartT.healed && heartT.noBad && heartT.pageErr.length === 0, JSON.stringify(heartT));
+
 const recProfT = await page.evaluate(async () => {
   const origId = window.getActiveProfileId, origKey = window.getTmdbKey, origFetch = window.fetch, out = {};
   const fake = url => { const pg = +((/[?&]page=(\d+)/.exec(url) || [])[1] || 1), tv = /discover\/tv/.test(url);

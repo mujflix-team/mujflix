@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.3
+- **Srdíčko na kartě a `[object Object]` v Oblíbených – skutečná oprava** (záznam 3.21.1 to tvrdil, ale chyba zůstala). V `home.js` byly dvě definice `window.mfhToggleFav`. Druhá, zbytek ze starého MůjFlixu s parametry `(slug, btn)`, platila místo správné `(btn, cid, idx)`, dostala tlačítko jako `slug` a uložila do Oblíbených záznam s prázdnými objekty. Druhá definice je smazaná.
+- `toggleWatchlistItem` ignoruje slug, který není text. `getWatchlist` zahazuje záznamy bez textového slugu a opravený seznam jednou uloží zpět (v Oblíbených nezůstanou prázdné karty).
+- Nový test kliká na srdíčko na kartě (uloží text, druhý klik odebere, bez chyby v konzoli).
+
 ## 3.21.2
 - **Doporučení zvlášť pro každý profil:** řada „Vybráno pro tebe“ / „Populární právě teď“ se dřív brala jen jako nejpopulárnější tituly v žánrech, takže profily se stejnými (nebo žádnými) žánry dostaly totéž. Teď má každý profil vlastní osivo (stabilní v rámci týdne): začíná na jiné stránce výsledků TMDB a pořadí si zamíchá po svém. Žánry zůstávají, bez žánrů se bere obecná nabídka.
 - **Banner na úvodní stránce se neopakuje:** vybírá se z 14 titulů (dřív ze 4) a vynechávají se naposledy ukázané (paměť na profil, posledních 8). Během jednoho otevření aplikace se nemění.
