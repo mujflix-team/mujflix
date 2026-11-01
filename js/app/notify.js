@@ -52,7 +52,7 @@ async function checkNewEpisodes() {
     list.querySelectorAll(".notif-rec").forEach(el => el.addEventListener("click", () => {
       closeNotifPanel();
       const id = el.dataset.rec, title = el.dataset.title;
-      "tv" === el.dataset.type ? "function" == typeof openDiscoverTv && openDiscoverTv(id, title) : "function" == typeof _showCinemaOrFinderChoice && (window._mfFinderTmdbId = id, _showCinemaOrFinderChoice(id, title, "movie", title))
+      "tv" === el.dataset.type ? "function" == typeof openDiscoverTv && openDiscoverTv(id, title) : "function" == typeof _showCinemaOrFinderChoice && _showCinemaOrFinderChoice(id, title, "movie", title)
     }));
     list.querySelectorAll(".notif-item[data-tv]").forEach(el => el.addEventListener("click", () => {
       closeNotifPanel(), "function" == typeof openDiscoverTv && openDiscoverTv(el.dataset.tv, "")

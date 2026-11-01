@@ -569,10 +569,6 @@ let _momentumCache = null,
   _ratingSignalCache = null,
   _ratingSignalTs = 0;
 
-function getMomentumCached() {
-  return (!_momentumCache || Date.now() - _momentumTs > 6e4) && (_momentumCache = _computeWatchMomentum(), _momentumTs = Date.now()), _momentumCache
-}
-
 function getRatingSignalCached() {
   return (!_ratingSignalCache || Date.now() - _ratingSignalTs > 6e4) && (_ratingSignalCache = _computePersonalRatingSignal(), _ratingSignalTs = Date.now()), _ratingSignalCache
 }

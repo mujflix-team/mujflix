@@ -491,12 +491,6 @@ function selectSeasonFromDropdown(v) {
   activeSeason = n, showAllSeasons = !1, renderSeasons(), renderEpisodes()
 }
 
-function switchToEpisodesView() {
-  _sdTab("eps");
-  const t = document.getElementById("modalBody");
-  t && (t.scrollTop = 0) /* hned, ne plynule: animace přes dlouhý seznam dílů sekala */
-}
-
 function toggleShowAll() {
   showAllSeasons = !showAllSeasons, renderSeasons(), renderEpisodes()
 }

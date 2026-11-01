@@ -2,28 +2,6 @@ import { startApp, check, finish } from "./helpers.mjs";
 
 const { page, errors, close } = await startApp();
 
-// --- Validace URL zdrojů
-const urls = await page.evaluate(() => ({
-  good: _isValidStreamUrl("https://www.bombuj.si/film/abc"),
-  sub: _isValidStreamUrl("https://serialy.bombuj.si/serial/abc"),
-  evil: _isValidStreamUrl("https://evilbombuj.si/film/abc"),
-  search: _isValidStreamUrl("https://www.bombuj.si/?s=abc"),
-  js: _isValidStreamUrl("javascript:alert(1)"),
-}));
-check("validace: bombuj.si projde", urls.good);
-check("validace: subdoména projde", urls.sub);
-check("validace: evilbombuj.si neprojde", !urls.evil);
-check("validace: vyhledávací URL neprojde", !urls.search);
-check("validace: javascript: neprojde", !urls.js);
-
-// --- Finder modul
-const fin = await page.evaluate(() => ({
-  slug: _slugify("Pán prstenů: Společenstvo"),
-  fns: ["runFinder", "openWithCopy", "showFinderModal", "verifyAndOpen"].every(n => typeof window[n] === "function"),
-}));
-check("finder: slug je ASCII bez diakritiky", /^[a-z0-9-]+$/.test(fin.slug), fin.slug);
-check("finder: veřejné funkce jsou dostupné", fin.fns);
-
 // --- Escapování v inline onclick
 const esc = await page.evaluate(() => {
   const s = `https://x.cz/a'b\\c"d</script>`;
@@ -1090,23 +1068,6 @@ check("detail: řada herců má šipky (vpravo viditelná, vlevo ne) a bez posuv
 const ver = await page.evaluate(() => { MFSettings.open(); const t = document.getElementById("mfVersionLine")?.textContent; document.getElementById("mfBeautifulSettings")?.remove(); return t; });
 const pkgVer = JSON.parse((await import("node:fs")).readFileSync("package.json", "utf8")).version;
 check("verze v Nastavení = package.json a je tam odkaz na Soukromí a podmínky", ver === "MůjFlix v" + pkgVer + " · Soukromí a podmínky", String(ver) + " vs " + pkgVer);
-
-const fz = await page.evaluate(() => {
-  const evil = `Film "X" '</b><img src=x onerror="window.__finderXss=1"> \\`;
-  window._mfFinderTmdbId = "123"; window._mfFinderType = "movie";
-  showFinderModal(evil, "movie", "2020");
-  showFinderResults([{ url: "https://bombuj.si/film-a'b?x=\"1\"", title: evil }, { url: "https://svetserialu.to/x'y", title: evil }], evil, "movie");
-  const c = document.getElementById("mfFinderContent");
-  const btns = [...c.querySelectorAll("button[onclick]")];
-  let opened = [], oc = null;
-  const origOpen = window.open, origCin = window.openMovieInCinema;
-  window.open = u => { opened.push(u); }; window.openMovieInCinema = (...a) => { oc = a; };
-  btns.forEach(b => { try { b.click(); } catch (e) { opened.push("ERR " + e.message); } });
-  window.open = origOpen; window.openMovieInCinema = origCin;
-  return { xss: window.__finderXss || 0, imgs: c.querySelectorAll("img[src='x']").length, btns: btns.length, opened, oc, evil };
-});
-check("finder: hostilní název nevytvoří HTML/XSS", fz.xss === 0 && fz.imgs === 0, JSON.stringify(fz));
-check("finder: tlačítka fungují i s uvozovkami v názvu", fz.btns >= 3 && fz.opened.length >= 2 && !fz.opened.some(u => /^ERR/.test(u)) && fz.oc && fz.oc[0] === "123" && fz.oc[1] === fz.evil, JSON.stringify(fz));
 
 const cm = await page.evaluate(async () => {
   MFCinemaPlayer.open("1399", "Hra o trůny", "tv", { season: 1, episode: 1 });

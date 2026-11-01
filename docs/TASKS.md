@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.4: úklid po Finderu, AI klíčích a mrtvých funkcích (audit B2–B5, D2–D3).
 - 3.21.3: srdíčko na kartě a [object Object] v Oblíbených (duplicitní mfhToggleFav), zahazování poškozených záznamů Oblíbených.
 - 3.21.2: doporučení zvlášť pro každý profil, banner se neopakuje, víc a lepších podobných seriálů, verze schovaná na telefonu ve výběru profilu.
 - 3.21.1: Oblíbené bez [object Object] a bez starého vyhledávacího dialogu, prolnutí banneru s pozadím, srdíčko podle TMDB ID, čeština vždy první.

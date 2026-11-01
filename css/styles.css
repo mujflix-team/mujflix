@@ -115,14 +115,6 @@ body {
   pointer-events: none;
 
 }
-@keyframes bgShift {
-  0% {
-    transform: scale(1) rotate(0);
-  }
-  100% {
-    transform: scale(1.06) rotate(1.5deg);
-  }
-}
 
 .logo {
   position: fixed;
@@ -282,15 +274,6 @@ body {
 .streak-widget {
   top: max(58px, calc(env(safe-area-inset-top, 0px) + 58px)) !important;
 }
-@keyframes dotBlink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
 .key-hint {
   position: fixed;
   bottom: max(14px, env(safe-area-inset-bottom, 14px));
@@ -342,56 +325,7 @@ body {
 .twa:first-child {
   margin-left: 0;
 }
-@keyframes dotPulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes gridDrift {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 24px 24px;
-  }
-}
-@keyframes scanLine {
-  0% {
-    top: -2px;
-    opacity: 0;
-  }
-  8% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 1;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
-@keyframes iconRingPulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.18);
-    opacity: 0.12;
-  }
-}
 
 .universe-overlay {
   position: fixed;
@@ -410,14 +344,6 @@ body {
 }
 .universe-overlay.visible {
   opacity: 1;
-}
-@keyframes scrollHintFade {
-  to { opacity: 1; }
-}
-@keyframes scrollHintFade {
-  to {
-    opacity: 1;
-  }
 }
 .modal-overlay {
   position: fixed;
@@ -1468,15 +1394,6 @@ body {
 
 }
 
-@keyframes pulseHint {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
 canvas#particles {
   position: fixed;
   inset: 0;
@@ -1512,15 +1429,6 @@ canvas#particles {
 }
 .wrapped-overlay.visible {
   opacity: 1;
-}
-@keyframes pulseHint {
-  0%,
-  100% {
-    opacity: 0.25;
-  }
-  50% {
-    opacity: 0.6;
-  }
 }
 
 .genre-editor-overlay.visible .genre-editor-box {
@@ -1708,62 +1616,8 @@ body.grain-none::after {
   }
 }
 
-@keyframes wheelGlowPulse {
-  from {
-    opacity: 0.4;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-}
 
-@keyframes wheelGlowSpin {
-  from {
-    background: radial-gradient(
-      circle,
-      rgba(200, 164, 0, 0.28) 0,
-      transparent 60%
-    );
-  }
-  to {
-    background: radial-gradient(
-      circle,
-      rgba(255, 120, 0, 0.15) 0,
-      transparent 60%
-    );
-  }
-}
-@keyframes wheelGlowPulse {
-  from {
-    opacity: 0.6;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
 
-@keyframes wheelGlowSpin {
-  from {
-    opacity: 0.8;
-    background: radial-gradient(
-      circle,
-      rgba(200, 164, 0, 0.25) 0,
-      transparent 65%
-    );
-  }
-  to {
-    opacity: 1;
-    background: radial-gradient(
-      circle,
-      rgba(255, 100, 100, 0.15) 0,
-      transparent 65%
-    );
-  }
-}
 #_mfUserBadge:hover {
   border-color: rgba(200, 164, 0, 0.5);
   background: rgba(14, 14, 16, 0.98) !important;
@@ -2062,16 +1916,6 @@ body.grain-none::after {
   gap: 20px;
   min-width: 300px;
 
-}
-@keyframes pmSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
 .pm-avatar {
   font-size: 3.5rem;
@@ -4657,10 +4501,6 @@ input:focus, textarea:focus {
   pointer-events: auto !important;
 }
 
-@keyframes mf-fade-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
 @keyframes mf-scale-in {
   from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
@@ -4851,10 +4691,6 @@ body::before, body::after { display: none !important; }
 
 .adaptive-bg { opacity: 0.06 !important; filter: blur(120px) saturate(2) !important; }
 
-@keyframes tv-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
 
 @keyframes tv-rise {
   from { opacity: 0; transform: translateY(18px); }

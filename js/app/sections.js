@@ -1,21 +1,4 @@
 /* Klíče podle profilu, sekce a adresy (#serialy …). Část původního app.js, načítá se v tomto pořadí (viz index.html). */
-const _PP_KEYS = [{
-  key: "mf_gemini_key",
-  label: "Gemini",
-  color: "#007AFF",
-  ph: "AIzaSy…"
-}, {
-  key: "mf_or_key",
-  label: "OpenRouter",
-  color: "#00cfff",
-  ph: "sk-or-…"
-}, {
-  key: "mf_groq_key",
-  label: "Groq",
-  color: "#ff9a3c",
-  ph: "gsk_…"
-}];
-
 function _czSlug(e) {
   return e ? e.toLowerCase().replace(/[łøđðıþßæœ]/g, c => ({ "ł": "l", "ø": "o", "đ": "d", "ð": "d", "ı": "i", "þ": "th", "ß": "ss", "æ": "ae", "œ": "oe" })[c]).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, "and").replace(/'/g, "").replace(/:/g, "").replace(/\./g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : ""
 }
@@ -38,18 +21,13 @@ function _bombujMovieUrlVariants(e, t) {
   return [`https://www.bombuj.si/online-film-${n}-${o}`, `https://www.bombuj.si/online-film-${n}-${o-1}`, `https://www.bombuj.si/online-film-${n}`, q]
 }
 ! function() {
-    function e() {
-      const e = localStorage.getItem("mf_active_pid");
-      e && _PP_KEYS.forEach(t => {
-        const n = localStorage.getItem(t.key + "_" + e);
-        n && (localStorage.setItem(t.key, n), window.MFApiKeysDB?._db && window.MFApiKeysDB.saveKey(t.key, n))
+    /* Jednorázový úklid: klíče AI služeb ze starého hledání (Finder), dnes se nepoužívají */
+    try {
+      ["mf_gemini_key", "mf_or_key", "mf_groq_key", "mf_anthropic_key", "mf_jina_key", "mf_tavily_key"].forEach(k => {
+        localStorage.removeItem(k);
+        Object.keys(localStorage).filter(x => x.indexOf(k + "_") === 0).forEach(x => localStorage.removeItem(x))
       })
-    }
-    document.addEventListener("DOMContentLoaded", () => setTimeout(e, 400));
-    const t = window.setActiveUser;
-    window.setActiveUser = function(n) {
-      t && t(n), setTimeout(e, 100)
-    }
+    } catch (e) {}
   }(),
   function() {
     const e = {
@@ -143,64 +121,6 @@ function _bombujMovieUrlVariants(e, t) {
       }, 900)
     })
   }(), function() {
-    let e = "movie";
-    window.ptSetType = function(t) {
-      e = t;
-      const n = document.getElementById("ptTypeMovie"),
-        o = document.getElementById("ptTypeSerial");
-      n && o && ("movie" === t ? (n.style.background = "rgba(0,122,255,0.18)", n.style.color = "#007AFF", o.style.background = "transparent", o.style.color = "rgba(255,255,255,0.35)") : (o.style.background = "rgba(0,122,255,0.18)", o.style.color = "#007AFF", n.style.background = "transparent", n.style.color = "rgba(255,255,255,0.35)"))
-    }, window.ptFinderSearch = function() {
-      const t = document.getElementById("ptFinderInput");
-      if (!t) return;
-      const n = t.value.trim();
-      n ? (! function(e, t) {
-        let n;
-        try {
-          n = safeLS(uKey("mf_pt_chips"), "[]")
-        } catch {
-          n = []
-        }
-        const o = {
-            name: e,
-            type: t,
-            ts: Date.now()
-          },
-          i = n.filter(t => t.name !== e).slice(0, 7);
-        i.unshift(o), safeSetItem(uKey("mf_pt_chips"), JSON.stringify(i)), ptRenderChips()
-      }(n, e), "function" == typeof verifyAndOpen ? verifyAndOpen(n, e) : "function" == typeof showFinderModal && (showFinderModal(n, e), "function" == typeof runFinder && runFinder(n, e))) : t.focus()
-    }, window.ptRenderChips = function() {
-      const e = document.getElementById("ptFinderChips");
-      if (!e) return;
-      let t;
-      try {
-        t = safeLS(uKey("mf_pt_chips"), "[]")
-      } catch {
-        t = []
-      }
-      e.innerHTML = '<span style="font-size:0.55rem;color:rgba(255,255,255,0.25);align-self:center;flex-shrink:0;">Naposledy:</span>', t.length ? t.slice(0, 5).forEach(t => {
-        const n = document.createElement("button");
-        n.style.cssText = "\n        padding:5px 11px;border-radius:20px;\n        background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);\n        color:rgba(255,255,255,0.6);font-size:0.62rem;font-family:-apple-system,sans-serif;\n        cursor:pointer;white-space:nowrap;transition:all 0.18s;display:flex;align-items:center;gap:5px;\n      ", n.innerHTML = `${"movie"===t.type?"🎬":"📺"} ${escapeHTML(t.name)}`, n.onmouseover = () => {
-          n.style.background = "rgba(255,255,255,0.11)", n.style.color = "#fff"
-        }, n.onmouseout = () => {
-          n.style.background = "rgba(255,255,255,0.06)", n.style.color = "rgba(255,255,255,0.6)"
-        }, n.onclick = () => {
-          document.getElementById("ptFinderInput").value = t.name, ptSetType(t.type), ptFinderSearch()
-        }, e.appendChild(n)
-      }) : e.innerHTML += '<span style="font-size:0.6rem;color:rgba(255,255,255,0.18);">zatím nic</span>'
-    };
-    const t = new MutationObserver(() => {
-      const e = document.getElementById("mfSectionProtebe");
-      e && "none" !== e.style.display && ptRenderChips()
-    });
-    document.addEventListener("DOMContentLoaded", () => {
-      const e = document.getElementById("mfSectionProtebe");
-      e && t.observe(e, {
-        attributes: !0,
-        attributeFilter: ["style"]
-      }), ptRenderChips()
-    })
-  }(),
-  function() {
     let e = "serialy";
     window.mfSectionBtn = function(e, t) {}, window.mfShowSection = function(t) {
       e = t, window._mfCurrentSection = t;
