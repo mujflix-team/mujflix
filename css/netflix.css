@@ -365,19 +365,17 @@ html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchli
   font-size: clamp(1rem, 1.4vw, 1.25rem); font-weight: 700; letter-spacing: -0.01em; color: #fff;
   max-width: min(36vw, 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-#mfStandaloneCinema .mf-cin-src-label { font-size: 0.78rem; color: #b3b3b3; font-weight: 600; white-space: nowrap; }
-#mfStandaloneCinema .mf-cin-src-counter { font-size: 0.72rem; color: #808080; white-space: nowrap; }
 
 /* tlačítka v liště */
-#mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn,
+#mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn,
 #mfStandaloneCinema .mf-cin-external-btn {
   flex: none; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border: 0; border-radius: 4px;
   background: rgba(109, 109, 110, 0.55); color: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; text-decoration: none; white-space: nowrap;
   cursor: pointer; transition: background 0.15s, transform 0.1s;
 }
-#mfStandaloneCinema .mf-cin-ep-btn:hover, #mfStandaloneCinema .mf-cin-fav-btn:hover, #mfStandaloneCinema .mf-cin-switch-btn:hover,
+#mfStandaloneCinema .mf-cin-ep-btn:hover, #mfStandaloneCinema .mf-cin-fav-btn:hover,
 #mfStandaloneCinema .mf-cin-external-btn:hover { background: rgba(109, 109, 110, 0.85); }
-#mfStandaloneCinema .mf-cin-ep-btn:active, #mfStandaloneCinema .mf-cin-fav-btn:active, #mfStandaloneCinema .mf-cin-switch-btn:active { transform: scale(0.97); }
+#mfStandaloneCinema .mf-cin-ep-btn:active, #mfStandaloneCinema .mf-cin-fav-btn:active { transform: scale(0.97); }
 #mfStandaloneCinema .mf-cin-ep-pick, #mfStandaloneCinema #mfCinNextEp { background: #fff; color: #000; }
 #mfStandaloneCinema .mf-cin-ep-pick:hover, #mfStandaloneCinema #mfCinNextEp:hover { background: rgba(255, 255, 255, 0.78); }
 #mfStandaloneCinema .mf-cin-fav-btn.faved { background: rgba(255, 255, 255, 0.16); color: #fff; }
@@ -431,12 +429,10 @@ html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchli
 @media (max-width: 700px) {
   #mfStandaloneCinema .mf-standalone-cinema-top { gap: 8px; }
   #mfStandaloneCinema .mf-standalone-cinema-top strong { max-width: calc(100vw - 90px); font-size: 1rem; }
-  #mfStandaloneCinema .mf-cin-src-label { order: 5; }
-  #mfStandaloneCinema .mf-cin-src-counter { display: none; }
   #mfStandaloneCinema .mf-cin-tvbar { order: 6; flex: 1 0 100%; margin: 0; padding: 0; border: 0; gap: 6px; }
-  #mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn,
+  #mfStandaloneCinema .mf-cin-ep-btn, #mfStandaloneCinema .mf-cin-fav-btn,
   #mfStandaloneCinema .mf-cin-external-btn { height: 34px; padding: 0 11px; font-size: 0.78rem; }
-    #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-switch-btn, #mfStandaloneCinema .mf-cin-external-btn { order: 7; }
+    #mfStandaloneCinema .mf-cin-fav-btn, #mfStandaloneCinema .mf-cin-external-btn { order: 7; }
   #mfStandaloneCinema .mf-cin-epgrid { max-height: 50vh; }
   #mfStandaloneCinema .mf-cin-epgrid-body { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
 }
@@ -954,8 +950,6 @@ html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margi
 @media (max-height: 640px) { #mfSyncModal .sy-qr { width: 120px; height: 120px; } #mfSyncModal .sy-ico svg { width: 40px; height: 40px; } }
 #mfSyncBanner { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000005; display: flex; align-items: center; gap: 14px; padding: 11px 14px 11px 18px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #fff; font: 600 0.95rem var(--nf-font, sans-serif); box-shadow: 0 10px 34px rgba(0, 0, 0, 0.7); max-width: calc(100vw - 24px); }
 #mfSyncBanner button { background: #fff; color: #000; border: 0; border-radius: 4px; padding: 8px 14px; font: 700 0.9rem var(--nf-font, sans-serif); cursor: pointer; white-space: nowrap; }
-#mfStandaloneCinema .mf-cin-bad-btn { background: transparent; box-shadow: inset 0 0 0 1px #555; color: #b3b3b3; }
-#mfStandaloneCinema .mf-cin-bad-btn:hover { background: rgba(229, 9, 20, 0.2); color: #fff; }
 
 /* ── Zaměření a žánry (MFPrefs) a přepínač „Jen anime“ při zakládání profilu ── */
 #mfPrefsModal, #mfSettingsModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
@@ -1204,11 +1198,8 @@ html body #seriesModal .sd-overview.is-open { max-height: 40vh; overflow-y: auto
 html body #mfStandaloneCinema .mf-standalone-cinema-top { gap: 10px 14px; }
 html body #mfStandaloneCinema .mf-cin-titlebox { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 0; flex: 0 1 auto; max-width: min(34vw, 420px); }
 html body #mfStandaloneCinema .mf-cin-titlebox strong { max-width: 100%; line-height: 1.2; }
-html body #mfStandaloneCinema .mf-cin-submeta { display: flex; align-items: baseline; gap: 8px; min-width: 0; overflow: hidden; }
-html body #mfStandaloneCinema .mf-cin-src-label { overflow: hidden; text-overflow: ellipsis; }
-html body #mfStandaloneCinema .mf-cin-src-counter { overflow: hidden; text-overflow: ellipsis; }
 
-html body #mfStandaloneCinema .mf-cin-ep-btn, html body #mfStandaloneCinema .mf-cin-fav-btn, html body #mfStandaloneCinema .mf-cin-switch-btn {
+html body #mfStandaloneCinema .mf-cin-ep-btn, html body #mfStandaloneCinema .mf-cin-fav-btn {
   height: 36px; border-radius: 6px; font-size: 0.84rem; font-weight: 600; padding: 0 14px;
 }
 /* epizody: Další je hlavní akce (bílá), ostatní tmavé */
@@ -1221,7 +1212,6 @@ html body #mfStandaloneCinema .mf-cin-ep-current { min-width: 64px; text-align: 
 html body #mfStandaloneCinema .mf-cin-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex: none; }
 html body #mfStandaloneCinema .mf-cin-actions .mf-cin-fav-btn { margin: 0; width: 36px; padding: 0; font-size: 1.15rem; }
 html body #mfStandaloneCinema .mf-cin-actions .mf-cin-rate-btn { opacity: 0.85; }
-html body #mfStandaloneCinema .mf-cin-actions .mf-cin-bad-btn { box-shadow: inset 0 0 0 1px #5a5a5a; }
 
 @media (max-width: 900px) {
   html body #mfStandaloneCinema .mf-cin-titlebox { max-width: none; flex: 1 1 0; }
@@ -1231,8 +1221,7 @@ html body #mfStandaloneCinema .mf-cin-actions .mf-cin-bad-btn { box-shadow: inse
   html body #mfStandaloneCinema .mf-cin-tvbar { flex-wrap: wrap; }
   html body #mfStandaloneCinema .mf-cin-tvbar .mf-cin-next-series { flex: 1 0 100%; }
   html body #mfStandaloneCinema .mf-cin-actions { order: 6; flex: 1 0 100%; margin-left: 0; gap: 6px; }
-  html body #mfStandaloneCinema .mf-cin-actions .mf-cin-switch-btn { flex: 1 1 0; padding: 0 8px; }
-  html body #mfStandaloneCinema .mf-cin-ep-btn, html body #mfStandaloneCinema .mf-cin-fav-btn, html body #mfStandaloneCinema .mf-cin-switch-btn { height: 36px; font-size: 0.8rem; }
+  html body #mfStandaloneCinema .mf-cin-ep-btn, html body #mfStandaloneCinema .mf-cin-fav-btn { height: 36px; font-size: 0.8rem; }
 }
 
 /* Výběr avatara: tlačítko „Zkusit znovu“ u hlášky o anime postavách */
@@ -1645,15 +1634,13 @@ html body #watchlistOverlay .wl-sort select { height: 40px; padding: 0 12px; bor
 @media (max-width: 700px) { html body #watchlistOverlay .wl-sort { margin-left: 0; width: 100%; } html body #watchlistOverlay .wl-sort select { flex: 1; } }
 
 /* ═════════ Cinema mód 3.15: lišta se nikdy nezalamuje (PC 1 řádek, telefon 2 řádky), „Další seriál“ jen na velkém PC ═════════ */
-html body #mfStandaloneCinema .mf-cin-ep-btn,
-html body #mfStandaloneCinema .mf-cin-switch-btn { white-space: nowrap; }
+html body #mfStandaloneCinema .mf-cin-ep-btn { white-space: nowrap; }
 html body #mfStandaloneCinema .mf-cin-ep-btn.mf-cin-next-series { display: none; }
 
 @media (min-width: 901px) {
   html body #mfStandaloneCinema .mf-standalone-cinema-top { flex-wrap: nowrap; align-items: center; }
   html body #mfStandaloneCinema .mf-cin-titlebox { flex: 1 1 120px; max-width: 420px; min-width: 90px; }
   html body #mfStandaloneCinema .mf-cin-titlebox strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  html body #mfStandaloneCinema .mf-cin-submeta { white-space: nowrap; }
   html body #mfStandaloneCinema .mf-cin-tvbar { flex-wrap: nowrap; flex: none; padding-left: 14px; }
   html body #mfStandaloneCinema .mf-cin-actions { flex-wrap: nowrap; margin-left: auto; }
 }
@@ -1677,12 +1664,8 @@ html body #mfStandaloneCinema .mf-cin-ep-btn.mf-cin-next-series { display: none;
   html body #mfStandaloneCinema #mfCinNextEp::after { content: "›"; }
   html body #mfStandaloneCinema #mfCinPickEp::after { content: "≡"; }
   html body #mfStandaloneCinema .mf-cin-tvbar .mf-cin-ep-current { flex: 0 0 auto; min-width: 0; font-size: 0.78rem; text-align: center; white-space: nowrap; }
-  html body #mfStandaloneCinema .mf-cin-actions .mf-cin-switch-btn { order: 5; flex: 0 0 auto; padding: 0 8px; font-size: 0; }
-  html body #mfStandaloneCinema #mfCinSwitchSrc::after { content: "Zdroj"; font-size: 0.8rem; }
-  html body #mfStandaloneCinema #mfCinBadSrc::after { content: "Nefunguje"; font-size: 0.8rem; }
 }
 @media (max-width: 400px) {
-  html body #mfStandaloneCinema #mfCinBadSrc::after { content: "Nejde"; }
   html body #mfStandaloneCinema .mf-cin-tvbar { gap: 4px; }
   html body #mfStandaloneCinema .mf-cin-tvbar .mf-cin-ep-btn { min-width: 30px; }
 }
@@ -1787,5 +1770,8 @@ html body #seriesModal .sd-head-plain .sd-seasons-wrap { display: none; }
 
 /* Banner na úvodní stránce: první zobrazení plynule naběhne, výměna za jiný titul je bez probliknutí */
 @keyframes nfHeroIn { from { opacity: 0 } to { opacity: 1 } }
-html body .nf-hero.nf-hero-in > * { animation: nfHeroIn .55s ease both; }
+html body .nf-hero.nf-hero-in > * { animation: nfHeroIn .7s ease both; }
+/* Výměna banneru: starý zešedne do černa (opacity), pak se nový rozjasní (nf-hero-in) */
+html body .nf-hero.nf-hero-out, html body .nf-hero.nf-hero-in { background: #000; }
+html body .nf-hero.nf-hero-out > * { opacity: 0; transition: opacity .4s ease; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { html body .nf-hero.nf-hero-in > * { animation: none; } }

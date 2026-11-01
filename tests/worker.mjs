@@ -64,8 +64,6 @@ const pages = {
   "https://www.uzi.la/p/presmerovano-www-cil": () => new Response("<html><title>Přesměrováno www cíl</title>" + "x".repeat(2000) + "</html>", { status: 200 }),
   "https://uzi.la/": () => new Response("<html><title>Uzi.la úvod</title>" + "x".repeat(2000) + "</html>", { status: 200 }),
   "https://uzi.la/p/smycka": () => new Response(null, { status: 302, headers: { Location: "https://uzi.la/p/smycka" } }),
-  "https://podivana.xyz/serial/mentalista-2008/serie-1/dil-2": () => new Response("<html><title>Mentalista 1. řada 2. díl online</title>" + "x".repeat(2000) + "</html>", { status: 200 }),
-  "https://podivana.xyz/serial/neexistuje-2008/serie-1/dil-2": () => new Response("<html><title>Podivana – filmy a seriály online</title><h1>Podívej se</h1>" + "x".repeat(2000) + "</html>", { status: 200 }),
   "https://www.bombuj.si/online-film-oppenheimer-2023": () => new Response("<html><title>Oppenheimer (2023) online film</title>" + "x".repeat(2000) + "</html>", { status: 200 }),
 };
 globalThis.fetch = async (u) => { const f = pages[String(u)]; if (!f) throw new Error("síť: " + u); const r = f(); Object.defineProperty(r, "url", { value: String(u) }); return r; };
@@ -73,8 +71,6 @@ const pr = await call("/src/probe", { urls: ["https://www.najserialy.io/serial/m
 check("probe: má titul = true, 404 = false, „nenalezeno“ v titulku = false, ochrana webu = null", JSON.stringify(pr.json.results.slice(0, 4)) === JSON.stringify([true, false, false, null]), JSON.stringify(pr.json));
 const ps = await call("/src/probe", { urls: ["https://www.bombuj.si/online-film-odyssea-2026", "https://www.bombuj.si/online-film-oppenheimer-2023"] }, "https://a.b", "7.7.7.9");
 check("probe: měkká 404 (200 + obecná stránka bez názvu titulu) = false, skutečná stránka = true", JSON.stringify(ps.json.results) === "[false,true]", JSON.stringify(ps.json));
-const pv = await call("/src/probe", { urls: ["https://podivana.xyz/serial/mentalista-2008/serie-1/dil-2#player", "https://podivana.xyz/serial/neexistuje-2008/serie-1/dil-2#player"] }, "https://a.b", "7.7.7.10");
-check("probe: Podivana – existující epizoda = true, obecná stránka bez názvu = false (serie-/dil- se do názvu nepočítá)", JSON.stringify(pv.json.results) === "[true,false]", JSON.stringify(pv.json));
 const pd = await call("/src/probe", { urls: ["https://uzi.la/p/presmerovano-ven", "https://uzi.la/p/presmerovano-http", "https://uzi.la/p/presmerovano-uvod", "https://uzi.la/p/presmerovano-www", "https://uzi.la/p/smycka"] }, "https://a.b", "7.7.7.5");
 check("probe: přesměrování se sleduje ručně – ven z povolených webů / na http / smyčka = null, na úvod = false, na www variantu = true", JSON.stringify(pd.json.results) === "[null,null,false,true,null]", JSON.stringify(pd.json));
 check("probe: cizí doména, http a javascript: se nikdy nestahují (null)", pr.json.results.slice(4).every(x => x === null), JSON.stringify(pr.json));

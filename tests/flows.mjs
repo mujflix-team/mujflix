@@ -171,7 +171,7 @@ const uzi = await page.evaluate(() => {
     for (let i = 0; i < 8; i++) {
       href = (window.MFCinemaPlayer.currentUrl() || "") || "";
       if (href.includes("uzi.la")) break;
-      document.getElementById("mfCinSwitchSrc")?.click();
+      MFCinemaPlayer.nextSource();
     }
     MFCinemaPlayer.close(); return href;
   };
@@ -198,7 +198,7 @@ const alt = await page.evaluate(async () => {
   for (let i = 0; i < 14; i++) {
     const h = (window.MFCinemaPlayer.currentUrl() || "") || "";
     if (h.includes("uzi.la")) urls.push(h);
-    document.getElementById("mfCinSwitchSrc")?.click();
+    MFCinemaPlayer.nextSource();
   }
   window.fetch = realFetch; MFCinemaPlayer.close();
   return [...new Set(urls)];
@@ -220,7 +220,7 @@ const jp = await page.evaluate(async () => {
   const urls = [];
   for (let i = 0; i < 12; i++) {
     urls.push(window.MFCinemaPlayer.currentUrl() || "");
-    document.getElementById("mfCinSwitchSrc")?.click();
+    MFCinemaPlayer.nextSource();
   }
   window.fetch = realFetch; MFCinemaPlayer.close();
   return urls;
@@ -420,8 +420,8 @@ const prT = await page.evaluate(async () => {
     out.url = MFCinemaPlayer.currentUrl();
     const n0 = sent.length; document.getElementById("mfCinNextEp").click(); await w(700);
     out.noRepeat = sent.length === n0;
-    out.ep1 = sent.flat().filter(x => !/\?s=|hledej/.test(x)).every(x => /s01e01|1x01|S01E01|serie-1\/dil-1/i.test(x));
-    out.label = document.getElementById("mfCinSrcLabel")?.textContent || [...document.querySelectorAll("#mfStandaloneCinema *")].map(e => e.textContent).find(t => /zdroj|✓|✗/i.test(t) && t.length < 80) || "";
+    out.ep1 = sent.flat().filter(x => !/\?s=|hledej/.test(x)).every(x => /s01e01|1x01|S01E01/i.test(x));
+    out.label = MFCinemaPlayer.sourceLabel();
   } finally { MFCinemaPlayer.close(); await w(400); window.fetch = of; window.TMDB_PROXY_URL = oUrl; }
   return out;
 });
@@ -429,7 +429,7 @@ const barT = await page.evaluate(async () => {
   const w = ms => new Promise(r => setTimeout(r, ms));
   MFCinemaPlayer.open("98765", "Nějaký Seriál s dlouhým názvem", "tv", { season: 1, episode: 4 }); await w(900);
   const t = document.querySelector("#mfStandaloneCinema .mf-standalone-cinema-top");
-  const rows = new Set([...t.querySelectorAll("button,strong")].filter(b => b.offsetParent).map(b => Math.round(b.getBoundingClientRect().top / 10))).size;
+  const rows = new Set([...t.querySelectorAll("button,strong")].filter(b => b.offsetParent).map(b => Math.round((b.getBoundingClientRect().top + b.getBoundingClientRect().height / 2) / 24))).size;
   const ns = getComputedStyle(document.getElementById("mfCinNextSeries")).display;
   MFCinemaPlayer.close(); await w(300);
   return { rows, ns, vw: innerWidth };
@@ -949,6 +949,21 @@ const topT = await page.evaluate(() => {
 });
 check("horní lišta po reloadu: třída nf-top-hidden se odebere i když dock už má správný styl", topT.skip || !topT.hidden, JSON.stringify(topT));
 
+const heroFadeT = await page.evaluate(async () => {
+  const w = ms => new Promise(r => setTimeout(r, ms));
+  const mk = t => ({ title: t, image: "", onPlay() {}, isFav: () => false, onFav() {}, playLabel: "Přehrát" });
+  const hero = document.getElementById("nfHero"); if (!hero) return { skip: true };
+  mfhHeroShow(mk("První")); await w(100);
+  mfhHeroShow(mk("Druhý")); await w(120);
+  const out = hero.classList.contains("nf-hero-out") && getComputedStyle(hero.firstElementChild).opacity !== "1";
+  await w(900);
+  const done = !hero.classList.contains("nf-hero-out") && /Druhý/.test(hero.textContent) && hero.classList.contains("nf-hero-in");
+  mfhHeroShow(mk("Druhý")); await w(100);
+  const same = !hero.classList.contains("nf-hero-out");
+  return { out, done, same };
+});
+check("banner: při výměně titulu starý zešedne do černa a nový se rozjasní, stejný titul se nevyměňuje", heroFadeT.skip || (heroFadeT.out && heroFadeT.done && heroFadeT.same), JSON.stringify(heroFadeT));
+
 const arrT = await page.evaluate(async () => {
   const row = document.getElementById("sdCastRow"); if (!row) return null;
   document.getElementById("seriesModal").classList.add("open");
@@ -1137,17 +1152,9 @@ const persistT = await page.evaluate(() => {
 check("seriál z Objevovat se po zhlédnutí uloží (pokračování po restartu)", persistT.saved && persistT.light && persistT.notDiscover && persistT.counts === 1, JSON.stringify(persistT));
 
 const uziT = await page.evaluate(() => { return [window.MFCinemaPlayer.sourceIds("tv"), window.MFCinemaPlayer.sourceIds("movie")]; });
-check("zdroje: pořadí seriály SvetSerialu, Bombuj, Uzi.la, Podivana, NajSerialy, Prehrajto (varianty až za nimi); filmy Bombuj, Uzi.la, Podivana, Prehrajto", JSON.stringify(uziT) === JSON.stringify([["svetserialu", "bombuj", "uzila", "podivana", "najserialy", "prehrajto", "najserialy-year"], ["bombuj", "uzila", "podivana", "prehrajto", "bombuj-noyear"]]), JSON.stringify(uziT));
-const pdT = await page.evaluate(() => {
-  MFCinemaPlayer.open("1", "Mentalista", "tv_ep", { season: 1, episode: 2 });
-  const out = [];
-  for (let i = 0; i < 8; i++) { const u = MFCinemaPlayer.currentUrl(); if (/podivana/.test(u)) out.push(u); document.getElementById("mfCinSwitchSrc")?.click(); }
-  MFCinemaPlayer.close();
-  return { out, movie: MFCinemaPlayer.sourceIds("movie") };
-});
-check("zdroj Podivana: tvar /serial/{slug}[-rok]/serie-1/dil-2#player, u filmu mezi zdroji", pdT.out.length > 0 && /^https:\/\/podivana\.xyz\/serial\/mentalista(-\d{4})?\/serie-1\/dil-2#player$/.test(pdT.out[0]) && pdT.movie.includes("podivana"), JSON.stringify(pdT));
+check("zdroje: pořadí seriály SvetSerialu, Bombuj, Uzi.la, NajSerialy, Prehrajto (varianty až za nimi); filmy Bombuj, Uzi.la, Prehrajto", JSON.stringify(uziT) === JSON.stringify([["svetserialu", "bombuj", "uzila", "najserialy", "prehrajto", "najserialy-year"], ["bombuj", "uzila", "prehrajto", "bombuj-noyear"]]), JSON.stringify(uziT));
 const uziL = await page.evaluate(() => window.MFCinemaPlayer.sourceLabels("tv", ["Anglický", "Slovenský", "Český"]));
-check("zdroje: s víc názvy jdou zdroje popořadě, další názvy Uzi.la a NajSerialy až za Prehrajto", JSON.stringify(uziL.slice(0, 6)) === JSON.stringify(["SvetSerialu", "Bombuj", "Uzi.la (Anglický)", "Podivana (Anglický, serial)", "NajSerialy (Anglický)", "Prehrajto.cz"]) && uziL.slice(6).every(l => /^(Uzi\.la|NajSerialy|Podivana)/.test(l)) && uziL.length === 18, JSON.stringify(uziL));
+check("zdroje: s víc názvy jdou zdroje popořadě, další názvy Uzi.la a NajSerialy až za Prehrajto", JSON.stringify(uziL.slice(0, 5)) === JSON.stringify(["SvetSerialu", "Bombuj", "Uzi.la (Anglický)", "NajSerialy (Anglický)", "Prehrajto.cz"]) && uziL.slice(5).every(l => /^(Uzi\.la|NajSerialy)/.test(l)) && uziL.length === 12, JSON.stringify(uziL));
 
 await page.evaluate(() => history.pushState(null, "", "#filmy"));
 await page.waitForTimeout(400);
@@ -1192,9 +1199,9 @@ check("anime-only profil: doporučení jsou jen anime (žádné Breaking Bad ani
 const najT = await page.evaluate(() => {
   MFCinemaPlayer.open("1", "Overflow", "tv", { season: 1, episode: 1 });
   const urls = [];
-  for (let i = 0; i < 8; i++) { const u = MFCinemaPlayer.currentUrl(); if (/najserialy/.test(u)) urls.push(u); document.getElementById("mfCinSwitchSrc").click(); }
+  for (let i = 0; i < 8; i++) { const u = MFCinemaPlayer.currentUrl(); if (/najserialy/.test(u)) urls.push(u); MFCinemaPlayer.nextSource(); }
   let noEmbed = false;
-  for (let i = 0; i < 8; i++) { if (document.querySelector(".mf-cin-noembed")) { noEmbed = !!document.querySelector(".mf-cin-noembed-btn[target=_blank]") && !document.querySelector("#mfStandaloneCinemaFrame iframe"); break; } document.getElementById("mfCinSwitchSrc").click(); }
+  for (let i = 0; i < 8; i++) { if (document.querySelector(".mf-cin-noembed")) { noEmbed = !!document.querySelector(".mf-cin-noembed-btn[target=_blank]") && !document.querySelector("#mfStandaloneCinemaFrame iframe"); break; } MFCinemaPlayer.nextSource(); }
   MFCinemaPlayer.close();
   return { urls, noEmbed, ids: MFCinemaPlayer.sourceIds("tv") };
 });
@@ -1558,12 +1565,12 @@ check("kino: Další epizoda funguje i bez TMDB", /S01 · E02/.test(nxt), nxt);
 const mem = await page.evaluate(async () => {
   const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
   localStorage.removeItem("mf_src_pref");
-  const label = () => document.getElementById("mfCinSrcLabel").textContent.replace(/\s*\(\d+\/\d+\)\s*$/, "");
+  const label = () => MFCinemaPlayer.sourceLabel();
   const real = Date.now;
   MFCinemaPlayer.open("777001", "Paměť test", "movie", {});
   await wait(50);
   out.first = label();
-  document.getElementById("mfCinBadSrc").click(); await wait(50);
+  MFCinemaPlayer.nextSource(); await wait(50);
   out.afterBad = label();
   const pref = JSON.parse(localStorage.getItem("mf_src_pref") || "{}")["movie:777001"];
   out.badStored = !!(pref && pref.bad && pref.bad[out.first]);
@@ -1576,28 +1583,45 @@ const mem = await page.evaluate(async () => {
   MFCinemaPlayer.open("777001", "Paměť test", "movie", {}); await wait(50);
   out.reopen = label();
   // rychlé „Jiný zdroj“ označí aktuální jako nefunkční a přeskočí nefunkční
-  document.getElementById("mfCinSwitchSrc").click(); await wait(50);
+  MFCinemaPlayer.nextSource(); await wait(50);
   const pref3 = JSON.parse(localStorage.getItem("mf_src_pref") || "{}")["movie:777001"];
   out.quickBad = !!(pref3.bad[out.afterBad]);
   out.skipsBad = label() !== out.first && label() !== out.afterBad;
   MFCinemaPlayer.close();
   // označení nefunkčního po 14 dnech vyprší
   const all = JSON.parse(localStorage.getItem("mf_src_pref")); all["movie:777001"].bad = { [out.first]: Date.now() - 15 * 24 * 3600 * 1000 }; all["movie:777001"].good = "";
-  localStorage.setItem("mf_src_pref", JSON.stringify(all));
+  localStorage.setItem("mf_src_pref", JSON.stringify(all)); localStorage.removeItem("mf_src_last_movie");
   MFCinemaPlayer.open("777001", "Paměť test", "movie", {}); await wait(50);
   out.expired = label() === out.first;
   MFCinemaPlayer.close();
   return out;
 });
-check("zdroje: Nefunguje to označí zdroj a přepne na další", mem.badStored && mem.afterBad !== mem.first, JSON.stringify(mem));
+check("zdroje: rychlé přepnutí označí zdroj a přepne na další", mem.badStored && mem.afterBad !== mem.first, JSON.stringify(mem));
 check("zdroje: delší sledování uloží zdroj jako funkční a příště se začne jím", mem.goodStored && mem.reopen === mem.afterBad, JSON.stringify(mem));
 check("zdroje: rychlé přepnutí označí zdroj, nefunkční se přeskakují, po 14 dnech vyprší", mem.quickBad && mem.skipsBad && mem.expired, JSON.stringify(mem));
 
 
+// --- Poslední použitý zdroj zvlášť pro seriály a filmy: nový titul začne tam, kde se naposledy sledovalo
+const lastT = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  localStorage.removeItem("mf_src_pref"); localStorage.setItem("mf_src_last_tv", "najserialy"); localStorage.setItem("mf_src_last_movie", "prehrajto");
+  MFCinemaPlayer.open("888001", "Nový seriál", "tv_ep", { season: 1, episode: 1 }); await wait(50);
+  out.tv = MFCinemaPlayer.sourceLabel(); MFCinemaPlayer.close();
+  MFCinemaPlayer.open("888002", "Nový film", "movie", {}); await wait(50);
+  out.movie = MFCinemaPlayer.sourceLabel(); MFCinemaPlayer.close();
+  localStorage.removeItem("mf_src_last_tv"); localStorage.removeItem("mf_src_last_movie");
+  MFCinemaPlayer.open("888003", "Jiný seriál", "tv_ep", { season: 1, episode: 1 }); await wait(50);
+  out.def = MFCinemaPlayer.sourceLabel(); MFCinemaPlayer.close();
+  const bar = document.querySelector("#mfStandaloneCinema");
+  out.noSrcUi = !bar.querySelector("#mfCinSwitchSrc, #mfCinBadSrc, #mfCinSrcLabel, .mf-cin-submeta");
+  return out;
+});
+check("kino: začíná posledním použitým zdrojem zvlášť pro seriály a filmy; v liště není název zdroje ani tlačítka Jiný zdroj / Nefunguje to", /^NajSerialy/.test(lastT.tv) && /^Prehrajto/.test(lastT.movie) && lastT.def === "SvetSerialu" && lastT.noSrcUi, JSON.stringify(lastT));
+
 // --- Sdílená paměť zdrojů (Worker): nápověda pro začátek, vlastní zkušenost má přednost, hlášení jednou za titul
 const shr = await page.evaluate(async () => {
   const out = {}, wait = ms => new Promise(r => setTimeout(r, ms)), real = Date.now, nf = window.fetch, oldUrl = window.TMDB_PROXY_URL;
-  const label = () => document.getElementById("mfCinSrcLabel").textContent.replace(/\s*\(\d+\/\d+\)\s*$/, "");
+  const label = () => MFCinemaPlayer.sourceLabel();
   const reset = () => { ["mf_src_pref", "mfx_src_shared", "mfx_src_reported", "mfx_src_share_off"].forEach(k => localStorage.removeItem(k)); };
   const calls = []; let sharedLabel = "";
   window.TMDB_PROXY_URL = "https://test.workers.dev";
@@ -1611,7 +1635,7 @@ const shr = await page.evaluate(async () => {
   try {
     reset();
     MFCinemaPlayer.open("777009", "Zjisti zdroje", "movie", {}); await wait(50);
-    out.L1 = label(); document.getElementById("mfCinSwitchSrc").click(); await wait(50);
+    out.L1 = label(); MFCinemaPlayer.nextSource(); await wait(50);
     out.L2 = label(); MFCinemaPlayer.close(); reset(); calls.length = 0;
     sharedLabel = out.L2;
     // 1) odpověď z Workeru dorazí brzy → začne se sdíleným zdrojem

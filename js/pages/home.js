@@ -588,7 +588,21 @@
       var _heroTok = 0;
       function nfHeroShow(h) {
         var tok = ++_heroTok, fired = false;
-        function go() { if (fired || tok !== _heroTok) return; fired = true; nfHeroPaint(h); }
+        function go() {
+          if (fired || tok !== _heroTok) return;
+          fired = true;
+          var hero = document.getElementById('nfHero');
+          var key = (h.title || '') + '|' + (h.image || '');
+          if (hero && hero.querySelector('.nf-hero-body') && hero.dataset.key !== key) {
+            /* Výměna banneru: starý titul zešedne až do černa, potom se rozjasní nový */
+            hero.classList.add('nf-hero-out');
+            setTimeout(function () {
+              if (tok !== _heroTok) return;
+              hero.classList.remove('nf-hero-out');
+              nfHeroPaint(h, true);
+            }, 420);
+          } else nfHeroPaint(h);
+        }
         if (h.image) {
           /* obrázek se nejdřív stáhne, teprve potom se banner vymění → žádné prázdné bliknutí */
           var im = new Image();
@@ -598,7 +612,8 @@
         } else go();
       }
 
-      function nfHeroPaint(h) {
+      window.mfhHeroShow = nfHeroShow; // pro testy
+      function nfHeroPaint(h, fade) {
         var hero = document.getElementById('nfHero');
         if (!hero) return;
         var first = !hero.querySelector('.nf-hero-body');
@@ -612,7 +627,8 @@
         if (h.year) meta.push('<span>' + esc(h.year) + '</span>');
         (h.genres || []).slice(0, 3).forEach(function (g) { meta.push('<span>' + esc(g) + '</span>'); });
         if (h.episode) meta.push('<span>' + esc(h.episode) + '</span>');
-        hero.className = 'nf-hero' + (first ? ' nf-hero-in' : '');
+        hero.className = 'nf-hero' + (first || fade ? ' nf-hero-in' : '');
+        hero.dataset.key = (h.title || '') + '|' + (h.image || '');
         hero.innerHTML =
           bg + '<div class="nf-hero-shade"></div>' +
           '<div class="nf-hero-body">' +

@@ -55,7 +55,7 @@ async function handleSrc(request, env, cors, url) {
 }
 
 /* Ověření zdrojů: Worker stáhne stránku zdroje (prohlížeč to kvůli CORS nesmí) a řekne, jestli titul opravdu existuje. */
-const PROBE_HOSTS = new Set(["www.najserialy.io", "najserialy.io", "svetserialu.to", "www.svetserialu.to", "serialy.bombuj.si", "www.bombuj.si", "bombuj.si", "uzi.la", "www.uzi.la", "podivana.xyz", "www.podivana.xyz"]);
+const PROBE_HOSTS = new Set(["www.najserialy.io", "najserialy.io", "svetserialu.to", "www.svetserialu.to", "serialy.bombuj.si", "www.bombuj.si", "bombuj.si", "uzi.la", "www.uzi.la"]);
 const PROBE_MAX = 8, PROBE_TTL = 1800, PROBE_LIMIT = 200;
 const NOTFOUND_RE = /(\b404\b|nenalezen|nebyl[aoy]? nalezen|neexistuje|stránk[auy] nebyl|not found|nic (jsme )?nenašli)/i;
 const probeHits = new Map();
@@ -63,7 +63,7 @@ const probeHits = new Map();
 const SLUG_STOP = new Set(["online", "film", "filmy", "serial", "serialy", "sezona", "serie", "epizoda", "dil", "cz", "sk", "hd", "zdarma", "titulky", "dabing"]);
 function foldText(t) { return String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 function slugTokens(pathname) {
-  const last = decodeURIComponent(pathname.split("/").filter(Boolean).filter(x => !/^(s\d+e\d+|serie-\d+|dil-\d+)$/i.test(x)).pop() || "");
+  const last = decodeURIComponent(pathname.split("/").filter(Boolean).filter(x => !/^s\d+e\d+$/i.test(x)).pop() || "");
   return foldText(last).split(/[^a-z0-9]+/).filter(t => t.length >= 3 && !/^\d+$/.test(t) && !SLUG_STOP.has(t));
 }
 

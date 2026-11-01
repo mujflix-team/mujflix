@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.20.14
+- **Zdroj Podivana.xyz odstraněn** (kód, ověřování ve Workeru, hlídač zdrojů, testy).
+- **Přehrávač jednodušší:** pod názvem titulu už není název zdroje ani počet ověřených zdrojů a pryč jsou tlačítka *Jiný zdroj* a *Nefunguje to* (zdroj se vybírá sám). Smazané i úpravy v CSS a tip v prvních krocích.
+- **Poslední použitý zdroj zvlášť pro filmy a seriály:** nový titul začne zdrojem, který se naposledy sledoval (weby mají vlastní přehrávač, který si pamatuje, kde divák skončil); titul s vlastní zkušeností má přednost.
+- **Banner na úvodní stránce:** při výměně titulu starý banner zešedne až do černa a pak se rozjasní nový. Stejný titul se při překreslení nevyměňuje.
+
 ## 3.20.13
 - **README:** přepsáno podle skutečného kódu (jen dokumentace, kód beze změny). Opraveno: smazané soubory a funkce (`premiere.js`, `collections.js`, `customize.js`, Nálada), iframe přehrávače **nemá** `sandbox`, doporučování (nic jako „momentum“ ani Bayesovská korekce nejede), `PROBE_HOSTS` je konstanta (ne proměnná Workeru), záložky a řazení v Oblíbených. Doplněno: architektura, tabulka zdrojů (`noEmbed`), adresy `/s/` `/f/` `/c/`, propojení zařízení (třícestné slučování, limity), PIN a věk, service worker, limity Workeru, `TMDB_READ_TOKEN`, starší Finder a jeho klíče, testy, CI, nová sekce „Známá omezení a technický dluh“.
 - **Výkon (hlavně Firefox a slabší zařízení):** měřeno v Chromiu s 4× zpomaleným CPU.

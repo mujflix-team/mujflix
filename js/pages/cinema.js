@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  var modal, frame, titleNode, sourceLabelNode, sourceCounterNode;
+  var modal, frame, titleNode;
   var tvBar, epGridPanel, epGridBody;
   var favBtn;
   var current = null;
@@ -133,21 +133,9 @@
     return "https://www.najserialy.io/serial/" + slug + "/s" + pad2(season) + "e" + pad2(episode);
   }
 
-  /* Podivana.xyz: web vložení do cizí stránky zakazuje („odmítl připojení“), proto noEmbed (tlačítko do nového okna) jako u Uzi.la.
-     Kdyby vložení někdy povolil, stačí u zdrojů níže noEmbed: true zrušit.
-     Přehrávač je na stránce hluboko dole a pokaždé jinde; kotva #player ho vyscrolluje na místo. */
-  function podivanaUrl(title, year, season, episode, section) {
-    var slug = daslug(title);
-    if (!slug) return "https://podivana.xyz/";
-    var y = /^\d{4}$/.test(String(year || "")) && !/-\d{4}$/.test(slug) ? "-" + year : "";
-    if (season == null) return "https://podivana.xyz/film/" + slug + y + "#player";
-    return "https://podivana.xyz/" + (section || (current && current.isAnime ? "anime" : "serial")) + "/" + slug + y + "/serie-" + season + "/dil-" + episode + "#player";
-  }
-
   var MOVIE_SOURCES = [
     { id: "bombuj", label: "Bombuj", build: function (t, y) { return bombujMovieUrl(t, y); } },
     { id: "uzila", label: "Uzi.la", noEmbed: true, build: function (t) { return uziMovieUrl(t); } },
-    { id: "podivana", label: "Podivana", noEmbed: true, build: function (t, y) { return podivanaUrl(t, y); } },
     { id: "prehrajto", label: "Prehrajto.cz", build: function (t) { return prehrajtoUrl(t); } },
     { id: "bombuj-noyear", label: "Bombuj (bez roku)", build: function (t) { return bombujMovieUrlNoYear(t); } }
   ];
@@ -156,7 +144,6 @@
     { id: "svetserialu", label: "SvetSerialu", build: function (t, s, e, slug) { return svetSerialuUrl(t, s, e, slug); } },
     { id: "bombuj", label: "Bombuj", build: function (t, s, e) { return bombujTvUrl(t, s, e); } },
     { id: "uzila", label: "Uzi.la", noEmbed: true, build: function (t, s, e) { return uziTvUrl(t, s, e); } },
-    { id: "podivana", label: "Podivana", noEmbed: true, build: function (t, s, e) { return podivanaUrl(t, current && (current.firstYear || current.year), s, e); } },
     { id: "najserialy", label: "NajSerialy", build: function (t, s, e) { return najTvUrl(t, s, e, false); } },
     { id: "prehrajto", label: "Prehrajto.cz", build: function (t, s, e) { return prehrajtoTvUrl(t, s, e); } },
     { id: "najserialy-year", label: "NajSerialy (s rokem)", build: function (t, s, e) { return najTvUrl(t, s, e, true); } }
@@ -169,31 +156,18 @@
     // Uzi.la a NajSerialy pojmenovávají tituly podle lokalizovaného názvu. Zdroje jdou popořadě (každý jednou s prvním názvem),
     // další názvy (SK / CZ / původní) se nabídnou až za nimi, ať se mezi zdroji nemíchají.
     var main = [], extra = [];
-    function variant(src, name, section) {
+    function variant(src, name) {
       return {
         id: src.id,
         noEmbed: src.noEmbed,
-        label: src.label + " (" + name + (section ? ", " + section : "") + ")",
+        label: src.label + " (" + name + ")",
         build: function (t, a, b) {
           if (src.id === "uzila") return type === "movie" ? uziMovieUrl(name) : uziTvUrl(name, a, b);
-          if (src.id === "podivana") return type === "movie" ? podivanaUrl(name, current && current.year) : podivanaUrl(name, current && (current.firstYear || current.year), a, b, section);
           return najTvUrl(name, a, b, src.id === "najserialy-year");
         }
       };
     }
     base.forEach(function (src) {
-      if (src.id !== "uzila" && src.id !== "podivana" && src.id.indexOf("najserialy") !== 0) return main.push(src);
-      if (src.id === "podivana") {
-        /* Podivana pojmenovává tituly česky (Family Guy = griffinovi-1999), anime má ale vlastní sekci /anime/ a anglický název
-           (naruto-shippuden-2007). Zkouší se tedy správná sekce s nejpravděpodobnějším názvem, další názvy a druhá sekce až potom. */
-        var anime = !!current.isAnime, sec = anime ? "anime" : "serial", other = anime ? "serial" : "anime";
-        var pf = anime ? alts[0] : (current.czTitle || alts[0]);
-        var tv = type !== "movie";
-        main.push(variant(src, pf, tv ? sec : ""));
-        alts.forEach(function (name) { if (name !== pf) extra.push(variant(src, name, tv ? sec : "")); });
-        if (tv) alts.forEach(function (name) { extra.push(variant(src, name, other)); });
-        return;
-      }
       if (src.id !== "uzila" && src.id.indexOf("najserialy") !== 0) return main.push(src);
       main.push(variant(src, alts[0]));
       alts.slice(1).forEach(function (name) { extra.push(variant(src, name)); });
@@ -228,8 +202,6 @@
         var ordered = kind === "movie"
           ? [pick("SK"), pick("CZ"), cur.title, en, orig]
           : [en, romaji, orig, cur.title, pick("SK"), pick("CZ")];
-        cur.czTitle = pick("CZ") || "";
-        cur.isAnime = info.original_language === "ja" && (info.genres || []).some(function (g) { return g.id === 16; });
         applyAlts(cur, ordered, info);
       };
       // Anime weby (NajSerialy…) používají romaji název (Shuiro no Kamen) – TMDB ho nemá, vezme se z AniList
@@ -261,10 +233,8 @@
     var keep = before ? after.findIndex(function (s) { return s.label === before.label; }) : -1;
     if (keep < 0 && before) keep = after.findIndex(function (s) { return s.id === before.id; });
     if (keep >= 0) cur.sourceIdx = keep;
-    cur.tried = new Set();
     // zdroj načtený s nepoužitelným odkazem (např. japonský název bez latinky) se po doplnění názvů načte znovu
     if (current === cur && cur._loadedUrl && buildUrl() !== cur._loadedUrl) renderCurrent();
-    else renderSourceBar();
     probeSources();
   }
 
@@ -389,7 +359,6 @@
         '</button>' +
         '<div class="mf-cin-titlebox">' +
           '<strong id="mfStandaloneCinemaTitle"></strong>' +
-          '<div class="mf-cin-submeta"><span class="mf-cin-src-label" id="mfCinSrcLabel"></span><span class="mf-cin-src-counter" id="mfCinSrcCounter"></span></div>' +
         "</div>" +
 
         '<div class="mf-cin-tvbar" id="mfCinTvBar" style="display:none">' +
@@ -406,8 +375,6 @@
           '<button type="button" class="mf-cin-fav-btn" id="mfCinSearchSrc" aria-label="Hledat titul na tomto zdroji" title="Hledat titul na tomto zdroji (další klik zkusí jiný název)">' +
             '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
           '</button>' +
-          '<button type="button" class="mf-cin-switch-btn" id="mfCinSwitchSrc" title="Jiný zdroj">Jiný zdroj</button>' +
-          '<button type="button" class="mf-cin-switch-btn mf-cin-bad-btn" id="mfCinBadSrc" title="Zdroj nefunguje – zapamatuji si to a zkusím další">Nefunguje to</button>' +
         "</div>" +
       "</div>" +
 
@@ -422,16 +389,12 @@
 
     frame = modal.querySelector("#mfStandaloneCinemaFrame");
     titleNode = modal.querySelector("#mfStandaloneCinemaTitle");
-    sourceLabelNode = modal.querySelector("#mfCinSrcLabel");
-    sourceCounterNode = modal.querySelector("#mfCinSrcCounter");
     tvBar = modal.querySelector("#mfCinTvBar");
     epGridPanel = modal.querySelector("#mfCinEpGrid");
     epGridBody = modal.querySelector("#mfCinEpGridBody");
 
     modal.querySelector("#mfStandaloneCinemaClose").onclick = close;
-    modal.querySelector("#mfCinSwitchSrc").onclick = function () { cycleSource(1); };
     modal.querySelector("#mfCinSearchSrc").onclick = searchOnSource;
-    modal.querySelector("#mfCinBadSrc").onclick = markBadAndNext;
     modal.querySelector("#mfCinPrevEp").onclick = function () { stepEpisode(-1); };
     modal.querySelector("#mfCinNextEp").onclick = function () { stepEpisode(1); };
     modal.querySelector("#mfCinPickEp").onclick = toggleEpGrid;
@@ -509,6 +472,16 @@
     shPost("/src/report", { key: key, label: label }).catch(function () {});
   }
 
+  /* Poslední použitý zdroj zvlášť pro filmy a seriály: weby mají vlastní přehrávač, který si pamatuje, kde divák skončil,
+     takže se u dalšího titulu začíná tam, kde se naposledy sledovalo. Ukládá se id zdroje (bez názvové varianty). */
+  function lastTypeKey() { return "mf_src_last_" + (current && current.type === "movie" ? "movie" : "tv"); }
+  function lastTypeLoad() { try { return localStorage.getItem(lastTypeKey()) || ""; } catch (e) { return ""; } }
+  function lastTypeSave(label) {
+    try {
+      var src = sourcesFor(current.type).find(function (x) { return x.label === label; });
+      if (src) localStorage.setItem(lastTypeKey(), src.id);
+    } catch (e) {}
+  }
   function srcIsBad(label) {
     var t = (prefEntry().bad || {})[label];
     return !!t && Date.now() - t < BAD_TTL;
@@ -518,7 +491,7 @@
     if (!current || !label) return;
     var all = prefsLoad(), k = prefKey(), e = all[k] || { good: "", bad: {} };
     e.bad = e.bad || {};
-    if (kind === "good") { e.good = label; delete e.bad[label]; shReport(k, label); }
+    if (kind === "good") { e.good = label; delete e.bad[label]; shReport(k, label); lastTypeSave(label); }
     else { e.bad[label] = Date.now() - (kind === "soft" ? BAD_TTL - SOFT_BAD_TTL : 0); if (e.good === label) e.good = ""; }
     e.t = Date.now();
     all[k] = e;
@@ -527,7 +500,7 @@
   /* ---------- Ověření zdrojů ----------
    * Worker stáhne stránky zdrojů (prohlížeč kvůli CORS nesmí) a řekne, jestli titul opravdu mají. Výsledek: PROBE[url] = true | false.
    * Zdroje, které titul nemají, se přeskakují a při otevření se rovnou přepne na první, který ho má. */
-  var PROBE = {}, PROBE_PENDING = {}, PROBE_UNKNOWN = {}, PROBE_FAIL = 0; // PROBE_UNKNOWN: web nic jasného neřekl, 5 minut se neptáme znovu
+  var PROBE = {}, PROBE_PENDING = {}, PROBE_UNKNOWN = {}; // PROBE_UNKNOWN: web nic jasného neřekl, 5 minut se neptáme znovu
   /* U seriálů se ověřuje 1. epizoda 1. série: že seriál na zdroji je, se s epizodami nemění, a dotazy na Worker se tak nemnoží při každém „Další“. */
   function srcUrl(src) {
     try {
@@ -552,15 +525,14 @@
     urls.forEach(function (u) { PROBE_PENDING[u] = 1; });
     shPost("/src/probe", { urls: urls }).then(function (r) {
       urls.forEach(function (u) { delete PROBE_PENDING[u]; });
-      if (!r || !Array.isArray(r.results)) { PROBE_FAIL = Date.now(); renderSourceBar(); fin(); return; }
-      PROBE_FAIL = 0;
+      if (!r || !Array.isArray(r.results)) { fin(); return; }
       urls.forEach(function (u, i) { if (r.results[i] === true || r.results[i] === false) PROBE[u] = r.results[i]; else PROBE_UNKNOWN[u] = Date.now(); });
       var keys = Object.keys(PROBE);
       if (keys.length > 400) keys.slice(0, keys.length - 400).forEach(function (k) { delete PROBE[k]; });
       fin();
       applyProbe();
       if (urls.length === 8 && current === cur) probeSources(); // zbylé varianty (další názvy) se ověří v dalším kole
-    }).catch(function () { urls.forEach(function (u) { delete PROBE_PENDING[u]; }); PROBE_FAIL = Date.now(); renderSourceBar(); fin(); });
+    }).catch(function () { urls.forEach(function (u) { delete PROBE_PENDING[u]; }); fin(); });
   }
 
   /** Když zdroj, na kterém právě jsme, titul nemá, přepne na první, který ho má (jen krátce po načtení a pokud uživatel nepřepínal sám). */
@@ -588,7 +560,6 @@
         if (typeof showToast === "function") showToast("Tenhle titul se na žádném zdroji nenašel", 3500);
       }
     }
-    renderSourceBar();
   }
 
   /** Zdroj, od kterého se začíná: ten, co pro titul fungoval; jinak první, který není označen jako nefunkční. */
@@ -597,6 +568,8 @@
     var pref = e.good || shLabel(prefKey());
     var gi = pref ? sources.findIndex(function (s) { return s.label === pref; }) : -1;
     if (gi >= 0 && !srcIsBad(sources[gi].label) && probeState(sources[gi]) !== false) return gi;
+    var lid = lastTypeLoad();
+    if (lid) for (var li = 0; li < sources.length; li++) if (sources[li].id === lid && !srcIsBad(sources[li].label) && probeState(sources[li]) !== false) return li;
     for (var t = 0; t < sources.length; t++) if (probeState(sources[t]) === true && !srcIsBad(sources[t].label)) return t;
     for (var i = 0; i < sources.length; i++) if (!srcIsBad(sources[i].label) && probeState(sources[i]) !== false) return i;
     for (var k = 0; k < sources.length; k++) if (!srcIsBad(sources[k].label)) return k;
@@ -634,12 +607,6 @@
     if (typeof showToast === "function") showToast("Hledám „" + q + "“ na " + src.label + (names.length > 1 ? " (další klik: jiný název)" : ""), 2600);
   }
 
-  function markBadAndNext() {
-    srcMark("bad", currentSrcLabel());
-    if (typeof showToast === "function") showToast("Zdroj označen jako nefunkční, zkouším další", 2200);
-    cycleSource(1, true);
-  }
-
   function cycleSource(dir, skipQuickCheck) {
     var sources = sourcesFor(current.type);
     // rychlé „Jiný zdroj“ krátce po načtení = zdroj nefungoval
@@ -654,25 +621,6 @@
     if (!found) idx = (current.sourceIdx + dir + sources.length) % sources.length;
     current.sourceIdx = idx;
     renderCurrent();
-  }
-
-  function renderSourceBar() {
-    var sources = sourcesFor(current.type);
-    var src = sources[current.sourceIdx];
-    current.tried.add(current.sourceIdx);
-    var used = current.tried.size;
-    var total = sources.length;
-    var remaining = total - used;
-    var st = probeState(src);
-    sourceLabelNode.textContent = src.label + " (" + (current.sourceIdx + 1) + "/" + total + ")" + (st === true ? " ✓" : st === false ? " ✗ titul nemá" : "");
-    var has = 0, known = 0;
-    sources.forEach(function (x) { var q = probeState(x); if (q === true) has++; if (q === true || q === false) known++; });
-    var pending = Object.keys(PROBE_PENDING).length > 0, checkable = sources.some(function (x) { return isCheckable(srcUrl(x)); });
-    sourceCounterNode.textContent = known
-      ? (has ? "titul má " + has + " z " + known + " ověřených zdrojů" : "žádný z ověřených zdrojů titul nemá, zkus Jiný zdroj nebo hledání")
-      : pending ? "ověřuji zdroje… (vyzkoušeno " + used + " z " + total + ")"
-      : PROBE_FAIL && checkable ? "ověření zdrojů teď není dostupné · vyzkoušeno " + used + " z " + total
-      : "vyzkoušeno " + used + " z " + total;
   }
 
   function updateEpCurrentLabel() {
@@ -705,7 +653,6 @@
       current.episode = newEp;
       if (current.localSlug) appMarkWatched(current.localSlug + "-S" + current.season + "-E" + current.episode);
       noteGoodIfStayed();
-      current.tried = new Set();
       current._manual = false; current._noneToast = false;
       current.sourceIdx = startIndex();
       renderCurrent();
@@ -783,8 +730,7 @@
           current.episode = e;
           if (current.localSlug) appMarkWatched(current.localSlug + "-S" + current.season + "-E" + e);
           noteGoodIfStayed();
-          current.tried = new Set();
-          current.sourceIdx = startIndex();
+              current.sourceIdx = startIndex();
           renderCurrent();
           renderEpGrid();
         };
@@ -873,7 +819,6 @@
     current._loadedUrl = url;
     current._srcSince = Date.now();
     loadUrl(url, label, sources[current.sourceIdx].noEmbed);
-    renderSourceBar();
     updateFavBtn();
     var rateBtn = modal.querySelector("#mfCinRateBtn");
     if (rateBtn) rateBtn.style.display = "inline-flex";
@@ -916,8 +861,7 @@
       totalSeasonsCount: null,
       totalEps: {},
       epCountFn: null,
-      altTitles: null,
-      tried: new Set()
+      altTitles: null
     };
     window._cinSiteSlug = null;
     window._cinYear = null;
@@ -968,7 +912,7 @@
     document.body.style.overflow = "";
   }
 
-  window.MFCinemaPlayer = { open: open, close: close, state: function () { return current && modal && modal.classList.contains("open") ? { title: current.title, type: current.type, season: current.season, episode: current.episode } : null; }, sourceLabels: function (type, alts) { var prev = current; current = Object.assign({}, prev || {}, { altTitles: alts }); try { return sourcesFor(type).map(function (s) { return s.label; }); } finally { current = prev; } }, currentUrl: function () { return current ? buildUrl() : ""; }, sourceIds: function (type) { return (type === "movie" ? MOVIE_SOURCES : TV_SOURCES).map(function (s) { return s.id; }); } };
+  window.MFCinemaPlayer = { open: open, close: close, nextSource: function () { if (current) cycleSource(1); }, sourceLabel: function () { return currentSrcLabel(); }, state: function () { return current && modal && modal.classList.contains("open") ? { title: current.title, type: current.type, season: current.season, episode: current.episode } : null; }, sourceLabels: function (type, alts) { var prev = current; current = Object.assign({}, prev || {}, { altTitles: alts }); try { return sourcesFor(type).map(function (s) { return s.label; }); } finally { current = prev; } }, currentUrl: function () { return current ? buildUrl() : ""; }, sourceIds: function (type) { return (type === "movie" ? MOVIE_SOURCES : TV_SOURCES).map(function (s) { return s.id; }); } };
 })();
 
 (function() {

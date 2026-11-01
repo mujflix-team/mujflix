@@ -55,7 +55,7 @@ Celé řešení se skládá ze tří částí:
  Prohlížeč (PWA, localStorage)  ──►  Cloudflare Worker  ──►  TMDB API        (metadata, plakáty, žánry, věkové značky)
         │                              │ ├─ KV „SYNC“        (propojení zařízení, sdílená paměť zdrojů)
         │                              │ └─ /src/probe       (ověření, že zdrojový web titul opravdu má)
-        └──►  externí weby (iframe / nové okno)             (Bombuj, SvětSeriálů, Uzi.la, Podivana … – přímo z prohlížeče)
+        └──►  externí weby (iframe / nové okno)             (Bombuj, SvětSeriálů, Uzi.la … – přímo z prohlížeče)
 ```
 
 Metadata o filmech a seriálech (plakáty, popisy, herci, trailery, hodnocení, kde se dá legálně sledovat) pocházejí z [TMDB](https://www.themoviedb.org/). Aplikace **nehostuje žádná videa** – jen tě navede na streamovací služby nebo externí weby.
@@ -68,7 +68,7 @@ Metadata o filmech a seriálech (plakáty, popisy, herci, trailery, hodnocení, 
 
 ### 🏠 Úvodní stránka
 
-- **Hero banner** s doporučeným titulem (s trailerem, který se při odscrollování nebo klepnutí pozastaví)
+- **Hero banner** s doporučeným titulem (s trailerem, který se při odscrollování nebo klepnutí pozastaví); při výměně titulu starý banner zešedne do černa a nový se rozjasní
 - **Pokračovat ve sledování** – plakát, lišta postupu, „S1 E4“, štítek *Nová epizoda* a tlačítko *Dokoukal jsem*
   - **klepnutí na kartu seriálu otevře detail s výběrem epizod** (nic se nespustí samo)
   - **▶ na kartě** rovnou pustí další epizodu (nebo rozkoukaný film)
@@ -104,8 +104,9 @@ Okno se třemi záložkami:
 
 ### 🎞 Cinema mód (přehrávač)
 
-- Vestavěný přehrávač s výběrem sezóny a epizody, tlačítkem **Další ›** (na konci seriálu i **další seriál**) a přepínáním zdrojů za běhu
-- Jedna kompaktní lišta ovládání (na telefonu i počítači se nezalamuje)
+- Vestavěný přehrávač s výběrem sezóny a epizody, tlačítkem **Další ›** (na konci seriálu i **další seriál**)
+- Jedna kompaktní lišta ovládání (na telefonu i počítači se nezalamuje), pod názvem titulu není nic navíc
+- **Zdroj se vybírá sám:** začíná se naposledy použitým zdrojem zvlášť pro filmy a seriály (weby mají vlastní přehrávač, který si pamatuje, kde jsi skončil); zdroj, který titul nemá, se přeskočí. Ruční přepínání zdrojů v liště není
 - Hodnocení epizody / filmu hvězdičkou, srdce do Oblíbených, ikona „kde to legálně sledovat“
 - Zdroje se vkládají do `<iframe>` **bez `sandbox`** (hostingy videa sandbox odmítají), takže vyskakovací reklamy cizích webů neblokuje; proto tip na blokovač reklam podle prohlížeče
 
@@ -120,13 +121,12 @@ Okno se třemi záložkami:
   | NajSerialy (`najserialy.io`) | – | ✓ | ano |
   | Prehraj.to (`prehrajto.cz`, hledání) | ✓ | ✓ | ano |
   | Uzi.la (`uzi.la`) | ✓ | ✓ | ne, tlačítko *Otevřít v novém okně* (`noEmbed`) |
-  | Podivana (`podivana.xyz`) | ✓ | ✓ | ne, tlačítko *Otevřít v novém okně* (`noEmbed`) |
 
 - **Legální služby** (Netflix, Disney+, Max, Apple TV+, Prime Video, SkyShowtime, Voyo, Canal+, O2 TV, Crunchyroll …) přes *TMDB Watch Providers* pro ČR/SK
 - **Alternativní názvy** – appka z TMDB načte český, slovenský, anglický a původní název a zkouší je postupně (weby pojmenovávají tituly různě, např. *Family Guy* = `griffinovi-1999`)
-- **Paměť zdrojů** – appka si pamatuje, který zdroj u titulu fungoval; tlačítko *Nefunguje to* ho označí (na 14 dní, „měkce“ na 3 dny) a zkusí další
+- **Paměť zdrojů** – appka si pamatuje, který zdroj u titulu fungoval, a zvlášť poslední použitý zdroj pro filmy a seriály (`mf_src_last_movie`, `mf_src_last_tv`)
 - **Sdílená paměť zdrojů** (volitelná) – zdroj, který fungoval ostatním, se zkusí první; posílá se jen „titul + název zdroje“
-- **Ověření zdrojů** (Worker) – před přehráním se zkontroluje, jestli web titul opravdu má (✓ / ✗ v liště zdrojů); zdroj bez titulu se automaticky přeskočí
+- **Ověření zdrojů** (Worker) – před přehráním se zkontroluje, jestli web titul opravdu má ; zdroj bez titulu se automaticky přeskočí
 - **Lupa v přehrávači** – hledání titulu přímo na aktuálním zdroji
 
 ### 🧠 Doporučování
@@ -307,7 +307,7 @@ Soubory byly kdysi jeden velký `app.js` rozdělený podle témat. **Načítají
 |---|---|
 | `home.js` | Úvodní stránka: hero, řady, **Pokračovat ve sledování**, „Protože jsi viděl“, věkový filtr řad, „Zobrazit vše“ |
 | `discover.js` | Procházení: banner, řady podle žánrů, filtry, řazení, hledání s historií |
-| `cinema.js` | Přehrávač (Cinema mód, `MFCinemaPlayer`): sestavení URL zdrojů, lišta zdrojů, paměť zdrojů, ověření přes Worker, epizody, hodnocení, **kde to legálně sledovat** (`MFLegalProviders`) |
+| `cinema.js` | Přehrávač (Cinema mód, `MFCinemaPlayer`): sestavení URL zdrojů, paměť zdrojů, ověření přes Worker, epizody, hodnocení, **kde to legálně sledovat** (`MFLegalProviders`) |
 
 ### `js/shell/`, `js/core/`, ostatní
 
@@ -316,7 +316,7 @@ Soubory byly kdysi jeden velký `app.js` rozdělený podle témat. **Načítají
 | `shell/dock.js` | Navigace (Domů · Seriály · Filmy · Oblíbené · Profil), čisté URL |
 | `shell/nav.js` | Tlačítko Zpět zavírá přehrávač, detail, Oblíbené, Procházení |
 | `shell/titleurl.js` | Čisté adresy titulů `/s/`, `/f/`, `/c/` (zápis do adresního řádku i otevření titulu z odkazu) |
-| `shell/polish.js` | Šipky u řad, chybový stav, offline |
+| `shell/polish.js` | Šipky u řad, chybový stav, offline, schování filtrů v Procházení |
 | `shell/update.js` | Hláška „Je dostupná nová verze“ |
 | `core/tmdb-proxy-shim.js` | Přesměruje TMDB volání přes Worker a odstraní `api_key` |
 | `core/age.js` | `MFAge` – věkové omezení podle certifikace z TMDB |
@@ -420,12 +420,12 @@ Co se z toho skládá:
 
 ### Zdroje
 
-Přehrávač (`js/pages/cinema.js`) z názvu, roku, sezóny a epizody složí URL pro každý podporovaný web (tvary adres jsou na jednom místě v kódu, např. Uzi.la `/tv/<slug>/S04E08`, Podivana `/serial/<slug>-<rok>/serie-<s>/dil-<e>#player`). Postup:
+Přehrávač (`js/pages/cinema.js`) z názvu, roku, sezóny a epizody složí URL pro každý podporovaný web (tvary adres jsou na jednom místě v kódu, např. Uzi.la `/tv/<slug>/S04E08`). Postup:
 
 1. Z TMDB se načtou alternativní názvy (český, slovenský, anglický, původní). U anime se doplní romaji z AniList; titul bez latinky (např. japonský) se v URL nahradí prvním latinským názvem. Zdroje jdou popořadě s hlavním názvem a další názvy se nabídnou až za nimi.
 2. Worker (`/src/probe`) dá osm adres najednou ověřit: stáhne stránku a vyhodnotí `true` (titul tam je), `false` (404, „nenalezeno“, přesměrování na úvod, nebo **měkká 404** – 200 a obecná stránka, kde není nic z názvu titulu) nebo `null` (nevíme – např. web za ochranou, 403). Výsledek se cachuje 30 min.
-3. Zdroj označený `false` se v liště zdrojů ukáže jako ✗ a přehrávač krátce po otevření přepne na první, který titul má (jen pokud uživatel nepřepínal sám).
-4. Úvodní zdroj se vybírá takto: zdroj, který u titulu fungoval (vlastní zkušenost – zůstal jsi na něm aspoň minutu – má přednost před sdílenou pamětí z Workeru), pokud není označený jako špatný a ověření ho nezamítlo → první zdroj, který ověření potvrdilo → první neoznačený → výchozí pořadí. Když přepneš zdroj do 25 s po načtení, bere se to jako „měkce špatný“ (3 dny); tlačítko *Nefunguje to* ho označí jako špatný na 14 dní. V obou případech se zkusí další zdroj.
+3. Zdroj označený `false` přehrávač krátce po otevření přeskočí a přepne na první, který titul má.
+4. Úvodní zdroj se vybírá takto: zdroj, který u titulu fungoval (vlastní zkušenost – zůstal jsi na něm aspoň minutu – má přednost před sdílenou pamětí z Workeru), pokud není označený jako špatný a ověření ho nezamítlo → poslední použitý zdroj pro film / seriál → první zdroj, který ověření potvrdilo → první neoznačený → výchozí pořadí.
 5. Weby, které vložení do iframe zakazují, mají příznak `noEmbed` – místo přehrávání v okně se zobrazí tlačítko *Otevřít v novém okně*.
 
 Přehrávač vkládá zdroje do `<iframe>` **bez atributu `sandbox`** (hostingy videa jako Filemoon uvnitř SvětSeriálů sandbox detekují a odmítnou přehrávat), takže vyskakovací okna a reklamy cizích webů se tím nezablokují – proto aplikace v úvodním průvodci doporučuje blokátor reklam podle prohlížeče (`core/adblock.js`). Skript `npm run check-sources` zkontroluje, že tvary adres a ověření pořád odpovídají skutečným webům (testovací dotazy mají vyjít `true`, vymyšlené `false`).
@@ -526,7 +526,7 @@ Co se při studiu kódu ukázalo; část je i v [`docs/TASKS.md`](docs/TASKS.md)
 - **Úsporný režim se nikde neprojeví.** `index.html` přidá `html.mf-low-power` na zařízeních s ≤ 4 jádry nebo s „šetřením dat“, ale žádné CSS tuto třídu nepoužívá.
 - **Bezpečnost API klíčů.** Podle `TASKS.md` byl starý TMDB klíč v historii GitHubu – je třeba ho vyměnit a nový dát jen do secretu Workeru. `ALLOWED_ORIGINS` nechaná prázdná povolí Worker komukoli.
 - **CSS.** `css/styles.css` má ~5 500 řádků a hodně pravidel je přepsaných v `netflix.css`; po změření (Lighthouse) by se mrtvá pravidla měla odstranit. `docs/css-vars.md` ukazuje duplicitní proměnné.
-- **Zdroje se mění.** Zdrojové weby mění tvar adres a ochranu bez varování; proto existují `npm run check-sources` a ověřování přes Worker. Uzi.la a Podivana vložení do iframe zakazují.
+- **Zdroje se mění.** Zdrojové weby mění tvar adres a ochranu bez varování; proto existují `npm run check-sources` a ověřování přes Worker. Uzi.la vložení do iframe zakazuje.
 - **Neověřeno.** Plynulost na Firefoxu a skutečných slabých zařízeních (výkon se měřil jen v Chromiu se zpomaleným CPU).
 
 ---
@@ -558,7 +558,7 @@ Co se při studiu kódu ukázalo; část je i v [`docs/TASKS.md`](docs/TASKS.md)
 
 **Kód pro propojení nefunguje.** Platí jen 10 minut a jde použít jednou. Po 10 neúspěšných pokusech z jedné IP se zadávání na 10 minut zablokuje.
 
-**Zdroj se neotevře v přehrávači.** Některé weby odmítají vložení do iframe (Uzi.la, Podivana) – zobrazí se tlačítko *Otevřít v novém okně*. Když zdroj titul nemá nebo nefunguje, použij *Jiný zdroj* / *Nefunguje to* nebo lupu (hledání titulu na aktuálním webu). Značka ✗ v liště zdrojů znamená, že ověření (Worker) titul na webu nenašlo.
+**Zdroj se neotevře v přehrávači.** Některé weby odmítají vložení do iframe (Uzi.la) – zobrazí se tlačítko *Otevřít v novém okně*. Když zdroj titul nemá nebo nefunguje, zkus lupu (hledání titulu na aktuálním webu). Značka ✗ v liště zdrojů znamená, že ověření (Worker) titul na webu nenašlo.
 
 **V přehrávači vyskakují reklamy.** Iframe nemá `sandbox` (jinak by hostingy videa odmítly přehrávat). Nainstaluj blokátor reklam – appka v průvodci nabídne správný pro tvůj prohlížeč.
 

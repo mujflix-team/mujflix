@@ -19,9 +19,9 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.20.14: Podivana pryč, jednodušší lišta přehrávače, poslední zdroj zvlášť pro filmy a seriály, banner zešedne do černa.
 - 3.20.13: README přepsáno podle skutečného kódu (jen dokumentace).
-- 3.20.6: Worker ověřuje i Podivana.xyz.
-- 3.20.5: zdroj Podivana.xyz (kotva #player), oprava schované horní lišty po reloadu.
+- 3.20.5: oprava schované horní lišty po reloadu.
 - 3.20.4: řady úvodní stránky bez blikání, smazané mrtvé CSS, jednotná barva v Nastavení.
 - 3.20.3: zavření přehrávače z odkazu /c/ vede na detail seriálu.
 - 3.20.2: výběr profilu se po obnovení / odkazu přeskočí.
