@@ -30,7 +30,7 @@ const big = await call("/sync/push", { id, data: { x: "y".repeat(4 * 1024 * 1024
 check("worker: příliš velká data se odmítnou", big.status === 413);
 const get = await w.fetch(new Request("https://w/sync/pull", { method: "GET", headers: { Origin: "https://a.b" } }), env, {});
 check("worker: /sync/ vyžaduje POST", get.status === 405);
-const noKv = await w.fetch(new Request("https://w/sync/pull", { method: "POST", headers: { Origin: "https://a.b" }, body: "{}" }), { TMDB_API_KEY: "x" }, {});
+const noKv = await w.fetch(new Request("https://w/sync/pull", { method: "POST", headers: { Origin: "https://mujflix.pages.dev" }, body: "{}" }), { TMDB_API_KEY: "x" }, {});
 check("worker: bez KV odpoví 501", noKv.status === 501);
 
 // --- sdílená paměť zdrojů
@@ -79,5 +79,20 @@ check("probe: cizí Origin nesmí", (await call("/src/probe", { urls: ["https://
 let pl; for (let i = 0; i < 30; i++) pl = await call("/src/probe", { urls: Array(8).fill("https://uzi.la/tv/ochrana/S01E01") }, "https://a.b", "8.8.8.8");
 check("probe: omezení počtu kontrol z jedné IP (429)", pl.status === 429);
 globalThis.fetch = realFetch;
+
+
+// --- Audit C: CORS bez ALLOWED_ORIGINS, velikost těla, obnova platnosti dat při čtení
+const env0 = { SYNC: env.SYNC, TMDB_API_KEY: "x" };
+const call0 = async origin => (await w.fetch(new Request("https://w/sync/pull", { method: "POST", headers: { Origin: origin }, body: JSON.stringify({ id }) }), env0, {})).status;
+check("worker: bez ALLOWED_ORIGINS projde jen mujflix.pages.dev (i náhled) a localhost, cizí web ne", (await call0("https://mujflix.pages.dev")) === 200 && (await call0("https://abc123.mujflix.pages.dev")) === 200 && (await call0("http://localhost:8080")) === 200 && (await call0("https://evil.x")) === 403 && (await call0("https://mujflix.pages.dev.evil.x")) === 403);
+const bigCl = await w.fetch(new Request("https://w/sync/push", { method: "POST", headers: { Origin: "https://a.b", "Content-Length": String(5 * 1024 * 1024) }, body: "{}" }), env, {});
+check("worker: obří tělo se odmítne podle Content-Length (413)", bigCl.status === 413);
+const ttlPuts = [], envT = { ...env, SYNC: { get: async k => m.get(k) ?? null, put: async (k, v) => { ttlPuts.push(k); m.set(k, v); }, delete: async k => { m.delete(k); } } };
+m.delete("r:" + id);
+const pullT = () => w.fetch(new Request("https://w/sync/pull", { method: "POST", headers: { Origin: "https://a.b" }, body: JSON.stringify({ id }) }), envT, {});
+await call("/sync/push", { id, data: { x: 1 } });
+await pullT(); const first = ttlPuts.filter(k => k === "d:" + id || k === "r:" + id).length; ttlPuts.length = 0;
+await pullT();
+check("worker: čtení obnoví platnost dat nejvýš jednou týdně", first >= 2 && ttlPuts.length === 0, JSON.stringify({ first, again: ttlPuts }));
 
 finish();
