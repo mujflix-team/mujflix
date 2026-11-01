@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.8: úklid starého přehrávače (`cinema-legacy.js` 491 → 12 řádků), smazán `CinAI` a „AI Source statistiky“ v Nastavení (audit B1).
 - 3.21.7: bezpečnostní audit: HSTS a COOP v `_headers`, zúžené `frame-src` v CSP (jen weby zdrojů a YouTube), bezpečnostní hlavičky odpovědí Workeru, smazaný nepoužitý režim `MF_PROXY`, `SECURITY.md`, Dependabot, upřesněné Soukromí.
 - 3.21.6: cache service workeru podle verze aplikace (audit F).
 - 3.21.5: Worker: CORS bez otevřeného výchozího stavu, limit těla a obnova platnosti dat (audit C1, C4, C5).

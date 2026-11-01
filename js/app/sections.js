@@ -23,7 +23,7 @@ function _bombujMovieUrlVariants(e, t) {
 ! function() {
     /* Jednorázový úklid: klíče AI služeb ze starého hledání (Finder), dnes se nepoužívají */
     try {
-      ["mf_gemini_key", "mf_or_key", "mf_groq_key", "mf_anthropic_key", "mf_jina_key", "mf_tavily_key"].forEach(k => {
+      ["mf_gemini_key", "mf_or_key", "mf_groq_key", "mf_anthropic_key", "mf_jina_key", "mf_tavily_key", "mf_cin_ai_stats"].forEach(k => {
         localStorage.removeItem(k);
         Object.keys(localStorage).filter(x => x.indexOf(k + "_") === 0).forEach(x => localStorage.removeItem(x))
       })
@@ -196,127 +196,6 @@ function _bombujMovieUrlVariants(e, t) {
     }
 
     "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", e) : e()
-  }(), window.CinAI = function() {
-    const e = "mf_cin_ai_stats";
-
-    function t() {
-      try {
-        return safeLS(e, "{}")
-      } catch (e) {
-        return {}
-      }
-    }
-
-    function n(e) {
-      if (!e || 0 === e.tries) return 50;
-      const t = e.ok / e.tries,
-        n = Date.now() - (e.lastTs || 0),
-        o = Math.max(.4, 1 - n / 1728e5);
-      return Math.round(100 * t * o)
-    }
-
-    function o(e) {
-      const o = t();
-      return [...e].map((e, t) => ({
-        src: e,
-        i: t,
-        score: n(o[e.id])
-      })).sort((e, t) => t.score - e.score)
-    }
-
-    function i(n, o) {
-      const i = t();
-      i[n] || (i[n] = {
-          ok: 0,
-          tries: 0,
-          lastTs: 0
-        }), i[n].tries++, o && i[n].ok++, i[n].lastTs = Date.now(),
-        function(t) {
-          try {
-            localStorage.setItem(e, JSON.stringify(t))
-          } catch (e) {}
-        }(i)
-    }
-    return {
-      findBestSource: async function(e, i, a, s, r) {
-        const l = o(e),
-          c = t(),
-          d = _cinState;
-        if (e.every(e => e.popupOnly)) return d.sourceIdx;
-        const m = l.slice(0, 4).map(async ({
-            src: e,
-            i: t
-          }) => {
-            const n = "movie" === a ? e.movie(i, d.title, d.year) : e.tv(i, s, r, d.title, d.siteSlug || null),
-              o = await async function(e) {
-                try {
-                  const t = new AbortController,
-                    n = setTimeout(() => t.abort(), 5e3);
-                  return await fetch(e, {
-                    method: "HEAD",
-                    mode: "no-cors",
-                    signal: t.signal
-                  }), clearTimeout(n), !0
-                } catch (e) {
-                  return !1
-                }
-              }(n);
-            return {
-              src: e,
-              i: t,
-              alive: o,
-              url: n
-            }
-          }),
-          u = (await Promise.all(m)).filter(e => e.alive);
-        if (u.length > 0) {
-          const e = u[0];
-          return window.MF_DEBUG && console.log(`[CinAI] Nejlepší zdroj: ${e.src.label} (skóre ${n(c[e.src.id])}, probe OK)`), e.i
-        }
-        return window.MF_DEBUG && console.log("[CinAI] Probe timeout, fallback na přednastavený zdroj"), d.sourceIdx
-      },
-      monitorIframe: function(e, t) {
-        let n = !1;
-        e.addEventListener("load", () => {
-          n = !0, setTimeout(() => {
-            const n = e.getBoundingClientRect(),
-              o = n.width > 100 && n.height > 100;
-            i(t, o), o && window.MF_DEBUG && console.log(`[CinAI] ${t} ✅ zaznamenán úspěch`)
-          }, 2e3)
-        }), setTimeout(() => {
-          n || (i(t, !1), window.MF_DEBUG && console.log(`[CinAI] ${t} ❌ timeout — zaznamenán neúspěch`))
-        }, 12e3)
-      },
-      renderAIBadge: function(e) {
-        const t = document.createElement("div");
-        t.id = "cinAIBadge", t.style.cssText = "display:flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(0,122,255,0.15);border:1px solid rgba(0,122,255,0.3);border-radius:20px;font-size:0.6rem;color:rgba(0,122,255,0.9);font-family:Inter,sans-serif;font-weight:600;white-space:nowrap;cursor:default;", t.title = "AI automaticky vybírá nejspolehlivější zdroj", t.innerHTML = "✦ AI", e.prepend(t)
-      },
-      recordResult: i,
-      getScore: n,
-      loadStats: t,
-      resetStats: function() {
-        localStorage.removeItem(e), window.MF_DEBUG && console.log("[CinAI] Statistiky vynulovány")
-      },
-      showStats: function() {
-        const e = t();
-        if (void 0 === CINEMA_SOURCES) return;
-        const o = CINEMA_SOURCES.map(t => {
-          const o = e[t.id],
-            i = n(o),
-            a = "█".repeat(Math.round(i / 10)) + "░".repeat(10 - Math.round(i / 10)),
-            s = o ? o.tries : 0;
-          return `${t.label.padEnd(12)} ${a} ${i}% (${s}×)`
-        }).join("\n");
-        if (window.MF_DEBUG && console.log("[CinAI] Statistiky zdrojů:\n" + o), "function" == typeof showToast) {
-          const t = CINEMA_SOURCES.map(t => ({
-            src: t,
-            score: n(e[t.id])
-          })).sort((e, t) => t.score - e.score)[0];
-          showToast(`🤖 Nejlepší zdroj: ${t.src.label} (${t.score}%)`, "success")
-        }
-      },
-      rankSources: o
-    }
   }(), window.MFTransition = function() {
     const e = !!document.startViewTransition;
     return {
@@ -461,18 +340,6 @@ function _bombujMovieUrlVariants(e, t) {
       return escapeHTML(e)
     }
 
-    function n() {
-      const e = document.getElementById("mfAiStatsGrid");
-      if (!e || !window.CinAI || void 0 === CINEMA_SOURCES) return;
-      const t = CinAI.loadStats();
-      e.innerHTML = CINEMA_SOURCES.map(e => {
-        const n = CinAI.getScore(t[e.id]),
-          o = t[e.id],
-          i = n >= 70 ? "#30d158" : n >= 40 ? "#ff9f0a" : o ? "#ff453a" : "rgba(255,255,255,0.2)",
-          a = o ? o.tries : 0;
-        return `<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;background:rgba(255,255,255,0.03);border-radius:8px;">\n        <div style="width:7px;height:7px;border-radius:50%;background:${i};flex-shrink:0;"></div>\n        <div>\n          <div style="font-size:0.62rem;color:rgba(255,255,255,0.65);font-weight:600;">${e.label}</div>\n          <div style="font-size:0.5rem;color:rgba(255,255,255,0.3);">${a?n+"% ("+a+"×)":"Neotestováno"}</div>\n        </div>\n      </div>`
-      }).join("")
-    }
     return {
       open: function() {
         document.getElementById("mfBeautifulSettings") || function() {
@@ -480,7 +347,7 @@ function _bombujMovieUrlVariants(e, t) {
             s = document.createElement("div");
           s.id = "mfBeautifulSettings", s.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.75);backdrop-filter:blur(24px);display:flex;align-items:flex-end;justify-content:center;font-family:-apple-system,Inter,sans-serif;animation:mfSettFade 0.22s ease;";
           const r = document.createElement("div");
-          r.style.cssText = "background:rgba(18,18,26,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -20px 60px rgba(0,0,0,0.6);animation:mfSettUp 0.38s cubic-bezier(0.34,1.1,0.64,1);", r.innerHTML = `\n      \x3c!-- Handle --\x3e\n      <div style="display:flex;justify-content:center;padding:12px 0 4px;">\n        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);"></div>\n      </div>\n\n      \x3c!-- Header --\x3e\n      <div style="padding:16px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">\n        <div style="display:flex;align-items:center;justify-content:space-between;">\n          <div>\n            <div style="font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-0.3px;">Nastavení</div>\n            <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-top:2px;">MůjFlix konfigurace</div>\n          </div>\n          <button id="mfSetClose" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>\n        </div>\n      </div>\n\n      \x3c!-- Section: TMDB --\x3e\n      <div style="padding:20px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🎬 Film databáze</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">TMDB API klíč</label>\n          <input id="mfSetTmdb" type="password" placeholder="Vložte váš TMDB API klíč…" value="${t(a)}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:inherit;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;line-height:1.5;">\n            Získej zdarma na <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="color:rgba(0,122,255,0.7);">themoviedb.org</a> → API → Klíč v3\n          </div>\n        </div>\n      </div>\n\n      \x3c!-- Section: AI --\x3e\n      <div style="padding:16px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🤖 AI asistent</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">Anthropic API klíč</label>\n          <input id="mfSetAnthro" type="password" placeholder="sk-ant-…" value="${t(localStorage.getItem("mf_anthropic_key")||"")}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:monospace;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;">Potřeba pro AI doporučení. Získej na <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,122,255,0.7);">console.anthropic.com</a></div>\n        </div>\n\n        \x3c!-- AI Source stats --\x3e\n        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 14px;">\n          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\n            <span style="font-size:0.68rem;font-weight:600;color:rgba(255,255,255,0.5);">✦ AI Source statistiky</span>\n            <button id="mfResetAiStats" style="font-size:0.6rem;background:transparent;border:none;color:rgba(255,100,100,0.6);cursor:pointer;padding:2px 6px;">Reset</button>\n          </div>\n          <div id="mfAiStatsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>\n        </div>\n      </div>\n\n      \x3c!-- Save button --\x3e\n      <div style="padding:24px 24px 0;">\n        <button id="mfSetSave" style="width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:-0.2px;">Uložit nastavení</button>\n      </div>\n    `, s.appendChild(r), document.body.appendChild(s),
+          r.style.cssText = "background:rgba(18,18,26,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -20px 60px rgba(0,0,0,0.6);animation:mfSettUp 0.38s cubic-bezier(0.34,1.1,0.64,1);", r.innerHTML = `\n      \x3c!-- Handle --\x3e\n      <div style="display:flex;justify-content:center;padding:12px 0 4px;">\n        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);"></div>\n      </div>\n\n      \x3c!-- Header --\x3e\n      <div style="padding:16px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">\n        <div style="display:flex;align-items:center;justify-content:space-between;">\n          <div>\n            <div style="font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-0.3px;">Nastavení</div>\n            <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-top:2px;">MůjFlix konfigurace</div>\n          </div>\n          <button id="mfSetClose" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>\n        </div>\n      </div>\n\n      \x3c!-- Section: TMDB --\x3e\n      <div style="padding:20px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🎬 Film databáze</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">TMDB API klíč</label>\n          <input id="mfSetTmdb" type="password" placeholder="Vložte váš TMDB API klíč…" value="${t(a)}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:inherit;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;line-height:1.5;">\n            Získej zdarma na <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="color:rgba(0,122,255,0.7);">themoviedb.org</a> → API → Klíč v3\n          </div>\n        </div>\n      </div>\n\n      \x3c!-- Section: AI --\x3e\n      <div style="padding:16px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🤖 AI asistent</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">Anthropic API klíč</label>\n          <input id="mfSetAnthro" type="password" placeholder="sk-ant-…" value="${t(localStorage.getItem("mf_anthropic_key")||"")}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:monospace;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;">Potřeba pro AI doporučení. Získej na <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,122,255,0.7);">console.anthropic.com</a></div>\n        </div>\n\n        \n      </div>\n\n      \x3c!-- Save button --\x3e\n      <div style="padding:24px 24px 0;">\n        <button id="mfSetSave" style="width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:-0.2px;">Uložit nastavení</button>\n      </div>\n    `, s.appendChild(r), document.body.appendChild(s),
             function() {
               if (document.getElementById("mfSettStyle")) return;
               const e = document.createElement("style");
@@ -502,9 +369,7 @@ function _bombujMovieUrlVariants(e, t) {
               (e.firstElementChild || e).appendChild(v);
               e.querySelector("#mfSetClose").onclick = () => e.remove(), e.addEventListener("click", t => {
                 t.target === e && e.remove()
-              }),  e.querySelector("#mfResetAiStats").onclick = () => {
-                window.CinAI && (CinAI.resetStats(), n(), "function" == typeof showToast && showToast("AI statistiky vynulovány"))
-              }, e.querySelectorAll("input").forEach(e => {
+              }), e.querySelectorAll("input").forEach(e => {
                 e.addEventListener("focus", () => e.style.borderColor = "rgba(0,122,255,0.45)"), e.addEventListener("blur", () => e.style.borderColor = "rgba(255,255,255,0.09)")
               }), e.querySelector("#mfSetSave").onclick = () => {
                 const n = e.querySelector("#mfSetTmdb").value.trim();
@@ -512,7 +377,7 @@ function _bombujMovieUrlVariants(e, t) {
                 const a = e.querySelector("#mfSetAnthro").value.trim();
                 a ? safeSetItem("mf_anthropic_key", a) : localStorage.removeItem("mf_anthropic_key"), e.remove(), "function" == typeof showToast && showToast("✅ Nastavení uloženo!", "success")
               }
-            }(s), n()
+            }(s)
         }()
       }
     }
