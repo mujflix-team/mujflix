@@ -110,6 +110,12 @@ check("worker: odpovědi mají nosniff, X-Frame-Options DENY a Cache-Control no-
   check("hash ?v=: stejný obsah dává stejný hash, jiný jiný", v("js/a.js") && v("js/a.js") !== v("css/b.css") && v("js/a.js") === hashAssets(html, p => files[p] || Buffer.alloc(0)).match(/js\/a.js\?v=([^"]+)/)[1]);
   check("hash ?v=: hash má 8 hex znaků", /^[0-9a-f]{8}$/.test(v("js/a.js")));
   check("hash ?v=: ikony a chybějící soubory zůstanou beze změny", out.includes("icons/x.png?v=3") && out.includes("js/missing.js?v=7"));
+  const bez = '<link href="css/b.css"><script src="js/a.js"></script><script src="https://cdn.x/js/a.js"></script><link href="icons/x.png"><script data-src="js/a.js"></script>';
+  const rd = p => { if (!files[p]) throw new Error("nenalezeno"); return files[p]; };
+  const o1 = hashAssets(bez, rd);
+  check("hash ?v=: odkaz bez ?v= dostane 8znakový hash", /css\/b\.css\?v=[0-9a-f]{8}"/.test(o1) && /src="js\/a\.js\?v=[0-9a-f]{8}"/.test(o1));
+  check("hash ?v=: externí adresy, ikony a data-src zůstanou bez změny", o1.includes('src="https://cdn.x/js/a.js"') && o1.includes('href="icons/x.png"') && o1.includes('data-src="js/a.js"'));
+  check("hash ?v=: druhý běh nic nezmění", hashAssets(o1, rd) === o1);
   files["js/a.js"] = Buffer.from("A2");
   check("hash ?v=: změna souboru změní hash", hashAssets(html, p => { if (!files[p]) throw new Error("nenalezeno"); return files[p]; }).match(/js\/a.js\?v=([^"]+)/)[1] !== v("js/a.js"));
 }

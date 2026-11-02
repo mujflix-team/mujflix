@@ -19,6 +19,8 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- Vědomě přeskočeno: PIN profilu je 4místný kód (10 000 možností), hash by ho neochránil a zásah do `gate.js`, `prefs.js` a synchronizace profilů by přinesl riziko. PIN slouží jen jako dětský zámek, proto se ukládá v čistém textu. Je i v synchronizovaných datech; sync ID je samo tajemství.
+- 3.21.12: `?v=` z hashe obsahu se při sestavení doplní i u odkazů, které parametr neměly (12 odkazů v `index.html`).
 - 3.21.11: `?v=` z hashe obsahu při sestavení na Cloudflare Pages (audit F, `scripts/hash-assets.mjs`).
 - 3.21.10: oprava CI: `@eslint/js` zpět na 9 (shoda s `eslint` 9), Dependabot nezvedá hlavní verze ESLintu samostatně.
 - 3.21.9: výkon v klidu: pryč animace pozadí na výběru profilu (−80 % práce vlákna v klidu), časovače změřeny a ponechány (audit E).

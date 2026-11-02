@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.12
+- **`?v=` z hashe i u odkazů bez parametru:** `scripts/hash-assets.mjs` přepisoval jen odkazy, které už `?v=` měly. V `index.html` jich 12 nemá (`css/patches.css`, `js/core/` `tmdb-proxy-shim`, `version`, `adblock`, `genres`, `age`, `sync`, `sync-ui`, `js/profiles/prefs`, `js/shell/` `dock`, `update`, `nav`), takže mohly zůstat ve staré cache. Při sestavení na Cloudflare Pages se `?v=<hash>` doplní i tam, kde chybí. Dál se nesahá na ikony, písma, manifest, externí adresy ani `data-src`. V repozitáři se nic nemění.
+- Testy: odkaz bez `?v=` dostane 8znakový hash, externí adresy a ikony zůstanou, druhý běh nic nezmění.
+- `docs/TASKS.md`: zapsáno, proč se PIN profilu neukládá jako hash.
+
 ## 3.21.11
 - **`?v=` z hashe obsahu (audit F):** nový `scripts/hash-assets.mjs`. Při sestavení na Cloudflare Pages (`node scripts/version.mjs`, bez změny nastavení) se `?v=` u všech skriptů a stylů v `index.html` nahradí 8 znaky hashe obsahu souboru. Změněný soubor tak vždy dostane novou adresu a nezměněný zůstane v cache; zapomenuté ruční zvýšení už nevadí. V repozitáři a v testech zůstávají ruční hodnoty (nic se nepřepisuje, soubor `index.html` se nemění). Ikony a manifest se neřeší.
 - Test: stejný obsah = stejný hash, změna souboru změní hash, ikony a chybějící soubory zůstanou nedotčené.
