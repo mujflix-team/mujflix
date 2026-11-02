@@ -457,7 +457,28 @@ function renderSeasons() {
   const o = document.getElementById("seasonAllBtn");
   o && (o.className = "season-all-btn" + (showAllSeasons ? " active" : ""), o.textContent = showAllSeasons ? "← Jedna sezóna" : "☰ Všechny epizody", o.hidden = t < 2);
   const i = document.getElementById("epViewSeasonText");
-  i && (i.textContent = showAllSeasons ? "Všechny sezóny" : `Sezóna ${activeSeason}`), renderSeasonStrip(t)
+  i && (i.textContent = showAllSeasons ? "Všechny sezóny" : `Sezóna ${activeSeason}`);
+  const m = document.getElementById("seasonMarkBtn");
+  m && (m.hidden = showAllSeasons || !activeSeries, m.textContent = _sdSeasonAllWatched(activeSeason) ? "✕ Zrušit zhlédnutí sezóny" : "✓ Označit sezónu"), renderSeasonStrip(t)
+}
+
+/* Jsou všechny díly sezóny zhlédnuté? */
+function _sdSeasonAllWatched(n) {
+  const c = epsInSeason(activeSeries, n), w = getWatched();
+  if (!c) return !1;
+  for (let e = 1; e <= c; e++) if (!w[`${activeSeries}-S${n}-E${e}`]) return !1;
+  return !0
+}
+
+/* Označí všechny díly vybrané sezóny jako zhlédnuté; když už jsou všechny zhlédnuté, zhlédnutí zruší. Hodnocení dílu se tu nevyvolává. */
+function toggleSeasonWatched() {
+  if (!activeSeries || showAllSeasons) return;
+  const n = activeSeason, c = epsInSeason(activeSeries, n), all = _sdSeasonAllWatched(n), w = getWatched();
+  for (let e = 1; e <= c; e++) {
+    const k = `${activeSeries}-S${n}-E${e}`;
+    all ? delete w[k] : w[k] = !0
+  }
+  saveWatched(w), all || persistSeriesRecord(activeSeries), renderEpisodes(), renderSeasons(), updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateLogoProgress(), "function" == typeof showToast && showToast(all ? `Sezóna ${n}: zhlédnutí zrušeno` : `Sezóna ${n} označena jako zhlédnutá`)
 }
 
 /* Řádek sezón: tlačítka S1, S2 … posuvná do stran, jedno klepnutí přepne epizody. Zcela zhlédnutá sezóna má fajfku. */
