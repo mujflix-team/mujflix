@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.21.13
+- **Nové testy nejčastěji rozbíjených toků** (`tests/toky.mjs`, spouští se v `npm test`):
+  - **Oblíbené:** srdíčko v přehrávači přidá a odebere (název je text), stránka Oblíbené ukáže karty bez `[object Object]`, správný počet, filtr Filmy a odebrání z karty, po obnovení stránky vše zůstane.
+  - **Přepnutí profilu:** Oblíbené, zhlédnuté a Pokračovat jednoho profilu nejsou vidět u druhého a po návratu jsou zpět.
+  - **Dvě zařízení:** dva oddělené prohlížeče proti skutečnému kódu Workeru (KV v paměti, včetně CORS): kód propojení, připojení druhého zařízení, souběžné odebrání a přidání oblíbeného, smazání profilu, tajný klíč se nepřenese.
+  - Ověřeno, že testy opravdu selhávají, když se kód záměrně rozbije (název jako objekt, sdílené klíče mezi profily, nefunkční Worker).
+- **Opraveno (odhalily to nové testy):** když byla otevřená stránka Oblíbené a přepnul se profil, zůstal zobrazený seznam předchozího profilu. Seznam se teď po přepnutí profilu přepíše.
+
 ## 3.21.12
 - **`?v=` z hashe i u odkazů bez parametru:** `scripts/hash-assets.mjs` přepisoval jen odkazy, které už `?v=` měly. V `index.html` jich 12 nemá (`css/patches.css`, `js/core/` `tmdb-proxy-shim`, `version`, `adblock`, `genres`, `age`, `sync`, `sync-ui`, `js/profiles/prefs`, `js/shell/` `dock`, `update`, `nav`), takže mohly zůstat ve staré cache. Při sestavení na Cloudflare Pages se `?v=<hash>` doplní i tam, kde chybí. Dál se nesahá na ikony, písma, manifest, externí adresy ani `data-src`. V repozitáři se nic nemění.
 - Testy: odkaz bez `?v=` dostane 8znakový hash, externí adresy a ikony zůstanou, druhý běh nic nezmění.
