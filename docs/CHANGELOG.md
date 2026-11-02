@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.9
+- **Výkon v klidu (audit E):** změřeno v Chromiu se 4× zpomaleným CPU, 15 s nečinnosti na výběru profilu: 872 přepočtů stylů a 1,74 s práce vlákna. Příčinou nebyly časovače (skripty dohromady ~0,05 s), ale animace `background-position` na celé obrazovce, která se překreslovala každý snímek. Animace pozadí (`pgAmbientBackground`) je odstraněna, mřížka dál jemně plave (jen `transform`/`opacity`). Po úpravě: **75 přepočtů a 0,34 s** (−80 %).
+- Časovače (`nav.js`, `dock.js`, `polish.js`, `dock-overlays.js`) zůstávají beze změny, po této opravě tvoří jednotky ms za 15 s a nestojí za riziko přepisu na události.
+
 ## 3.21.8
 - **Úklid starého přehrávače (audit B1):** `js/app/cinema-legacy.js` má z 491 řádků 12 – zůstaly jen `openMovieInCinema` (předá věc novému přehrávači) a `closeCinema`. Smazán záložní přehrávač, který se po zavedení `MFCinemaPlayer` nikdy nespustil, včetně pole `CINEMA_SOURCES`.
 - Smazán `CinAI` (hodnocení zdrojů pro starý přehrávač) a blok **„AI Source statistiky“ v Nastavení**, protože data pro něj sbíral jen starý přehrávač. Klíč `mf_cin_ai_stats` se jednorázově odstraní z úložiště.
