@@ -24,7 +24,7 @@ jobs:
         run: |
           V=$(node -p 'require("playwright/package.json").version')
           echo "v=$V" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         id: pwcache
         with:
           path: ~/.cache/ms-playwright
