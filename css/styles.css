@@ -1672,16 +1672,10 @@ body.grain-none::after {
 
 #mfProfileGate:not(.hiding) {
   background-size: 115% 115%, 120% 120%, 100% 100%;
-  animation: pgAmbientBackground 20s ease-in-out infinite alternate;
-  will-change: background-position;
 }
 #mfProfileGate:not(.hiding)::before {
   animation: pgGridDrift 26s ease-in-out infinite alternate;
   will-change: transform;
-}
-@keyframes pgAmbientBackground {
-  0% { background-position: 50% 0%, 80% 100%, 0 0; }
-  100% { background-position: 46% 4%, 76% 96%, 0 0; }
 }
 @keyframes pgGridDrift {
   0% { transform: translate3d(0, 0, 0); opacity: 0.72; }
