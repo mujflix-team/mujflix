@@ -1,6 +1,6 @@
 {
   "name": "mujflix",
-  "version": "3.21.9",
+  "version": "3.21.10",
   "private": true,
   "type": "module",
   "description": "MůjFlix — osobní tracker filmů a seriálů (statická PWA)",
@@ -14,7 +14,7 @@
     "css-vars": "node scripts/css-vars.mjs --only-dup"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.5",
     "eslint": "^9.0.0",
     "globals": "^15.0.0",
     "playwright": "^1.64.1"

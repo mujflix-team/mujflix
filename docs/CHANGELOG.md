@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.10
+- **Oprava CI (`npm ci` padalo na ERESOLVE):** Dependabot sloučil `@eslint/js` 10, ale `eslint` zůstal na 9, což k sobě nesedí. `@eslint/js` vrácen na `^9.39.5`, přegenerován `package-lock.json`. Chyby `no-useless-assignment` v `notify.js` a `gate.js` byly jen důsledek nových pravidel verze 10 a s verzí 9 nejsou.
+- `.github/dependabot.yml`: hlavní verze `eslint` a `@eslint/js` se už nenavrhují samostatně (přechod na 10 se udělá společně, až bude potřeba).
+
 ## 3.21.9
 - **Výkon v klidu (audit E):** změřeno v Chromiu se 4× zpomaleným CPU, 15 s nečinnosti na výběru profilu: 872 přepočtů stylů a 1,74 s práce vlákna. Příčinou nebyly časovače (skripty dohromady ~0,05 s), ale animace `background-position` na celé obrazovce, která se překreslovala každý snímek. Animace pozadí (`pgAmbientBackground`) je odstraněna, mřížka dál jemně plave (jen `transform`/`opacity`). Po úpravě: **75 přepočtů a 0,34 s** (−80 %).
 - Časovače (`nav.js`, `dock.js`, `polish.js`, `dock-overlays.js`) zůstávají beze změny, po této opravě tvoří jednotky ms za 15 s a nestojí za riziko přepisu na události.
