@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.11: `?v=` z hashe obsahu při sestavení na Cloudflare Pages (audit F, `scripts/hash-assets.mjs`).
 - 3.21.10: oprava CI: `@eslint/js` zpět na 9 (shoda s `eslint` 9), Dependabot nezvedá hlavní verze ESLintu samostatně.
 - 3.21.9: výkon v klidu: pryč animace pozadí na výběru profilu (−80 % práce vlákna v klidu), časovače změřeny a ponechány (audit E).
 - 3.21.8: úklid starého přehrávače (`cinema-legacy.js` 491 → 12 řádků), smazán `CinAI` a „AI Source statistiky“ v Nastavení (audit B1).
