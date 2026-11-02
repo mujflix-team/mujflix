@@ -15,7 +15,7 @@ Podrobnosti o struktuře a funkcích jsou v `README.md`, historie změn v `docs/
 - Po dokončení aktualizuj `docs/TASKS.md` (přesuň položku do „Hotovo“).
 - Nový externí web nebo API musí být v CSP (`<meta http-equiv="Content-Security-Policy">` v `index.html`, `connect-src`).
 - Pořadí skriptů a CSS v `index.html` je důležité (klasické `<script defer>`, globální proměnné, Netflix vzhled přepisuje ostatní CSS přes `html body … !important`).
-- Parametry `?v=` u skriptů v `index.html` zvedni u souboru, který jsi změnil.
+- Parametry `?v=` u skriptů v `index.html` zvedni u souboru, který jsi změnil (v repozitáři a testech zůstávají ruční; na Cloudflare Pages je při sestavení přepíše hash obsahu, viz `scripts/hash-assets.mjs`).
 
 ## Zakázáno
 - **Nikdy** neukládej do repozitáře API klíče (TMDB ani jiné). `config.js` smí obsahovat jen `window.TMDB_PROXY_URL`. Klíče patří do Cloudflare Workeru jako secret.

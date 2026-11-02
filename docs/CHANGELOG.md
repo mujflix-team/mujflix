@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.11
+- **`?v=` z hashe obsahu (audit F):** nový `scripts/hash-assets.mjs`. Při sestavení na Cloudflare Pages (`node scripts/version.mjs`, bez změny nastavení) se `?v=` u všech skriptů a stylů v `index.html` nahradí 8 znaky hashe obsahu souboru. Změněný soubor tak vždy dostane novou adresu a nezměněný zůstane v cache; zapomenuté ruční zvýšení už nevadí. V repozitáři a v testech zůstávají ruční hodnoty (nic se nepřepisuje, soubor `index.html` se nemění). Ikony a manifest se neřeší.
+- Test: stejný obsah = stejný hash, změna souboru změní hash, ikony a chybějící soubory zůstanou nedotčené.
+
 ## 3.21.10
 - **Oprava CI (`npm ci` padalo na ERESOLVE):** Dependabot sloučil `@eslint/js` 10, ale `eslint` zůstal na 9, což k sobě nesedí. `@eslint/js` vrácen na `^9.39.5`, přegenerován `package-lock.json`. Chyby `no-useless-assignment` v `notify.js` a `gate.js` byly jen důsledek nových pravidel verze 10 a s verzí 9 nejsou.
 - `.github/dependabot.yml`: hlavní verze `eslint` a `@eslint/js` se už nenavrhují samostatně (přechod na 10 se udělá společně, až bude potřeba).

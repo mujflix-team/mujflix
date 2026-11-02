@@ -100,4 +100,18 @@ check("worker: čtení obnoví platnost dat nejvýš jednou týdně", first >= 2
 const hdr = await w.fetch(new Request("https://w/sync/pull", { method: "POST", headers: { Origin: "https://a.b" }, body: "{}" }), env, {});
 check("worker: odpovědi mají nosniff, X-Frame-Options DENY a Cache-Control no-store", hdr.headers.get("X-Content-Type-Options") === "nosniff" && hdr.headers.get("X-Frame-Options") === "DENY" && hdr.headers.get("Cache-Control") === "no-store", JSON.stringify([...hdr.headers.entries()]));
 
+// --- ?v= z hashe obsahu (scripts/hash-assets.mjs)
+{
+  const { hashAssets } = await import("../scripts/hash-assets.mjs");
+  const files = { "js/a.js": Buffer.from("A"), "css/b.css": Buffer.from("B") };
+  const html = '<link href="css/b.css?v=3"><script src="js/a.js?v=1" defer></script><link href="icons/x.png?v=3"><script src="js/missing.js?v=7"></script>';
+  const out = hashAssets(html, p => { if (!files[p]) throw new Error("nenalezeno"); return files[p]; });
+  const v = n => (out.match(new RegExp(n + "\\?v=([^\"]+)")) || [])[1];
+  check("hash ?v=: stejný obsah dává stejný hash, jiný jiný", v("js/a.js") && v("js/a.js") !== v("css/b.css") && v("js/a.js") === hashAssets(html, p => files[p] || Buffer.alloc(0)).match(/js\/a.js\?v=([^"]+)/)[1]);
+  check("hash ?v=: hash má 8 hex znaků", /^[0-9a-f]{8}$/.test(v("js/a.js")));
+  check("hash ?v=: ikony a chybějící soubory zůstanou beze změny", out.includes("icons/x.png?v=3") && out.includes("js/missing.js?v=7"));
+  files["js/a.js"] = Buffer.from("A2");
+  check("hash ?v=: změna souboru změní hash", hashAssets(html, p => { if (!files[p]) throw new Error("nenalezeno"); return files[p]; }).match(/js\/a.js\?v=([^"]+)/)[1] !== v("js/a.js"));
+}
+
 finish();

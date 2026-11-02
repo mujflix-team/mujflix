@@ -3,6 +3,7 @@
 //   node scripts/version.mjs            → jen synchronizuje (běží automaticky před `npm test`)
 //   node scripts/version.mjs patch|minor|major|2.4.0 → zvedne verzi, synchronizuje, přidá nadpis do docs/CHANGELOG.md
 import { readFileSync, writeFileSync } from "node:fs";
+import { hashAssets } from "./hash-assets.mjs";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const arg = process.argv[2];
@@ -25,3 +26,11 @@ const out = `/* GENEROVÁNO z package.json (node scripts/version.mjs) – needit
 let cur = ""; try { cur = readFileSync("js/core/version.js", "utf8"); } catch { /* soubor ještě neexistuje */ }
 if (cur !== out) writeFileSync("js/core/version.js", out);
 console.log("Verze:", pkg.version);
+
+// Jen na Cloudflare Pages: ?v= u skriptů a stylů z hashe obsahu (v repozitáři zůstávají ruční hodnoty)
+if (env.CF_PAGES_COMMIT_SHA) {
+  const html = readFileSync("index.html", "utf8");
+  const next = hashAssets(html, p => readFileSync(p));
+  if (next !== html) writeFileSync("index.html", next);
+  console.log("Parametry ?v= přepsány hashem obsahu");
+}
