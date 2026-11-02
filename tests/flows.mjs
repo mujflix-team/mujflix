@@ -2,16 +2,6 @@ import { startApp, check, finish } from "./helpers.mjs";
 
 const { page, errors, close } = await startApp();
 
-// --- Escapování v inline onclick
-const esc = await page.evaluate(() => {
-  const s = `https://x.cz/a'b\\c"d</script>`;
-  const holder = document.createElement("div");
-  holder.innerHTML = `<button onclick="window.__v=${_cinJs(s)}">x</button>`;
-  holder.querySelector("button").click();
-  return window.__v === s;
-});
-check("onclick: URL se zvláštními znaky přežije round-trip", esc);
-
 // --- Hodnocení ukládá žánry a AI se z něj učí
 const rating = await page.evaluate(() => {
   const slug = Object.keys(db)[0];

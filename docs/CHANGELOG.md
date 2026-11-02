@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.8
+- **Úklid starého přehrávače (audit B1):** `js/app/cinema-legacy.js` má z 491 řádků 12 – zůstaly jen `openMovieInCinema` (předá věc novému přehrávači) a `closeCinema`. Smazán záložní přehrávač, který se po zavedení `MFCinemaPlayer` nikdy nespustil, včetně pole `CINEMA_SOURCES`.
+- Smazán `CinAI` (hodnocení zdrojů pro starý přehrávač) a blok **„AI Source statistiky“ v Nastavení**, protože data pro něj sbíral jen starý přehrávač. Klíč `mf_cin_ai_stats` se jednorázově odstraní z úložiště.
+- V `index.html` odstraněny inline `onchange` starého výběru řady a dílu.
+- Z testů odstraněn test smazané pomocné funkce `_cinJs`.
+
 ## 3.21.7
 - **Bezpečnostní audit (zapracováno, dle souboru `mujflix-bezpecnostni-audit.md`):**
   - **`_headers`:** přidány `Strict-Transport-Security` (bez `preload`) a `Cross-Origin-Opener-Policy: same-origin`.
