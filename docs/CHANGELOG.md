@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.14
+- **Řada Oblíbené na úvodní stránce:** srdíčko mělo jen část karet. Dostaly ho jen položky s uloženým TMDB ID, starší seriály uložené jen pod místním názvem (např. Griffinovi, Americký táta) srdíčko neměly. Teď ho má každá karta v řadě a klik ji z Oblíbených odebere.
+- Nový test (`tests/toky.mjs`): v řadě Oblíbené mají srdíčko všechny karty a klik na starší seriál ho odebere. Bez opravy test selže.
+
 ## 3.21.13
 - **Nové testy nejčastěji rozbíjených toků** (`tests/toky.mjs`, spouští se v `npm test`):
   - **Oblíbené:** srdíčko v přehrávači přidá a odebere (název je text), stránka Oblíbené ukáže karty bez `[object Object]`, správný počet, filtr Filmy a odebrání z karty, po obnovení stránky vše zůstane.

@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.14: srdíčko na všech kartách v řadě Oblíbené (i u starších seriálů bez TMDB ID).
 - 3.21.13: testy toků Oblíbené, přepnutí profilu a propojení dvou zařízení proti skutečnému Workeru (`tests/toky.mjs`); oprava starého seznamu v otevřených Oblíbených po přepnutí profilu.
 - Vědomě přeskočeno: PIN profilu je 4místný kód (10 000 možností), hash by ho neochránil a zásah do `gate.js`, `prefs.js` a synchronizace profilů by přinesl riziko. PIN slouží jen jako dětský zámek, proto se ukládá v čistém textu. Je i v synchronizovaných datech; sync ID je samo tajemství.
 - 3.21.12: `?v=` z hashe obsahu se při sestavení doplní i u odkazů, které parametr neměly (12 odkazů v `index.html`).
