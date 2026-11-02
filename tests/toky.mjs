@@ -95,6 +95,28 @@ const sw = await page.evaluate(async () => {
 check("profil: Oblíbené, zhlédnuté a Pokračovat jednoho profilu nejsou vidět u druhého", sw.bFav && sw.bWatched && sw.bCont === null && sw.aBack === "Matrix" && sw.aWatched && sw.aCont === "Počátek" && sw.aContBack === "Počátek", JSON.stringify(sw));
 check("profil: otevřená stránka Oblíbené se po přepnutí profilu přepíše", sw.aCards === 1 && sw.bCards === 0, JSON.stringify(sw));
 
+// --- Úvodní stránka, řada Oblíbené: srdíčko mají všechny karty (i starší seriál jen pod místním slugem) a klik ji odebere
+await seedProfiles(page, "p_A");
+const myList = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  const slug = Object.keys(db)[0];
+  saveWatchlistData([{ slug, name: db[slug].name, type: "series", poster: "" }, { slug: "__tmdbfav_movie_603", name: "Matrix", type: "movie", poster: "", tmdbId: 603 }]);
+  window.mfhResetSig && window.mfhResetSig();
+  window.renderHomepage(); await wait(2600);
+  const cards = () => [...document.querySelectorAll("#mfhMyList .nf-card")];
+  out.cards = cards().length;
+  out.hearts = cards().filter(c => c.querySelector(".nf-fav.on")).length;
+  const legacy = cards().find(c => c.querySelector(".nf-fav.on") && !/Matrix/.test(c.textContent));
+  legacy && legacy.querySelector(".nf-fav").click();
+  await wait(300);
+  out.left = getWatchlist().map(x => x.name).join();
+  out.cardsAfter = cards().length;
+  out.slug = slug;
+  return out;
+});
+check("úvodní stránka: v řadě Oblíbené mají srdíčko všechny karty (i starší seriál bez TMDB ID) a klik ji odebere", myList.cards === 2 && myList.hearts === 2 && myList.left === "Matrix" && myList.cardsAfter === 1, JSON.stringify(myList));
+
 // --- Dvě zařízení proti skutečnému Workeru
 const B = await startApp();
 const kv = new Map();

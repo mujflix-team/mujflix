@@ -399,15 +399,21 @@
       /* Srdíčko „Do oblíbených“ na kartě (stejné jako v Procházení); jen pro tituly z TMDB */
       function mfhFavInfo(it) {
         var id = it && (it.tmdbId || (it.fav && it.fav.tmdbId));
+        /* Starší oblíbený seriál bez TMDB ID (uložený jen pod místním slugem) se v řadě Oblíbené pozná podle slugu */
+        if (!id && it && !it.slug && it.fav && typeof it.fav.slug === 'string' && it.fav.slug) return { slug: it.fav.slug };
         if (!id || it.slug) return null;
         var type = (it.mediaType === 'tv' || (it.fav && it.fav.type === 'series')) ? 'tv' : 'movie';
         return { id: id, type: type };
+      }
+      function mfhFavOn(f) {
+        if (f.slug) return getWatchlist().some(function (w) { return w.slug === f.slug; });
+        return isTmdbFavorite(f.id, f.type);
       }
       function mfhFavButton(it, cid, idx) {
         var f = mfhFavInfo(it);
         if (!f || typeof isTmdbFavorite !== 'function') return '';
         var on = false;
-        try { on = isTmdbFavorite(f.id, f.type); } catch (e) {}
+        try { on = mfhFavOn(f); } catch (e) {}
         return '<button type="button" class="nf-fav' + (on ? ' on' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + (on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených') + '" aria-label="Oblíbené: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfhToggleFav(this, \'' + cid + '\', ' + idx + ')">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z"/></svg></button>';
       }
@@ -415,8 +421,9 @@
         try {
           var track = document.getElementById(cid), it = track && track._mfhItems && track._mfhItems[idx], f = mfhFavInfo(it);
           if (!f || typeof toggleTmdbFavorite !== 'function') return;
-          toggleTmdbFavorite(f.id, f.type, it.title, it.image || '', null);
-          var on = isTmdbFavorite(f.id, f.type);
+          if (f.slug) toggleWatchlistItem(f.slug);
+          else toggleTmdbFavorite(f.id, f.type, it.title, it.image || '', null);
+          var on = mfhFavOn(f);
           btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false');
           btn.title = on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených';
           _nfSig = ''; /* řada Oblíbené se při dalším vykreslení obnoví */
