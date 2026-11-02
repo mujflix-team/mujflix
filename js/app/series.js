@@ -324,7 +324,7 @@ function _sdFill(slug, next) {
     btn.textContent = "", svg && btn.appendChild(svg), btn.appendChild(document.createTextNode((seen ? "Pokračovat" : "Přehrát") + (lbl ? " · " + lbl : "")))
   }
   _sdPaint(slug, _sdCache[t.tmdbId]);
-  if (!t.tmdbId || _sdCache[t.tmdbId] || !(TMDB_KEY || window.MF_USING_TMDB_PROXY || window.MF_PROXY?.enabled)) return;
+  if (!t.tmdbId || _sdCache[t.tmdbId] || !(TMDB_KEY || window.MF_USING_TMDB_PROXY)) return;
   const id = t.tmdbId;
   Promise.all([tmdbGet(`/tv/${id}?language=cs-CZ`).catch(() => null), tmdbGet(`/tv/${id}/credits?language=cs-CZ`).catch(() => null), tmdbGet(`/tv/${id}/videos?language=cs-CZ&include_video_language=cs,en,null`).catch(() => null)]).then(([d, c, v]) => {
     const castFull = ((c && c.cast) || []).filter(x => x && x.name).slice(0, 14).map(x => ({ id: x.id, name: x.name, role: x.character || "", photo: x.profile_path ? "https://image.tmdb.org/t/p/w185" + x.profile_path : "" }));
@@ -354,7 +354,7 @@ function _sdLogo(slug) {
   const h = document.getElementById("sTitle");
   h && h.classList.remove("sd-has-logo");
   const t = db[slug];
-  if (!t || !t.tmdbId || !(TMDB_KEY || window.MF_USING_TMDB_PROXY || window.MF_PROXY?.enabled)) return;
+  if (!t || !t.tmdbId || !(TMDB_KEY || window.MF_USING_TMDB_PROXY)) return;
   mfFetchLogo("tv", t.tmdbId).then(u => {
     if (!u || slug !== activeSeries || document.getElementById("sLogo")) return;
     const im = new Image;

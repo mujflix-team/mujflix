@@ -195,43 +195,7 @@ function _tmdbMemGet(key) {
   return entry.data;
 }
 
-window.MF_PROXY = {
-  enabled: false,
-  baseUrl: '/api',
-  tmdbEndpoint: '/tmdb'
-};
-
-async function tmdbGet(e, forceDirect = false) {
-  const useProxy = window.MF_PROXY?.enabled && !forceDirect;
-
-  if (useProxy) {
-    try {
-      const base = window.MF_PROXY.baseUrl || '';
-      const endpoint = window.MF_PROXY.tmdbEndpoint || '/tmdb';
-      const baseWithSlash = base && !base.endsWith('/') ? base + '/' : base;
-      const endpointClean = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-      const cleanPath = e.startsWith('/') ? e.slice(1) : e;
-      const proxyUrl = `${baseWithSlash}${endpointClean}?path=${encodeURIComponent(cleanPath)}`;
-
-      const cached = _tmdbMemGet(proxyUrl);
-      if (cached) return cached;
-
-      const resp = await mfFetch(proxyUrl);
-      if (!resp.ok) {
-        console.warn("[TMDB-Proxy] HTTP error:", resp.status, resp.statusText);
-        
-        return tmdbGet(e, true);
-      }
-      const data = await resp.json();
-      if (!data) return null;
-      _tmdbMemSet(proxyUrl, data);
-      return data;
-    } catch (err) {
-      console.error("[TMDB-Proxy] Fetch error:", err.message, "- fallback to direct");
-      return tmdbGet(e, true);
-    }
-  }
-
+async function tmdbGet(e) {
   try {
     const t = e.startsWith("http") ? e : `${TMDB}${e}`,
       n = new URL(t);

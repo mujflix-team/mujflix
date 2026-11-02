@@ -57,7 +57,7 @@
 
   function hasKey() {
     try {
-      return !!((typeof TMDB_KEY !== 'undefined' && TMDB_KEY) || (window.MF_PROXY && window.MF_PROXY.enabled));
+      return !!((typeof TMDB_KEY !== 'undefined' && TMDB_KEY));
     } catch (e) { return false; }
   }
 
