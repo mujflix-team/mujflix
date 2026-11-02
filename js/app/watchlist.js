@@ -311,3 +311,7 @@ function submitRating(e) {
 document.getElementById("watchlistOverlay").addEventListener("click", e => {
   e.target === document.getElementById("watchlistOverlay") && closeWatchlist()
 });
+// Po přepnutí profilu při otevřených Oblíbených se seznam přepíše (jinak zůstane vidět seznam předchozího profilu)
+window.addEventListener("mf:profile-changed", () => {
+  try { const o = document.getElementById("watchlistOverlay"); o && o.classList.contains("open") && renderWatchlist() } catch (e) {}
+});
