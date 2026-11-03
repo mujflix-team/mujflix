@@ -2,6 +2,21 @@ import { startApp, check, finish } from "./helpers.mjs";
 
 const { page, errors, close } = await startApp();
 
+// --- Náhled odkazu v chatech: velký obrázek 1200×630, absolutní adresy, canonical
+const og = await page.evaluate(() => {
+  const m = n => (document.querySelector(`meta[property="${n}"], meta[name="${n}"]`) || {}).content || "";
+  return { image: m("og:image"), w: m("og:image:width"), h: m("og:image:height"), alt: m("og:image:alt"), url: m("og:url"), card: m("twitter:card"), canon: (document.querySelector('link[rel="canonical"]') || {}).href || "" };
+});
+const fsOg = await import("node:fs");
+const ogPath = og.image.replace("https://mujflix.pages.dev/", "");
+let ogSize = null;
+if (/^https:\/\/mujflix\.pages\.dev\/icons\/[\w.-]+\.png$/.test(og.image) && fsOg.existsSync(ogPath)) {
+  const buf = fsOg.readFileSync(ogPath);
+  ogSize = { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20), kb: buf.length / 1024 };
+}
+check("náhled odkazu: og:image je absolutní https a soubor existuje ve velikosti 1200×630 do 300 kB", !!ogSize && ogSize.w === 1200 && ogSize.h === 630 && ogSize.kb < 300 && og.w === "1200" && og.h === "630", JSON.stringify({ og, ogSize }));
+check("náhled odkazu: twitter:card je summary_large_image, je og:image:alt, og:url a canonical", og.card === "summary_large_image" && og.alt.length > 5 && /^https:\/\/mujflix\.pages\.dev\/$/.test(og.url) && og.canon === "https://mujflix.pages.dev/", JSON.stringify(og));
+
 // --- Hodnocení ukládá žánry a AI se z něj učí
 const rating = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
