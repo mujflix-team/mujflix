@@ -370,21 +370,6 @@
         document.addEventListener('error', mark, true);
       })();
 
-      /* Šipka u panelu Novinky míří na zvonek */
-      function nfPlaceNotifArrow() {
-        var p = document.getElementById('notifPanel'), b = document.getElementById('nfBellBtn');
-        if (!p || !b || !p.classList.contains('open') || !p.classList.contains('visible')) return;
-        var pr = p.getBoundingClientRect(), br = b.getBoundingClientRect();
-        if (!pr.width || !br.width) return;
-        var x = Math.max(16, Math.min(p.offsetWidth - 28, br.left + br.width / 2 - p.offsetLeft - 6));
-        p.style.setProperty('--notif-arrow-x', x + 'px');
-      }
-      (function () {
-        var p = document.getElementById('notifPanel');
-        if (!p) return;
-        new MutationObserver(function () { requestAnimationFrame(nfPlaceNotifArrow); }).observe(p, { attributes: true, attributeFilter: ['class'] });
-        window.addEventListener('resize', nfPlaceNotifArrow);
-      })();
       /* Při startu volá překreslení víc míst za sebou (profil, historie, oblíbené…); sloučí se do jednoho, ať řady neblikají víckrát */
       var _rhT = 0;
       window.renderHomepage = function () {

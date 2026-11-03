@@ -494,24 +494,6 @@ const TMDB_GENRE_CS = {
     10768: "valecny"
   };
 
-function _computeWatchMomentum() {
-  try {
-    const e = safeLS(uKey("mf_watch_timeline"), "[]"),
-      t = Date.now() - 6048e5,
-      n = e.filter(e => e.ts > t),
-      o = {};
-    return n.forEach(e => {
-      const t = (Date.now() - e.ts) / 6048e5,
-        n = Math.exp(2 * -t);
-      (e.genres || []).forEach(e => {
-        o[e] = (o[e] || 0) + n
-      })
-    }), o
-  } catch {
-    return {}
-  }
-}
-
 function _computePersonalRatingSignal() {
   try {
     const e = safeLS(uKey("mf_ratings"), "{}"),

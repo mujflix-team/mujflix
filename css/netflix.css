@@ -322,18 +322,10 @@ html body .wl-search { background: #2a2a2a !important; border: 0 !important; bor
 html body .wl-tab { background: transparent !important; border: 1px solid #404040 !important; border-radius: 4px !important; color: #d2d2d2 !important; box-shadow: none !important; }
 html body .wl-tab.active { background: #fff !important; border-color: #fff !important; color: #000 !important; }
 html body .wl-empty-btn { background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; }
-
-/* oznámení, nastavení a další okna */
-html body .notif-panel {
-  top: calc(var(--nf-bar-h) + 6px + env(safe-area-inset-top, 0px)) !important; right: var(--nf-pad) !important; left: auto !important;
-   background: #181818 !important; border: 1px solid #333 !important; border-radius: 6px !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8) !important; backdrop-filter: none !important;
-}
 html body .genre-editor-box, html body .pm-box { background: #181818 !important; border: 1px solid #333 !important; border-radius: 8px !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85) !important; backdrop-filter: none !important; }
 html body #mf-toast { background: #333 !important; border: 0 !important; border-radius: 4px !important; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6) !important; backdrop-filter: none !important; font-weight: 600 !important; }
 
 @media (max-width: 899px) {
-  html body .notif-panel { right: 8px !important; top: calc(56px + env(safe-area-inset-top, 0px)) !important; }
   html body .watchlist-box { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 100px) !important; }
   #mfProfileGate .pg-logo { top: 16px; }
   html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle { height: 40px; padding: 0 14px !important; font-size: 0.88rem !important; }
@@ -502,12 +494,6 @@ html body #mfProfileWelcome .pw-skip:hover { color: #fff !important; border-colo
   html body #mfProfileCreate .pc-btn-row, html body #mfProfileWelcome .pw-actions { flex-direction: column-reverse; }
   html body #mfProfileCreate .pc-btn-save, html body #mfProfileCreate .pc-btn-cancel, html body #mfProfileWelcome .pw-save, html body #mfProfileWelcome .pw-skip { width: 100%; }
 }
-
-/* ============================================================
-   Novinky (zvonek)
-   ============================================================ */
-html body .notif-panel { width: min(420px, calc(100vw - 24px)) !important; max-height: min(640px, calc(100vh - var(--nf-bar-h) - 24px)) !important; display: none; flex-direction: column; overflow: hidden; padding: 0 !important; }
-html body .notif-panel.open { display: flex !important; }
 
 /* ============================================================
    Notebooky (13–15", cca 1024–1600 px) – nic se nepřekrývá
@@ -1020,18 +1006,11 @@ html body .spoiler-blur .ep-thumb:hover .spoiler-label { opacity: 0; }
 /* Šipky u řad musí být nad zvětšenou kartou, jinak je při najetí přebije a kliknutí propadne na kartu pod nimi */
 html body .nf-arrow { z-index: 6; }
 
-/* Šipka oznámení míří na zvonek (stejně jako u menu profilu) */
-html body .notif-panel::before { content: ""; position: absolute; top: -7px; left: var(--notif-arrow-x, calc(100% - 96px)); width: 12px; height: 12px; background: #181818; border-left: 1px solid #333; border-top: 1px solid #333; transform: rotate(45deg); pointer-events: none; }
-html body .notif-panel { overflow: visible !important; }
-
 /* Miniatury epizod bez filtru brightness/saturate (stovky obrázků s filtrem zbytečně zatěžují grafiku); hover jen jemně přiblíží */
 html body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-thumb img,
 html body:not(.tv-mode):not(.appletv-mode) .episode-card:hover .ep-thumb img { filter: none !important; }
 html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb img { opacity: 0; }
 html body:not(.tv-mode):not(.appletv-mode) .episode-card.spoiler-blur .ep-thumb:hover img { opacity: 1; }
-
-/* Šipka panelu Novinky se při zavírání hned schová (žádná „druhá šipka“) */
-html body .notif-panel:not(.visible)::before { opacity: 0; transition: none; }
 .dv-brand { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
 /* ===== Dávka C: načítání, Oblíbené jako ostatní řady ===== */

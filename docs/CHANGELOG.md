@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.21.23
+- **Úklid mrtvého kódu (~330 řádků)**, bez změny chování aplikace:
+  - panel Novinky/zvonek: `checkNewEpisodes`, `fetchRecommendedNews`, `closeNotifPanel`, `mfNotify`, odznaky v docku, šipka panelu a všechna CSS pravidla `.notif-*` (prvky v aplikaci už dávno nebyly, test „zvonek už není“ to hlídá);
+  - nepoužívané funkce: `JWAvail` (přímé volání TMDB s klíčem), `MFLegalProviders` (export), `_computeWatchMomentum`, `mfSyncDockToView`, prázdná `mfSectionBtn`, nepoužité globální `_refreshPanelRatingSummary` a `_epRatingRefreshCard`.
+  - `notify.js` zůstává (editor žánrů, karta epizody, registrace service workeru), jen bez notifikací.
+
+## 3.21.23
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.22
 - **Oprava náhledu odkazů v chatech („Stránka nenalezena“):** adresa `/f|s|c/…` nemá vlastní soubor a statická vrstva pro ni vrací `404.html`, takže chat ukázal její název. Bot teď v tom případě dostane hlavní stránku z `ASSETS` s tagy titulu (status 200). Běžný prohlížeč se nemění. Testy doplněny.
 - Do `main` se dostal i nový popis náhledu (3.21.21), který v #35 chyběl.

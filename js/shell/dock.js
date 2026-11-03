@@ -64,7 +64,6 @@
       clearTimeout(timer);
       timer = setTimeout(apply, typeof delay === "number" ? delay : 60);
     }
-    window.mfSyncDockToView = sync;
     window.mfDockTarget = target;
     function init() {
       ["universeOverlay", "watchlistOverlay", "mfProfileGate", "mfSectionProtebe", "seriesModal", "mfStandaloneCinema", "cinemaModal", "mfhSeeAllModal", "dockMoreSheet", "ratingOverlay"].forEach(function (id) {

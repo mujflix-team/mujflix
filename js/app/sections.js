@@ -122,7 +122,7 @@ function _bombujMovieUrlVariants(e, t) {
     })
   }(), function() {
     let e = "serialy";
-    window.mfSectionBtn = function(e, t) {}, window.mfShowSection = function(t) {
+    window.mfShowSection = function(t) {
       e = t, window._mfCurrentSection = t;
       const n = document.querySelector(".ps-menu-scene"),
         o = document.querySelector(".key-hint"),
@@ -257,84 +257,7 @@ function _bombujMovieUrlVariants(e, t) {
         n.style.viewTransitionName = ""
       }, 700))
     }, !0)
-  }), window.JWAvail = function() {
-    const e = {},
-      t = 432e5,
-      n = void 0 !== window.TMDB_KEY ? window.TMDB_KEY : null,
-      o = {
-        flatrate: {
-          label: "Streaming",
-          color: "#30d158",
-          icon: "▶"
-        },
-        rent: {
-          label: "Pronájem",
-          color: "#ff9f0a",
-          icon: "🔑"
-        },
-        buy: {
-          label: "Koupit",
-          color: "#007AFF",
-          icon: "🛒"
-        },
-        free: {
-          label: "Zdarma",
-          color: "#5ac8fa",
-          icon: "✨"
-        }
-      };
-    async function i(o, i) {
-      const a = `${i}_${o}`,
-        s = Date.now();
-      if (e[a] && s - e[a].ts < t) return e[a].data;
-      try {
-        const n = safeLS("mf_jw_" + a, "null");
-        if (n && s - n.ts < t) return e[a] = n, n.data
-      } catch (e) {}
-      if (!n) return null;
-      try {
-        const t = "movie" === i ? `https://api.themoviedb.org/3/movie/${o}/watch/providers?api_key=${n}` : `https://api.themoviedb.org/3/tv/${o}/watch/providers?api_key=${n}`,
-          r = await fetch(t);
-        if (!r.ok) return null;
-        const l = await r.json(),
-          c = l.results?.CZ || l.results?.SK || l.results?.DE || null,
-          d = {
-            data: c,
-            ts: s
-          };
-        e[a] = d;
-        try {
-          localStorage.setItem("mf_jw_" + a, JSON.stringify(d))
-        } catch (e) {}
-        return c
-      } catch (e) {
-        return null
-      }
-    }
-    async function a(e, t, n) {
-      if (!e || !t) return;
-      e.innerHTML = '<div style="display:flex;gap:8px;align-items:center;opacity:0.35;">\n      <div class="sk-block" style="width:28px;height:28px;border-radius:8px;"></div>\n      <div class="sk-block" style="width:28px;height:28px;border-radius:8px;"></div>\n      <div class="sk-block" style="width:28px;height:28px;border-radius:8px;"></div>\n    </div>';
-      const a = await i(t, n);
-      if (!a) return void(e.innerHTML = "");
-      let s = [];
-      ["flatrate", "rent", "buy", "free"].forEach(e => {
-        if (!a[e] || !a[e].length) return;
-        const t = a[e].slice(0, 4),
-          n = o[e];
-        s.push(`\n        <div style="margin-bottom:10px;">\n          <div style="font-size:0.55rem;font-weight:700;letter-spacing:0.5px;color:${n.color};margin-bottom:5px;text-transform:uppercase;">${n.icon} ${n.label}</div>\n          <div style="display:flex;gap:6px;flex-wrap:wrap;">\n            ${t.map(e=>{return`\n              <div title="${escapeHTML(e.provider_name)}" style="width:30px;height:30px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);flex-shrink:0;cursor:default;" >\n                <img src="${t=e.logo_path,`https://image.tmdb.org/t/p/original${t}`}" alt="${e.provider_name}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">\n              </div>`;var t}).join("")}\n          </div>\n        </div>`)
-      }), 0 !== s.length ? e.innerHTML = `\n      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:4px;">\n        <div style="font-size:0.6rem;color:rgba(255,255,255,0.35);margin-bottom:8px;display:flex;align-items:center;gap:5px;">\n          <span>Dostupné přes</span>\n          <span style="opacity:0.4">·</span>\n          <a href="https://www.justwatch.com/cz" target="_blank" rel="noopener" style="color:rgba(0,122,255,0.7);text-decoration:none;font-size:0.55rem;">JustWatch</a>\n        </div>\n        ${s.join("")}\n      </div>` : e.innerHTML = '<div style="font-size:0.62rem;color:rgba(255,255,255,0.25);padding:4px 0;">Není dostupné ve streaming službách v CZ</div>'
-    }
-    return {
-      render: a,
-      fetchProviders: i,
-      injectIntoModal: function(e, t) {
-        setTimeout(() => {
-          const n = document.querySelector(".jw-avail-slot");
-          n && a(n, e, t)
-        }, 200)
-      }
-    }
-  }(), window.MFSettings = function() {
+  }), window.MFSettings = function() {
 
     function t(e) {
       return escapeHTML(e)
