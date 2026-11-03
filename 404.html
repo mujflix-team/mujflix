@@ -11,7 +11,7 @@
   /* Záloha, kdyby hosting nepřepsal /s/, /f/, /c/ na index.html: pošli odkaz do aplikace. */
   (function () {
     var p = location.pathname;
-    if (/^\/[sfc]\/[^\/]+/.test(p)) { document.documentElement.style.display = "none"; location.replace("/?mfp=" + encodeURIComponent(p)); }
+    if (/^\/[sfc]\/[^\/]+/.test(p)) { document.documentElement.style.display = "none"; location.replace("/?mfp=" + encodeURIComponent(p + location.search)); }
   })();
 </script>
   <style>

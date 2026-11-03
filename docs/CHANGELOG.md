@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.21.19
+- **Náhled odkazu na konkrétní titul v chatech (Discord, WhatsApp, Telegram, Facebook):** nová Cloudflare Pages Function (`functions/f|s|c/[[path]].js`, logika v `functions/_shared/og.js`).
+  - Běžný prohlížeč dostane `index.html` beze změny. Jen boti (Discordbot, Twitterbot, facebookexternalhit, TelegramBot, WhatsApp, Slackbot, LinkedInBot) dostanou kopii s `og:title` „<Název> – MůjFlix“, `og:description` (děj z TMDB, ~200 znaků), `og:image` (backdrop `w780`, bez něj plakát `w500` a `twitter:card=summary`), `og:url`, `canonical` a `twitter:*`.
+  - Titul se určí z `?id=<TMDB ID>` (`/f/` = film, `/s/` a `/c/` = seriál), bez `?id=` hledáním podle názvu z adresy.
+  - TMDB se volá **jen přes stávající Worker** (`TMDB_PROXY_URL` z `config.js`) s hlavičkou `Origin: https://mujflix.pages.dev` a jen cestami `/3/movie/<id>`, `/3/tv/<id>`, `/3/search/(movie|tv|multi)`. Žádný klíč ve funkci ani v repozitáři.
+  - Vše vkládané do HTML se escapuje (`& < > " '`), obrázek smí být jen z `image.tmdb.org`. Výsledek se cachuje (Cache API, 1 den). Při chybě TMDB, timeoutu (2,5 s), neexistujícím titulu nebo neplatném ID se vrátí výchozí tagy.
+  - Odpovědi Functions nemají hlavičky z `_headers`, proto je funkce přidává sama (`SECURITY_HEADERS`, test hlídá shodu s `_headers`) a posílá `Vary: User-Agent`.
+- **Odkaz s `?id=` otevře titul přímo podle ID** (`titleurl.js`); hledání podle názvu zůstává jako záloha (neplatné nebo neznámé ID, chyba TMDB). Odkaz bez `?id=` funguje jako dřív. `404.html` při záložním přesměrování zachová i `?id=`.
+- `docs/CLAUDE.md`: popsáno, že web už není čistě statický (Pages Function).
+- Testy: `tests/functions.mjs` (součást `npm test`, TMDB i Cache API zamockované) a otevírání podle `?id=` ve `tests/flows.mjs`. CSP, `_headers` ani `_redirects` jsem nemusel měnit.
+
+## 3.21.18
+- **Tlačítko Sdílet** v banneru na úvodní stránce (stejná výška a styl jako „Do oblíbených“, na šířce do 520 px jen ikona), v detailu seriálu a v liště přehrávače (jen ikona, jedno malé tlačítko navíc). Ikona je SVG, `aria-label` je „Sdílet odkaz na <název>“, ovládá se klávesnicí.
+- Chování: když existuje `navigator.share` (telefon), použije se systémové sdílení (titul, text, adresa). Jinak se adresa zkopíruje do schránky a ukáže toast „Odkaz zkopírován“ (toast je `role="status"`). Když schránka selže (HTTP, odepřeno), použije se záložní kopírování přes skrytý `<textarea>`; když selže i to, toast ukáže přímo odkaz. Zrušení sdílení uživatelem (`AbortError`) se nebere jako chyba. Nic se neposílá na server.
+- **Adresy titulů mají `?id=<TMDB ID>`:** `js/shell/titleurl.js` má jedinou funkci `window.mfTitleUrl(type, title, tmdbId)` (např. `https://mujflix.pages.dev/f/matrix?id=603`, seriál `/s/…`), kterou používá i adresní řádek. Neplatné ID se zahodí. `MFCinemaPlayer.state()` vrací navíc `id`. Otevírání odkazu podle `?id=` zatím zůstává jak bylo (hledání podle názvu); přijde s náhledy titulů.
+- Testy: slug bez diakritiky a se znaky `"`, `&`, `<`; kopírování adresy s `?id=` (schránka zamockovaná), záložní kopírování, odmítnutá schránka, `navigator.share`, `AbortError`, aria-label, adresní řádek v detailu a v přehrávači. Bez `?id=` v adrese testy selžou.
+
 ## 3.21.17
 - **Rozbalování popisu v banneru a v detailu seriálu:**
   - Když je popis useknutý „…“, na konci je značka **Více ▾** (po rozbalení **Méně ▴**). U krátkých popisů značka není. Měří se po načtení, při změně velikosti okna a při výměně titulu.
