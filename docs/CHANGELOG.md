@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.15
+- **Označit celou sezónu jako zhlédnutou:** v detailu seriálu je vedle „Všechny epizody“ tlačítko **✓ Označit sezónu**. Jedním klepnutím označí všechny díly vybrané sezóny, druhým (**✕ Zrušit zhlédnutí sezóny**) je odznačí. Ostatní sezóny se nemění, po označení se nevyvolává hodnocení dílu. Tlačítko je skryté v zobrazení „Všechny epizody“.
+- Test v `tests/toky.mjs` (označí všechny díly, druhé klepnutí je zruší, jiná sezóna zůstane).
+
 ## 3.21.14
 - **Řada Oblíbené na úvodní stránce:** srdíčko mělo jen část karet. Dostaly ho jen položky s uloženým TMDB ID, starší seriály uložené jen pod místním názvem (např. Griffinovi, Americký táta) srdíčko neměly. Teď ho má každá karta v řadě a klik ji z Oblíbených odebere.
 - Nový test (`tests/toky.mjs`): v řadě Oblíbené mají srdíčko všechny karty a klik na starší seriál ho odebere. Bez opravy test selže.

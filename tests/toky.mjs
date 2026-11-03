@@ -117,6 +117,34 @@ const myList = await page.evaluate(async () => {
 });
 check("úvodní stránka: v řadě Oblíbené mají srdíčko všechny karty (i starší seriál bez TMDB ID) a klik ji odebere", myList.cards === 2 && myList.hearts === 2 && myList.left === "Matrix" && myList.cardsAfter === 1, JSON.stringify(myList));
 
+// --- Detail seriálu: tlačítko „Označit sezónu“ označí všechny díly sezóny a druhým klepnutím je odznačí
+await seedProfiles(page, "p_A");
+const seasonMark = await page.evaluate(async () => {
+  const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
+  const slug = Object.keys(db)[0];
+  saveWatched({});
+  openSeries(slug); await wait(500);
+  const btn = document.getElementById("seasonMarkBtn"), n1 = epsInSeason(slug, 1), n2 = totalSeasons(slug) > 1 ? 2 : 0;
+  out.visible = !!btn && !btn.hidden && /Označit sezónu/.test(btn.textContent);
+  if (n2) { const w0 = getWatched(); w0[slug + "-S2-E1"] = true; saveWatched(w0); }
+  btn.click(); await wait(200);
+  const w1 = getWatched(), all1 = Array.from({ length: n1 }, (_, i) => !!w1[`${slug}-S1-E${i + 1}`]).every(Boolean);
+  out.marked = all1 && n1 > 0;
+  out.otherKept = !n2 || !!w1[slug + "-S2-E1"];
+  out.label = btn.textContent;
+  out.done = !!document.querySelector("#sdSeasons .sd-season.done");
+  out.noPrompt = !document.querySelector(".ep-rating-modal.open, #epRatingModal.open");
+  btn.click(); await wait(200);
+  const w2 = getWatched();
+  out.cleared = Array.from({ length: n1 }, (_, i) => !!w2[`${slug}-S1-E${i + 1}`]).every(v => !v);
+  out.otherKept2 = !n2 || !!w2[slug + "-S2-E1"];
+  out.label2 = btn.textContent;
+  document.getElementById("seriesModal").classList.remove("open");
+  return out;
+});
+check("detail seriálu: Označit sezónu označí všechny díly (jiné sezóny nechá), popisek se změní", seasonMark.visible && seasonMark.marked && seasonMark.otherKept && /Zrušit/.test(seasonMark.label) && seasonMark.done, JSON.stringify(seasonMark));
+check("detail seriálu: druhé klepnutí zhlédnutí sezóny zruší, jiné sezóny zůstanou", seasonMark.cleared && seasonMark.otherKept2 && /Označit/.test(seasonMark.label2), JSON.stringify(seasonMark));
+
 // --- Dvě zařízení proti skutečnému Workeru
 const B = await startApp();
 const kv = new Map();

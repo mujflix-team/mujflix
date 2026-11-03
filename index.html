@@ -813,6 +813,14 @@
                 >
                   &#x2630; Všechny epizody
                 </button>
+                <button
+                  class="season-all-btn"
+                  id="seasonMarkBtn"
+                  onclick="toggleSeasonWatched()"
+                  hidden
+                >
+                  ✓ Označit sezónu
+                </button>
               </div>
             </div>
             <div class="sd-scroller sd-seasons-wrap"><div class="sd-seasons" id="sdSeasons" role="tablist" aria-label="Sezóny"></div></div>
@@ -1792,7 +1800,7 @@
     <script src="js/profiles/gate.js?v=6" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
     <script src="js/app/core.js?v=4" defer></script>
-    <script src="js/app/series.js?v=10" defer></script>
+    <script src="js/app/series.js?v=11" defer></script>
     <script src="js/app/watchlist.js?v=5" defer></script>
     <script src="js/app/interaction.js?v=3" defer></script>
     <script src="js/app/notify.js?v=5" defer></script>
