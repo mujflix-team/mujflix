@@ -1058,6 +1058,83 @@ check("popis v banneru: totéž na šířce 768 px", descOk(768), JSON.stringify
 check("popis v banneru: totéž na šířce 390 px", descOk(390), JSON.stringify(descRes[390]));
 check("popis v banneru: krátký popis nemá značku ani roli tlačítka; text v detailu seriálu se při výměně titulu vrátí zavřený", !descShort || (descShort.more === null && descShort.role === null) && (descDetail.skip || (descDetail.reset && descDetail.noTitle)), JSON.stringify({ descShort, descDetail }));
 
+// --- Sdílení: adresa titulu s ?id= (slug bez diakritiky), tlačítko Sdílet v banneru, detailu a přehrávači
+const shareUrlT = await page.evaluate(() => ({
+  tv: mfTitleUrl("tv", 'Příliš "žluťoučký" kůň & spol. <b>', 603),
+  movie: mfTitleUrl("movie", "Šíleně smutná princezna", "1399"),
+  noId: mfTitleUrl("tv", "Dark"),
+  badId: mfTitleUrl("tv", "Dark", "abc&x=1"),
+  empty: mfTitleUrl("tv", "", 5),
+}));
+check("sdílení: adresa titulu má slug bez diakritiky a ?id= (film /f/, seriál /s/), neplatné ID se zahodí", shareUrlT.tv === "https://mujflix.pages.dev/s/prilis-zlutoucky-kun-spol-b?id=603" && shareUrlT.movie === "https://mujflix.pages.dev/f/silene-smutna-princezna?id=1399" && shareUrlT.noId === "https://mujflix.pages.dev/s/dark" && shareUrlT.badId === "https://mujflix.pages.dev/s/dark" && shareUrlT.empty === "https://mujflix.pages.dev/", JSON.stringify(shareUrlT));
+
+await descSetup(false); await page.waitForTimeout(2800);
+const shareHero = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms)), copied = [];
+  Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: async t => { copied.push(t); } }, configurable: true });
+  const btn = document.getElementById("nfHeroShare");
+  if (!btn) return { skip: true };
+  out.label = btn.getAttribute("aria-label"); out.icon = !!btn.querySelector("svg"); out.focusable = btn.tabIndex === 0 && btn.tagName === "BUTTON";
+  const type = /Seriál/.test(document.querySelector("#nfHero .nf-hero-badge")?.textContent || "") ? "s" : "f";
+  btn.click(); await w(150);
+  out.copied = copied[0] || "";
+  out.typeOk = new RegExp("^https://mujflix\\.pages\\.dev/" + type + "/h\\d\\?id=50\\d$").test(out.copied);
+  const t = document.getElementById("mf-toast");
+  out.toast = t && t.textContent; out.status = t && t.getAttribute("role");
+  // schránka selže → záložní kopírování; když selže i to, toast ukáže odkaz
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: async () => { throw new Error("denied"); } }, configurable: true });
+  const origExec = document.execCommand; let execText = null;
+  document.execCommand = c => { execText = document.querySelector("textarea[readonly]")?.value; return c === "copy"; };
+  btn.click(); await w(150);
+  out.fallback = execText === out.copied && /Odkaz zkopírován/.test(document.getElementById("mf-toast").textContent) && !document.querySelector("textarea[readonly]");
+  document.execCommand = () => false;
+  btn.click(); await w(150);
+  out.shownUrl = document.getElementById("mf-toast").textContent === out.copied;
+  document.execCommand = origExec;
+  // systémové sdílení (telefon) a zrušení uživatelem
+  const calls = []; let abort = false;
+  Object.defineProperty(navigator, "share", { value: async d => { calls.push(d); if (abort) throw new DOMException("zrušeno", "AbortError"); }, configurable: true });
+  document.getElementById("mf-toast").textContent = "";
+  btn.click(); await w(150);
+  out.shared = calls.length === 1 && calls[0].url === out.copied && !!calls[0].title && /MůjFlix/.test(calls[0].text) && document.getElementById("mf-toast").textContent === "";
+  abort = true; btn.click(); await w(150);
+  out.abortQuiet = calls.length === 2 && document.getElementById("mf-toast").textContent === "";
+  Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
+  return out;
+});
+check("sdílení v banneru: tlačítko Sdílet (ikona, aria-label s názvem) zkopíruje adresu s ?id= a ohlásí to toastem (role status)", shareHero.skip || (shareHero.icon && shareHero.focusable && /^Sdílet odkaz na H\d$/.test(shareHero.label) && shareHero.typeOk && /Odkaz zkopírován/.test(shareHero.toast) && shareHero.status === "status"), JSON.stringify(shareHero));
+check("sdílení: když selže schránka, použije se záložní kopírování; když i to, toast ukáže odkaz", shareHero.skip || (shareHero.fallback && shareHero.shownUrl), JSON.stringify(shareHero));
+check("sdílení: navigator.share dostane titul, text a adresu; zrušení uživatelem (AbortError) není chyba", shareHero.skip || (shareHero.shared && shareHero.abortQuiet), JSON.stringify(shareHero));
+
+const shareOther = await page.evaluate(async () => {
+  const out = {}, w = ms => new Promise(r => setTimeout(r, ms)), copied = [];
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: async t => { copied.push(t); } }, configurable: true });
+  // detail seriálu
+  const slug = Object.keys(db)[0];
+  openSeries(slug); await w(900);
+  const sb = document.getElementById("modalShareBtn");
+  out.detailBtn = !!sb && !!sb.querySelector("svg") && sb.getAttribute("aria-label") === "Sdílet odkaz na " + db[slug].name;
+  sb && sb.click(); await w(150);
+  out.detailUrl = copied[0] === mfTitleUrl("tv", db[slug].name, db[slug].tmdbId);
+  out.detailAddr = location.pathname + location.search;
+  out.detailAddrOk = out.detailAddr === new URL(mfTitleUrl("tv", db[slug].name, db[slug].tmdbId)).pathname + new URL(mfTitleUrl("tv", db[slug].name, db[slug].tmdbId)).search;
+  closeModal(); await w(900);
+  // přehrávač
+  MFCinemaPlayer.open("603", "Matrix", "movie"); await w(900);
+  const pb = document.getElementById("mfCinShareBtn");
+  out.playerBtn = !!pb && !!pb.querySelector("svg") && pb.getAttribute("aria-label") === "Sdílet odkaz na Matrix";
+  pb && pb.click(); await w(150);
+  out.playerUrl = copied[1] === "https://mujflix.pages.dev/f/matrix?id=603";
+  out.playerAddr = location.pathname + location.search;
+  MFCinemaPlayer.close(); await w(900);
+  out.homeAddr = location.pathname + location.search;
+  return out;
+});
+check("sdílení v detailu seriálu: tlačítko zkopíruje adresu s ?id= a adresní řádek ji nese", shareOther.detailBtn && shareOther.detailUrl && shareOther.detailAddrOk, JSON.stringify(shareOther));
+check("sdílení v přehrávači: tlačítko zkopíruje /f/matrix?id=603, adresní řádek ji nese a po zavření se vrátí", shareOther.playerBtn && shareOther.playerUrl && shareOther.playerAddr === "/f/matrix?id=603" && /^\/(index\.html)?$/.test(shareOther.homeAddr), JSON.stringify(shareOther));
+await page.evaluate(() => { window.fetch = window.__origFetchDesc || window.fetch; localStorage.removeItem("mf_tmdb_key"); });
+
 const heartT = await page.evaluate(async () => {
   const out = { pageErr: [] }, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
   const onErr = e => out.pageErr.push(String(e.message || e)); window.addEventListener("error", onErr);

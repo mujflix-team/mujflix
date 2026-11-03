@@ -651,6 +651,7 @@
             '<div class="nf-hero-actions">' +
               '<button type="button" class="nf-btn nf-btn-primary" id="nfHeroPlay"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>' + esc(h.playLabel) + '</span></button>' +
               '<button type="button" class="nf-btn nf-btn-ghost" id="nfHeroFav"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + HEART_PATH + '"/></svg><span></span></button>' +
+              '<button type="button" class="nf-btn nf-btn-ghost nf-btn-share" id="nfHeroShare"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg><span>Sdílet</span></button>' +
             '</div>' +
           '</div>';
         var play = document.getElementById('nfHeroPlay');
@@ -670,6 +671,14 @@
           fav.querySelector('span').textContent = on ? 'V oblíbených' : 'Do oblíbených';
         }
         fav.addEventListener('click', function () { h.onFav(); paintFav(); });
+        var shareBtn = document.getElementById('nfHeroShare');
+        if (shareBtn) {
+          shareBtn.setAttribute('aria-label', 'Sdílet odkaz na ' + (h.title || 'titul'));
+          shareBtn.addEventListener('click', function () {
+            var sh = h.share ? h.share() : { type: 'tv', title: h.title };
+            if (typeof window.mfShareTitle === 'function') window.mfShareTitle(sh.type, sh.title, sh.id);
+          });
+        }
         paintFav();
         if (h.after) h.after();
       }
@@ -679,6 +688,7 @@
           image: c.image, title: c.title, eyebrow: 'Pokračovat ve sledování',
           episode: c.left ? c.episode + ' · ' + c.left : c.episode, progress: c.progress, playLabel: 'Pokračovat', onDone: window.mfhFinishContinue,
           onPlay: function () { window.mfhResume(); },
+          share: function () { var id = c.tmdbId || (c.slug && typeof db !== 'undefined' && db[c.slug] && db[c.slug].tmdbId) || ''; return { type: c.kind === 'movie' ? 'movie' : 'tv', id: id, title: c.title }; },
           isFav: function () {
             try { return c.slug && getWatchlist().some(function (w) { return w.slug === c.slug; }); } catch (e) { return false; }
           },
@@ -730,6 +740,7 @@
           genres: (it.genreIds || []).map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean),
           playLabel: 'Přehrát',
           onPlay: function () { mfhOpenCard(it.title, it.tmdbId, it.mediaType); },
+          share: function () { return { type: it.mediaType === 'tv' ? 'tv' : 'movie', id: it.tmdbId, title: it.title }; },
           isFav: function () { try { return isTmdbFavorite(it.tmdbId, it.mediaType); } catch (e) { return false; } },
           onFav: function () {
             if (typeof toggleTmdbFavorite === 'function') toggleTmdbFavorite(it.tmdbId, it.mediaType, it.title, it.image, null);
