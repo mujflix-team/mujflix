@@ -2,6 +2,21 @@ import { startApp, check, finish } from "./helpers.mjs";
 
 const { page, errors, close } = await startApp();
 
+// --- Náhled odkazu v chatech: velký obrázek 1200×630, absolutní adresy, canonical
+const og = await page.evaluate(() => {
+  const m = n => (document.querySelector(`meta[property="${n}"], meta[name="${n}"]`) || {}).content || "";
+  return { image: m("og:image"), w: m("og:image:width"), h: m("og:image:height"), alt: m("og:image:alt"), url: m("og:url"), card: m("twitter:card"), canon: (document.querySelector('link[rel="canonical"]') || {}).href || "" };
+});
+const fsOg = await import("node:fs");
+const ogPath = og.image.replace("https://mujflix.pages.dev/", "");
+let ogSize = null;
+if (/^https:\/\/mujflix\.pages\.dev\/icons\/[\w.-]+\.png$/.test(og.image) && fsOg.existsSync(ogPath)) {
+  const buf = fsOg.readFileSync(ogPath);
+  ogSize = { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20), kb: buf.length / 1024 };
+}
+check("náhled odkazu: og:image je absolutní https a soubor existuje ve velikosti 1200×630 do 300 kB", !!ogSize && ogSize.w === 1200 && ogSize.h === 630 && ogSize.kb < 300 && og.w === "1200" && og.h === "630", JSON.stringify({ og, ogSize }));
+check("náhled odkazu: twitter:card je summary_large_image, je og:image:alt, og:url a canonical", og.card === "summary_large_image" && og.alt.length > 5 && /^https:\/\/mujflix\.pages\.dev\/$/.test(og.url) && og.canon === "https://mujflix.pages.dev/", JSON.stringify(og));
+
 // --- Hodnocení ukládá žánry a AI se z něj učí
 const rating = await page.evaluate(() => {
   const slug = Object.keys(db)[0];
@@ -568,7 +583,8 @@ check("avatary: bez AniListu se ukáže hláška + Zkusit znovu a ostatní řady
 // --- Popis s „…“ se po kliknutí rozbalí
 const dsT = await page.evaluate(() => {
   const p = document.createElement("p"); p.className = "nf-hero-desc"; p.textContent = "x ".repeat(400); document.body.appendChild(p);
-  p.click(); const open = p.classList.contains("is-open"), dsp = getComputedStyle(p).webkitLineClamp; p.click(); const closed = !p.classList.contains("is-open"); p.remove();
+  window.mfDescInit(p);
+  p.click(); const open = p.classList.contains("is-open"), dsp = getComputedStyle(p).webkitLineClamp; p.click(); const closed = !p.classList.contains("is-open"); p._mfMore && p._mfMore.remove(); p.remove();
   return { open, dsp, closed };
 });
 check("popis: klik rozbalí celý text a další klik ho sbalí", dsT.open && dsT.closed && (dsT.dsp === "none" || dsT.dsp === "unset"), JSON.stringify(dsT));
@@ -1000,6 +1016,62 @@ const swT = await page.evaluate(async () => {
   return { none: true };
 });
 check("service worker: adresa skriptu nese verzi aplikace (nová verze = nová cache)", swT.none || swT.url.endsWith("/sw.js?v=" + encodeURIComponent(swT.v)), JSON.stringify(swT));
+
+// --- Popis v banneru: „Více ▾“ jen u useknutého textu, rozbalení nevytlačí tlačítka, klávesnice, reset při výměně titulu
+const descSetup = short => page.evaluate(short => {
+  window.__origFetchDesc = window.__origFetchDesc || window.fetch;
+  window.__SHORT = short;
+  window.fetch = async u => {
+    if (/\/videos/.test(String(u))) return { ok: true, json: async () => ({ results: [] }) };
+    const ov = window.__SHORT ? "Krátký popis." : "Dlouhý popis filmu o ničem. ".repeat(40);
+    return { ok: true, json: async () => ({ results: Array.from({ length: 10 }, (_, i) => ({ id: 500 + i, title: "H" + i, name: "H" + i, overview: ov, poster_path: "/p.jpg", backdrop_path: "/b.jpg", vote_average: 7, release_date: "2020-01-01", first_air_date: "2020-01-01", genre_ids: [18] })) }) };
+  };
+  localStorage.setItem("mf_tmdb_key", "K");
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  const ps = _getProfiles(), p = ps.find(x => x.id === getActiveProfileId());
+  if (p) { p.prefs = { ...p.prefs, maxAge: 0, animeOnly: false }; _saveProfiles(ps); }
+  window.mfhResetSig && window.mfhResetSig(); window.renderHomepage();
+}, short);
+const descState = () => page.evaluate(() => {
+  const d = document.querySelector("#nfHero .nf-hero-desc"), play = document.getElementById("nfHeroPlay"), hero = document.getElementById("nfHero");
+  if (!d || !play || !hero) return null;
+  const more = d.nextElementSibling, pb = play.getBoundingClientRect(), hb = hero.getBoundingClientRect();
+  return { exp: d.getAttribute("aria-expanded"), role: d.getAttribute("role"), tab: d.getAttribute("tabindex"), title: d.getAttribute("title"), more: more && more.classList.contains("mf-desc-more") && getComputedStyle(more).display !== "none" ? more.textContent : null, playTop: Math.round(pb.top), inHero: pb.top >= hb.top && pb.bottom <= hb.bottom + 1 };
+});
+const descRes = {};
+for (const [w, h] of [[1280, 800], [768, 1024], [390, 844]]) {
+  await page.setViewportSize({ width: w, height: h });
+  await descSetup(false); await page.waitForTimeout(2800);
+  const a = await descState();
+  if (!a) { descRes[w] = { skip: true }; continue; }
+  await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(250);
+  const b = await descState();
+  await page.click("#nfHero .mf-desc-more"); await page.waitForTimeout(150);
+  const c = await descState();
+  await page.focus("#nfHero .nf-hero-desc"); await page.keyboard.press("Enter"); await page.waitForTimeout(150);
+  const d2 = await descState();
+  await page.keyboard.press(" "); await page.waitForTimeout(150);
+  const e2 = await descState();
+  await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(150);
+  await descSetup(false); await page.waitForTimeout(2800); // výměna titulu: banner se vykreslí znovu
+  const f = await descState();
+  descRes[w] = { a, b, c, d2, e2, f };
+}
+await page.setViewportSize({ width: 1280, height: 800 });
+await descSetup(true); await page.waitForTimeout(2800);
+const descShort = await descState();
+const descDetail = await page.evaluate(async () => {
+  const o = document.getElementById("sOverview");
+  if (!o) return { skip: true };
+  o.classList.add("is-open", "is-scrollable"); o.textContent = "Jiný titul"; await new Promise(r => setTimeout(r, 100));
+  return { reset: !o.classList.contains("is-open") && !o.classList.contains("is-scrollable"), noTitle: !o.hasAttribute("title") };
+});
+await page.evaluate(() => { window.fetch = window.__origFetchDesc || window.fetch; localStorage.removeItem("mf_tmdb_key"); });
+const descOk = w => { const r = descRes[w]; return !r || r.skip || (r.a.more === "Více ▾" && r.a.exp === "false" && r.a.role === "button" && r.a.tab === "0" && r.a.title === null && r.b.exp === "true" && r.b.more === "Méně ▴" && r.b.inHero && r.b.playTop === r.a.playTop && r.c.exp === "false" && r.c.more === "Více ▾" && r.d2.exp === "true" && r.e2.exp === "false" && r.f.exp === "false"); };
+check("popis v banneru: značka Více ▾, klik rozbalí (aria-expanded, tlačítko Přehrát zůstane na místě a v banneru), druhý klik, Enter a Mezerník ovládají, nová vykreslení je zavřené, bez title (1280 px)", descOk(1280), JSON.stringify(descRes[1280]));
+check("popis v banneru: totéž na šířce 768 px", descOk(768), JSON.stringify(descRes[768]));
+check("popis v banneru: totéž na šířce 390 px", descOk(390), JSON.stringify(descRes[390]));
+check("popis v banneru: krátký popis nemá značku ani roli tlačítka; text v detailu seriálu se při výměně titulu vrátí zavřený", !descShort || (descShort.more === null && descShort.role === null) && (descDetail.skip || (descDetail.reset && descDetail.noTitle)), JSON.stringify({ descShort, descDetail }));
 
 const heartT = await page.evaluate(async () => {
   const out = { pageErr: [] }, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
