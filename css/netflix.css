@@ -1792,3 +1792,10 @@ html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba
 
 /* Výběr profilu na telefonu: číslo verze se neukazuje */
 @media (hover: none), (max-width: 520px) { html body #mfProfileGate .pg-version { display: none; } }
+
+/* Tlačítko Sdílet: v banneru stejné jako „Do oblíbených“, na úzké šířce jen ikona */
+.nf-btn-share svg { flex: 0 0 auto; }
+@media (max-width: 520px) {
+  .nf-btn-share { flex: 0 0 44px; padding: 0; }
+  .nf-btn-share span { display: none; }
+}
