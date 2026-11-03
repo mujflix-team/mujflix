@@ -1150,6 +1150,38 @@ check("sdílení v detailu seriálu: tlačítko zkopíruje adresu s ?id= a adres
 check("sdílení v přehrávači: tlačítko zkopíruje /f/matrix?id=603, adresní řádek ji nese a po zavření se vrátí", shareOther.playerBtn && shareOther.playerUrl && shareOther.playerAddr === "/f/matrix?id=603" && /^\/(index\.html)?$/.test(shareOther.homeAddr), JSON.stringify(shareOther));
 await page.evaluate(() => { window.fetch = window.__origFetchDesc || window.fetch; localStorage.removeItem("mf_tmdb_key"); });
 
+// --- Odkaz s ?id= otevře titul přímo podle ID (hledání podle názvu je jen záloha), bez ?id= funguje jako dřív
+const idOpenT = await page.evaluate(async () => {
+  const log = [], opened = [], saved = { tmdbGet: window.tmdbGet, tv: window.openDiscoverTv, card: window.mfhOpenCard, play: MFCinemaPlayer.open };
+  window.tmdbGet = async p => {
+    log.push(p);
+    if (/^\/tv\/70523\?/.test(p)) return { id: 70523, name: "Dark" };
+    if (/^\/movie\/603\?/.test(p)) return { id: 603, title: "Matrix" };
+    if (/^\/(tv|movie)\/\d+/.test(p)) return null;
+    if (/search\/tv/.test(p)) return { results: [{ id: 1, name: "Dark" }] };
+    if (/search\/movie/.test(p)) return { results: [{ id: 2, title: "Matrix" }] };
+    if (/search\/multi/.test(p)) return { results: [{ id: 3, media_type: "tv", name: "Dark" }] };
+    return { results: [] };
+  };
+  window.openDiscoverTv = (id, n) => opened.push(["tv", id, n]);
+  window.mfhOpenCard = (n, id, t) => opened.push([t, id, n]);
+  MFCinemaPlayer.open = (id, n, t, o) => opened.push(["play", id, n, t, o && o.season, o && o.episode]);
+  const out = {};
+  const step = async (key, path) => { log.length = 0; opened.length = 0; await mfOpenTitleFromPath(path); out[key] = { log: log.slice(), opened: opened.slice() }; };
+  await step("tvId", "/s/dark?id=70523");
+  await step("movieId", "/f/matrix?id=603");
+  await step("noId", "/s/dark");
+  await step("unknownId", "/s/dark?id=999");
+  await step("badId", "/s/dark?id=abc");
+  await step("episode", "/c/dark-s01e02?id=70523");
+  Object.assign(window, { tmdbGet: saved.tmdbGet, openDiscoverTv: saved.tv, mfhOpenCard: saved.card }); MFCinemaPlayer.open = saved.play;
+  return out;
+});
+const J = x => JSON.stringify(x);
+check("odkaz s ?id=: seriál i film se otevře podle ID, bez hledání podle názvu", idOpenT.tvId.log.length === 1 && /^\/tv\/70523\?/.test(idOpenT.tvId.log[0]) && J(idOpenT.tvId.opened) === J([["tv", 70523, "Dark"]]) && idOpenT.movieId.log.length === 1 && J(idOpenT.movieId.opened) === J([["movie", 603, "Matrix"]]), J(idOpenT));
+check("odkaz s ?id=: přehrávač /c/ s ?id= se otevře od dané epizody", J(idOpenT.episode.opened) === J([["play", 70523, "Dark", "tv_ep", 1, 2]]) && idOpenT.episode.log.length === 1, J(idOpenT.episode));
+check("odkaz bez ?id= (nebo s neplatným / neznámým ID) funguje jako dřív: hledání podle názvu", J(idOpenT.noId.opened) === J([["tv", 1, "Dark"]]) && /search\/tv/.test(idOpenT.noId.log[0]) && J(idOpenT.unknownId.opened) === J([["tv", 1, "Dark"]]) && /^\/tv\/999/.test(idOpenT.unknownId.log[0]) && /search\/tv/.test(idOpenT.unknownId.log[1]) && J(idOpenT.badId.opened) === J([["tv", 1, "Dark"]]) && idOpenT.badId.log.length === 1, J(idOpenT));
+
 const heartT = await page.evaluate(async () => {
   const out = { pageErr: [] }, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
   const onErr = e => out.pageErr.push(String(e.message || e)); window.addEventListener("error", onErr);

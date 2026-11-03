@@ -31,5 +31,5 @@ export default [
       "eqeqeq": ["warn", "smart"],
     },
   },
-  { files: ["scripts/eslint.config.js", "tests/**"], languageOptions: { sourceType: "module", globals: { ...globals.node } }, rules: { "no-undef": "off" } },
+  { files: ["scripts/eslint.config.js", "tests/**", "functions/**"], languageOptions: { sourceType: "module", globals: { ...globals.node } }, rules: { "no-undef": "off" } },
 ];

@@ -153,9 +153,34 @@
     return { kind: m[1], slug: sl, season: se || 1, episode: ep || 1 };
   }
 
+  /* TMDB ID z dotazu adresy (?id=123); neplatné ID se ignoruje */
+  function parseId(p) {
+    var m = /[?&]id=(\d{1,9})(?:[&#]|$)/.exec(p || "");
+    return m ? m[1] : "";
+  }
+
+  /* Otevře nalezený titul: přehrávač (/c/), detail seriálu, nebo film */
+  function openResolved(r, isTv, id, name) {
+    if (r.kind === "c") {
+      if (window.MFCinemaPlayer) {
+        backTo = isTv ? { id: id, name: name } : null;
+        MFCinemaPlayer.open(id, name, isTv ? "tv_ep" : "movie", { season: r.season, episode: r.episode });
+      }
+    } else if (isTv) openDiscoverTv(id, name);
+    else if (typeof mfhOpenCard === "function") mfhOpenCard(name, id, "movie");
+  }
+
   async function openTitleFromPath(p) {
     var r = parsePath(p);
     if (!r || !r.slug || typeof tmdbGet !== "function") return false;
+    /* S ?id= se titul otevře přímo podle ID; hledání podle názvu je záloha (neplatné ID, chyba TMDB) */
+    var id = parseId(p);
+    if (id) {
+      var isTvId = r.kind !== "f", dd = null;
+      try { dd = await tmdbGet("/" + (isTvId ? "tv" : "movie") + "/" + id + "?language=cs-CZ"); } catch (e) {}
+      var nm = dd && dd.id && (dd.name || dd.title);
+      if (nm) { openResolved(r, isTvId, dd.id, nm); return true; }
+    }
     var type = r.kind === "s" ? "tv" : r.kind === "f" ? "movie" : "multi";
     var q = encodeURIComponent(r.slug.replace(/-/g, " "));
     var d = null;
@@ -169,13 +194,7 @@
     }
     var name = hit.name || hit.title;
     var isTv = type === "tv" || (type === "multi" && hit.media_type === "tv");
-    if (r.kind === "c") {
-      if (window.MFCinemaPlayer) {
-        backTo = isTv ? { id: hit.id, name: name } : null;
-        MFCinemaPlayer.open(hit.id, name, isTv ? "tv_ep" : "movie", { season: r.season, episode: r.episode });
-      }
-    } else if (isTv) openDiscoverTv(hit.id, name);
-    else if (typeof mfhOpenCard === "function") mfhOpenCard(name, hit.id, "movie");
+    openResolved(r, isTv, hit.id, name);
     return true;
   }
   window.mfOpenTitleFromPath = openTitleFromPath;
@@ -184,7 +203,7 @@
   function init() {
     hook();
     /* přesměrování z 404.html: /?mfp=/c/nazev-s01e02 */
-    var path = location.pathname;
+    var path = location.pathname + location.search;
     try {
       var q = new URLSearchParams(location.search).get("mfp");
       if (q && /^\/[sfc]\//.test(q)) { path = q; history.replaceState(history.state, "", q); }
