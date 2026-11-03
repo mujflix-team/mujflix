@@ -133,9 +133,19 @@ export async function handle(context, type) {
   let base = null;
   try {
     base = await context.next();
-    if (!base.ok || !/text\/html/i.test(base.headers.get("Content-Type") || "")) return base;
+    const isHtml = r => r && r.ok && /text\/html/i.test(r.headers.get("Content-Type") || "");
+    let shell = base;
+    /* Adresa /f|s|c/… nemá vlastní soubor a pravidlo z _redirects se tu nemusí uplatnit → statická vrstva vrátí 404.html.
+       Botovi pak vezmeme hlavní stránku přímo z ASSETS (stejně jako ji dostane prohlížeč po přesměrování). */
+    if (!isHtml(shell) && env.ASSETS) {
+      for (const p of ["/", "/index.html"]) {
+        const r = await env.ASSETS.fetch(new Request(SITE_ORIGIN + p, { redirect: "follow" })).catch(() => null);
+        if (isHtml(r)) { shell = r; break; }
+      }
+    }
+    if (!isHtml(shell)) return base;
     const url = new URL(request.url);
-    const html = await base.clone().text();
+    const html = await shell.clone().text();
     const timeoutMs = Number(env.OG_TIMEOUT_MS) || DEFAULT_TIMEOUT_MS;
     const idRaw = url.searchParams.get("id") || "";
     const keyPart = /^\d{1,9}$/.test(idRaw) ? idRaw : "q-" + (url.pathname.split("/")[2] || "");

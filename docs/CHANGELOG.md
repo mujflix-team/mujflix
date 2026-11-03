@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.21.22
+- **Oprava náhledu odkazů v chatech („Stránka nenalezena“):** adresa `/f|s|c/…` nemá vlastní soubor a statická vrstva pro ni vrací `404.html`, takže chat ukázal její název. Bot teď v tom případě dostane hlavní stránku z `ASSETS` s tagy titulu (status 200). Běžný prohlížeč se nemění. Testy doplněny.
+- Do `main` se dostal i nový popis náhledu (3.21.21), který v #35 chyběl.
+
+## 3.21.22
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.21
 - **Nový popis náhledu odkazu:** „Seriál · 2005 · ★ 7,9 — začátek děje…“ (film/seriál, rok, hodnocení z TMDB a zkrácený děj, celkem do ~200 znaků). Bez děje zůstane jen první část. Test formátu přidán.
 

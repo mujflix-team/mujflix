@@ -61,7 +61,10 @@ const isDefault = t => t === INDEX;
   const { res, text } = await run(onF, "/f/matrix?id=603", { ua: CHROME, fetchFn: mkFetch(() => json(MOVIE)) });
   check("funkce: běžný prohlížeč dostane původní index.html beze změny (pustí se dál přes next()) a TMDB se nevolá", isDefault(text) && calls.length === 0 && nextCalls === 1 && res.status === 200, String(calls.length));
   const nf = await run(onF, "/f/matrix?id=603", { next: () => new Response("<h1>Stránka nebyla nalezena</h1>", { status: 404, headers: { "Content-Type": "text/html" } }), fetchFn: mkFetch(() => json(MOVIE)) });
-  check("funkce: když statická stránka není (404), bot dostane totéž a TMDB se nevolá", nf.res.status === 404 && /nebyla nalezena/.test(nf.text) && calls.length === 0);
+  check("funkce: když next() vrátí 404.html, bot dostane index.html z ASSETS s tagy titulu (status 200)", nf.res.status === 200 && metaOf(nf.text, "og:title") === "Matrix – MůjFlix" && !/nebyla nalezena/.test(nf.text), nf.text.slice(0, 80));
+  const none = { fetch: async () => new Response("x", { status: 404 }) };
+  const nn = await run(onF, "/f/matrix?id=603", { env: { ASSETS: none }, next: () => new Response("<h1>Stránka nebyla nalezena</h1>", { status: 404, headers: { "Content-Type": "text/html" } }), fetchFn: mkFetch(() => json(MOVIE)) });
+  check("funkce: když není ani index.html v ASSETS, bot dostane původní 404 a TMDB se nevolá", nn.res.status === 404 && /nebyla nalezena/.test(nn.text));
   const nx = await run(onF, "/f/matrix?id=603", { next: () => { throw new Error("next selhal"); }, fetchFn: mkFetch(() => json(MOVIE)) });
   check("funkce: když selže statická vrstva, vrátí se 502 a TMDB se nevolá", nx.res.status === 502 && calls.length === 0);
 }
