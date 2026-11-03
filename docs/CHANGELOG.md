@@ -15,6 +15,12 @@
 - Testy: značka a rozbalení na 3 šířkách (tlačítko Přehrát na místě a celé v banneru), klávesnice, krátký popis bez značky, reset při výměně titulu. Bez opravy rozložení testy selžou.
 - Pozn.: popis v záložce Popis detailu seriálu se nikdy neusekává, takže tam značku neuvidíš; chování je ale stejné, kdyby se tam text useknul.
 
+## 3.21.16
+- **Hezký náhled odkazu v chatech (Discord, WhatsApp, Telegram, Facebook):** místo malé čtvercové ikony se ukáže velká karta. Nový obrázek `icons/og-image.png` (1200×630, 27 kB: logo MůjFlix a „Filmy a seriály na jednom místě“) se vyrábí skriptem `scripts/og-image.mjs` (`node scripts/og-image.mjs`, Playwright; písmo z `fonts/`).
+- `index.html`: `og:image` ukazuje na nový obrázek, přibyly `og:image:width`, `og:image:height`, `og:image:alt`, `og:url` a `<link rel="canonical">`, `twitter:card` je `summary_large_image`. Ikony záložek a PWA se nemění.
+- Test: `og:image` je absolutní https adresa, soubor existuje a má 1200×630 do 300 kB, `twitter:card` je `summary_large_image`.
+- Tuto úpravu navazuje na #30 (verze 3.21.15), proto číslo 3.21.16 (13 a 14 už jsou obsazené dřívějšími PR).
+
 ## 3.21.15
 - **Označit celou sezónu jako zhlédnutou:** v detailu seriálu je vedle „Všechny epizody“ tlačítko **✓ Označit sezónu**. Jedním klepnutím označí všechny díly vybrané sezóny, druhým (**✕ Zrušit zhlédnutí sezóny**) je odznačí. Ostatní sezóny se nemění, po označení se nevyvolává hodnocení dílu. Tlačítko je skryté v zobrazení „Všechny epizody“.
 - Test v `tests/toky.mjs` (označí všechny díly, druhé klepnutí je zruší, jiná sezóna zůstane).
