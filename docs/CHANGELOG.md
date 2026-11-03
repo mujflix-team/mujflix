@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.20
+- **Oprava „Stránka nebyla nalezena“ u odkazů /f/, /s/, /c/:** funkce pro náhled (3.21.19) načítala `index.html` i běžným návštěvníkům sama přes `env.ASSETS`, a když to nevyšlo, ukázala se stránka 404. Teď se běžný prohlížeč jen pustí dál přes `context.next()`, tedy stejnou cestou jako před funkcí (statický soubor + pravidla v `_redirects`). Funkce upravuje HTML jen pro boty chatů, a to z odpovědi `next()`. Když není co upravit (404 nebo jiný než HTML), bot dostane totéž.
+- Tlačítko **Sdílet** (3.21.18) a funkce pro náhled titulů (3.21.19) se omylem slily do vedlejších větví a v `main` nebyly; tento PR je dává do `main`.
+- Testy funkce upraveny (průchod přes `next()`, statická 404 pro bota, selhání statické vrstvy).
+
 ## 3.21.19
 - **Náhled odkazu na konkrétní titul v chatech (Discord, WhatsApp, Telegram, Facebook):** nová Cloudflare Pages Function (`functions/f|s|c/[[path]].js`, logika v `functions/_shared/og.js`).
   - Běžný prohlížeč dostane `index.html` beze změny. Jen boti (Discordbot, Twitterbot, facebookexternalhit, TelegramBot, WhatsApp, Slackbot, LinkedInBot) dostanou kopii s `og:title` „<Název> – MůjFlix“, `og:description` (děj z TMDB, ~200 znaků), `og:image` (backdrop `w780`, bez něj plakát `w500` a `twitter:card=summary`), `og:url`, `canonical` a `twitter:*`.

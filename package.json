@@ -1,6 +1,6 @@
 {
   "name": "mujflix",
-  "version": "3.21.19",
+  "version": "3.21.20",
   "private": true,
   "type": "module",
   "description": "MůjFlix — osobní tracker filmů a seriálů (statická PWA)",

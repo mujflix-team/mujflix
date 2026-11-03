@@ -29,9 +29,11 @@ const mkFetch = handler => async (url, init) => { calls.push({ url: String(url),
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { "Content-Type": "application/json" } });
 const MOVIE = { id: 603, title: "Matrix", overview: "Programátor Neo zjistí, že svět kolem něj je simulace. ".repeat(8), backdrop_path: "/bd.jpg", poster_path: "/po.jpg" };
 
-async function run(fn, path, { ua = DISCORD, fetchFn, env = {}, method = "GET" } = {}) {
-  store.clear(); calls.length = 0;
-  const res = await fn({ request: new Request("https://mujflix.pages.dev" + path, { method, headers: { "User-Agent": ua } }), env: { ASSETS: assets, ...env }, fetchFn });
+let nextCalls = 0;
+const staticPage = () => { nextCalls++; return new Response(INDEX, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } }); };
+async function run(fn, path, { ua = DISCORD, fetchFn, env = {}, method = "GET", next = staticPage } = {}) {
+  store.clear(); calls.length = 0; nextCalls = 0;
+  const res = await fn({ request: new Request("https://mujflix.pages.dev" + path, { method, headers: { "User-Agent": ua } }), env: { ASSETS: assets, ...env }, fetchFn, next });
   return { res, text: await res.text() };
 }
 const metaOf = (html, prop) => { const m = new RegExp(`<meta (?:property|name)="${prop}" content="([^"]*)"`).exec(html); return m ? m[1] : null; };
@@ -41,7 +43,7 @@ const isDefault = t => t === INDEX;
 {
   const { res, text } = await run(onF, "/f/matrix?id=603", { fetchFn: mkFetch(() => json(MOVIE)) });
   check("funkce: Discordbot a platné ?id= dostane og:title s názvem a obrázek z TMDB", metaOf(text, "og:title") === "Matrix – MůjFlix" && metaOf(text, "og:image") === "https://image.tmdb.org/t/p/w780/bd.jpg" && metaOf(text, "twitter:card") === "summary_large_image" && metaOf(text, "og:url") === "https://mujflix.pages.dev/f/matrix?id=603" && /<link rel="canonical" href="https:\/\/mujflix\.pages\.dev\/f\/matrix\?id=603"/.test(text), text.slice(text.indexOf("<title>"), text.indexOf("<title>") + 400));
-  check("funkce: popis z TMDB je nejvýš ~200 znaků, status 200, HTML a hlavičky zabezpečení i Vary", metaOf(text, "og:description").length <= 205 && /…$/.test(metaOf(text, "og:description")) && res.status === 200 && /text\/html/.test(res.headers.get("content-type")) && res.headers.get("X-Frame-Options") === "DENY" && res.headers.get("Vary") === "User-Agent", metaOf(text, "og:description"));
+  check("funkce: popis z TMDB je nejvýš ~200 znaků, status 200, HTML a hlavičky zabezpečení i Vary (u bota)", metaOf(text, "og:description").length <= 205 && /…$/.test(metaOf(text, "og:description")) && res.status === 200 && /text\/html/.test(res.headers.get("content-type")) && res.headers.get("X-Frame-Options") === "DENY" && res.headers.get("Vary") === "User-Agent", metaOf(text, "og:description"));
   const c = calls[0];
   check("funkce: TMDB se volá jen přes Worker, povolenou cestou, s Origin a bez klíče", calls.length === 1 && c.url === WORKER + "/3/movie/603?language=cs-CZ" && c.headers.Origin === "https://mujflix.pages.dev" && !/api_key|Authorization/i.test(JSON.stringify(c)), JSON.stringify(calls));
   check("funkce: zbytek stránky (CSP, skripty, ostatní og: tagy) zůstane", text.includes('http-equiv="Content-Security-Policy"') && text.includes('og:site_name') && text.includes("js/core/version.js"));
@@ -56,7 +58,11 @@ const isDefault = t => t === INDEX;
 // --- Běžný prohlížeč: původní index.html beze změny, TMDB se nevolá
 {
   const { res, text } = await run(onF, "/f/matrix?id=603", { ua: CHROME, fetchFn: mkFetch(() => json(MOVIE)) });
-  check("funkce: běžný prohlížeč dostane původní index.html beze změny a TMDB se nevolá", isDefault(text) && calls.length === 0 && res.status === 200 && res.headers.get("Strict-Transport-Security") !== null, String(calls.length));
+  check("funkce: běžný prohlížeč dostane původní index.html beze změny (pustí se dál přes next()) a TMDB se nevolá", isDefault(text) && calls.length === 0 && nextCalls === 1 && res.status === 200, String(calls.length));
+  const nf = await run(onF, "/f/matrix?id=603", { next: () => new Response("<h1>Stránka nebyla nalezena</h1>", { status: 404, headers: { "Content-Type": "text/html" } }), fetchFn: mkFetch(() => json(MOVIE)) });
+  check("funkce: když statická stránka není (404), bot dostane totéž a TMDB se nevolá", nf.res.status === 404 && /nebyla nalezena/.test(nf.text) && calls.length === 0);
+  const nx = await run(onF, "/f/matrix?id=603", { next: () => { throw new Error("next selhal"); }, fetchFn: mkFetch(() => json(MOVIE)) });
+  check("funkce: když selže statická vrstva, vrátí se 502 a TMDB se nevolá", nx.res.status === 502 && calls.length === 0);
 }
 // --- Escapování: název z TMDB i z adresy se v HTML neprovede
 {
@@ -106,7 +112,7 @@ const isDefault = t => t === INDEX;
 {
   store.clear(); calls.length = 0;
   const f = mkFetch(() => json(MOVIE));
-  const mk = () => ({ request: new Request("https://mujflix.pages.dev/f/matrix?id=603", { headers: { "User-Agent": DISCORD } }), env: { ASSETS: assets }, fetchFn: f });
+  const mk = () => ({ request: new Request("https://mujflix.pages.dev/f/matrix?id=603", { headers: { "User-Agent": DISCORD } }), env: { ASSETS: assets }, fetchFn: f, next: staticPage });
   const a = await (await onF(mk())).text(); const b = await (await onF(mk())).text();
   check("funkce: výsledek se cachuje (druhý požadavek nevolá TMDB a vrátí totéž)", calls.length === 1 && a === b && store.size === 1, String(calls.length));
 }

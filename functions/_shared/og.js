@@ -122,13 +122,13 @@ async function buildPreview({ env, url, type, html, fetchFn, signal }) {
 export async function handle(context, type) {
   const { request, env } = context;
   const fetchFn = context.fetchFn || fetch;
-  let base;
-  try {
-    base = await env.ASSETS.fetch(new Request(new URL("/", request.url).href));
-  } catch (e) { void e; return new Response("Služba je dočasně nedostupná", { status: 502 }); }
   const ua = request.headers.get("User-Agent") || "";
-  if (!BOT_RE.test(ua) || (request.method !== "GET" && request.method !== "HEAD")) return withHeaders(base);
+  /* Běžný prohlížeč: žádná práce navíc, pustí se dál stejnou cestou jako bez funkce (static + _redirects → index.html) */
+  if (!BOT_RE.test(ua) || (request.method !== "GET" && request.method !== "HEAD")) return context.next();
+  let base = null;
   try {
+    base = await context.next();
+    if (!base.ok || !/text\/html/i.test(base.headers.get("Content-Type") || "")) return base;
     const url = new URL(request.url);
     const html = await base.clone().text();
     const timeoutMs = Number(env.OG_TIMEOUT_MS) || DEFAULT_TIMEOUT_MS;
@@ -150,5 +150,5 @@ export async function handle(context, type) {
       }
     }
     return withHeaders(new Response(out || html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } }), { "Cache-Control": out ? "public, max-age=300" : "public, max-age=60" });
-  } catch (e) { void e; return withHeaders(base); }
+  } catch (e) { void e; return base || new Response("Služba je dočasně nedostupná", { status: 502 }); }
 }
