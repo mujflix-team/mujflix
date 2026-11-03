@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.21: popis náhledu odkazu ve formátu „Film · rok · ★ hodnocení — děj“.
 - 3.21.20: oprava „Stránka nebyla nalezena“ u titulových odkazů (funkce pouští běžné návštěvníky přes next()); Sdílet a náhled titulů dány do main.
 - 3.21.19: náhled odkazu na titul pro boty chatů (Cloudflare Pages Function), otevírání odkazu podle ?id=.
 - 3.21.18: tlačítko Sdílet (banner, detail seriálu, přehrávač), adresy titulů s ?id= přes window.mfTitleUrl.
