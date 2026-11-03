@@ -9,6 +9,7 @@
  *
  * Propojení zařízení (volitelné; vyžaduje KV namespace s vazbou SYNC, viz wrangler.toml):
  *   POST /sync/code  {id}    → {code}   jednorázový 6znakový kód (platí 10 min), který odkazuje na ID sady dat
+ *   POST /sync/code-status {id, code} → {pending}  čeká kód ještě na druhé zařízení? (false = už použitý nebo vypršel; jen čtení)
  *   POST /sync/join  {code}  → {id}     výměna kódu za ID (kód se hned smaže; max 10 pokusů / 10 min na IP)
  *   POST /sync/pull  {id}    → {data}   načtení sady dat
  *   POST /sync/push  {id, data}  → {ok} uložení sady dat (max 4 MB)
@@ -169,6 +170,14 @@ async function handleSync(request, env, cors, url) {
       return json({ code, ttl: SYNC_CODE_TTL }, 200, cors);
     }
     return json({ error: "Try again" }, 503, cors);
+  }
+
+  if (route === "/sync/code-status") {
+    // Jen pro zařízení, které kód vytvořilo (zná ID sady dat): bez něj se kód nedá ověřovat ani hádat.
+    if (!SYNC_ID_RE.test(body.id || "")) return json({ error: "Bad id" }, 400, cors);
+    const code = String(body.code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (code.length !== 6) return json({ error: "Bad code" }, 400, cors);
+    return json({ pending: (await env.SYNC.get("c:" + code)) === body.id }, 200, cors);
   }
 
   if (route === "/sync/join") {

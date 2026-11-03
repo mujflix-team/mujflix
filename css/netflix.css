@@ -920,6 +920,14 @@ html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margi
 #mfSyncModal .sy-qr svg { width: 100%; height: 100%; display: block; }
 #mfSyncModal .sy-steps { text-align: left; color: #b3b3b3; font-size: 0.95rem; line-height: 1.55; margin: 0 0 12px; padding-left: 22px; }
 #mfSyncModal .sy-steps b { color: #fff; }
+/* Stav propojení: puntík + text (zelená propojeno, modrá čeká, oranžová problém, šedá nepropojeno) */
+#mfSyncModal .sy-status { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto 16px; padding: 8px 14px; width: fit-content; max-width: 100%; background: #232323; border-radius: 12px; color: #d2d2d2; font-size: 0.92rem; font-weight: 600; }
+#mfSyncModal .sy-status i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #808080; }
+#mfSyncModal .sy-st-ok i { background: #46d369; }
+#mfSyncModal .sy-st-wait i { background: var(--nf-accent, #0a84ff); }
+#mfSyncModal .sy-st-warn i { background: #ffb340; }
+#mfSyncModal .sy-qr.sy-qr-info { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: #232323; color: #b3b3b3; font-size: 0.85rem; line-height: 1.3; }
+#mfSyncModal .sy-qr.sy-qr-info .sy-btn { width: auto; height: auto; margin: 0; padding: 6px 12px; font-size: 0.85rem; }
 #mfSyncModal .sy-timer { color: #808080; font-size: 0.9rem; margin: 4px 0 14px; }
 #mfSyncModal .sy-msg { min-height: 1.3em; margin: 8px 0; font-size: 0.95rem; color: #b3b3b3; }
 #mfSyncModal .sy-msg.sy-ok { color: #46d369; }

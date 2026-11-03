@@ -300,6 +300,11 @@
     return run(false).then(function () { return api("/sync/code", { id: syncId() }); });
   }
 
+  /** Čeká kód ještě na druhé zařízení? (true = ano, false = už se použil nebo vypršel). Starý Worker bez této cesty vrátí chybu. */
+  function codeStatus(code) {
+    return api("/sync/code-status", { id: syncId(), code: String(code || "") }).then(function (r) { return !!r.pending; });
+  }
+
   /** Druhé zařízení: vymění kód za ID a stáhne data (vlastní dosavadní data se spojí, cizí mají přednost). */
   function join(code) {
     return api("/sync/join", { code: String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "") }).then(function (r) {
@@ -421,6 +426,7 @@
     available: available,
     isLinked: isLinked,
     createCode: createCode,
+    codeStatus: codeStatus,
     join: join,
     unlink: unlink,
     syncNow: syncNow,

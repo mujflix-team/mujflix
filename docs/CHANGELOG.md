@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.21.24
+- **Propojení zařízení – stav a spolehlivost:**
+  - nahoře je stavový řádek s puntíkem: *Nepropojeno* (šedá), *Propojeno · poslední synchronizace…* (zelená), *Synchronizuji…* / *Čekám na druhé zařízení…* (modrá), *Synchronizace se nepovedla* / *Bez připojení* / *Kód vypršel* (oranžová);
+  - **QR se už nevytvoří „napůl“:** knihovna QR se stahuje hned při otevření nabídky a při chybě se zkusí ještě dvakrát; když to nevyjde, ukáže se hláška a tlačítko **Zkusit znovu** (dřív se QR bez zprávy schoval a bylo třeba otevřít kód znovu);
+  - první zařízení pozná, že druhé kód použilo, a ukáže „Druhé zařízení je propojené ✓“. Vyžaduje nasazení Workeru (nová cesta `/sync/code-status`); se starým Workerem se řádek „Čekám…“ jen skryje.
+- Worker: `POST /sync/code-status {id, code} → {pending}` (jen čtení, funguje jen pro zařízení, které zná ID sady dat). Test v `tests/worker.mjs`.
+- Testy: stavy, selhání načtení QR + „Zkusit znovu“, zjištění propojení.
+
+## 3.21.24
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.23
 - **Úklid mrtvého kódu (~330 řádků)**, bez změny chování aplikace:
   - panel Novinky/zvonek: `checkNewEpisodes`, `fetchRecommendedNews`, `closeNotifPanel`, `mfNotify`, odznaky v docku, šipka panelu a všechna CSS pravidla `.notif-*` (prvky v aplikaci už dávno nebyly, test „zvonek už není“ to hlídá);

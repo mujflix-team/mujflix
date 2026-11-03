@@ -1,7 +1,7 @@
 /* MůjFlix — obrazovka „Propojit zařízení“ (MFSyncUI). Logika je v js/core/sync.js. */
 (function () {
   "use strict";
-  var el = null, tick = null, expiresAt = 0, onCloseCb = null;
+  var el = null, tick = null, poll = null, expiresAt = 0, onCloseCb = null;
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
@@ -35,7 +35,7 @@
     return el;
   }
 
-  function stopTick() { if (tick) { clearInterval(tick); tick = null; } }
+  function stopTick() { if (tick) { clearInterval(tick); tick = null; } if (poll) { clearInterval(poll); poll = null; } }
 
   function ago(ts) {
     if (!ts) return "ještě nikdy";
@@ -46,6 +46,19 @@
     var h = Math.round(m / 60);
     if (h < 24) return "před " + h + " h";
     return "před " + Math.round(h / 24) + " dny";
+  }
+
+  /** Stavový řádek: puntík + text. kind: ok (zelená), wait (modrá), warn (oranžová), off (šedá) */
+  function status(kind, text, id) {
+    return '<div class="sy-status sy-st-' + kind + '"' + (id ? ' id="' + id + '"' : '') + ' role="status"><i aria-hidden="true"></i><span>' + esc(text) + '</span></div>';
+  }
+
+  function setStatus(id, kind, text) {
+    var n = document.getElementById(id);
+    if (!n) return;
+    n.className = "sy-status sy-st-" + kind;
+    var sp = n.querySelector("span");
+    if (sp) sp.textContent = text;
   }
 
   function frame(inner, back) {
@@ -62,12 +75,12 @@
     var S = window.MFSync, html = "";
     if (screen === "home") {
       if (!S || !S.available()) {
-        html = frame('<div class="sy-ico">' + ICON + '</div><h2 class="sy-title">Propojit zařízení</h2>' +
+        html = frame('<div class="sy-ico">' + ICON + '</div><h2 class="sy-title">Propojit zařízení</h2>' + status("off", "Propojení není zapnuté") +
           '<p class="sy-text">Propojení zatím není zapnuté. Je potřeba nastavit adresu Cloudflare Workeru v <b>config.js</b> (viz README).</p>' +
           '<button type="button" class="sy-btn sy-ghost" data-sa="close">Zavřít</button>');
       } else if (S.isLinked()) {
-        html = frame('<div class="sy-ico sy-ok">' + ICON + '</div><h2 class="sy-title">Zařízení je propojené ✓</h2>' +
-          '<p class="sy-text">Profily, seznamy a hodnocení se sdílejí mezi všemi propojenými zařízeními.<br>Poslední synchronizace: <b id="syLast">' + esc(ago(S.lastSync())) + '</b></p>' +
+        html = frame('<div class="sy-ico sy-ok">' + ICON + '</div><h2 class="sy-title">Zařízení je propojené</h2>' + status("ok", "Propojeno · poslední synchronizace " + ago(S.lastSync()), "syStatus") +
+          '<p class="sy-text">Profily, seznamy a hodnocení se sdílejí mezi všemi propojenými zařízeními.<br></p>' +
           '<div class="sy-msg" id="syMsg" role="status"></div>' +
           '<div class="sy-choices">' +
           '<button type="button" class="sy-choice" data-sa="sync"><strong>Synchronizovat teď</strong><span>Stáhne změny z ostatních zařízení</span></button>' +
@@ -75,7 +88,7 @@
           '</div><button type="button" class="sy-btn sy-link" data-sa="backup">Záloha dat do souboru</button>' +
           '<button type="button" class="sy-btn sy-link" data-sa="unlink">Odpojit toto zařízení</button>');
       } else {
-        html = frame('<div class="sy-ico">' + ICON + '</div><h2 class="sy-title">Propojit zařízení</h2>' +
+        html = frame('<div class="sy-ico">' + ICON + '</div><h2 class="sy-title">Propojit zařízení</h2>' + status("off", "Nepropojeno") +
           '<p class="sy-text">Měj stejné profily, seznamy a hodnocení na telefonu, tabletu i počítači. Bez hesla a bez e-mailu – stačí opsat krátký kód.</p>' +
           '<div class="sy-choices">' +
           '<button type="button" class="sy-choice" data-sa="show"><strong>Zobrazit kód</strong><span>Moje data jsou tady a chci je dostat na jiné zařízení</span></button>' +
@@ -84,7 +97,7 @@
       }
     } else if (screen === "show") {
       html = frame('<h2 class="sy-title">Tvůj kód</h2><div class="sy-code" id="syCode" aria-live="polite">…</div>' +
-        '<div class="sy-qr" id="syQr"></div>' +
+        '<div class="sy-qr sy-qr-info" id="syQr"></div>' + status("wait", "Čekám na druhé zařízení…", "syStatus") +
         '<ol class="sy-steps"><li>Na druhém zařízení otevři MůjFlix.</li><li>Klikni na <b>Propojit zařízení</b> → <b>Mám kód</b>.</li><li>Opiš kód nebo naskenuj QR kód fotoaparátem.</li></ol>' +
         '<div class="sy-msg" id="syMsg" role="status"></div><div class="sy-timer" id="syTimer"></div>' +
         '<button type="button" class="sy-btn sy-ghost" data-sa="show">Nový kód</button>', true);
@@ -134,44 +147,96 @@
     return "Něco se nepovedlo. Zkus to prosím znovu.";
   }
 
-  /** QR knihovna (56 kB) se stahuje až ve chvíli, kdy je potřeba, ne při každém startu appky. */
+  /** QR knihovna (56 kB) se stahuje až ve chvíli, kdy je potřeba. Souběžná volání čekají na jedno stažení,
+      při chybě se to zkusí ještě dvakrát (první načtení na pomalé síti občas selže). cb(true/false) */
+  var qrWait = [], qrLoading = false;
   function loadQr(cb) {
-    if (window.qrcode) return cb();
-    var sc = document.createElement("script");
-    sc.src = "js/core/qr.js";
-    sc.onload = function () { cb(); };
-    sc.onerror = function () { cb(); };
-    document.head.appendChild(sc);
+    if (window.qrcode) return cb(true);
+    qrWait.push(cb);
+    if (qrLoading) return;
+    qrLoading = true;
+    var tries = 0;
+    function done(ok) { qrLoading = false; var l = qrWait; qrWait = []; l.forEach(function (f) { try { f(ok); } catch (e) {} }); }
+    (function go() {
+      var sc = document.createElement("script");
+      sc.src = "js/core/qr.js" + (tries ? "?r=" + Date.now() : "");
+      sc.onload = function () { done(!!window.qrcode); };
+      sc.onerror = function () {
+        sc.remove();
+        if (++tries < 3) return void setTimeout(go, 400 * tries);
+        done(false);
+      };
+      document.head.appendChild(sc);
+    })();
+  }
+
+  var curCode = "";
+  function drawQr() {
+    var box = document.getElementById("syQr");
+    if (!box || !curCode) return;
+    box.className = "sy-qr sy-qr-info";
+    box.textContent = "Načítám QR kód…";
+    loadQr(function (ok) {
+      var qr = document.getElementById("syQr");
+      if (!qr) return;
+      if (ok) {
+        try {
+          var q = window.qrcode(0, "M");
+          q.addData(location.origin + location.pathname + "?link=" + curCode); q.make();
+          qr.className = "sy-qr";
+          qr.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+          return;
+        } catch (e) { /* spadne dál na chybu */ }
+      }
+      qr.className = "sy-qr sy-qr-info";
+      qr.innerHTML = '<span>QR kód se nepodařilo vytvořit. Kód vedle můžeš opsat.</span><button type="button" class="sy-btn sy-ghost" data-sa="qr">Zkusit znovu</button>';
+    });
   }
 
   function showCode() {
     render("show");
+    curCode = "";
     msg("Vytvářím kód…");
+    loadQr(function () {}); // stahuje se hned, ať je QR hotové, až přijde kód
     window.MFSync.createCode().then(function (r) {
       var code = String(r.code || "");
       var c = document.getElementById("syCode");
       if (!c) return;
+      curCode = code;
       c.textContent = code.slice(0, 3) + " " + code.slice(3);
       msg("");
       expiresAt = Date.now() + (r.ttl || 600) * 1000;
-      loadQr(function () {
-        var qr = document.getElementById("syQr");
-        if (!qr) return;
-        try {
-          var url = location.origin + location.pathname + "?link=" + code;
-          var q = window.qrcode(0, "M");
-          q.addData(url); q.make();
-          qr.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-        } catch (e) { qr.style.display = "none"; }
-      });
+      drawQr();
       var timer = document.getElementById("syTimer");
       var upd = function () {
         var left = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
         if (timer) timer.textContent = left > 0 ? "Kód platí ještě " + Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0") : "Kód vypršel – vytvoř nový.";
-        if (!left) stopTick();
+        if (!left) { stopTick(); setStatus("syStatus", "warn", "Kód vypršel"); }
       };
       upd(); tick = setInterval(upd, 1000);
-    }, function (e) { msg(errText(e), "err"); var c = document.getElementById("syCode"); if (c) c.textContent = "–"; });
+      // Druhé zařízení kód použilo? (potřebuje aktuální Worker; starší cestu nezná, pak se stav prostě skryje)
+      var S = window.MFSync;
+      if (!S.codeStatus) return;
+      var check = function () {
+        S.codeStatus(code).then(function (pending) {
+          if (pending) return setStatus("syStatus", "wait", "Čekám na druhé zařízení…");
+          if (Date.now() >= expiresAt) return;
+          stopTick();
+          setStatus("syStatus", "ok", "Druhé zařízení je propojené ✓");
+          var t = document.getElementById("syTimer"); if (t) t.textContent = "";
+          var q = document.getElementById("syQr"); if (q) q.style.display = "none";
+        }, function (e) {
+          if (e && e.code === "network") return setStatus("syStatus", "warn", "Bez připojení, zkouším znovu…");
+          var st = document.getElementById("syStatus"); if (st) st.remove();
+          if (poll) { clearInterval(poll); poll = null; }
+        });
+      };
+      poll = setInterval(check, 3000);
+    }, function (e) {
+      msg(errText(e), "err");
+      var c = document.getElementById("syCode"); if (c) c.textContent = "–";
+      setStatus("syStatus", "warn", "Kód se nepodařilo vytvořit");
+    });
   }
 
   function doJoin() {
@@ -220,17 +285,18 @@
     if (a === "close") return close();
     if (a === "home") return render("home");
     if (a === "show") return showCode();
+    if (a === "qr") return drawQr();
     if (a === "enter") return render("enter");
     if (a === "join") return doJoin();
     if (a === "backup") return render("backup");
     if (a === "export") return doExport();
     if (a === "import") { var fi = document.getElementById("mfBackupFile"); if (fi) { fi.value = ""; fi.click(); } return; }
     if (a === "sync") {
-      msg("Synchronizuji…");
+      msg(""); setStatus("syStatus", "wait", "Synchronizuji…");
       return S.syncNow({ reload: false }).then(function (r) {
         if (r.changed) { msg("Hotovo, načítám změny…", "ok"); setTimeout(function () { location.reload(); }, 800); }
-        else { msg("Vše je aktuální ✓", "ok"); var l = document.getElementById("syLast"); if (l) l.textContent = ago(S.lastSync()); }
-      }, function (e) { msg(errText(e), "err"); });
+        else { setStatus("syStatus", "ok", "Propojeno · vše je aktuální ✓"); }
+      }, function (e) { setStatus("syStatus", "warn", "Synchronizace se nepovedla"); msg(errText(e), "err"); });
     }
     if (a === "unlink") {
       if (!window.confirm("Odpojit toto zařízení? Data zůstanou tady i na ostatních zařízeních, jen se přestanou sdílet.")) return;
@@ -241,6 +307,7 @@
 
   function open(screen, data) {
     render(screen || "home", data);
+    if ((screen || "home") === "home" && window.MFSync && window.MFSync.available()) loadQr(function () {});
   }
 
   function close() {
