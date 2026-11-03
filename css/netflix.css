@@ -1172,10 +1172,20 @@ html body .nf-arrow { top: 32px; bottom: 48px; }
 #seriesModal #episodesGrid .episode-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
 #seriesModal #episodesGrid .episode-card:hover { will-change: auto; }
 
-/* Popis se po kliknutí rozbalí celý (jinak končí „…“) */
-html body .nf-hero-desc, html body #seriesModal .sd-overview { cursor: pointer; }
-html body .nf-hero-desc.is-open, html body #seriesModal .sd-overview.is-open { display: block; -webkit-line-clamp: unset; overflow: visible; max-height: none; }
-html body #seriesModal .sd-overview.is-open { max-height: 40vh; overflow-y: auto; }
+/* Popis: značka „Více ▾“ jen u useknutého textu. Rozbalený popis roste nahoru (obsah banneru je u spodku), má max-height a posuv, tlačítka zůstávají na místě */
+html body .nf-hero-desc.is-expandable, html body #seriesModal .sd-overview.is-expandable { cursor: pointer; margin-bottom: 4px; }
+html body .nf-hero-desc.is-expandable:focus-visible, html body #seriesModal .sd-overview.is-expandable:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
+html body .nf-hero-body { display: flex; flex-direction: column; justify-content: flex-end; }
+html body .nf-hero-body > * { flex-shrink: 0; }
+html body .nf-hero-body > .nf-hero-desc.is-open { flex-shrink: 1; min-height: 4.4em; }
+html body .nf-hero-desc.is-open, html body #seriesModal .sd-overview.is-open { display: block; -webkit-line-clamp: unset; max-height: 40vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.35) transparent; }
+html body .nf-hero-desc.is-open.is-scrollable, html body #seriesModal .sd-overview.is-open.is-scrollable { padding-bottom: 18px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); }
+.mf-desc-more { display: none; margin: 0 0 16px; font-size: 0.9rem; font-weight: 700; color: #fff; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+.mf-desc-more.show { display: block; width: max-content; }
+@media (hover: hover) {
+  html body .nf-hero-desc.is-expandable:hover, html body #seriesModal .sd-overview.is-expandable:hover { color: #fff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85); }
+  .mf-desc-more:hover { text-decoration: underline; }
+}
 
 /* Mini přehrávač traileru: tlačítka dole vpravo, ať nepřekrývají název videa, který YouTube ukazuje nahoře */
 .nf-tr-ctl { top: auto; bottom: 8px; right: 8px; }
@@ -1415,8 +1425,6 @@ html body #universeOverlay .dv-track::-webkit-scrollbar, html body .pc-av-strip:
 .mf-arr svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .mf-arr.show { display: flex; }
 @media (hover: none) { .mf-arr { display: none !important; } }
-/* Popis v detailu seriálu se po kliknutí rozbalí do šířky (ne do výšky), tlačítka zůstávají na místě */
-html body #seriesModal .sd-overview.is-open { max-width: min(92%, 1040px); max-height: 7.2em; overflow-y: auto; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85); transition: max-width .2s ease; }
 html body #seriesModal .modal-hero-left { max-width: none; }
 
 /* Pokračovat ve sledování: ukazatel postupu na plakátu */

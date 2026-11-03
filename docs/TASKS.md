@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.17: rozbalování popisu v banneru a detailu (Více ▾ / Méně ▴, klávesnice, tlačítka se nevytlačí).
 - 3.21.15: tlačítko „Označit sezónu“ v detailu seriálu (označí / odznačí všechny díly sezóny).
 - 3.21.14: srdíčko na všech kartách v řadě Oblíbené (i u starších seriálů bez TMDB ID).
 - 3.21.13: testy toků Oblíbené, přepnutí profilu a propojení dvou zařízení proti skutečnému Workeru (`tests/toky.mjs`); oprava starého seznamu v otevřených Oblíbených po přepnutí profilu.

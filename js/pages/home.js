@@ -656,6 +656,7 @@
         var play = document.getElementById('nfHeroPlay');
         var fav = document.getElementById('nfHeroFav');
         play.addEventListener('click', h.onPlay);
+        if (typeof window.mfDescInit === 'function') window.mfDescInit(hero.querySelector('.nf-hero-desc'));
         if (h.onDone) {
           var dn = document.createElement('button');
           dn.type = 'button'; dn.className = 'nf-btn nf-btn-ghost nf-btn-icon'; dn.id = 'nfHeroDone'; dn.title = 'Dokoukal jsem'; dn.setAttribute('aria-label', 'Dokoukal jsem – schovat z pokračování');
@@ -1686,14 +1687,70 @@
         else if (cinema) cinema.style.display = 'none';
       });
     
-  /* Popis s „…“ (hero na domovské stránce, detail seriálu): klepnutím/kliknutím se rozbalí celý, dalším se zase sbalí. */
-  document.addEventListener('click', function (e) {
-    var d = e.target && e.target.closest && e.target.closest('.nf-hero-desc, #seriesModal .sd-overview');
+  /* Popis s „…“ (hero na domovské stránce, detail seriálu): značka „Více ▾“ / „Méně ▴“ se ukáže jen u useknutého textu.
+     Rozbalení: klik, Enter nebo Mezerník; stav se při výměně titulu vrací na zavřený. */
+  var DESC_SEL = '.nf-hero-desc, #seriesModal .sd-overview';
+  function mfDescMarker(d) {
+    var m = d._mfMore;
+    if (m && m.isConnected) return m;
+    m = document.createElement('span');
+    m.className = 'mf-desc-more'; m.setAttribute('aria-hidden', 'true');
+    d.insertAdjacentElement('afterend', m);
+    return d._mfMore = m;
+  }
+  function mfDescSync(d) {
+    var open = d.classList.contains('is-open'), m = mfDescMarker(d);
+    m.textContent = open ? 'Méně ▴' : 'Více ▾';
+    d.setAttribute('aria-expanded', open ? 'true' : 'false');
+    d.classList.toggle('is-scrollable', open && d.scrollHeight > d.clientHeight + 1);
+  }
+  function mfDescMeasure(d) {
+    if (d.classList.contains('is-open')) return mfDescSync(d);
+    if (!d.offsetParent && !d.getClientRects().length) return; /* skryté: změří se, až se zobrazí (ResizeObserver) */
+    var cut = d.scrollHeight > d.clientHeight + 1, m = mfDescMarker(d);
+    d.classList.toggle('is-expandable', cut);
+    m.classList.toggle('show', cut);
+    if (cut) { d.setAttribute('role', 'button'); d.tabIndex = 0; mfDescSync(d); }
+    else { d.removeAttribute('role'); d.removeAttribute('tabindex'); d.removeAttribute('aria-expanded'); }
+  }
+  function mfDescReset(d) { d.classList.remove('is-open', 'is-scrollable'); mfDescMeasure(d); }
+  function mfDescInit(d) {
     if (!d) return;
+    mfDescMarker(d);
+    if (!d._mfRO && window.ResizeObserver) { d._mfRO = new ResizeObserver(function () { mfDescMeasure(d); }); d._mfRO.observe(d); }
+    mfDescMeasure(d);
+  }
+  function mfDescToggle(d) {
+    if (!d || !d.classList.contains('is-expandable')) return;
     d.classList.toggle('is-open');
+    mfDescSync(d);
+  }
+  window.mfDescInit = mfDescInit;
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest || t.closest('a, button')) return;
+    var d = t.closest(DESC_SEL);
+    if (!d && t.closest('.mf-desc-more')) { var m = t.closest('.mf-desc-more'); d = m.previousElementSibling; }
+    if (!d || !d.matches(DESC_SEL)) return;
+    var sel = window.getSelection && String(window.getSelection());
+    if (sel) return; /* označování textu myší popis nerozbalí */
+    mfDescToggle(d);
   });
-  document.addEventListener('mouseover', function (e) {
-    var d = e.target && e.target.closest && e.target.closest('.nf-hero-desc, #seriesModal .sd-overview');
-    if (d && !d.title) d.title = 'Kliknutím zobrazíš celý popis';
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var d = e.target && e.target.matches && e.target.matches(DESC_SEL) ? e.target : null;
+    if (!d) return;
+    e.preventDefault();
+    mfDescToggle(d);
   });
+  /* Popis v detailu seriálu je jeden prvek, jehož text se mění: při výměně titulu se vrátí zavřený */
+  function mfDescWatchDetail() {
+    var o = document.getElementById('sOverview');
+    if (!o || o._mfMO) return;
+    o._mfMO = new MutationObserver(function () { mfDescReset(o); });
+    o._mfMO.observe(o, { childList: true, characterData: true, subtree: true });
+    mfDescInit(o);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mfDescWatchDetail); else mfDescWatchDetail();
+  window.addEventListener('resize', function () { document.querySelectorAll(DESC_SEL).forEach(function (d) { if (d._mfRO) mfDescMeasure(d); }); });
 })();
