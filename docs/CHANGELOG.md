@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.18
+- **Tlačítko Sdílet** v banneru na úvodní stránce (stejná výška a styl jako „Do oblíbených“, na šířce do 520 px jen ikona), v detailu seriálu a v liště přehrávače (jen ikona, jedno malé tlačítko navíc). Ikona je SVG, `aria-label` je „Sdílet odkaz na <název>“, ovládá se klávesnicí.
+- Chování: když existuje `navigator.share` (telefon), použije se systémové sdílení (titul, text, adresa). Jinak se adresa zkopíruje do schránky a ukáže toast „Odkaz zkopírován“ (toast je `role="status"`). Když schránka selže (HTTP, odepřeno), použije se záložní kopírování přes skrytý `<textarea>`; když selže i to, toast ukáže přímo odkaz. Zrušení sdílení uživatelem (`AbortError`) se nebere jako chyba. Nic se neposílá na server.
+- **Adresy titulů mají `?id=<TMDB ID>`:** `js/shell/titleurl.js` má jedinou funkci `window.mfTitleUrl(type, title, tmdbId)` (např. `https://mujflix.pages.dev/f/matrix?id=603`, seriál `/s/…`), kterou používá i adresní řádek. Neplatné ID se zahodí. `MFCinemaPlayer.state()` vrací navíc `id`. Otevírání odkazu podle `?id=` zatím zůstává jak bylo (hledání podle názvu); přijde s náhledy titulů.
+- Testy: slug bez diakritiky a se znaky `"`, `&`, `<`; kopírování adresy s `?id=` (schránka zamockovaná), záložní kopírování, odmítnutá schránka, `navigator.share`, `AbortError`, aria-label, adresní řádek v detailu a v přehrávači. Bez `?id=` v adrese testy selžou.
+
 ## 3.21.17
 - **Rozbalování popisu v banneru a v detailu seriálu:**
   - Když je popis useknutý „…“, na konci je značka **Více ▾** (po rozbalení **Méně ▴**). U krátkých popisů značka není. Měří se po načtení, při změně velikosti okna a při výměně titulu.

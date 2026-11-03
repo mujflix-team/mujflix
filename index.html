@@ -56,7 +56,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
-    <link rel="stylesheet" href="css/netflix.css?v=23" />
+    <link rel="stylesheet" href="css/netflix.css?v=24" />
 
     <style>
       .key-hint { display: none !important; }
@@ -801,6 +801,14 @@
                 "
                 title="Přidat do Oblíbených" aria-label="Přidat do Oblíbených"
               >♡</button>
+              <button
+                class="btn-shuffle"
+                id="modalShareBtn"
+                type="button"
+                onclick="mfShareCurrent()"
+                title="Sdílet odkaz" aria-label="Sdílet odkaz"
+                style="padding: 0 14px"
+              ><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button>
             </div>
           </div>
         </div>
@@ -2012,13 +2020,13 @@
       })();
     </script>
     
-    <script src="js/pages/cinema.js?v=13" defer></script>
-    <script src="js/pages/home.js?v=11" defer></script>
+    <script src="js/pages/cinema.js?v=14" defer></script>
+    <script src="js/pages/home.js?v=12" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/polish.js?v=2" defer></script>
     <script src="js/shell/nav.js" defer></script>
-    <script src="js/shell/titleurl.js?v=4" defer></script>
+    <script src="js/shell/titleurl.js?v=5" defer></script>
 
 </body>
 </html>

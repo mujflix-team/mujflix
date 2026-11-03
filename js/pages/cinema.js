@@ -399,6 +399,7 @@
           '<button type="button" class="mf-cin-fav-btn" id="mfCinBadSrc" aria-label="Zdroj nejde, zkusit další" title="Zdroj nejde – zkusit další"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn mf-cin-rate-btn" id="mfCinRateBtn" aria-label="Ohodnotit" title="Ohodnotit" style="display:none">☆</button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených" title="Přidat do Oblíbených">♡</button>' +
+          '<button type="button" class="mf-cin-fav-btn" id="mfCinShareBtn" aria-label="Sdílet odkaz" title="Sdílet odkaz"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinSearchSrc" aria-label="Hledat titul na tomto zdroji" title="Hledat titul na tomto zdroji (další klik zkusí jiný název)">' +
             '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
           '</button>' +
@@ -432,6 +433,8 @@
 
     favBtn = modal.querySelector("#mfCinFavBtn");
     if (favBtn) favBtn.onclick = toggleCurrentFavorite;
+    var shareBtn = modal.querySelector("#mfCinShareBtn");
+    if (shareBtn) shareBtn.onclick = function () { if (typeof window.mfShareCurrent === "function") window.mfShareCurrent(); };
     modal.querySelector("#mfCinRateBtn").onclick = rateCurrentEpisode;
 
 
@@ -982,7 +985,7 @@
     document.body.style.overflow = "";
   }
 
-  window.MFCinemaPlayer = { open: open, close: close, nextSource: function () { if (current) cycleSource(1); }, sourceLabel: function () { return currentSrcLabel(); }, state: function () { return current && modal && modal.classList.contains("open") ? { title: current.title, type: current.type, season: current.season, episode: current.episode } : null; }, sourceLabels: function (type, alts) { var prev = current; current = Object.assign({}, prev || {}, { altTitles: alts }); try { return sourcesFor(type).map(function (s) { return s.label; }); } finally { current = prev; } }, currentUrl: function () { return current ? buildUrl() : ""; }, sourceIds: function (type) { return (type === "movie" ? MOVIE_SOURCES : TV_SOURCES).filter(inLang).map(function (s) { return s.id; }); }, lang: function (l) { if (l) setLang(l); return srcLang; } };
+  window.MFCinemaPlayer = { open: open, close: close, nextSource: function () { if (current) cycleSource(1); }, sourceLabel: function () { return currentSrcLabel(); }, state: function () { return current && modal && modal.classList.contains("open") ? { title: current.title, type: current.type, id: current.tmdbId, season: current.season, episode: current.episode } : null; }, sourceLabels: function (type, alts) { var prev = current; current = Object.assign({}, prev || {}, { altTitles: alts }); try { return sourcesFor(type).map(function (s) { return s.label; }); } finally { current = prev; } }, currentUrl: function () { return current ? buildUrl() : ""; }, sourceIds: function (type) { return (type === "movie" ? MOVIE_SOURCES : TV_SOURCES).filter(inLang).map(function (s) { return s.id; }); }, lang: function (l) { if (l) setLang(l); return srcLang; } };
 })();
 
 (function() {
