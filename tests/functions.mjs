@@ -27,7 +27,7 @@ globalThis.caches = { default: {
 const calls = [];
 const mkFetch = handler => async (url, init) => { calls.push({ url: String(url), headers: init && init.headers }); return handler(String(url), init); };
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { "Content-Type": "application/json" } });
-const MOVIE = { id: 603, title: "Matrix", overview: "Programátor Neo zjistí, že svět kolem něj je simulace. ".repeat(8), backdrop_path: "/bd.jpg", poster_path: "/po.jpg" };
+const MOVIE = { id: 603, title: "Matrix", release_date: "1999-03-31", vote_average: 8.24, overview: "Programátor Neo zjistí, že svět kolem něj je simulace. ".repeat(8), backdrop_path: "/bd.jpg", poster_path: "/po.jpg" };
 
 let nextCalls = 0;
 const staticPage = () => { nextCalls++; return new Response(INDEX, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } }); };
@@ -43,6 +43,7 @@ const isDefault = t => t === INDEX;
 {
   const { res, text } = await run(onF, "/f/matrix?id=603", { fetchFn: mkFetch(() => json(MOVIE)) });
   check("funkce: Discordbot a platné ?id= dostane og:title s názvem a obrázek z TMDB", metaOf(text, "og:title") === "Matrix – MůjFlix" && metaOf(text, "og:image") === "https://image.tmdb.org/t/p/w780/bd.jpg" && metaOf(text, "twitter:card") === "summary_large_image" && metaOf(text, "og:url") === "https://mujflix.pages.dev/f/matrix?id=603" && /<link rel="canonical" href="https:\/\/mujflix\.pages\.dev\/f\/matrix\?id=603"/.test(text), text.slice(text.indexOf("<title>"), text.indexOf("<title>") + 400));
+  check("funkce: popis začíná „Film · rok · ★ hodnocení — “ a pokračuje začátkem děje", /^Film · 1999 · ★ 8,2 — Programátor Neo/.test(metaOf(text, "og:description")), metaOf(text, "og:description"));
   check("funkce: popis z TMDB je nejvýš ~200 znaků, status 200, HTML a hlavičky zabezpečení i Vary (u bota)", metaOf(text, "og:description").length <= 205 && /…$/.test(metaOf(text, "og:description")) && res.status === 200 && /text\/html/.test(res.headers.get("content-type")) && res.headers.get("X-Frame-Options") === "DENY" && res.headers.get("Vary") === "User-Agent", metaOf(text, "og:description"));
   const c = calls[0];
   check("funkce: TMDB se volá jen přes Worker, povolenou cestou, s Origin a bez klíče", calls.length === 1 && c.url === WORKER + "/3/movie/603?language=cs-CZ" && c.headers.Origin === "https://mujflix.pages.dev" && !/api_key|Authorization/i.test(JSON.stringify(c)), JSON.stringify(calls));
@@ -60,7 +61,10 @@ const isDefault = t => t === INDEX;
   const { res, text } = await run(onF, "/f/matrix?id=603", { ua: CHROME, fetchFn: mkFetch(() => json(MOVIE)) });
   check("funkce: běžný prohlížeč dostane původní index.html beze změny (pustí se dál přes next()) a TMDB se nevolá", isDefault(text) && calls.length === 0 && nextCalls === 1 && res.status === 200, String(calls.length));
   const nf = await run(onF, "/f/matrix?id=603", { next: () => new Response("<h1>Stránka nebyla nalezena</h1>", { status: 404, headers: { "Content-Type": "text/html" } }), fetchFn: mkFetch(() => json(MOVIE)) });
-  check("funkce: když statická stránka není (404), bot dostane totéž a TMDB se nevolá", nf.res.status === 404 && /nebyla nalezena/.test(nf.text) && calls.length === 0);
+  check("funkce: když next() vrátí 404.html, bot dostane index.html z ASSETS s tagy titulu (status 200)", nf.res.status === 200 && metaOf(nf.text, "og:title") === "Matrix – MůjFlix" && !/nebyla nalezena/.test(nf.text), nf.text.slice(0, 80));
+  const none = { fetch: async () => new Response("x", { status: 404 }) };
+  const nn = await run(onF, "/f/matrix?id=603", { env: { ASSETS: none }, next: () => new Response("<h1>Stránka nebyla nalezena</h1>", { status: 404, headers: { "Content-Type": "text/html" } }), fetchFn: mkFetch(() => json(MOVIE)) });
+  check("funkce: když není ani index.html v ASSETS, bot dostane původní 404 a TMDB se nevolá", nn.res.status === 404 && /nebyla nalezena/.test(nn.text));
   const nx = await run(onF, "/f/matrix?id=603", { next: () => { throw new Error("next selhal"); }, fetchFn: mkFetch(() => json(MOVIE)) });
   check("funkce: když selže statická vrstva, vrátí se 502 a TMDB se nevolá", nx.res.status === 502 && calls.length === 0);
 }

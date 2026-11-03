@@ -115,7 +115,12 @@ async function buildPreview({ env, url, type, html, fetchFn, signal }) {
   if (!name) return null;
   const img = pickImage(item) || { url: SITE_ORIGIN + "/icons/og-image.png", card: "summary_large_image" };
   const pageUrl = url.origin + url.pathname + "?id=" + item.id;
-  const description = shorten(item.overview) || "Filmy a seriály na jednom místě.";
+  // Popis: „Seriál · 2005 · ★ 7,9 — začátek děje…“ (děj zkrácený, ať celek nepřesáhne ~200 znaků)
+  const year = String(item.release_date || item.first_air_date || "").slice(0, 4);
+  const rating = Number(item.vote_average) > 0 ? "★ " + Number(item.vote_average).toFixed(1).replace(".", ",") : "";
+  const facts = [type === "tv" ? "Seriál" : "Film", /^\d{4}$/.test(year) ? year : "", rating].filter(Boolean).join(" · ");
+  const plot = shorten(item.overview, 200 - facts.length - 3);
+  const description = plot ? facts + " — " + plot : facts;
   return injectMeta(html, { name, title: name + " – MůjFlix", description, url: pageUrl, image: img.url, card: img.card });
 }
 
@@ -128,9 +133,19 @@ export async function handle(context, type) {
   let base = null;
   try {
     base = await context.next();
-    if (!base.ok || !/text\/html/i.test(base.headers.get("Content-Type") || "")) return base;
+    const isHtml = r => r && r.ok && /text\/html/i.test(r.headers.get("Content-Type") || "");
+    let shell = base;
+    /* Adresa /f|s|c/… nemá vlastní soubor a pravidlo z _redirects se tu nemusí uplatnit → statická vrstva vrátí 404.html.
+       Botovi pak vezmeme hlavní stránku přímo z ASSETS (stejně jako ji dostane prohlížeč po přesměrování). */
+    if (!isHtml(shell) && env.ASSETS) {
+      for (const p of ["/", "/index.html"]) {
+        const r = await env.ASSETS.fetch(new Request(SITE_ORIGIN + p, { redirect: "follow" })).catch(() => null);
+        if (isHtml(r)) { shell = r; break; }
+      }
+    }
+    if (!isHtml(shell)) return base;
     const url = new URL(request.url);
-    const html = await base.clone().text();
+    const html = await shell.clone().text();
     const timeoutMs = Number(env.OG_TIMEOUT_MS) || DEFAULT_TIMEOUT_MS;
     const idRaw = url.searchParams.get("id") || "";
     const keyPart = /^\d{1,9}$/.test(idRaw) ? idRaw : "q-" + (url.pathname.split("/")[2] || "");
