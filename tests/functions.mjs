@@ -89,7 +89,7 @@ const isDefault = t => t === INDEX;
 }
 // --- Bez ?id= záložní hledání podle názvu z adresy
 {
-  const { text } = await run(onS, "/s/dark", { fetchFn: mkFetch(url => json({ results: [{ id: 70523, name: "Dark Matter", overview: "x" }, { id: 70524, name: "Dark", overview: "Zmizí dítě.", backdrop_path: "/d.jpg" }] })) });
+  const { text } = await run(onS, "/s/dark", { fetchFn: mkFetch(() => json({ results: [{ id: 70523, name: "Dark Matter", overview: "x" }, { id: 70524, name: "Dark", overview: "Zmizí dítě.", backdrop_path: "/d.jpg" }] })) });
   check("funkce: bez ?id= se titul najde hledáním podle názvu z adresy (přesná shoda názvu má přednost)", /\/3\/search\/tv\?language=cs-CZ&query=dark$/.test(calls[0].url) && metaOf(text, "og:title") === "Dark – MůjFlix" && metaOf(text, "og:url") === "https://mujflix.pages.dev/s/dark?id=70524", calls[0].url);
 }
 // --- Všechna volání TMDB mají jen povolené cesty Workeru
@@ -97,7 +97,7 @@ const isDefault = t => t === INDEX;
   const ALLOWED = /^\/3\/(movie\/\d+|tv\/\d+|search\/(movie|tv|multi))$/;
   const all = [];
   for (const [fn, p] of [[onF, "/f/matrix?id=603"], [onS, "/s/dark"], [onC, "/c/dark-s01e02"], [onF, "/f/x?id=abc"]]) {
-    await run(fn, p, { fetchFn: mkFetch(url => json({ results: [] }, 200)) });
+    await run(fn, p, { fetchFn: mkFetch(() => json({ results: [] }, 200)) });
     calls.forEach(c => all.push(new URL(c.url)));
   }
   check("funkce: volá jen /3/movie/<id>, /3/tv/<id> a /3/search/(movie|tv|multi) na Workeru", all.length >= 4 && all.every(u => u.origin === WORKER && ALLOWED.test(u.pathname)), all.map(u => u.pathname).join(" "));
