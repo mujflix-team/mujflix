@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.28
+- **Menu profilu (vpravo nahoře):** pod Nastavením je nová položka **Odhlásit se** s ikonou. Účty v aplikaci nejsou, takže vrátí na výběr profilu („Kdo se dívá?“) a zruší přeskočení výběru při obnovení stránky; profil s PINem se zeptá znovu. Test doplněn.
+
+## 3.21.28
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.27
 - Dokumentace: `docs/MAPA.md` už neuvádí okna, která v aplikaci nejsou (kalendář, kolekce, nálada, vzhled, „Zobrazit vše“).
 
