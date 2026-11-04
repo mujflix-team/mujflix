@@ -1611,7 +1611,23 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings" && menuT.hubRows === "profile,prefs,sync" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings,logout" && menuT.hubRows === "profile,prefs,sync" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+const logoutT = await page.evaluate(() => {
+  const out = {};
+  document.getElementById("mfProfileGate").style.display = "none";
+  sessionStorage.setItem("mf_gate_ok", "1");
+  mfToggleProfileMenu(document.getElementById("nfAvatar"));
+  const b = document.querySelector('#nfProfileMenu [data-act="logout"]');
+  out.label = b && b.textContent.trim();
+  out.icon = !!(b && b.querySelector("svg"));
+  b.click();
+  out.gate = getComputedStyle(document.getElementById("mfProfileGate")).display !== "none";
+  out.flag = sessionStorage.getItem("mf_gate_ok");
+  out.menuClosed = !document.getElementById("nfProfileMenu");
+  document.getElementById("mfProfileGate").style.display = "none";
+  return out;
+});
+check("menu profilu: „Odhlásit se“ (ikona + text) vrátí na výběr profilu a zruší přeskočení výběru", logoutT.label === "Odhlásit se" && logoutT.icon && logoutT.gate && logoutT.flag === null && logoutT.menuClosed, JSON.stringify(logoutT));
 check("Kdo se dívá → Upravit: bez třesení, tužka na avataru, velké červené mínus, klik otevře úpravu", menuT.anim === "none" && menuT.overlay && menuT.rmSize >= 36 && menuT.editTitle === "Uprav si svůj profil" && menuT.editName === "MenuB", JSON.stringify(menuT));
 
 const cinOrder = await page.evaluate(() => {
