@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.25
+- **Úklid CSS (~11 kB):** smazána pravidla pro třídy, které se nikde v HTML ani JS nepoužívají (`ep-view-*`, `ssv-*`, `sd-link(s)`, `pc-avatar-tabs`, `accent-swatch(es)`, `font-option(s)`, `grain-none`, `tv-mode`, `appletv-mode`, `nf-see-all` aj.) a 16 nepoužitých CSS proměnných. Selektory s `:not()` se nechaly. Vzhled se nemění.
+
+## 3.21.25
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.24
 - **Propojení zařízení – stav a spolehlivost:**
   - nahoře je stavový řádek s puntíkem: *Nepropojeno* (šedá), *Propojeno · poslední synchronizace…* (zelená), *Synchronizuji…* / *Čekám na druhé zařízení…* (modrá), *Synchronizace se nepovedla* / *Bez připojení* / *Kód vypršel* (oranžová);

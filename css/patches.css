@@ -238,9 +238,6 @@
   border-color: rgba(10, 132, 255, 0.35) !important;
   color: #fff !important;
 }
-#seriesModal .ep-view-back:hover {
-  border-color: rgba(10, 132, 255, 0.35) !important;
-}
 
 @media (max-width: 640px) {
 

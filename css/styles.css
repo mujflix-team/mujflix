@@ -597,50 +597,6 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 2px;
 }
-.ep-view-bar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  flex-shrink: 0;
-}
-.ep-view-back {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
-  
-  font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
-
-  flex-shrink: 0;
-}
-.ep-view-back:hover {
-
-  color: #fff;
-  transform: translateX(-2px);
-}
-.ep-view-back svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-.ep-view-title {
-  flex: 1;
-  min-width: 0;
-  font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  font-size: 0.88rem;
-  font-weight: 900;
-  letter-spacing: -0.3px;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .season-all-btn {
 
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
@@ -659,15 +615,6 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.75);
-}
-.season-select-view {
-  display: none;
-  flex-direction: column;
-  padding: 20px 16px 32px;
-  gap: 0;
-}
-.season-select-view.active {
-  display: flex;
 }
 .ssv-grid {
   display: grid;
@@ -718,14 +665,6 @@ body {
   z-index: 1;
   pointer-events: none;
 }
-.ssv-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  padding: 10px 10px 12px;
-}
 .ssv-num {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
   font-size: 0.58rem;
@@ -745,49 +684,6 @@ body {
   color: #fff;
   letter-spacing: -0.2px;
   line-height: 1.2;
-}
-.ssv-ep-count {
-  font-size: 0.5rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
-  margin-top: 3px;
-}
-.ssv-active-badge {
-  position: absolute;
-  top: 9px;
-  right: 9px;
-  z-index: 3;
-  width: 22px;
-  height: 22px;
-
-  display: none;
-  align-items: center;
-  justify-content: center;
-  
-}
-.ssv-card.ssv-active .ssv-active-badge {
-  display: flex;
-}
-.ssv-active-badge svg {
-  width: 11px;
-  height: 11px;
-  fill: none;
-  stroke: #000;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-.ssv-play-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.22s;
-}
-.ssv-card:hover .ssv-play-overlay {
-  opacity: 1;
 }
 .ssv-play-btn {
   display: flex;
@@ -1189,40 +1085,6 @@ body {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text);
 }
-.mf-fab-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  transition: all 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
-  position: relative;
-  overflow: hidden;
-}
-.mf-fab-icon::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0,
-    transparent 55%
-  );
-  border-radius: inherit;
-  pointer-events: none;
-}
-.mf-fab-label {
-  font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-  font-size: 0.42rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: all 0.2s;
-  opacity: 0.55;
-}
 .watchlist-overlay {
   position: fixed;
   inset: 0;
@@ -1517,64 +1379,9 @@ canvas#particles {
   transform: scale(1.04);
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
 }
-.accent-swatches {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-.accent-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.18s;
-  position: relative;
-}
-.accent-swatch.active {
-  border-color: #fff;
-  transform: scale(1.15);
-}
-.accent-swatch.active::after {
-  content: "✓";
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  font-weight: 900;
-  color: rgba(0, 0, 0, 0.8);
-}
-.font-options {
-  display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-.font-option {
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  transition: all 0.18s;
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 600;
-}
-.font-option.active {
-  background: rgba(0, 122, 255, 0.1);
-  border-color: rgba(0, 122, 255, 0.35);
-  color: var(--accent);
-}
 .font-option:hover:not(.active) {
   border-color: rgba(255, 255, 255, 0.18);
   color: rgba(255, 255, 255, 0.8);
-}
-body.grain-none::after {
-  opacity: 0 !important;
 }
 
 @keyframes shimmer {
@@ -2076,7 +1883,6 @@ body.grain-none::after {
 }
 .pc-avatar-picker-toggle strong { display: block; font-size: .78rem; }
 .pc-avatar-picker-toggle small { display: block; margin-top: 3px; color: rgba(255,255,255,.38); font-size: .65rem; }
-.pc-avatar-picker-arrow { margin-left: auto; color: rgba(255,255,255,.42); font-size: 1.2rem; }
 .pc-avatar-picker {
   margin-bottom: 22px;
   padding: 10px;
@@ -2084,19 +1890,6 @@ body.grain-none::after {
   border-radius: 16px;
   background: rgba(0,0,0,.16);
 }
-.pc-avatar-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-.pc-avatar-tabs button {
-  flex: 1;
-  padding: 8px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: rgba(255,255,255,.42);
-  font: inherit;
-  font-size: .68rem;
-  cursor: pointer;
-}
-.pc-avatar-tabs button.active { background: rgba(10,132,255,.16); color: #fff; }
 .pc-avatar-search {
   width: 100%;
   box-sizing: border-box;
@@ -2126,19 +1919,6 @@ body.grain-none::after {
 .pc-avatar-option span { display: block; padding: 5px 4px; overflow: hidden; font-size: .56rem; text-overflow: ellipsis; white-space: nowrap; }
 .pc-avatar-option:hover, .pc-avatar-option.selected { border-color: #0a84ff; color: #fff; }
 .pc-avatar-loading { grid-column: 1 / -1; padding: 24px 8px; color: rgba(255,255,255,.38); font-size: .68rem; text-align: center; }
-.pc-avatar-back {
-  grid-column: 1 / -1;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 9px;
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.65);
-  font: inherit;
-  font-size: .68rem;
-  text-align: left;
-  cursor: pointer;
-}
-.pc-avatar-back:hover { color: #fff; background: rgba(10,132,255,.14); }
 .pc-character-option span { min-height: 24px; }
 .pc-input {
   width: 100%;
@@ -2423,13 +2203,8 @@ body.grain-none::after {
   background: rgba(255, 255, 255, 0.14);
 }
 :root {
-  --sys-blue: #007aff;
-  --sys-blue-tint: rgba(0, 122, 255, 0.12);
   --sys-bg1: #1c1c1e;
-  --sys-bg2: #2c2c2e;
   --sys-fill3: rgba(118, 118, 128, 0.24);
-  --mat-chrome: rgba(28, 28, 30, 0.92);
-  --mat-blur: saturate(200%) blur(28px);
   --font-sf:
     -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
 
@@ -2597,13 +2372,6 @@ header.mf-header {
 
   transition: all 0.15s ease !important;
 }
-
-.ssv-active-badge {
-  background: #007aff !important;
-  box-shadow: none !important;
-  border-radius: 5px !important;
-  font-weight: 700 !important;
-}
 .toast {
 
   font-family: var(--font-sf) !important;
@@ -2712,8 +2480,7 @@ body {
 }
 #modalBody,
 .episode-grid,
-.modal-body,
-.season-select-view {
+.modal-body{
   -webkit-overflow-scrolling: touch !important;
   scroll-behavior: smooth !important;
   overscroll-behavior: contain !important;
@@ -3074,25 +2841,6 @@ body {
   background: rgba(255, 255, 255, 0.15) !important;
   transform: rotate(90deg) scale(1.12) !important;
 }
-.ep-view-bar {
-  
-  backdrop-filter: blur(52px) saturate(2) !important;
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06) !important;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.03),
-    0 4px 24px rgba(0, 0, 0, 0.45) !important;
-}
-.ep-view-back {
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 11px !important;
-  
-  font-weight: 600 !important;
-}
-.ep-view-back:hover {
-  background: rgba(0, 122, 255, 0.12) !important;
-  border-color: rgba(0, 122, 255, 0.25) !important;
-}
 .season-all-btn {
   
   border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
@@ -3339,9 +3087,7 @@ body {
 }
 :root {
 
-  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.55);
 
-  --tile-h: 318px;
 }
 
 .logo {
@@ -3625,10 +3371,6 @@ body.mf-section-protebe #mfProfileBadge {
   --glass-bg: rgba(28, 28, 36, 0.72);
   --glass-border: rgba(255, 255, 255, 0.13);
   --glass-blur: blur(20px) saturate(1.5);
-  --glass-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  --glass-shadow-sm:
-    0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --ios-blue: #0a84ff;
 }
 #mfHeader,
@@ -3993,17 +3735,6 @@ body:not(.tv-mode):not(.appletv-mode) .episode-grid {
   background: transparent !important;
   grid-template-columns: unset !important;
 }
-.ep-view-bar {
-  padding: 14px 20px !important;
-  background: rgba(9, 12, 20, .98) !important;
-  border-bottom-color: rgba(255,255,255,.1) !important;
-}
-.ep-view-back {
-  min-height: 36px;
-  padding: 7px 14px 7px 10px !important;
-  color: rgba(255,255,255,.82) !important;
-  font-size: .72rem !important;
-}
 .season-all-btn {
   height: 36px !important;
   padding: 0 14px !important;
@@ -4071,10 +3802,6 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   border: 1px solid rgba(255,255,255,.13);
 }
 @media (max-width: 600px) {
-  .ep-view-bar {
-    flex-wrap: wrap;
-    gap: 8px !important;
-  }
 
   #seriesModal .episode-grid {
     display: grid !important;
@@ -4257,10 +3984,6 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
       min-width: 120px !important;
     }
   }
-  .ep-view-title {
-    order: 3;
-    flex-basis: 100%;
-  }
   body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-thumb {
     width: 126px !important;
     min-width: 126px !important;
@@ -4324,7 +4047,6 @@ body.modal-open .mf-profile-badge {
 
   --glass:             rgba(12,12,22,0.86);
   --plexi-border:      rgba(255,255,255,0.09);
-  --plexi-blur:        blur(52px) saturate(2.2) brightness(0.87);
 
   --border:    rgba(255,255,255,0.04);
 
@@ -4332,7 +4054,6 @@ body.modal-open .mf-profile-badge {
   --muted: rgba(255,255,255,0.36);
 
   --ease-spring: cubic-bezier(0.34,1.52,0.64,1);
-  --ease-soft:   cubic-bezier(0.25,0.8,0.25,1);
 
   --shadow:    0 2px 14px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.38);
   --shadow-lg: 0 20px 72px rgba(0,0,0,0.88), 0 6px 20px rgba(0,0,0,0.58);
@@ -4901,11 +4622,9 @@ input, textarea, select {
 
 :root {
   --jg-bg:         #000000;
-  --jg-dark-a:     rgba(17,24,39,0.85);
   --jg-border:     hsl(214,13%,32%);
   --jg-border-d:   hsl(214,13%,22%);
   --jg-border-l:   hsla(0,0%,100%,0.2);
-  --jg-sel:        rgb(55,65,81);
   --jg-sel-a:      rgba(55,65,81,0.5);
   --jg-active-a:   rgba(255,255,255,0.1);
   --jg-active:     #e0e0e0;
