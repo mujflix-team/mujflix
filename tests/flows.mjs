@@ -1267,9 +1267,18 @@ const arrT = await page.evaluate(async () => {
 });
 check("detail: řada herců má šipky (vpravo viditelná, vlevo ne) a bez posuvníku", arrT && arrT.hasR && arrT.rShown && arrT.lHidden && arrT.bar === "none", JSON.stringify(arrT));
 
-const ver = await page.evaluate(() => { MFSettings.open(); const t = document.getElementById("mfVersionLine")?.textContent; document.getElementById("mfBeautifulSettings")?.remove(); return t; });
-const pkgVer = JSON.parse((await import("node:fs")).readFileSync("package.json", "utf8")).version;
-check("verze v Nastavení = package.json a je tam odkaz na Soukromí a podmínky", ver === "MůjFlix v" + pkgVer + " · Soukromí a podmínky", String(ver) + " vs " + pkgVer);
+const setHash = await page.evaluate(async () => {
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const out = { oldGone: typeof window.MFSettings === "undefined" && typeof window.openSettings === "undefined" };
+  location.hash = "#settings"; await wait(300);
+  const m = document.getElementById("mfSettingsModal");
+  out.opened = !!m && getComputedStyle(m).display !== "none";
+  out.noKeyInputs = !document.getElementById("mfSetTmdb") && !document.getElementById("mfSetAnthro");
+  if (window.MFProfileSettings) MFProfileSettings.close();
+  location.hash = "#serialy";
+  return out;
+});
+check("Nastavení: adresa #settings otevře nové Nastavení, staré okno s políčky na API klíče už není", setHash.oldGone && setHash.opened && setHash.noKeyInputs, JSON.stringify(setHash));
 
 const cm = await page.evaluate(async () => {
   MFCinemaPlayer.open("1399", "Hra o trůny", "tv", { season: 1, episode: 1 });

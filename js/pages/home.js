@@ -536,35 +536,6 @@
         sec.hidden = false;
       }
 
-      window.mfhSeeAll = function (carouselId) {
-        var carousel = document.getElementById(carouselId);
-        var items = (carousel && carousel._mfhItems) || [];
-        var section = carousel && carousel.closest('section');
-        var titleEl = section && section.querySelector('.nf-row-title');
-        var modal = document.getElementById('mfhSeeAllModal');
-        if (!modal) return;
-        var titleTarget = document.getElementById('mfhSeeAllTitle');
-        if (titleTarget) titleTarget.textContent = titleEl ? titleEl.textContent : 'Vše';
-        var grid = document.getElementById('mfhSeeAllGrid');
-        if (grid) {
-          grid.innerHTML = items.length
-            ? items.map(function (it, i) { return mfhCardHtml(it, carouselId, i, 0); }).join('')
-            : '<p class="mfh-seeall-empty">Zatím tu nic není.</p>';
-          mfhBindCardImages(grid);
-        }
-        modal.classList.add('open');
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () { modal.classList.add('visible'); });
-        });
-      };
-
-      window.mfhCloseSeeAll = function () {
-        var modal = document.getElementById('mfhSeeAllModal');
-        if (!modal) return;
-        modal.classList.remove('visible');
-        setTimeout(function () { modal.classList.remove('open'); }, 250);
-      };
-
       /* ---------- Hero banner ---------- */
 
       var _heroItem = null;
@@ -1344,7 +1315,7 @@
         forceHome._lastRun = now;
         try {
           var OPEN_OVERLAY_IDS = [
-            'cinemaModal', 'mfStandaloneCinema', 'mfhSeeAllModal', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
+            'cinemaModal', 'mfStandaloneCinema', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
             'genreEditorOverlay',
             'wrappedOverlay',
             'dockMoreSheet'
@@ -1441,7 +1412,7 @@
         'cinemaModal', 'mfStandaloneCinema',
         'seriesModal', 'genreEditorOverlay',
         'wrappedOverlay',
-        'dockMoreSheet', 'mfhSeeAllModal'
+        'dockMoreSheet'
       ];
 
       function dockShouldShow() {

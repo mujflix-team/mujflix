@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.21.26
+- **Odstraněno staré okno Nastavení** (`MFSettings`) s políčky pro TMDB a Anthropic klíč: šlo otevřít jen adresou `#settings`, v appce na něj nic nevedlo. `#settings` teď otevře normální Nastavení z menu profilu (`MFProfileSettings`). Klíče se z aplikace nezadávají (TMDB jde přes Worker).
+- **Odstraněno nepoužívané okno „Zobrazit vše“** (`mfhSeeAll`, `#mfhSeeAllModal`, jeho CSS a zápisy v seznamech oken v `nav.js`, `dock.js`, `polish.js`, `home.js`): nic ho neotevíralo.
+- Test: `#settings` otevře nové Nastavení, staré okno a políčka na klíče neexistují.
+
+## 3.21.26
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.25
 - **Úklid CSS (~11 kB):** smazána pravidla pro třídy, které se nikde v HTML ani JS nepoužívají (`ep-view-*`, `ssv-*`, `sd-link(s)`, `pc-avatar-tabs`, `accent-swatch(es)`, `font-option(s)`, `grain-none`, `tv-mode`, `appletv-mode`, `nf-see-all` aj.) a 16 nepoužitých CSS proměnných. Selektory s `:not()` se nechaly. Vzhled se nemění.
 

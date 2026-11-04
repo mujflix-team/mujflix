@@ -208,8 +208,6 @@ html body.discover-open #mfDock { display: none !important; }
 
 /* „Zobrazit vše“ */
 .mfh-h2 { margin: 0; font: 700 1.2rem/1.2 -apple-system, "SF Pro Display", "Inter", sans-serif; color: #fff; }
-.mfh-seeall-grid .nf-card { width: 100%; }
-.mfh-seeall-grid { gap: 18px 12px; }
 
 /* telefon */
 @media (max-width: 899px) {
@@ -1281,7 +1279,7 @@ html body nav.nf-quick { background: #141414 !important; border: 0 !important; b
    Hlavička přes celou stránku: vlevo logo / nadpis, vpravo zavřít; okraje jako na úvodní stránce (--nf-pad). */
 :root { --mf-x: 44px; }
 @media (max-width: 899px) { :root { --mf-x: 40px; } }
-html body .wl-close, html body #universeOverlay .dv-close, html body #seriesModal .close-btn, html body .mfh-seeall-close, html body #mfStandaloneCinemaClose,
+html body .wl-close, html body #universeOverlay .dv-close, html body #seriesModal .close-btn, html body #mfStandaloneCinemaClose,
 html body #mfSyncModal .sy-x, html body #mfPrefsModal .pf-x, html body #mfSettingsModal .pf-x, html body .pc-close {
   width: var(--mf-x) !important; height: var(--mf-x) !important; min-width: var(--mf-x) !important; padding: 0 !important; margin: 0;
   border: 0 !important; border-radius: 50% !important; background: rgba(42, 42, 42, 0.92) !important; color: #fff !important;
@@ -1292,17 +1290,17 @@ html body #mfSyncModal .sy-x, html body #mfPrefsModal .pf-x, html body #mfSettin
 }
 html body .wl-close::before, html body .wl-close::after, html body #universeOverlay .dv-close::before, html body #universeOverlay .dv-close::after,
 html body #seriesModal .close-btn::before, html body #seriesModal .close-btn::after,
-html body .mfh-seeall-close::before, html body .mfh-seeall-close::after, html body #mfStandaloneCinemaClose::before, html body #mfStandaloneCinemaClose::after,
+html body #mfStandaloneCinemaClose::before, html body #mfStandaloneCinemaClose::after,
 html body #mfSyncModal .sy-x::before, html body #mfSyncModal .sy-x::after, html body #mfPrefsModal .pf-x::before, html body #mfPrefsModal .pf-x::after,
 html body #mfSettingsModal .pf-x::before, html body #mfSettingsModal .pf-x::after, html body .pc-close::before, html body .pc-close::after {
   content: ""; position: absolute; left: 50%; top: 50%; width: 18px; height: 2px; margin: -1px 0 0 -9px; border-radius: 1px; background: currentColor; display: block !important;
 }
-html body .wl-close::before, html body #universeOverlay .dv-close::before, html body #seriesModal .close-btn::before, html body .mfh-seeall-close::before, html body #mfStandaloneCinemaClose::before,
+html body .wl-close::before, html body #universeOverlay .dv-close::before, html body #seriesModal .close-btn::before, html body #mfStandaloneCinemaClose::before,
 html body #mfSyncModal .sy-x::before, html body #mfPrefsModal .pf-x::before, html body #mfSettingsModal .pf-x::before, html body .pc-close::before { transform: rotate(45deg); }
-html body .wl-close::after, html body #universeOverlay .dv-close::after, html body #seriesModal .close-btn::after, html body .mfh-seeall-close::after, html body #mfStandaloneCinemaClose::after,
+html body .wl-close::after, html body #universeOverlay .dv-close::after, html body #seriesModal .close-btn::after, html body #mfStandaloneCinemaClose::after,
 html body #mfSyncModal .sy-x::after, html body #mfPrefsModal .pf-x::after, html body #mfSettingsModal .pf-x::after, html body .pc-close::after { transform: rotate(-45deg); }
 html body #mfStandaloneCinemaClose svg { display: none !important; }
-html body .wl-close:hover, html body #universeOverlay .dv-close:hover, html body #seriesModal .close-btn:hover, html body .mfh-seeall-close:hover, html body #mfStandaloneCinemaClose:hover,
+html body .wl-close:hover, html body #universeOverlay .dv-close:hover, html body #seriesModal .close-btn:hover, html body #mfStandaloneCinemaClose:hover,
 html body #mfSyncModal .sy-x:hover, html body #mfPrefsModal .pf-x:hover, html body #mfSettingsModal .pf-x:hover, html body .pc-close:hover { background: rgba(80, 80, 80, 0.95) !important; }
 /* okna: křížek vpravo nahoře ve stejné vzdálenosti */
 html body #mfSyncModal .sy-x, html body #mfPrefsModal .pf-x, html body #mfSettingsModal .pf-x { position: absolute; top: 12px; right: 12px; }
