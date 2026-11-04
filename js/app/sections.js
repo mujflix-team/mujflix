@@ -56,7 +56,7 @@ function _bombujMovieUrlVariants(e, t) {
         "function" == typeof openWatchlist && openWatchlist()
       },
       "#settings": () => {
-        "function" == typeof openSettings && openSettings()
+        window.MFProfileSettings && window.MFProfileSettings.open()
       },
       "#profil": () => {
         void 0 !== ProfileGate && ProfileGate.show()
@@ -85,8 +85,7 @@ function _bombujMovieUrlVariants(e, t) {
         return o[t] && e(o[t]), window._mfShowSection_orig.call(this, t, ...n)
       });
       if ([
-          ["openWatchlist", "#watchlist"],
-          ["openSettings", "#settings"]
+          ["openWatchlist", "#watchlist"]
         ].forEach(([t, n]) => {
           if ("function" == typeof window[t]) {
             const o = window[t];
@@ -122,7 +121,7 @@ function _bombujMovieUrlVariants(e, t) {
     })
   }(), function() {
     let e = "serialy";
-    window.mfSectionBtn = function(e, t) {}, window.mfShowSection = function(t) {
+    window.mfShowSection = function(t) {
       e = t, window._mfCurrentSection = t;
       const n = document.querySelector(".ps-menu-scene"),
         o = document.querySelector(".key-hint"),
@@ -257,134 +256,4 @@ function _bombujMovieUrlVariants(e, t) {
         n.style.viewTransitionName = ""
       }, 700))
     }, !0)
-  }), window.JWAvail = function() {
-    const e = {},
-      t = 432e5,
-      n = void 0 !== window.TMDB_KEY ? window.TMDB_KEY : null,
-      o = {
-        flatrate: {
-          label: "Streaming",
-          color: "#30d158",
-          icon: "▶"
-        },
-        rent: {
-          label: "Pronájem",
-          color: "#ff9f0a",
-          icon: "🔑"
-        },
-        buy: {
-          label: "Koupit",
-          color: "#007AFF",
-          icon: "🛒"
-        },
-        free: {
-          label: "Zdarma",
-          color: "#5ac8fa",
-          icon: "✨"
-        }
-      };
-    async function i(o, i) {
-      const a = `${i}_${o}`,
-        s = Date.now();
-      if (e[a] && s - e[a].ts < t) return e[a].data;
-      try {
-        const n = safeLS("mf_jw_" + a, "null");
-        if (n && s - n.ts < t) return e[a] = n, n.data
-      } catch (e) {}
-      if (!n) return null;
-      try {
-        const t = "movie" === i ? `https://api.themoviedb.org/3/movie/${o}/watch/providers?api_key=${n}` : `https://api.themoviedb.org/3/tv/${o}/watch/providers?api_key=${n}`,
-          r = await fetch(t);
-        if (!r.ok) return null;
-        const l = await r.json(),
-          c = l.results?.CZ || l.results?.SK || l.results?.DE || null,
-          d = {
-            data: c,
-            ts: s
-          };
-        e[a] = d;
-        try {
-          localStorage.setItem("mf_jw_" + a, JSON.stringify(d))
-        } catch (e) {}
-        return c
-      } catch (e) {
-        return null
-      }
-    }
-    async function a(e, t, n) {
-      if (!e || !t) return;
-      e.innerHTML = '<div style="display:flex;gap:8px;align-items:center;opacity:0.35;">\n      <div class="sk-block" style="width:28px;height:28px;border-radius:8px;"></div>\n      <div class="sk-block" style="width:28px;height:28px;border-radius:8px;"></div>\n      <div class="sk-block" style="width:28px;height:28px;border-radius:8px;"></div>\n    </div>';
-      const a = await i(t, n);
-      if (!a) return void(e.innerHTML = "");
-      let s = [];
-      ["flatrate", "rent", "buy", "free"].forEach(e => {
-        if (!a[e] || !a[e].length) return;
-        const t = a[e].slice(0, 4),
-          n = o[e];
-        s.push(`\n        <div style="margin-bottom:10px;">\n          <div style="font-size:0.55rem;font-weight:700;letter-spacing:0.5px;color:${n.color};margin-bottom:5px;text-transform:uppercase;">${n.icon} ${n.label}</div>\n          <div style="display:flex;gap:6px;flex-wrap:wrap;">\n            ${t.map(e=>{return`\n              <div title="${escapeHTML(e.provider_name)}" style="width:30px;height:30px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);flex-shrink:0;cursor:default;" >\n                <img src="${t=e.logo_path,`https://image.tmdb.org/t/p/original${t}`}" alt="${e.provider_name}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">\n              </div>`;var t}).join("")}\n          </div>\n        </div>`)
-      }), 0 !== s.length ? e.innerHTML = `\n      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:4px;">\n        <div style="font-size:0.6rem;color:rgba(255,255,255,0.35);margin-bottom:8px;display:flex;align-items:center;gap:5px;">\n          <span>Dostupné přes</span>\n          <span style="opacity:0.4">·</span>\n          <a href="https://www.justwatch.com/cz" target="_blank" rel="noopener" style="color:rgba(0,122,255,0.7);text-decoration:none;font-size:0.55rem;">JustWatch</a>\n        </div>\n        ${s.join("")}\n      </div>` : e.innerHTML = '<div style="font-size:0.62rem;color:rgba(255,255,255,0.25);padding:4px 0;">Není dostupné ve streaming službách v CZ</div>'
-    }
-    return {
-      render: a,
-      fetchProviders: i,
-      injectIntoModal: function(e, t) {
-        setTimeout(() => {
-          const n = document.querySelector(".jw-avail-slot");
-          n && a(n, e, t)
-        }, 200)
-      }
-    }
-  }(), window.MFSettings = function() {
-
-    function t(e) {
-      return escapeHTML(e)
-    }
-
-    return {
-      open: function() {
-        document.getElementById("mfBeautifulSettings") || function() {
-          const a = localStorage.getItem("mf_tmdb_key") || "",
-            s = document.createElement("div");
-          s.id = "mfBeautifulSettings", s.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.75);backdrop-filter:blur(24px);display:flex;align-items:flex-end;justify-content:center;font-family:-apple-system,Inter,sans-serif;animation:mfSettFade 0.22s ease;";
-          const r = document.createElement("div");
-          r.style.cssText = "background:rgba(18,18,26,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -20px 60px rgba(0,0,0,0.6);animation:mfSettUp 0.38s cubic-bezier(0.34,1.1,0.64,1);", r.innerHTML = `\n      \x3c!-- Handle --\x3e\n      <div style="display:flex;justify-content:center;padding:12px 0 4px;">\n        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.18);"></div>\n      </div>\n\n      \x3c!-- Header --\x3e\n      <div style="padding:16px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">\n        <div style="display:flex;align-items:center;justify-content:space-between;">\n          <div>\n            <div style="font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-0.3px;">Nastavení</div>\n            <div style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-top:2px;">MůjFlix konfigurace</div>\n          </div>\n          <button id="mfSetClose" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>\n        </div>\n      </div>\n\n      \x3c!-- Section: TMDB --\x3e\n      <div style="padding:20px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🎬 Film databáze</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">TMDB API klíč</label>\n          <input id="mfSetTmdb" type="password" placeholder="Vložte váš TMDB API klíč…" value="${t(a)}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:inherit;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;line-height:1.5;">\n            Získej zdarma na <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="color:rgba(0,122,255,0.7);">themoviedb.org</a> → API → Klíč v3\n          </div>\n        </div>\n      </div>\n\n      \x3c!-- Section: AI --\x3e\n      <div style="padding:16px 24px 0;">\n        <div style="font-size:0.55rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">🤖 AI asistent</div>\n        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:8px;">\n          <label style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:6px;">Anthropic API klíč</label>\n          <input id="mfSetAnthro" type="password" placeholder="sk-ant-…" value="${t(localStorage.getItem("mf_anthropic_key")||"")}"\n            style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:0.8rem;outline:none;box-sizing:border-box;font-family:monospace;">\n          <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:6px;">Potřeba pro AI doporučení. Získej na <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,122,255,0.7);">console.anthropic.com</a></div>\n        </div>\n\n        \n      </div>\n\n      \x3c!-- Save button --\x3e\n      <div style="padding:24px 24px 0;">\n        <button id="mfSetSave" style="width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#007AFF,#5ac8fa);border:none;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:-0.2px;">Uložit nastavení</button>\n      </div>\n    `, s.appendChild(r), document.body.appendChild(s),
-            function() {
-              if (document.getElementById("mfSettStyle")) return;
-              const e = document.createElement("style");
-              e.id = "mfSettStyle", e.textContent = "\n      @keyframes mfSettFade { from{opacity:0} to{opacity:1} }\n      @keyframes mfSettUp { from{transform:translateY(40px);opacity:0} to{transform:none;opacity:1} }\n      #mfBeautifulSettings input::placeholder { color:rgba(255,255,255,0.2); }\n      #mfBeautifulSettings *::-webkit-scrollbar { width:3px; }\n      #mfBeautifulSettings *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12);border-radius:3px; }\n    ", document.head.appendChild(e)
-            }(),
-            function(e) {
-              const v = document.createElement("div");
-              v.id = "mfVersionLine", v.style.cssText = "text-align:center;font-size:11px;color:rgba(255,255,255,0.35);padding:18px 0 0", v.innerHTML = "MůjFlix v" + String(window.MF_VERSION || "?").replace(/[^\w.\-]/g, "") + ' · <a href="soukromi.html" target="_blank" rel="noopener" style="color:inherit">Soukromí a podmínky</a>',(e.firstElementChild || e).appendChild(function() {
-                const r = document.createElement("label");
-                r.id = "mfAnimeRow", r.style.cssText = "display:flex;align-items:center;gap:10px;padding:16px 24px 0;font-size:13px;color:rgba(255,255,255,0.8);cursor:pointer";
-                const c = document.createElement("input");
-                c.type = "checkbox", c.id = "mfAnimeToggle", c.checked = !!(window.mfLikesAnime && window.mfLikesAnime()), c.onchange = () => {
-                  const p = _getProfiles(), id = getActiveProfileId(), pr = p.find(x => x.id === id);
-                  pr && (pr.prefs = { ...pr.prefs, likesAnime: c.checked }, _saveProfiles(p), window.dispatchEvent(new Event("mf:profile-changed")), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof showToast && showToast(c.checked ? "Anime se přimíchá do doporučení" : "Anime se už nepřimíchává"))
-                };
-                const t = document.createElement("span");
-                return t.textContent = "Přimíchávat anime do doporučení", r.append(c, t), r
-              }());
-              (e.firstElementChild || e).appendChild(v);
-              e.querySelector("#mfSetClose").onclick = () => e.remove(), e.addEventListener("click", t => {
-                t.target === e && e.remove()
-              }), e.querySelectorAll("input").forEach(e => {
-                e.addEventListener("focus", () => e.style.borderColor = "rgba(0,122,255,0.45)"), e.addEventListener("blur", () => e.style.borderColor = "rgba(255,255,255,0.09)")
-              }), e.querySelector("#mfSetSave").onclick = () => {
-                const n = e.querySelector("#mfSetTmdb").value.trim();
-                n ? safeSetItem("mf_tmdb_key", n) : localStorage.removeItem("mf_tmdb_key"), TMDB_KEY = mfTmdbKey(), window.TMDB_KEY = TMDB_KEY;
-                const a = e.querySelector("#mfSetAnthro").value.trim();
-                a ? safeSetItem("mf_anthropic_key", a) : localStorage.removeItem("mf_anthropic_key"), e.remove(), "function" == typeof showToast && showToast("✅ Nastavení uloženo!", "success")
-              }
-            }(s)
-        }()
-      }
-    }
-  }(),
-  function() {
-    window.openSettings;
-    window.openSettings = function() {
-      MFSettings.open()
-    }
-  }();
+  });

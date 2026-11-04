@@ -18,6 +18,10 @@ check("worker: kód má 6 znaků bez 0/O/1/I", c.status === 200 && /^[A-HJ-NP-Z2
 check("worker: pull vrátí uložená data", (await call("/sync/pull", { id })).json.data.keys.a.v === "1");
 const j = await call("/sync/join", { code: c.json.code.toLowerCase() });
 check("worker: kód (i malými písmeny) vymění za ID", j.json.id === id);
+const c2 = await call("/sync/code", { id });
+check("worker: code-status: nový kód čeká (pending), cizí ID ani zlý kód nic neprozradí", (await call("/sync/code-status", { id, code: c2.json.code })).json.pending === true && (await call("/sync/code-status", { id: "b".repeat(40), code: c2.json.code })).json.pending === false && (await call("/sync/code-status", { id, code: "x" })).status === 400);
+await call("/sync/join", { code: c2.json.code });
+check("worker: code-status: po použití kódu pending=false", (await call("/sync/code-status", { id, code: c2.json.code })).json.pending === false);
 check("worker: kód je jednorázový", (await call("/sync/join", { code: c.json.code })).status === 404);
 check("worker: krátké ID se odmítne", (await call("/sync/pull", { id: "short" })).status === 400);
 check("worker: cizí Origin se odmítne a nedostane CORS", (await call("/sync/pull", { id }, "https://evil.x")).status === 403);

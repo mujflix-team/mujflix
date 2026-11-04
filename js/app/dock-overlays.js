@@ -26,16 +26,6 @@ function closeDockMore() {
   } [window._mfCurrentSection || "serialy"] || "dockHome")
 }
 
-function _syncDockBadges() {
-  const n = document.getElementById("notifBellBadge"),
-    o = document.getElementById("hdrNotifBadge");
-  if (o) {
-    const e = n && "" !== n.textContent.trim() && "none" !== n.style.display;
-    o.textContent = e ? "!" : "", o.classList.toggle("visible", e)
-  }
-  const d = document.getElementById("nfBellDot");
-  d && d.classList.toggle("visible", !!(n && "" !== n.textContent.trim() && "none" !== n.style.display))
-}
 document.addEventListener("keydown", function(e) {
     if ("INPUT" === e.target.tagName || "TEXTAREA" === e.target.tagName) return;
     const t = document.getElementById("seriesModal"),
@@ -67,7 +57,7 @@ function triggerPwaInstall() {
 }
 "function" == typeof _origCloseWatchlist && (window.closeWatchlist = function(...e) {
     return setDockActive("dockHome"), _origCloseWatchlist.apply(this, e)
-  }), setInterval(() => { document.hidden || _syncDockBadges() }, 6e3), setTimeout(_syncDockBadges, 500), window.addEventListener("beforeinstallprompt", e => {
+  }), window.addEventListener("beforeinstallprompt", e => {
     e.preventDefault(), window._pwaInstallPrompt = e;
     const t = document.getElementById("pwaInstallBtn");
     t && (t.style.display = "flex", t.onclick = async () => {
@@ -228,7 +218,7 @@ function triggerPwaInstall() {
           passive: !1
         })
       })
-    }), window._refreshPanelRatingSummary = r, window._epRatingRefreshCard = s, window._epRatingOpenFromCard = l, window._epRatingRefreshPanel = r
+    }), window._epRatingOpenFromCard = l, window._epRatingRefreshPanel = r
   }(),
   function() {
     const e = localStorage.setItem.bind(localStorage);

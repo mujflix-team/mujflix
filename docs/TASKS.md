@@ -19,6 +19,10 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.26: odstraněno staré Nastavení s políčky na API klíče a nepoužívané okno „Zobrazit vše“.
+- 3.21.25: úklid CSS (nepoužité třídy a proměnné, -11 kB).
+- 3.21.24: propojení zařízení má stavový řádek, QR se načítá spolehlivě (opakování + Zkusit znovu), první zařízení pozná připojení druhého (nový Worker).
+- 3.21.23: úklid mrtvého kódu (notifikace, nepoužívané funkce, CSS .notif-*).
 - 3.21.22: bot u /f|s|c/… dostane index.html s tagy titulu místo 404.html.
 - 3.21.21: popis náhledu odkazu ve formátu „Film · rok · ★ hodnocení — děj“.
 - 3.21.20: oprava „Stránka nebyla nalezena“ u titulových odkazů (funkce pouští běžné návštěvníky přes next()); Sdílet a náhled titulů dány do main.

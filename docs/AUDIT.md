@@ -1,5 +1,7 @@
 # Audit MůjFlix 3.15.0 (pohled nového uživatele)
 
+> **Stav k 3.21.26:** audit je z verze 3.15, bere se jako archiv. Vyřešeno: skryté funkce smazány (Premiéry, Kolekce, Nálada, Vzhled; 3.16), starý přehrávač zmenšen na most (`cinema-legacy.js`, 3.21.8), mrtvý kód a CSS uklizeny (3.21.23–3.21.26), Nastavení v menu profilu je jedno okno. Zůstává otevřené: přejmenování „Oblíbené → Můj seznam“ (bod 4), sloučení duplicit na úvodní stránce a v Procházení (body 3 a 5), první spuštění (bod 7). Průběžný seznam je v `docs/TASKS.md`.
+
 Prošlo se: výběr profilu, úvodní stránka, Procházení (Seriály/Filmy/hledání), Oblíbené, Nastavení, detail seriálu, přehrávač – telefon (390 px) i PC (1440 px). Screenshoty z demo prostředí.
 
 ## Jak to vypadá a funguje teď

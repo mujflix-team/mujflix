@@ -1429,10 +1429,5 @@
     }, 800);
   };
 
-  window.MFLegalProviders = {
-    show: renderLegalProviders,
-    providers: STREAMING_PROVIDERS
-  };
-
 })();
 

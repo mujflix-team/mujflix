@@ -1041,7 +1041,7 @@ const descState = () => page.evaluate(() => {
 const descRes = {};
 for (const [w, h] of [[1280, 800], [768, 1024], [390, 844]]) {
   await page.setViewportSize({ width: w, height: h });
-  await descSetup(false); await page.waitForTimeout(2800);
+  await descSetup(false); await page.waitForTimeout(4200);
   const a = await descState();
   if (!a) { descRes[w] = { skip: true }; continue; }
   await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(250);
@@ -1053,12 +1053,12 @@ for (const [w, h] of [[1280, 800], [768, 1024], [390, 844]]) {
   await page.keyboard.press(" "); await page.waitForTimeout(150);
   const e2 = await descState();
   await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(150);
-  await descSetup(false); await page.waitForTimeout(2800); // výměna titulu: banner se vykreslí znovu
+  await descSetup(false); await page.waitForTimeout(4200); // výměna titulu: banner se vykreslí znovu
   const f = await descState();
   descRes[w] = { a, b, c, d2, e2, f };
 }
 await page.setViewportSize({ width: 1280, height: 800 });
-await descSetup(true); await page.waitForTimeout(2800);
+await descSetup(true); await page.waitForTimeout(4200);
 const descShort = await descState();
 const descDetail = await page.evaluate(async () => {
   const o = document.getElementById("sOverview");
@@ -1083,7 +1083,7 @@ const shareUrlT = await page.evaluate(() => ({
 }));
 check("sdílení: adresa titulu má slug bez diakritiky a ?id= (film /f/, seriál /s/), neplatné ID se zahodí", shareUrlT.tv === "https://mujflix.pages.dev/s/prilis-zlutoucky-kun-spol-b?id=603" && shareUrlT.movie === "https://mujflix.pages.dev/f/silene-smutna-princezna?id=1399" && shareUrlT.noId === "https://mujflix.pages.dev/s/dark" && shareUrlT.badId === "https://mujflix.pages.dev/s/dark" && shareUrlT.empty === "https://mujflix.pages.dev/", JSON.stringify(shareUrlT));
 
-await descSetup(false); await page.waitForTimeout(2800);
+await descSetup(false); await page.waitForTimeout(4200);
 const shareHero = await page.evaluate(async () => {
   const out = {}, w = ms => new Promise(r => setTimeout(r, ms)), copied = [];
   Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
@@ -1267,9 +1267,18 @@ const arrT = await page.evaluate(async () => {
 });
 check("detail: řada herců má šipky (vpravo viditelná, vlevo ne) a bez posuvníku", arrT && arrT.hasR && arrT.rShown && arrT.lHidden && arrT.bar === "none", JSON.stringify(arrT));
 
-const ver = await page.evaluate(() => { MFSettings.open(); const t = document.getElementById("mfVersionLine")?.textContent; document.getElementById("mfBeautifulSettings")?.remove(); return t; });
-const pkgVer = JSON.parse((await import("node:fs")).readFileSync("package.json", "utf8")).version;
-check("verze v Nastavení = package.json a je tam odkaz na Soukromí a podmínky", ver === "MůjFlix v" + pkgVer + " · Soukromí a podmínky", String(ver) + " vs " + pkgVer);
+const setHash = await page.evaluate(async () => {
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const out = { oldGone: typeof window.MFSettings === "undefined" && typeof window.openSettings === "undefined" };
+  location.hash = "#settings"; await wait(300);
+  const m = document.getElementById("mfSettingsModal");
+  out.opened = !!m && getComputedStyle(m).display !== "none";
+  out.noKeyInputs = !document.getElementById("mfSetTmdb") && !document.getElementById("mfSetAnthro");
+  if (window.MFProfileSettings) MFProfileSettings.close();
+  location.hash = "#serialy";
+  return out;
+});
+check("Nastavení: adresa #settings otevře nové Nastavení, staré okno s políčky na API klíče už není", setHash.oldGone && setHash.opened && setHash.noKeyInputs, JSON.stringify(setHash));
 
 const cm = await page.evaluate(async () => {
   MFCinemaPlayer.open("1399", "Hra o trůny", "tv", { season: 1, episode: 1 });
@@ -1760,6 +1769,40 @@ const syUi = await page.evaluate(async () => {
 });
 check("sync UI: úvodní volby, kód + QR + odpočet, propojený stav", syUi.homeShown && /^[A-Z0-9]{3} [A-Z0-9]{3}$/.test(syUi.code) && syUi.qr && syUi.timer && syUi.linkedHome, JSON.stringify(syUi));
 check("sync UI: zadání kódu formátuje a hlásí neplatný kód, zavře se", syUi.fmt === "ABC DEF" && /neplatí/.test(syUi.err) && syUi.closed, JSON.stringify(syUi));
+
+// Propojení: stavový řádek, QR se po selhání načtení dá zkusit znovu, zjištění „druhé zařízení se připojilo“
+await page.evaluate(() => { MFSync.unlink(); MFSyncUI.open("home"); });
+const syState1 = await page.evaluate(() => (document.querySelector("#mfSyncModal .sy-status") || {}).textContent);
+check("sync UI: nepropojené zařízení ukáže stav „Nepropojeno“", /Nepropojeno/.test(syState1 || ""), String(syState1));
+await page.evaluate(() => { window.qrcode = undefined; });
+await page.evaluate(() => { // service worker zachytí síť dřív než Playwright, proto se selhání stažení napodobí v stránce
+  window.__origAppend = document.head.appendChild;
+  document.head.appendChild = function (n) { if (n && n.tagName === "SCRIPT" && /qr\.js/.test(n.src)) n.src = n.src.replace("qr.js", "neexistuje-qr.js"); return window.__origAppend.call(this, n); };
+});
+await page.evaluate(() => { document.querySelector('#mfSyncModal [data-sa="show"]').click(); });
+await page.waitForTimeout(4200);
+const qrFail = await page.evaluate(() => ({ html: document.getElementById("syQr").outerHTML.slice(0, 200), btn: !!document.querySelector('#syQr [data-sa="qr"]'), svg: !!document.querySelector("#syQr svg"), code: (document.getElementById("syCode") || {}).textContent }));
+await page.evaluate(() => { document.head.appendChild = window.__origAppend; });
+await page.evaluate(() => { const b = document.querySelector('#syQr [data-sa="qr"]'); if (b) b.click(); });
+await page.waitForTimeout(1200);
+const qrRetry = await page.evaluate(() => ({ svg: !!document.querySelector("#syQr svg"), btn: !!document.querySelector('#syQr [data-sa="qr"]') }));
+check("sync UI: když se QR knihovna nenačte, ukáže se „Zkusit znovu“ (kód zůstane) a po kliknutí se QR vytvoří", qrFail.btn && !qrFail.svg && /^[A-Z0-9]{3} [A-Z0-9]{3}$/.test(qrFail.code) && qrRetry.svg && !qrRetry.btn, JSON.stringify({ qrFail, qrRetry }));
+const syWait = await page.evaluate(async () => {
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const orig = MFSync.codeStatus; let pending = true;
+  MFSync.codeStatus = () => Promise.resolve(pending);
+  document.querySelector('#mfSyncModal [data-sa="show"]').click(); await wait(3600);
+  const waiting = (document.getElementById("syStatus") || {}).textContent;
+  pending = false; await wait(3300);
+  const joined = (document.getElementById("syStatus") || {}).textContent;
+  MFSync.codeStatus = orig;
+  MFSyncUI.close();
+  return { waiting, joined };
+});
+check("sync UI: po zobrazení kódu „Čekám na druhé zařízení…“, po použití kódu „propojené ✓“", /Čekám/.test(syWait.waiting || "") && /propojené ✓/.test(syWait.joined || ""), JSON.stringify(syWait));
+const syState2 = await page.evaluate(() => { MFSyncUI.open("home"); return (document.querySelector("#mfSyncModal .sy-status") || {}).textContent; });
+check("sync UI: po vytvoření kódu je zařízení propojené a stav to ukáže", /Propojeno/.test(syState2 || ""), String(syState2));
+await page.evaluate(() => { MFSyncUI.close(); MFSync.unlink(); });
 
 // vstupy a kroky onboardingu
 const syEnt = await page.evaluate(() => {

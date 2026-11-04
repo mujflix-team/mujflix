@@ -1,5 +1,55 @@
 # Changelog
 
+## 3.21.26
+- **Odstraněno staré okno Nastavení** (`MFSettings`) s políčky pro TMDB a Anthropic klíč: šlo otevřít jen adresou `#settings`, v appce na něj nic nevedlo. `#settings` teď otevře normální Nastavení z menu profilu (`MFProfileSettings`). Klíče se z aplikace nezadávají (TMDB jde přes Worker).
+- **Odstraněno nepoužívané okno „Zobrazit vše“** (`mfhSeeAll`, `#mfhSeeAllModal`, jeho CSS a zápisy v seznamech oken v `nav.js`, `dock.js`, `polish.js`, `home.js`): nic ho neotevíralo.
+- Test: `#settings` otevře nové Nastavení, staré okno a políčka na klíče neexistují.
+
+## 3.21.26
+### Nově
+- 
+
+### Opraveno
+- 
+
+## 3.21.25
+- **Úklid CSS (~11 kB):** smazána pravidla pro třídy, které se nikde v HTML ani JS nepoužívají (`ep-view-*`, `ssv-*`, `sd-link(s)`, `pc-avatar-tabs`, `accent-swatch(es)`, `font-option(s)`, `grain-none`, `tv-mode`, `appletv-mode`, `nf-see-all` aj.) a 16 nepoužitých CSS proměnných. Selektory s `:not()` se nechaly. Vzhled se nemění.
+
+## 3.21.25
+### Nově
+- 
+
+### Opraveno
+- 
+
+## 3.21.24
+- **Propojení zařízení – stav a spolehlivost:**
+  - nahoře je stavový řádek s puntíkem: *Nepropojeno* (šedá), *Propojeno · poslední synchronizace…* (zelená), *Synchronizuji…* / *Čekám na druhé zařízení…* (modrá), *Synchronizace se nepovedla* / *Bez připojení* / *Kód vypršel* (oranžová);
+  - **QR se už nevytvoří „napůl“:** knihovna QR se stahuje hned při otevření nabídky a při chybě se zkusí ještě dvakrát; když to nevyjde, ukáže se hláška a tlačítko **Zkusit znovu** (dřív se QR bez zprávy schoval a bylo třeba otevřít kód znovu);
+  - první zařízení pozná, že druhé kód použilo, a ukáže „Druhé zařízení je propojené ✓“. Vyžaduje nasazení Workeru (nová cesta `/sync/code-status`); se starým Workerem se řádek „Čekám…“ jen skryje.
+- Worker: `POST /sync/code-status {id, code} → {pending}` (jen čtení, funguje jen pro zařízení, které zná ID sady dat). Test v `tests/worker.mjs`.
+- Testy: stavy, selhání načtení QR + „Zkusit znovu“, zjištění propojení.
+
+## 3.21.24
+### Nově
+- 
+
+### Opraveno
+- 
+
+## 3.21.23
+- **Úklid mrtvého kódu (~330 řádků)**, bez změny chování aplikace:
+  - panel Novinky/zvonek: `checkNewEpisodes`, `fetchRecommendedNews`, `closeNotifPanel`, `mfNotify`, odznaky v docku, šipka panelu a všechna CSS pravidla `.notif-*` (prvky v aplikaci už dávno nebyly, test „zvonek už není“ to hlídá);
+  - nepoužívané funkce: `JWAvail` (přímé volání TMDB s klíčem), `MFLegalProviders` (export), `_computeWatchMomentum`, `mfSyncDockToView`, prázdná `mfSectionBtn`, nepoužité globální `_refreshPanelRatingSummary` a `_epRatingRefreshCard`.
+  - `notify.js` zůstává (editor žánrů, karta epizody, registrace service workeru), jen bez notifikací.
+
+## 3.21.23
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.22
 - **Oprava náhledu odkazů v chatech („Stránka nenalezena“):** adresa `/f|s|c/…` nemá vlastní soubor a statická vrstva pro ni vrací `404.html`, takže chat ukázal její název. Bot teď v tom případě dostane hlavní stránku z `ASSETS` s tagy titulu (status 200). Běžný prohlížeč se nemění. Testy doplněny.
 - Do `main` se dostal i nový popis náhledu (3.21.21), který v #35 chyběl.

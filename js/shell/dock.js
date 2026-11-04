@@ -64,10 +64,9 @@
       clearTimeout(timer);
       timer = setTimeout(apply, typeof delay === "number" ? delay : 60);
     }
-    window.mfSyncDockToView = sync;
     window.mfDockTarget = target;
     function init() {
-      ["universeOverlay", "watchlistOverlay", "mfProfileGate", "mfSectionProtebe", "seriesModal", "mfStandaloneCinema", "cinemaModal", "mfhSeeAllModal", "dockMoreSheet", "ratingOverlay"].forEach(function (id) {
+      ["universeOverlay", "watchlistOverlay", "mfProfileGate", "mfSectionProtebe", "seriesModal", "mfStandaloneCinema", "cinemaModal", "dockMoreSheet", "ratingOverlay"].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) new MutationObserver(function () { sync(); }).observe(el, { attributes: true, attributeFilter: ["class", "style"] });
       });

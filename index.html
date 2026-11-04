@@ -51,20 +51,19 @@
 
     <link rel="manifest" href="manifest.webmanifest?v=3" />
 
-    <link rel="stylesheet" href="css/styles.css?v=8" />
+    <link rel="stylesheet" href="css/styles.css?v=10" />
     <link rel="stylesheet" href="css/patches.css" />
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
-    <link rel="stylesheet" href="css/netflix.css?v=24" />
+    <link rel="stylesheet" href="css/netflix.css?v=28" />
 
     <style>
       .key-hint { display: none !important; }
     </style>
 
     <style>
-      #mfHeader,
-      .notif-panel {
+      #mfHeader {
         -webkit-backdrop-filter: blur(28px) saturate(1.6) !important;
         backdrop-filter: blur(28px) saturate(1.6) !important;
       }
@@ -1221,16 +1220,6 @@
       </footer>
     </div>
 
-    <div class="mfh-seeall-overlay" id="mfhSeeAllModal">
-      <div class="mfh-seeall-panel">
-        <div class="mfh-seeall-head">
-          <h2 class="mfh-h2" id="mfhSeeAllTitle">Vše</h2>
-          <button class="mfh-seeall-close" onclick="mfhCloseSeeAll()">&#x2715;</button>
-        </div>
-        <div class="mfh-seeall-grid" id="mfhSeeAllGrid"></div>
-      </div>
-    </div>
-
     <style id="mfh-styles">
 
       body.mfh-home-on .ps-menu-scene { display: none !important; }
@@ -1304,40 +1293,6 @@
         pointer-events: none;
       }
 
-      .mfh-seeall-overlay {
-        display: none;
-        position: fixed; inset: 0; z-index: 20000;
-        background: rgba(6,6,8,0.72);
-        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-        opacity: 0; transition: opacity 0.22s ease;
-        overflow-y: auto; padding: max(40px, env(safe-area-inset-top,0px)) 20px 40px;
-      }
-      .mfh-seeall-overlay.open { display: block; }
-      .mfh-seeall-overlay.visible { opacity: 1; }
-      .mfh-seeall-panel {
-        max-width: 1100px; margin: 0 auto;
-        background: #121216; border: 1px solid rgba(255,255,255,.08);
-        border-radius: 18px; padding: 22px clamp(16px,3vw,28px) 28px;
-        transform: translateY(14px); transition: transform 0.22s ease;
-      }
-      .mfh-seeall-overlay.visible .mfh-seeall-panel { transform: translateY(0); }
-      .mfh-seeall-head {
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 18px;
-      }
-      .mfh-seeall-close {
-        background: rgba(255,255,255,.08); border: none; color: #fff;
-        width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
-        font-size: .9rem; display: flex; align-items: center; justify-content: center;
-      }
-      .mfh-seeall-close:hover { background: rgba(255,255,255,.16); }
-      .mfh-seeall-grid {
-        display: grid; gap: 14px;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      }
-      .mfh-seeall-empty {
-        color: rgba(255,255,255,.4); font-size: .85rem; padding: 30px 0; text-align: center;
-      }
     
     </style>
 
@@ -1807,21 +1762,21 @@
     <script src="js/core/adblock.js" defer></script>
     <script src="js/core/genres.js" defer></script>
     <script src="js/core/age.js" defer></script>
-    <script src="js/core/sync.js" defer></script>
-    <script src="js/core/sync-ui.js" defer></script>
+    <script src="js/core/sync.js?v=2" defer></script>
+    <script src="js/core/sync-ui.js?v=2" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
     <script src="js/profiles/gate.js?v=6" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
-    <script src="js/app/core.js?v=4" defer></script>
+    <script src="js/app/core.js?v=5" defer></script>
     <script src="js/app/series.js?v=11" defer></script>
     <script src="js/app/watchlist.js?v=5" defer></script>
     <script src="js/app/interaction.js?v=3" defer></script>
-    <script src="js/app/notify.js?v=5" defer></script>
+    <script src="js/app/notify.js?v=6" defer></script>
     <script src="js/app/profiles-util.js?v=2" defer></script>
     <script src="js/app/streak-mood.js?v=2" defer></script>
-    <script src="js/app/dock-overlays.js?v=4" defer></script>
+    <script src="js/app/dock-overlays.js?v=5" defer></script>
     <script src="js/app/tmdb-avatar.js?v=2" defer></script>
-    <script src="js/app/sections.js?v=3" defer></script>
+    <script src="js/app/sections.js?v=5" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
     <script src="js/pages/discover.js?v=4" defer></script>
@@ -2020,11 +1975,11 @@
       })();
     </script>
     
-    <script src="js/pages/cinema.js?v=14" defer></script>
-    <script src="js/pages/home.js?v=12" defer></script>
+    <script src="js/pages/cinema.js?v=15" defer></script>
+    <script src="js/pages/home.js?v=14" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
-    <script src="js/shell/polish.js?v=2" defer></script>
+    <script src="js/shell/polish.js?v=3" defer></script>
     <script src="js/shell/nav.js" defer></script>
     <script src="js/shell/titleurl.js?v=6" defer></script>
 

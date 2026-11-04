@@ -7,7 +7,6 @@
       { id: "universeOverlay", open: function (e) { return e.classList.contains("open"); }, close: function () { if (window.closeUniverse) window.closeUniverse(); } },
       { id: "watchlistOverlay", open: function (e) { return e.classList.contains("open") || e.classList.contains("visible"); }, close: function () { if (window.closeWatchlist) window.closeWatchlist(); } },
       { id: "seriesModal", open: function (e) { return e.classList.contains("open"); }, close: function () { if (window.closeModal) window.closeModal(); } },
-      { id: "mfhSeeAllModal", open: function (e) { return e.classList.contains("open"); }, close: function () { if (window.mfhCloseSeeAll) window.mfhCloseSeeAll(); } },
       { id: "mfStandaloneCinema", open: function (e) { return e.classList.contains("open"); }, close: function () { var b = document.getElementById("mfStandaloneCinemaClose"); if (b) b.click(); } }
     ];
     /* interní přepínání sekcí (#serialy, #filmy …) nesmí přidávat položky do historie, jen přepisuje aktuální */

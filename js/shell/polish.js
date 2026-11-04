@@ -163,7 +163,7 @@
     if (!window.matchMedia || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     var bar, thumb, hideT, drag = null, de = document.documentElement;
     function blocked() {
-      return !!document.querySelector('#universeOverlay.open, #watchlistOverlay.open, #seriesModal.open, #mfStandaloneCinema.open, #mfhSeeAllModal.open, #mfProfileGate.show');
+      return !!document.querySelector('#universeOverlay.open, #watchlistOverlay.open, #seriesModal.open, #mfStandaloneCinema.open, #mfProfileGate.show');
     }
     function scroller() {
       if (blocked()) return null;

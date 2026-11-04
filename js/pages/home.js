@@ -370,21 +370,6 @@
         document.addEventListener('error', mark, true);
       })();
 
-      /* Šipka u panelu Novinky míří na zvonek */
-      function nfPlaceNotifArrow() {
-        var p = document.getElementById('notifPanel'), b = document.getElementById('nfBellBtn');
-        if (!p || !b || !p.classList.contains('open') || !p.classList.contains('visible')) return;
-        var pr = p.getBoundingClientRect(), br = b.getBoundingClientRect();
-        if (!pr.width || !br.width) return;
-        var x = Math.max(16, Math.min(p.offsetWidth - 28, br.left + br.width / 2 - p.offsetLeft - 6));
-        p.style.setProperty('--notif-arrow-x', x + 'px');
-      }
-      (function () {
-        var p = document.getElementById('notifPanel');
-        if (!p) return;
-        new MutationObserver(function () { requestAnimationFrame(nfPlaceNotifArrow); }).observe(p, { attributes: true, attributeFilter: ['class'] });
-        window.addEventListener('resize', nfPlaceNotifArrow);
-      })();
       /* Při startu volá překreslení víc míst za sebou (profil, historie, oblíbené…); sloučí se do jednoho, ať řady neblikají víckrát */
       var _rhT = 0;
       window.renderHomepage = function () {
@@ -550,35 +535,6 @@
         renderCarousel(id, items, ranked);
         sec.hidden = false;
       }
-
-      window.mfhSeeAll = function (carouselId) {
-        var carousel = document.getElementById(carouselId);
-        var items = (carousel && carousel._mfhItems) || [];
-        var section = carousel && carousel.closest('section');
-        var titleEl = section && section.querySelector('.nf-row-title');
-        var modal = document.getElementById('mfhSeeAllModal');
-        if (!modal) return;
-        var titleTarget = document.getElementById('mfhSeeAllTitle');
-        if (titleTarget) titleTarget.textContent = titleEl ? titleEl.textContent : 'Vše';
-        var grid = document.getElementById('mfhSeeAllGrid');
-        if (grid) {
-          grid.innerHTML = items.length
-            ? items.map(function (it, i) { return mfhCardHtml(it, carouselId, i, 0); }).join('')
-            : '<p class="mfh-seeall-empty">Zatím tu nic není.</p>';
-          mfhBindCardImages(grid);
-        }
-        modal.classList.add('open');
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () { modal.classList.add('visible'); });
-        });
-      };
-
-      window.mfhCloseSeeAll = function () {
-        var modal = document.getElementById('mfhSeeAllModal');
-        if (!modal) return;
-        modal.classList.remove('visible');
-        setTimeout(function () { modal.classList.remove('open'); }, 250);
-      };
 
       /* ---------- Hero banner ---------- */
 
@@ -1359,7 +1315,7 @@
         forceHome._lastRun = now;
         try {
           var OPEN_OVERLAY_IDS = [
-            'cinemaModal', 'mfStandaloneCinema', 'mfhSeeAllModal', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
+            'cinemaModal', 'mfStandaloneCinema', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
             'genreEditorOverlay',
             'wrappedOverlay',
             'dockMoreSheet'
@@ -1456,7 +1412,7 @@
         'cinemaModal', 'mfStandaloneCinema',
         'seriesModal', 'genreEditorOverlay',
         'wrappedOverlay',
-        'dockMoreSheet', 'mfhSeeAllModal'
+        'dockMoreSheet'
       ];
 
       function dockShouldShow() {
