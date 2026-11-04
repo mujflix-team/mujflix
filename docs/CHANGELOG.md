@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.27
+- Dokumentace: `docs/MAPA.md` už neuvádí okna, která v aplikaci nejsou (kalendář, kolekce, nálada, vzhled, „Zobrazit vše“).
+
+## 3.21.27
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.26
 - **Odstraněno staré okno Nastavení** (`MFSettings`) s políčky pro TMDB a Anthropic klíč: šlo otevřít jen adresou `#settings`, v appce na něj nic nevedlo. `#settings` teď otevře normální Nastavení z menu profilu (`MFProfileSettings`). Klíče se z aplikace nezadávají (TMDB jde přes Worker).
 - **Odstraněno nepoužívané okno „Zobrazit vše“** (`mfhSeeAll`, `#mfhSeeAllModal`, jeho CSS a zápisy v seznamech oken v `nav.js`, `dock.js`, `polish.js`, `home.js`): nic ho neotevíralo.
