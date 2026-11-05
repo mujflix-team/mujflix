@@ -29,7 +29,7 @@
 
   function syncable(k) {
     if (typeof k !== "string" || k.indexOf("mf_") !== 0) return false;
-    if (k === "mf_active_pid" || k === "mf_pin_lock" || k.indexOf("mf_sync_") === 0) return false;
+    if (k === "mf_active_pid" || k === "mf_pin_lock" || k.indexOf("mf_sync_") === 0 || k.indexOf("mf_backup_") === 0) return false;
     if (/(^|_)(key|token)(_|$)/.test(k)) return false; // API klíče a tokeny
     if (k.indexOf("mf_jw_") === 0) return false; // cache
     return true;

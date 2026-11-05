@@ -1820,6 +1820,35 @@ check("sync UI: po zobrazení kódu „Čekám na druhé zařízení…“, po p
 const syState2 = await page.evaluate(() => { MFSyncUI.open("home"); return (document.querySelector("#mfSyncModal .sy-status") || {}).textContent; });
 check("sync UI: po vytvoření kódu je zařízení propojené a stav to ukáže", /Propojeno/.test(syState2 || ""), String(syState2));
 await page.evaluate(() => { MFSyncUI.close(); MFSync.unlink(); });
+const bkRem = await page.evaluate(() => {
+  const out = {};
+  ["mf_backup_first", "mf_backup_last", "mf_backup_snooze"].forEach(k => localStorage.removeItem(k));
+  localStorage.setItem("mf_watched_pBK", JSON.stringify({ "a-S1E1": 1 }));
+  out.fresh = mfBackupReminder.check(true);
+  out.firstSet = !!localStorage.getItem("mf_backup_first");
+  localStorage.setItem("mf_backup_first", String(Date.now() - 40 * 864e5));
+  out.shown = mfBackupReminder.check(true) && !!document.getElementById("mfBackupBar");
+  document.querySelector("#mfBackupBar .mf-upd-x").click();
+  out.snoozed = !document.getElementById("mfBackupBar") && Number(localStorage.getItem("mf_backup_snooze")) > Date.now();
+  out.again = mfBackupReminder.check(true);
+  localStorage.setItem("mf_backup_snooze", "0");
+  localStorage.setItem("mf_sync_id", "x".repeat(32));
+  out.linked = mfBackupReminder.check(true);
+  MFSync.unlink();
+  out.shown2 = mfBackupReminder.check(true);
+  document.querySelector("#mfBackupBar .mf-upd-go").click();
+  out.opened = document.getElementById("mfSyncModal").classList.contains("show") && /Záloha dat/.test(document.getElementById("mfSyncModal").textContent);
+  MFSyncUI.close();
+  localStorage.setItem("mf_backup_snooze", "0");
+  mfBackupReminder.noteBackup();
+  out.afterBackup = mfBackupReminder.check(true);
+  out.notSynced = !MFSync._syncable("mf_backup_last") && !MFSync._syncable("mf_backup_first") && !("mf_backup_last" in MFSync.exportData().data);
+  ["mf_backup_first", "mf_backup_last", "mf_backup_snooze", "mf_watched_pBK"].forEach(k => localStorage.removeItem(k));
+  return out;
+});
+check("záloha: lišta se neukáže při prvním spuštění (jen začne odpočet), po 30 dnech se ukáže a „✕“ ji odloží", bkRem.fresh === false && bkRem.firstSet && bkRem.shown && bkRem.snoozed && bkRem.again === false, JSON.stringify(bkRem));
+check("záloha: propojené zařízení lištu nedostane, „Zálohovat“ otevře obrazovku Záloha dat, po záloze je klid a klíče se nesynchronizují", bkRem.linked === false && bkRem.shown2 && bkRem.opened && bkRem.afterBackup === false && bkRem.notSynced, JSON.stringify(bkRem));
+await page.evaluate(() => { MFSyncUI.close(); MFSync.unlink(); });
 
 // vstupy a kroky onboardingu
 const syEnt = await page.evaluate(() => {
