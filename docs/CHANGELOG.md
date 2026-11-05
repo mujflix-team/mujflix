@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.35
+- **Jemné animace:** okno detailu vyjede mírně zespodu, karty v řadě naskočí postupně, tlačítka, čipy a záložky mají jednotnou rychlou odezvu a při stisku se lehce zmenší. Jen CSS (průhlednost a posun, bez záře), při nastavení systému „omezit pohyb“ se vše vypne.
+
 ## 3.21.34
 - **Typografie:** používá se všech šest řezů písma Netflix Sans, každý ve své roli: Thin (nadpis „Kdo se dívá?“), Light (popisy), Regular (vedlejší údaje), Medium (navigace, čipy, názvy karet, meta údaje), Bold (nadpisy řádků, tlačítka), Black (hlavní nadpisy banneru a detailu, čísla Top 10). Jen CSS (blok „Typografie“ na konci `css/netflix.css`, váhy jako proměnné `--fw-*`), žádné nové funkce.
 

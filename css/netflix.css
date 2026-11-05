@@ -1766,3 +1766,23 @@ html body .nf-chip, html body #universeOverlay .dv-chip { font-weight: var(--fw-
 html body #mfDock .dock-btn, html body #mfDock .dock-btn span { font-weight: var(--fw-medium); }
 html body #mfDock .dock-btn.active, html body #mfDock .dock-btn.on, html body #mfDock .dock-btn[aria-current] { font-weight: var(--fw-bold); }
 html body #mfSyncModal .sy-title { font-weight: var(--fw-bold); }
+
+/* ── Pohyb: jemný a jednotný (jen průhlednost a posun, žádné záře) ──
+   Okno detailu vyjede mírně zespodu, karty v řadě naskočí postupně,
+   tlačítka a čipy mají stejně rychlou odezvu. Při „omezit pohyb“ vše vypnuto. */
+@keyframes mfModalIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes mfCardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+html body .modal-overlay.visible .modal-content { animation: mfModalIn .32s cubic-bezier(.2,.7,.2,1) both; }
+html body .nf-row .nf-card { animation: mfCardIn .4s cubic-bezier(.2,.7,.2,1) both; }
+html body .nf-row .nf-card:nth-child(2) { animation-delay: .04s; }
+html body .nf-row .nf-card:nth-child(3) { animation-delay: .08s; }
+html body .nf-row .nf-card:nth-child(4) { animation-delay: .12s; }
+html body .nf-row .nf-card:nth-child(5) { animation-delay: .16s; }
+html body .nf-row .nf-card:nth-child(6) { animation-delay: .2s; }
+html body .nf-row .nf-card:nth-child(n+7) { animation-delay: .24s; }
+html body #seriesModal #episodesGrid .episode-card, html body #seriesModal .sd-sim-card { transition: transform .2s ease, opacity .2s ease; }
+html body .nf-btn, html body .nf-chip, html body #seriesModal .sd-tab, html body #seriesModal .sd-season { transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease; }
+html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #seriesModal .sd-season:active { transform: scale(0.96); }
+@media (prefers-reduced-motion: reduce) {
+  html body .modal-overlay.visible .modal-content, html body .nf-row .nf-card { animation: none !important; }
+}
