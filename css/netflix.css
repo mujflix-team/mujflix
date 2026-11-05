@@ -1742,3 +1742,27 @@ html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba
   .nf-btn-share { flex: 0 0 44px; padding: 0; }
   .nf-btn-share span { display: none; }
 }
+
+/* ── Typografie: všech šest řezů Netflix Sans, každý má svou roli ──
+   Th 100 = velké nadpisy na přihlašovací obrazovce
+   Lt 300 = delší popisy a doplňkové texty
+   Rg 400 = běžný text, popisky, vedlejší údaje
+   Md 500 = navigace, čipy, meta údaje, názvy karet
+   Bd 700 = nadpisy řádků, tlačítka, aktivní záložky
+   Blk 900 = hlavní nadpisy (hero, detail), čísla Top 10 */
+:root { --fw-thin: 100; --fw-light: 300; --fw-regular: 400; --fw-medium: 500; --fw-bold: 700; --fw-black: 900; }
+html body #mfProfileGate .pg-title, html body #mfProfileWelcome .pw-title { font-weight: var(--fw-thin) !important; letter-spacing: -0.02em !important; }
+html body .nf-hero-title, html body #seriesModal .modal-hero-left h2 { font-weight: var(--fw-black) !important; letter-spacing: -0.035em !important; }
+html body .nf-rank { font-weight: var(--fw-black); }
+html body .nf-hero-eyebrow { font-weight: var(--fw-medium); letter-spacing: 0.14em; }
+html body .nf-hero-meta { font-weight: var(--fw-medium); }
+html body .nf-hero-desc, html body #seriesModal .sd-overview { font-weight: var(--fw-light) !important; }
+html body .nf-btn, html body #seriesModal .dv-btn { font-weight: var(--fw-bold) !important; }
+html body .nf-row-title, html body .mfh-h2 { font-weight: var(--fw-bold) !important; }
+html body .nf-row-sub { font-weight: var(--fw-light); }
+html body .nf-card-title { font-weight: var(--fw-medium) !important; }
+html body .nf-card-ep { font-weight: var(--fw-regular); }
+html body .nf-chip, html body #universeOverlay .dv-chip { font-weight: var(--fw-medium) !important; }
+html body #mfDock .dock-btn, html body #mfDock .dock-btn span { font-weight: var(--fw-medium); }
+html body #mfDock .dock-btn.active, html body #mfDock .dock-btn.on, html body #mfDock .dock-btn[aria-current] { font-weight: var(--fw-bold); }
+html body #mfSyncModal .sy-title { font-weight: var(--fw-bold); }

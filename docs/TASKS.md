@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.34: typografie – všech šest řezů Netflix Sans v jasné hierarchii (Thin až Black).
 - 3.21.33: banner ukazuje důvod doporučení (podle tvých žánrů), jen když ho známe.
 - 3.21.32: připomenutí zálohy (lišta jednou za 30 dní, když zařízení není propojené).
 - 3.21.31: minifikace JS a CSS při nasazení na Cloudflare Pages (zdroj zůstává čitelný, testy prošly i na minifikované kopii).
