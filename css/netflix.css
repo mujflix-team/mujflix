@@ -854,6 +854,8 @@ html body #legalProvidersPanel a span { font: 600 0.88rem/1 var(--nf-font, sans-
 html body #mfProfileWelcome .pw-actions.pw-actions-col { flex-direction: column !important; align-items: stretch; border-top: 0; margin-top: 24px !important; padding-top: 0; }
 html body #mfProfileWelcome .pw-actions.pw-actions-col button { width: 100%; }
 html body #mfProfileWelcome .pw-note { color: #808080; font-size: 0.95rem; margin-top: 18px; }
+html body #mfProfileWelcome .pw-linkbtn { background: none; border: 0; padding: 0; color: var(--nf-accent, #0a84ff); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
+html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfSyncModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
 #mfSyncModal.show { display: flex; }
 #mfSyncModal .sy-box { position: relative; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: auto; background: #181818; border: 1px solid #333; border-radius: 6px; padding: 34px 28px 28px; text-align: center; color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8); }

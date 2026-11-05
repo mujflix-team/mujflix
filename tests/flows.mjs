@@ -119,18 +119,19 @@ const cin = await page.evaluate(() => {
 });
 check("cinema: neoznačuje epizody cizího seriálu", cin.marked.length === 0, JSON.stringify(cin));
 
-// --- Onboarding: krok 2 (tutorial) + jediný odkaz na blokovač podle prohlížeče
+// --- Onboarding: jedna obrazovka (žánry, věk, upozornění na reklamy) + jediný odkaz na blokovač podle prohlížeče
 const tut = await page.evaluate(() => {
   const w = document.getElementById("mfProfileWelcome");
   localStorage.setItem("mf_profiles_v2", JSON.stringify([{ id: "p7", name: "T", avatar: "🎬", likedGenres: [], prefs: {} }]));
   localStorage.setItem("mf_active_pid", "p7");
   ProfileGate.openOnboarding("p7");
   const s1 = getComputedStyle(document.getElementById("pwStep1")).display !== "none";
-  ProfileGate.finishOnboarding();
-  const s2 = getComputedStyle(document.getElementById("pwStep2")).display !== "none";
-  const stillOpen = w.classList.contains("show");
+  const only = document.querySelectorAll("#mfProfileWelcome .pw-step").length === 1 && !document.getElementById("pwStep2") && !document.getElementById("pwStep3");
+  const warn = !!document.querySelector("#pwStep1 .pw-adwarn") && !!document.querySelector("#pwStep1 .pw-age");
   const links = document.querySelectorAll("#pwAdblockLink a").length;
-  ProfileGate.closeOnboarding();
+  ProfileGate.finishOnboarding();
+  const s2 = only && warn;
+  const stillOpen = !w.classList.contains("show");
   const closed = !w.classList.contains("show");
   const ua = ua => { Object.defineProperty(navigator, "userAgent", { value: ua, configurable: true }); return mfAdblock.link().url; };
   return { s1, s2, stillOpen, links, closed,
@@ -138,8 +139,8 @@ const tut = await page.evaluate(() => {
     ch: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"),
     ed: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36 Edg/130.0") };
 });
-check("onboarding: začíná krokem 1 (žánry)", tut.s1);
-check("onboarding: po potvrzení žánrů následuje krok 2 (tutorial)", tut.s2 && tut.stillOpen, JSON.stringify(tut));
+check("onboarding: má jedinou obrazovku (žánry)", tut.s1);
+check("onboarding: jediná obrazovka obsahuje věk i upozornění na reklamy a po potvrzení se průvodce zavře", tut.s2 && tut.stillOpen, JSON.stringify(tut));
 check("onboarding: zobrazí právě jeden odkaz na blokovač", tut.links === 1, String(tut.links));
 check("onboarding: „Začít sledovat“ zavře průvodce", tut.closed);
 check("blokovač: Firefox → addons.mozilla.org", /addons\.mozilla\.org/.test(tut.ff), tut.ff);
@@ -1826,25 +1827,24 @@ const syEnt = await page.evaluate(() => {
   out.gateBtn = !!document.getElementById("profileSyncBtn");
   MFSync.unlink();
   ProfileGate.openOnboarding("p_x");
-  out.k3 = document.querySelector('#mfProfileWelcome [data-ob-step="1"]').textContent;
-  ProfileGate.finishOnboarding();
-  out.btn2 = document.getElementById("pwStep2Btn").textContent;
-  ProfileGate.onboardingNext();
-  out.step3 = document.getElementById("pwStep3").style.display !== "none" && /jinde/.test(document.getElementById("pwStep3").textContent);
+  const row = document.getElementById("pwSyncRow");
+  out.rowShown = !!row && row.style.display !== "none";
+  out.kicker = document.querySelector("#mfProfileWelcome .pw-kicker").textContent;
+  row.querySelector("button").click();
+  out.syncOpened = document.getElementById("mfSyncModal").classList.contains("show") && /Zobrazit kód/.test(document.getElementById("mfSyncModal").textContent);
+  MFSyncUI.close();
   ProfileGate.closeOnboarding();
-  // už propojeno → 2 kroky
+  // už propojeno → odkaz na propojení se nenabízí
   localStorage.setItem("mf_sync_id", "x".repeat(32));
   ProfileGate.openOnboarding("p_x");
-  out.k2 = document.querySelector('#mfProfileWelcome [data-ob-step="1"]').textContent;
-  ProfileGate.finishOnboarding();
-  out.btn2b = document.getElementById("pwStep2Btn").textContent;
-  ProfileGate.onboardingNext();
+  out.rowHidden = document.getElementById("pwSyncRow").style.display === "none";
+  document.querySelector("#mfProfileWelcome .pw-skip").click();
   out.closed = !document.getElementById("mfProfileWelcome").classList.contains("show");
   MFSync.unlink();
   return out;
 });
-check("onboarding: nepropojeno = 3 kroky s krokem Propojení", syEnt.k3.endsWith("1/3") && syEnt.btn2 === "Pokračovat" && syEnt.step3, JSON.stringify(syEnt));
-check("onboarding: propojeno = 2 kroky", syEnt.k2.endsWith("1/2") && syEnt.btn2b === "Začít sledovat" && syEnt.closed, JSON.stringify(syEnt));
+check("onboarding: nepropojeno = na jediné obrazovce je odkaz „Propojit zařízení“ a otevře nabídku", syEnt.rowShown && syEnt.syncOpened && syEnt.kicker === "MůjFlix", JSON.stringify(syEnt));
+check("onboarding: propojeno = odkaz na propojení se neukáže, „Přeskočit“ průvodce zavře", syEnt.rowHidden && syEnt.closed, JSON.stringify(syEnt));
 check("sync: tlačítko v Kdo se dívá", syEnt.gateBtn);
 const syMenu = await page.evaluate(() => { window.mfToggleProfileMenu(document.getElementById("nfAvatar")); document.querySelector('#nfProfileMenu [data-act="settings"]').click(); const it = document.querySelector('#mfSettingsModal [data-st="sync"]'); const ok = !!it; if (it) it.click(); const shown = document.getElementById("mfSyncModal")?.classList.contains("show"); MFSyncUI.close(); return { ok, shown }; });
 check("sync: položka v menu profilu otevře obrazovku", syMenu.ok && syMenu.shown, JSON.stringify(syMenu));

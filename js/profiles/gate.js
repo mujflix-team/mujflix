@@ -520,37 +520,20 @@ const ProfileGate = {
     ag && (ag.onclick = ev => { const b = ev.target.closest(".pw-agebtn"); b && (ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x === b))); }, ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x.dataset.age === "0")));
     t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");
   },
-  /** 3 kroky, pokud jde propojení nabídnout (je nastavené a zařízení ještě není propojené); jinak 2. */
-  _obTotal() {
-    return window.MFSync && window.MFSync.available() && !window.MFSync.isLinked() ? 3 : 2;
-  },
-  _onboardingStep(n) {
-    const total = this._obTotal();
-    [1, 2, 3].forEach(i => {
-      const st = document.getElementById("pwStep" + i);
-      if (st) st.style.display = i === n ? "" : "none";
-    });
-    document.querySelectorAll("#mfProfileWelcome [data-ob-step]").forEach(k => {
-      k.textContent = "MůjFlix · " + k.dataset.obStep + "/" + total;
-    });
-    const btn = document.getElementById("pwStep2Btn");
-    if (btn) btn.textContent = total === 3 ? "Pokračovat" : "Začít sledovat";
-    if (2 === n) {
-      const l = document.getElementById("pwAdblockLink");
-      if (l && window.mfAdblock) l.innerHTML = window.mfAdblock.linkHtml();
-    }
+  /** Průvodce má jedinou obrazovku (žánry, věk, upozornění na reklamy, odkaz na propojení zařízení). */
+  _onboardingStep() {
+    const l = document.getElementById("pwAdblockLink");
+    if (l && window.mfAdblock) l.innerHTML = window.mfAdblock.linkHtml();
+    const row = document.getElementById("pwSyncRow");
+    if (row) row.style.display = window.MFSync && window.MFSync.available() && !window.MFSync.isLinked() ? "" : "none";
     const w = document.getElementById("mfProfileWelcome");
     w && w.scrollTo && w.scrollTo(0, 0);
-  },
-  onboardingNext() {
-    this._obTotal() === 3 ? this._onboardingStep(3) : this.closeOnboarding();
   },
   onboardingLink(screen) {
     window.MFSyncUI && window.MFSyncUI.open(screen);
   },
   skipOnboardingGenres() {
-    const e = document.getElementById("mfProfileWelcome");
-    e && e.classList.contains("show") && this._onboardingStep(2);
+    this.closeOnboarding();
   },
   closeOnboarding() {
     const e = document.getElementById("mfProfileWelcome");
@@ -572,7 +555,7 @@ const ProfileGate = {
       if (getActiveProfileId() === t && void 0 !== aiBrain) n.forEach(e => aiBrain.boostGenreIds([e], .12));
       try { if (typeof window.renderHomepage === "function") window.renderHomepage(); } catch (e) {}
     }
-    this._onboardingStep(2);
+    this.closeOnboarding();
   },
   renderBadge() {
     try { window.nfRenderProfile && window.nfRenderProfile() } catch (e) {}
