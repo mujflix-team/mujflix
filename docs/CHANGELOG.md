@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.34
+- **Typografie:** používá se všech šest řezů písma Netflix Sans, každý ve své roli: Thin (nadpis „Kdo se dívá?“), Light (popisy), Regular (vedlejší údaje), Medium (navigace, čipy, názvy karet, meta údaje), Bold (nadpisy řádků, tlačítka), Black (hlavní nadpisy banneru a detailu, čísla Top 10). Jen CSS (blok „Typografie“ na konci `css/netflix.css`, váhy jako proměnné `--fw-*`), žádné nové funkce.
+
 ## 3.21.33
 - **Důvod doporučení v banneru:** nad nadpisem banneru na úvodní stránce je řádek „Podle tvých žánrů: Sci-Fi · Akční“ (nebo „Podle toho, že sleduješ hlavně anime“). Píše se jen tehdy, když to opravdu víme (žánr titulu je mezi tvými nejčastějšími); bez shody se nepíše nic. Řady „Protože jsi viděl …“ a „Vybráno pro tebe“ důvod ukazovaly už dřív. Test doplněn.
 
