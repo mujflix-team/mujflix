@@ -1055,11 +1055,6 @@
       logo: "https://upload.wikimedia.org/wikipedia/commons/e/e8/MallTV_logo.svg",
       url: (title, type) => `https://mall.tv/vysledky-vyhledavani?search=${encodeURIComponent(title)}`
     },
-    682: {
-      name: "Kiwi",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/f/f3/Kiwi.com_logo.svg",
-      url: (title, type) => `https://kiwi.com/cz/search?search=${encodeURIComponent(title)}`
-    },
     68: {
       name: "Plex",
       logo: "https://upload.wikimedia.org/wikipedia/commons/d/df/Plex_logo.svg",
