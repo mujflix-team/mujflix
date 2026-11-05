@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.21.31
+- **Připomenutí zálohy:** data jsou jen v prohlížeči, takže po smazání dat prohlížeče by se ztratila. Jednou za 30 dní (odpočet začíná, když tu poprvé jsou data, a po stažení zálohy se vynuluje) se dole ukáže nenápadná lišta „Data máš jen v tomto prohlížeči. Stáhni si zálohu.“ s tlačítkem **Zálohovat** (otevře obrazovku Záloha dat). „✕“ odloží o 14 dní, „Zálohovat“ o 7. Neukáže se na propojeném zařízení, při výběru profilu, v onboardingu ani nad otevřeným oknem.
+- Klíče `mf_backup_*` jsou jen pro dané zařízení (nesynchronizují se ani se nezálohují). Nový `js/shell/backup-reminder.js`, testy v `tests/flows.mjs`.
+
+## 3.21.31
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.30
 - **Kratší onboarding:** místo tří obrazovek je jedna. Žánry, „Jen anime“, věk, krátké upozornění na reklamy s odkazem na blokovač a odkaz **Propojit zařízení** (jen když zařízení ještě není propojené a propojení je zapnuté). Pryč je obrazovka s tipy a samostatný krok propojení. Tlačítka: *Přeskočit* a *Začít sledovat*.
 - Propojení jde pořád z výběru profilu („Kdo se dívá?“) a z menu profilu. Testy upraveny.
