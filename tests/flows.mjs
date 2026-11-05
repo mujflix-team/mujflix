@@ -1231,6 +1231,13 @@ const heroPickT = await page.evaluate(() => {
   } finally { window.getActiveProfileId = origId; localStorage.removeItem("mf_hero_hist_pid-hero"); }
 });
 check("banner: nevybírá nedávno ukázané tituly a v rámci jednoho otevření se nemění", heroPickT.first === 105 && heroPickT.same && heroPickT.hist === 6, JSON.stringify(heroPickT));
+const heroReasonT = await page.evaluate(() => ({
+  match: mfhHeroReason({ genreIds: [878, 28, 18] }, ["878", "28", "35"]),
+  none: mfhHeroReason({ genreIds: [27] }, ["878", "28"]),
+  empty: mfhHeroReason({ genreIds: [878] }, []),
+  noItem: mfhHeroReason(null, ["878"])
+}));
+check("banner: důvod doporučení se napíše jen při shodě žánrů (jinak prázdný)", heroReasonT.match === "Podle tvých žánrů: Sci-Fi · Akční" && heroReasonT.none === "" && heroReasonT.empty === "" && heroReasonT.noItem === "", JSON.stringify(heroReasonT));
 
 const verDisp = async () => page.evaluate(() => getComputedStyle(document.getElementById("pgVersion")).display);
 const verPc = await verDisp();
