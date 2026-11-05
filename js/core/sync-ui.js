@@ -264,6 +264,7 @@
       a.download = "mujflix-zaloha-" + new Date().toISOString().slice(0, 10) + ".json";
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      if (window.mfBackupReminder) window.mfBackupReminder.noteBackup();
       msg("Záloha stažena ✓", "ok");
     } catch (e) { msg("Zálohu se nepodařilo vytvořit.", "err"); }
   }

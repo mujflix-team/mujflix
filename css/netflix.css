@@ -1128,18 +1128,18 @@ html body .nf-hero-desc.is-open.is-scrollable, html body #seriesModal .sd-overvi
 .nf-tr-ctl { top: auto; bottom: 8px; right: 8px; }
 .nf-trailer:fullscreen .nf-tr-ctl { top: auto; bottom: 22px; right: 22px; }
 
-/* Hláška o nové verzi */
-#mfUpdateBar {
+/* Hláška o nové verzi a připomenutí zálohy */
+#mfUpdateBar, #mfBackupBar {
   position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 99999;
   display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 24px); padding: 10px 12px 10px 16px;
   background: #1f1f1f; color: #fff; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   font-size: 0.9rem; animation: nfHeroIn 0.3s ease both;
 }
-#mfUpdateBar .mf-upd-go { height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: #fff; color: #000; font: inherit; font-weight: 700; cursor: pointer; }
-#mfUpdateBar .mf-upd-go:hover { background: rgba(255, 255, 255, 0.8); }
-#mfUpdateBar .mf-upd-x { width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: #aaa; font-size: 0.9rem; cursor: pointer; }
-#mfUpdateBar .mf-upd-x:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
-@media (max-width: 899px) { #mfUpdateBar { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } }
+#mfUpdateBar .mf-upd-go , #mfBackupBar .mf-upd-go { height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: #fff; color: #000; font: inherit; font-weight: 700; cursor: pointer; }
+#mfUpdateBar .mf-upd-go:hover , #mfBackupBar .mf-upd-go:hover { background: rgba(255, 255, 255, 0.8); }
+#mfUpdateBar .mf-upd-x , #mfBackupBar .mf-upd-x { width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: #aaa; font-size: 0.9rem; cursor: pointer; }
+#mfUpdateBar .mf-upd-x:hover , #mfBackupBar .mf-upd-x:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
+@media (max-width: 899px) { #mfUpdateBar, #mfBackupBar { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } }
 
 /* ═════════ Cinema mode: úklid lišty – tři skupiny (název · epizody · akce), stejné tlačítka na PC i v telefonu ═════════ */
 html body #mfStandaloneCinema .mf-standalone-cinema-top { gap: 10px 14px; }

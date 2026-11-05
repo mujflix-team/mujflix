@@ -1,6 +1,6 @@
 # MůjFlix – pravidla pro Clauda (platí pro všechny, kdo na projektu pracují)
 
-Statická PWA (vanilla JS, bez buildu) pro sledování filmů a seriálů. Data z TMDB přes Cloudflare Worker, přehrávání přes cizí weby.
+Statická PWA (vanilla JS; zdrojové soubory se neskládají, jen se při nasazení na Cloudflare Pages minifikují a dostanou hash v `?v=`) pro sledování filmů a seriálů. Data z TMDB přes Cloudflare Worker, přehrávání přes cizí weby.
 
 **Web už není čistě statický:** složka `functions/` je Cloudflare Pages Function (cesty `/f/`, `/s/`, `/c/`). Běžný prohlížeč se jen pustí dál přes `context.next()` (beze změny, jako by funkce nebyla); jen boti chatů (Discord, WhatsApp, Telegram, Facebook, Slack, LinkedIn, X) dostanou kopii s `og:` tagy titulu z TMDB (přes Worker, s `Origin: https://mujflix.pages.dev`, jen cesty `/3/movie/<id>`, `/3/tv/<id>`, `/3/search/...`, bez klíče). Sdílená logika je v `functions/_shared/og.js`, test v `tests/functions.mjs` (součást `npm test`). Odpovědi, které funkce sama vytváří (pro boty), nemají hlavičky z `_headers`, proto je `SECURITY_HEADERS` v `og.js` kopie bloku `/*` z `_headers` (test hlídá shodu: změníš-li jedno, změň i druhé). Co se do HTML vkládá, se escapuje; obrázek smí být jen z `image.tmdb.org`.
 Podrobnosti o struktuře a funkcích jsou v `README.md`, historie změn v `docs/CHANGELOG.md`, rozdělená práce v `docs/TASKS.md`.
