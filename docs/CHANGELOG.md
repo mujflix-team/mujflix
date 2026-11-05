@@ -1,8 +1,10 @@
 # Changelog
 
-## 3.21.31
+## 3.21.32
 - **Připomenutí zálohy:** data jsou jen v prohlížeči, takže po smazání dat prohlížeče by se ztratila. Jednou za 30 dní (odpočet začíná, když tu poprvé jsou data, a po stažení zálohy se vynuluje) se dole ukáže nenápadná lišta „Data máš jen v tomto prohlížeči. Stáhni si zálohu.“ s tlačítkem **Zálohovat** (otevře obrazovku Záloha dat). „✕“ odloží o 14 dní, „Zálohovat“ o 7. Neukáže se na propojeném zařízení, při výběru profilu, v onboardingu ani nad otevřeným oknem.
 - Klíče `mf_backup_*` jsou jen pro dané zařízení (nesynchronizují se ani se nezálohují). Nový `js/shell/backup-reminder.js`, testy v `tests/flows.mjs`.
+- **Minifikace JS a CSS při nasazení:** na Cloudflare Pages se skripty a styly před hashováním `?v=` zmenší (`scripts/minify-assets.mjs`, esbuild jako vývojářská závislost; ~830 kB → ~590 kB). Zdrojové soubory v repozitáři zůstávají čitelné a lokálně i v testech se nic nemění. Globální názvy se nepřejmenovávají, takže `onclick="…"` a `window.*` fungují dál. Když esbuild chybí nebo soubor selže, soubor zůstane beze změny a sestavení pokračuje.
+- Ověřeno: celá sada testů (296 kontrol) prošla i na minifikované kopii. Nové testy kroku minifikace v `tests/worker.mjs`.
 
 ## 3.21.31
 ### Nově
