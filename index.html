@@ -56,7 +56,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
-    <link rel="stylesheet" href="css/netflix.css?v=28" />
+    <link rel="stylesheet" href="css/netflix.css?v=29" />
 
     <style>
       .key-hint { display: none !important; }
@@ -263,7 +263,7 @@
       <div id="mfProfileWelcome" aria-hidden="true">
         <div class="pw-box">
           <div class="pw-step" id="pwStep1">
-            <div class="pw-kicker" data-ob-step="1">MůjFlix · 1/2</div>
+            <div class="pw-kicker">MůjFlix</div>
             <div class="pw-title">Vítej v MůjFlixu</div>
             <div class="pw-subtitle">Tvůj profil je hotový. Klepni na pár žánrů, které máš rád(a), a hned ti ukážeme něco dobrého. Nic z toho není povinné a všechno půjde později změnit.</div>
             <div class="pw-genres" id="pwGenres"></div>
@@ -280,39 +280,15 @@
                 <button type="button" class="pw-agebtn" data-age="15">Do 15</button>
               </div>
             </div>
-            <div class="pw-actions">
-              <button class="pw-skip" onclick="window.ProfileGate?.skipOnboardingGenres()">Přeskočit</button>
-              <button class="pw-save" onclick="window.ProfileGate?.finishOnboarding()">Pokračovat</button>
-            </div>
-          </div>
-          <div class="pw-step" id="pwStep2" style="display:none">
-            <div class="pw-kicker" data-ob-step="2">MůjFlix · 2/2</div>
-            <div class="pw-title">Pár rychlých tipů</div>
-            <div class="pw-subtitle">Ať si první film užiješ bez zbytečných starostí. Zabere to chvilku.</div>
-            <ul class="pw-tips">
-              <li><span class="pw-tip-ico">🎬</span><div><strong>Klepni na titul</strong><p>Seriál otevře výběr epizod (záložky <b>Epizody</b>, <b>Podobné</b> a <b>Popis</b>), film se rovnou otevře v přehrávači.</p></div></li>
-              <li><span class="pw-tip-ico">❤️</span><div><strong>Ulož si, co tě zajímá</strong><p>Srdíčko přidá titul do <b>Oblíbených</b> a MůjFlix se z toho učí, co ti doporučit.</p></div></li>
-              <li><span class="pw-tip-ico">▶️</span><div><strong>Rozkoukané najdeš hned doma</strong><p>Na úvodní stránce je řada <b>Pokračovat ve sledování</b> – klepnutím otevřeš seriál na další epizodě.</p></div></li>
-              <li><span class="pw-tip-ico">⏭</span><div><strong>Díly seriálu</strong><p>V přehrávači přepínáš díly tlačítky <b>‹</b> a <b>›</b>, seznam všech otevře <b>Epizody</b> (na telefonu <b>≡</b>).</p></div></li>
-            </ul>
             <div class="pw-adwarn">
               <strong>Reklamy a vyskakovací okna</strong>
-              <p>Zdroje filmů mohou zobrazovat reklamy nebo vyskakovací okna. Doporučujeme si nainstalovat blokátor reklam: <span id="pwAdblockLink"></span></p>
+              <p>Zdroje filmů mohou zobrazovat reklamy. Doporučujeme blokátor reklam: <span id="pwAdblockLink"></span></p>
             </div>
+            <p class="pw-note" id="pwSyncRow">Používáš MůjFlix i jinde? <button type="button" class="pw-linkbtn" onclick="window.ProfileGate?.onboardingLink('home')">Propojit zařízení</button></p>
             <div class="pw-actions">
-              <button class="pw-save" id="pwStep2Btn" onclick="window.ProfileGate?.onboardingNext()">Začít sledovat</button>
+              <button class="pw-skip" onclick="window.ProfileGate?.skipOnboardingGenres()">Přeskočit</button>
+              <button class="pw-save" onclick="window.ProfileGate?.finishOnboarding()">Začít sledovat</button>
             </div>
-          </div>
-          <div class="pw-step" id="pwStep3" style="display:none">
-            <div class="pw-kicker" data-ob-step="3">MůjFlix · 3/3</div>
-            <div class="pw-title">Používáš MůjFlix i jinde?</div>
-            <div class="pw-subtitle">Propoj telefon, tablet a počítač. Profily, seznamy a hodnocení budou všude stejné – bez hesla a bez e-mailu, stačí opsat krátký kód.</div>
-            <div class="pw-actions pw-actions-col">
-              <button class="pw-save" onclick="window.ProfileGate?.onboardingLink('show')">Propojit teď</button>
-              <button class="pw-skip" onclick="window.ProfileGate?.onboardingLink('enter')">Už mám profil na jiném zařízení</button>
-              <button class="pw-skip" onclick="window.ProfileGate?.closeOnboarding()">Teď ne</button>
-            </div>
-            <p class="pw-note">Propojit můžeš kdykoli později: profil vpravo nahoře → Propojit zařízení.</p>
           </div>
         </div>
       </div>
@@ -1765,7 +1741,7 @@
     <script src="js/core/sync.js?v=2" defer></script>
     <script src="js/core/sync-ui.js?v=2" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
-    <script src="js/profiles/gate.js?v=6" defer></script>
+    <script src="js/profiles/gate.js?v=7" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
     <script src="js/app/core.js?v=5" defer></script>
     <script src="js/app/series.js?v=11" defer></script>
