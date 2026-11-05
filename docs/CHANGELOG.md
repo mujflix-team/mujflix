@@ -1,8 +1,9 @@
 # Changelog
 
-## 3.21.29
+## 3.21.30
 - **Kratší onboarding:** místo tří obrazovek je jedna. Žánry, „Jen anime“, věk, krátké upozornění na reklamy s odkazem na blokovač a odkaz **Propojit zařízení** (jen když zařízení ještě není propojené a propojení je zapnuté). Pryč je obrazovka s tipy a samostatný krok propojení. Tlačítka: *Přeskočit* a *Začít sledovat*.
 - Propojení jde pořád z výběru profilu („Kdo se dívá?“) a z menu profilu. Testy upraveny.
+- **„Kde legálně sledovat“:** odstraněna služba „Kiwi“ (kiwi.com je vyhledávač letenek, ne streaming), odkaz vedl na hledání letenek. Služby bez záznamu v seznamu se u titulu prostě nezobrazí.
 
 ## 3.21.29
 ### Nově
