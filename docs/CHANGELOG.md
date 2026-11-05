@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.33
+- **Důvod doporučení v banneru:** nad nadpisem banneru na úvodní stránce je řádek „Podle tvých žánrů: Sci-Fi · Akční“ (nebo „Podle toho, že sleduješ hlavně anime“). Píše se jen tehdy, když to opravdu víme (žánr titulu je mezi tvými nejčastějšími); bez shody se nepíše nic. Řady „Protože jsi viděl …“ a „Vybráno pro tebe“ důvod ukazovaly už dřív. Test doplněn.
+
 ## 3.21.32
 - **Připomenutí zálohy:** data jsou jen v prohlížeči, takže po smazání dat prohlížeče by se ztratila. Jednou za 30 dní (odpočet začíná, když tu poprvé jsou data, a po stažení zálohy se vynuluje) se dole ukáže nenápadná lišta „Data máš jen v tomto prohlížeči. Stáhni si zálohu.“ s tlačítkem **Zálohovat** (otevře obrazovku Záloha dat). „✕“ odloží o 14 dní, „Zálohovat“ o 7. Neukáže se na propojeném zařízení, při výběru profilu, v onboardingu ani nad otevřeným oknem.
 - Klíče `mf_backup_*` jsou jen pro dané zařízení (nesynchronizují se ani se nezálohují). Nový `js/shell/backup-reminder.js`, testy v `tests/flows.mjs`.

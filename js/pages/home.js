@@ -691,10 +691,10 @@
         hero.appendChild(box);
       }
 
-      function nfHeroFromTmdb(it) {
+      function nfHeroFromTmdb(it, reason) {
         _heroItem = it;
         nfHeroShow({
-          image: it.backdrop, title: it.title, eyebrow: '', badge: it.mediaType === 'tv' ? 'Seriál' : 'Film',
+          image: it.backdrop, title: it.title, eyebrow: reason || '', badge: it.mediaType === 'tv' ? 'Seriál' : 'Film',
           rating: it.rating, year: it.ep, overview: it.overview,
           genres: (it.genreIds || []).map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean),
           playLabel: 'Přehrát',
@@ -1040,6 +1040,17 @@
       window.mfhFetchForYou = mfhFetchForYou;
       window.mfhPickHero = function (pool) { return mfhPickHero(pool); }; // pro testy
 
+      /* Proč je titul v banneru: jen když to opravdu víme (žánr titulu je mezi tvými nejčastějšími, nebo sleduješ hlavně anime).
+         Bez shody se nic nepíše, důvod se nevymýšlí. */
+      function mfhHeroReason(it, genres) {
+        if (!it) return '';
+        if (mfhOnlyAnime()) return 'Podle toho, že sleduješ hlavně anime';
+        var mine = (genres || []).map(String);
+        var hit = (it.genreIds || []).map(String).filter(function (g) { return mine.indexOf(g) >= 0 && GENRE_LABELS[g]; }).slice(0, 2).map(function (g) { return GENRE_LABELS[g]; });
+        return hit.length ? 'Podle tvých žánrů: ' + hit.join(' · ') : '';
+      }
+      window.mfhHeroReason = mfhHeroReason; // pro testy
+
       /* Banner: nedávno ukázané tituly (na profil) se vynechají; v rámci jednoho otevření aplikace zůstává stejný titul */
       var _heroOpenPick = null;
       function mfhPickHero(pool) {
@@ -1160,7 +1171,7 @@
              během jednoho otevření aplikace se nemění. */
           var pool = items.filter(function (it) { return it.backdrop && it.overview; }).slice(0, 14);
           var pick = mfhPickHero(pool);
-          if (pick) nfHeroFromTmdb(pick);
+          if (pick) nfHeroFromTmdb(pick, mfhHeroReason(pick, genres));
           else { var hh = document.getElementById('nfHero'); if (hh) hh.className = 'nf-hero nf-hero-none'; }
         }).catch(function () {
           if (myRun !== _nfRun) return;
