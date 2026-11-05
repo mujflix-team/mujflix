@@ -1,6 +1,10 @@
 // Test Workeru (propojení zařízení) s KV v paměti – bez sítě.
 import w from "../worker/tmdb-proxy.js";
 import { check, finish } from "./helpers.mjs";
+import { minifyAssets } from "../scripts/minify-assets.mjs";
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const m = new Map();
 const env = { SYNC: { get: async k => m.get(k) ?? null, put: async (k, v) => { m.set(k, v); }, delete: async k => { m.delete(k); } }, TMDB_API_KEY: "x", ALLOWED_ORIGINS: "https://a.b" };
@@ -122,6 +126,23 @@ check("worker: odpovědi mají nosniff, X-Frame-Options DENY a Cache-Control no-
   check("hash ?v=: druhý běh nic nezmění", hashAssets(o1, rd) === o1);
   files["js/a.js"] = Buffer.from("A2");
   check("hash ?v=: změna souboru změní hash", hashAssets(html, p => { if (!files[p]) throw new Error("nenalezeno"); return files[p]; }).match(/js\/a.js\?v=([^"]+)/)[1] !== v("js/a.js"));
+}
+
+// --- Minifikace při sestavení: zmenší soubory, globální názvy (onclick, window.*) zůstanou, vadný soubor se nezmění
+{
+  const d = mkdtempSync(join(tmpdir(), "mfmin-"));
+  const cwd = process.cwd();
+  process.chdir(d);
+  mkdirSync("js"); mkdirSync("css");
+  const js = "/* komentář */\nfunction globalniFunkce(parametrDlouhyNazev) {\n  var mistniPromenna = parametrDlouhyNazev + 1;\n  return mistniPromenna;\n}\nwindow.mojeFunkce = globalniFunkce;\n";
+  writeFileSync("js/a.js", js);
+  writeFileSync("js/vadny.js", "function (((");
+  writeFileSync("css/a.css", "/* c */\n.a  {  color : red ;  }\n");
+  const r = await minifyAssets();
+  const a = readFileSync("js/a.js", "utf8");
+  process.chdir(cwd);
+  check("minifikace: soubory se zmenší a globální názvy zůstanou (onclick, window.*)", r.files === 2 && a.length < js.length && /function globalniFunkce\(/.test(a) && /window\.mojeFunkce=globalniFunkce/.test(a), a);
+  check("minifikace: vadný soubor zůstane beze změny a nezastaví sestavení", readFileSync(join(d, "js/vadny.js"), "utf8") === "function (((");
 }
 
 finish();

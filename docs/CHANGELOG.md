@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.21.31
+- **Minifikace JS a CSS při nasazení:** na Cloudflare Pages se skripty a styly před hashováním `?v=` zmenší (`scripts/minify-assets.mjs`, esbuild jako vývojářská závislost; ~830 kB → ~590 kB). Zdrojové soubory v repozitáři zůstávají čitelné a lokálně i v testech se nic nemění. Globální názvy se nepřejmenovávají, takže `onclick="…"` a `window.*` fungují dál. Když esbuild chybí nebo soubor selže, soubor zůstane beze změny a sestavení pokračuje.
+- Ověřeno: celá sada testů (296 kontrol) prošla i na minifikované kopii. Nové testy kroku minifikace v `tests/worker.mjs`.
+
+## 3.21.31
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.30
 - **Kratší onboarding:** místo tří obrazovek je jedna. Žánry, „Jen anime“, věk, krátké upozornění na reklamy s odkazem na blokovač a odkaz **Propojit zařízení** (jen když zařízení ještě není propojené a propojení je zapnuté). Pryč je obrazovka s tipy a samostatný krok propojení. Tlačítka: *Přeskočit* a *Začít sledovat*.
 - Propojení jde pořád z výběru profilu („Kdo se dívá?“) a z menu profilu. Testy upraveny.

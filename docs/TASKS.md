@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.31: minifikace JS a CSS při nasazení na Cloudflare Pages (zdroj zůstává čitelný, testy prošly i na minifikované kopii).
 - 3.21.30: onboarding zkrácen na jednu obrazovku (žánry, věk, reklamy, odkaz na propojení).
 - 3.21.29: z „Kde legálně sledovat“ pryč Kiwi (letenky).
 - 3.21.28: v menu profilu je „Odhlásit se“ (zpět na výběr profilu).
