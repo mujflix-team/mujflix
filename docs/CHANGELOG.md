@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.29
+- **„Kde legálně sledovat“:** odstraněna služba „Kiwi“ (kiwi.com je vyhledávač letenek, ne streaming), odkaz vedl na hledání letenek. Služby bez záznamu v seznamu se u titulu prostě nezobrazí.
+
+## 3.21.29
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.28
 - **Menu profilu (vpravo nahoře):** pod Nastavením je nová položka **Odhlásit se** s ikonou. Účty v aplikaci nejsou, takže vrátí na výběr profilu („Kdo se dívá?“) a zruší přeskočení výběru při obnovení stránky; profil s PINem se zeptá znovu. Test doplněn.
 
