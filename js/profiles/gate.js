@@ -48,10 +48,19 @@ const ProfileGate = {
     const n = document.createElement("div");
     n.className = "pg-profile-item", n.innerHTML = '\n          <div class="pg-add-btn">＋</div>\n          <div class="pg-name" style="color:rgba(255,255,255,0.35)">Přidat profil</div>\n        ', n.onclick = () => ProfileGate.openCreate(), e.appendChild(n)
     const manage = document.getElementById("profileManageBtn");
+    const empty = !_getProfiles().length;
     if (manage) {
       manage.textContent = this._manageMode ? "Hotovo" : "Upravit";
       manage.classList.toggle("active", this._manageMode);
+      manage.style.display = empty ? "none" : "";
     }
+    // Úplně nový člověk: krátké vysvětlení a propojení zařízení jako věta pod tlačítkem, ne osamocené tlačítko
+    const gateEl = document.getElementById("mfProfileGate");
+    if (gateEl) gateEl.classList.toggle("pg-empty", empty);
+    const sub = gateEl && gateEl.querySelector(".pg-subtitle");
+    if (sub) sub.textContent = empty ? "Vytvoř si profil. Ukládá se jen u tebe v zařízení, bez účtu a bez hesla." : "Vyber profil a pusť si svůj večer.";
+    const sync = document.querySelector("#profileSyncBtn span");
+    if (sync) sync.innerHTML = empty ? "Už máš MůjFlix na jiném zařízení? <u>Propojit</u>" : "Propojit zařízení";
   },
   toggleManageMode() {
     this._manageMode = !this._manageMode;

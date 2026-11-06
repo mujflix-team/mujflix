@@ -849,7 +849,7 @@ const scT = await page.evaluate(async () => {
   const h0 = topEl.offsetHeight; await w(400);
   out.gone = root.classList.contains("dv-gone") && getComputedStyle(filt).display === "none" && topEl.offsetHeight <= h0;
   out.noAnim = !/max-height|margin/.test(getComputedStyle(filt).transitionProperty);
-  await w(1700); out.idle = !root.classList.contains("dv-collapsed") && !root.classList.contains("dv-gone");
+  await w(1700); out.stay = root.classList.contains("dv-collapsed") && root.classList.contains("dv-gone");
   pad.remove(); closeUniverse && closeUniverse(); await w(200);
   const modal = document.getElementById("seriesModal"), hero = modal.querySelector(".modal-hero");
   modal.classList.add("open"); _sdCompact(modal, true);
@@ -859,7 +859,7 @@ const scT = await page.evaluate(async () => {
   modal.classList.remove("open");
   return out;
 });
-check("scroll: Procházení schová filtry dolů, vrátí je nahoru i po klidu; hlavička seriálu se zmenšuje a vrací bez zbytků stylu", Object.values(scT).every(Boolean), JSON.stringify(scT));
+check("scroll: Procházení schová filtry dolů, vrátí je jen posunem nahoru (po zastavení se sama nevracejí a neposouvají obsah); hlavička seriálu se zmenšuje a vrací bez zbytků stylu", Object.values(scT).every(Boolean), JSON.stringify(scT));
 const skT = await page.evaluate(() => {
   const mk = (cls, parent) => { const e = document.createElement("div"); e.className = cls; (parent || document.body).appendChild(e); const cs = getComputedStyle(e); const r = { an: cs.animationName, bi: cs.backgroundImage }; e.remove(); return r; };
   const o = document.getElementById("universeOverlay");
@@ -1860,6 +1860,23 @@ const bkRem = await page.evaluate(() => {
 check("záloha: lišta se neukáže při prvním spuštění (jen začne odpočet), po 30 dnech se ukáže a „✕“ ji odloží", bkRem.fresh === false && bkRem.firstSet && bkRem.shown && bkRem.snoozed && bkRem.again === false, JSON.stringify(bkRem));
 check("záloha: propojené zařízení lištu nedostane, „Zálohovat“ otevře obrazovku Záloha dat, po záloze je klid a klíče se nesynchronizují", bkRem.linked === false && bkRem.shown2 && bkRem.opened && bkRem.afterBackup === false && bkRem.notSynced, JSON.stringify(bkRem));
 await page.evaluate(() => { MFSyncUI.close(); MFSync.unlink(); });
+
+// úvodní obrazovka: bez profilů věta místo osamoceného tlačítka, „Upravit“ jen když je co upravovat
+const gateEmpty = await page.evaluate(() => {
+  const keep = localStorage.getItem("mf_profiles_v2"), out = {};
+  const gate = () => document.getElementById("mfProfileGate");
+  localStorage.setItem("mf_profiles_v2", "[]"); ProfileGate.renderGate();
+  out.emptyCls = gate().classList.contains("pg-empty");
+  out.manageHidden = getComputedStyle(document.getElementById("profileManageBtn")).display === "none";
+  out.sentence = /Už máš MůjFlix na jiném zařízení/.test(document.querySelector("#profileSyncBtn span").textContent);
+  out.sub = /bez účtu a bez hesla/.test(gate().querySelector(".pg-subtitle").textContent);
+  if (keep) localStorage.setItem("mf_profiles_v2", keep); ProfileGate.renderGate();
+  out.withCls = !gate().classList.contains("pg-empty");
+  out.manageBack = getComputedStyle(document.getElementById("profileManageBtn")).display !== "none";
+  out.label = document.querySelector("#profileSyncBtn span").textContent === "Propojit zařízení";
+  return out;
+});
+check("úvodní obrazovka: bez profilů je jen věta „Už máš MůjFlix na jiném zařízení? Propojit“ a vysvětlení, bez „Upravit“; s profily se vrací", Object.values(gateEmpty).every(Boolean), JSON.stringify(gateEmpty));
 
 // vstupy a kroky onboardingu
 const syEnt = await page.evaluate(() => {

@@ -90,9 +90,9 @@
 
 
   /* Procházení: řada filtrů a žánrů se při posouvání dolů schová (nejdřív plynule zprůhlední, pak se jednorázově vyjme z rozložení
-     a posuv se opraví o její výšku, ať obsah neposkočí), při posunu nahoru nebo po chvíli klidu se vrátí. Třídy se mění jen při skutečné změně stavu. */
+     a posuv se opraví o její výšku, ať obsah neposkočí), při posunu nahoru se vrátí. Po zastavení posouvání zůstane schovaná (sama se nevrací, protože by posunula obsah). Třídy se mění jen při skutečné změně stavu. */
   (function () {
-    var last = 0, idle = 0, gone = 0;
+    var last = 0, gone = 0;
     function setGone(root, body, on) {
       var top = root.querySelector('.dv-top');
       if (!top || root.classList.contains('dv-gone') === on) return;
@@ -121,8 +121,6 @@
       if (y > 70 && dy > 5) collapse(root, t);
       else if (dy < -5 || y <= 10) expand(root, t);
       last = t.scrollTop;
-      clearTimeout(idle);
-      if (root.classList.contains('dv-collapsed')) idle = setTimeout(function () { expand(root, t); }, 1400);
     }, true);
   })();
 

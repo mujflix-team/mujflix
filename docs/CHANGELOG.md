@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.42
+- **Úvodní obrazovka:** když ještě není žádný profil, zmizí zbytečné „Upravit“, pod nadpisem je věta, že se vše ukládá jen v zařízení (bez účtu a hesla), a „Propojit zařízení“ je věta „Už máš MůjFlix na jiném zařízení? Propojit“ místo osamoceného tlačítka. S profily vše jako dřív.
+- **Objevovat:** lišta s filtry a žánry se po zastavení posouvání už sama nevrací a neposouvá obsah. Vrátí se jen posunem nahoru.
+
 ## 3.21.41
 - **Opraveno:** na notebooku (nižší okno) logo nebo nadpis banneru zasahoval pod horní lištu a překrýval „MůjFlix Domů“. Na nízkých oknech je banner pevně vyšší a logo a spodní odstup menší. Na velkém monitoru a na telefonu se nic nemění.
 

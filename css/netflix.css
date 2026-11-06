@@ -1809,3 +1809,9 @@ html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
   html body .nf-hero-body { padding-bottom: 52px; }
   html body .nf-hero-logo { max-height: clamp(56px, 11vh, 90px); }
 }
+
+/* Úvodní obrazovka bez profilů: věta místo osamoceného tlačítka, vysvětlení pod nadpisem */
+#mfProfileGate.pg-empty .pg-subtitle { display: block !important; margin: 4px auto 0; max-width: 30em; padding: 0 var(--nf-pad, 20px); text-align: center; color: #b3b3b3; font-weight: var(--fw-light); font-size: clamp(0.95rem, 1.2vw, 1.1rem); line-height: 1.45; }
+#mfProfileGate.pg-empty .pg-sync-btn { margin-top: 28px !important; color: #b3b3b3 !important; font-weight: var(--fw-regular) !important; text-align: center; line-height: 1.4; }
+#mfProfileGate.pg-empty .pg-sync-btn svg { display: none; }
+#mfProfileGate.pg-empty .pg-sync-btn u { color: #fff; text-underline-offset: 3px; }
