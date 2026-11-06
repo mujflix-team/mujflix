@@ -24,10 +24,9 @@ const rating = await page.evaluate(() => {
   _ratingSlug = slug;
   submitRating("loved");
   const stored = safeLS(uKey("mf_ratings"), "{}")[slug];
-  return { genres: stored?.genres, signal: Object.keys(getRatingSignalCached()).length };
+  return { genres: stored?.genres };
 });
 check("rating: uloží žánry", Array.isArray(rating.genres) && rating.genres.length === 2, JSON.stringify(rating));
-check("rating: signál pro AI není prázdný", rating.signal > 0, JSON.stringify(rating));
 
 // --- openSeries nezkresluje preference
 const boost = await page.evaluate(() => {

@@ -494,30 +494,8 @@ const TMDB_GENRE_CS = {
     10768: "valecny"
   };
 
-function _computePersonalRatingSignal() {
-  try {
-    const e = safeLS(uKey("mf_ratings"), "{}"),
-      t = {};
-    Object.values(e).forEach(e => {
-      const n = "loved" === e.rating ? 1.5 : "liked" === e.rating ? .8 : "ok" === e.rating ? .2 : -.5;
-      (e.genres || []).forEach(e => {
-        t[e] = (t[e] || 0) + n
-      })
-    });
-    const n = Math.max(1, Math.max(...Object.values(t).map(Math.abs)));
-    return Object.keys(t).forEach(e => t[e] = t[e] / n), t
-  } catch {
-    return {}
-  }
-}
 let _momentumCache = null,
-  _momentumTs = 0,
-  _ratingSignalCache = null,
-  _ratingSignalTs = 0;
-
-function getRatingSignalCached() {
-  return (!_ratingSignalCache || Date.now() - _ratingSignalTs > 6e4) && (_ratingSignalCache = _computePersonalRatingSignal(), _ratingSignalTs = Date.now()), _ratingSignalCache
-}
+  _momentumTs = 0;
 
 function recordWatchToTimeline(e, t) {
   try {
