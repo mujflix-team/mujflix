@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.43
+- **Karty na úvodní stránce** ukazují pod názvem rok a hodnocení (např. „2020 · ★ 8.1“).
+- **Soukromí a podmínky** se otevírají ve stejném okně (stránka má „Zpět do aplikace“), ne v nové kartě.
+- **Kratší úvodní stránka** (změna z #48, která se do mainu nedostala): pryč dvě řady podle jednotlivých žánrů (opakovaly „Vybráno pro tebe“) a „Protože jsi viděl“ je jen jedna řada místo dvou.
+
 ## 3.21.42
 - **Úvodní obrazovka:** když ještě není žádný profil, zmizí zbytečné „Upravit“, pod nadpisem je věta, že se vše ukládá jen v zařízení (bez účtu a hesla), a „Propojit zařízení“ je věta „Už máš MůjFlix na jiném zařízení? Propojit“ místo osamoceného tlačítka. S profily vše jako dřív.
 - **Objevovat:** lišta s filtry a žánry se po zastavení posouvání už sama nevrací a neposouvá obsah. Vrátí se jen posunem nahoru.

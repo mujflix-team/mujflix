@@ -2393,6 +2393,9 @@ const legalT = await page.evaluate(async () => {
 });
 check("soukromí a podmínky: stránka s TMDB atribucí a upozorněním o externích webech, 404 a odkaz na přihlašovací obrazovce", legalT.privacy && legalT.notFound && legalT.link, JSON.stringify(legalT));
 
+const legalLink = await page.evaluate(() => [...document.querySelectorAll('a[href^="soukromi.html"]')].every(a => !a.target));
+check("soukromí: odkazy se otevírají ve stejném okně (bez nové karty)", legalLink);
+
 // --- Výběr profilu se po obnovení stránky přeskočí (a bez příznaku se ukáže)
 {
   const ids = await page.evaluate(() => { const ps = _getProfiles(); return ps.length ? ps[0].id : null; });
