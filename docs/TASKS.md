@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.38: drobnosti: placeholder hledání, vzhled Pokročilé v nastavení.
+- 3.21.39: jasnější potvrzení při přidání do Oblíbených v banneru.
 - 3.21.37: oprava useknutého tlačítka Přehrát v detailu na telefonu.
 - 3.21.36: zjednodušení (banner, žánrové čipy, Náhodná, Pokročilé v nastavení).
 - 3.21.35: jemné animace (vjezd okna, postupné karty, odezva tlačítek).
