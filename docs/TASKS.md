@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.38: drobnosti: placeholder hledání, vzhled Pokročilé v nastavení.
 - 3.21.37: oprava useknutého tlačítka Přehrát v detailu na telefonu.
 - 3.21.36: zjednodušení (banner, žánrové čipy, Náhodná, Pokročilé v nastavení).
 - 3.21.35: jemné animace (vjezd okna, postupné karty, odezva tlačítek).

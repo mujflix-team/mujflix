@@ -1783,8 +1783,8 @@ html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #ser
 }
 
 /* Nastavení: pokročilé věci jsou schované pod jednou položkou */
-#mfSettingsModal .pf-adv { display: block; margin: 10px 0 0; padding: 8px 2px; background: none; border: 0; color: #b3b3b3; font: inherit; font-weight: var(--fw-medium); cursor: pointer; }
-#mfSettingsModal .pf-adv::after { content: " ›"; display: inline-block; transition: transform .18s ease; }
+#mfSettingsModal .pf-adv { display: block; width: 100%; text-align: left; margin: 10px 0 0; padding: 8px 2px; background: none; border: 0; color: #b3b3b3; font: inherit; font-weight: var(--fw-medium); cursor: pointer; }
+#mfSettingsModal .pf-adv::after { content: "›"; display: inline-block; margin-left: 8px; transition: transform .18s ease; }
 #mfSettingsModal .pf-adv[aria-expanded="true"]::after { transform: rotate(90deg); }
 #mfSettingsModal .pf-adv:hover { color: #fff; }
 #mfSettingsModal .pf-adv-box { display: grid; gap: 8px; margin-top: 6px; }
