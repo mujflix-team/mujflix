@@ -1787,7 +1787,9 @@ html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #ser
 #mfSettingsModal .pf-adv::after { content: "›"; display: inline-block; margin-left: 8px; transition: transform .18s ease; }
 #mfSettingsModal .pf-adv[aria-expanded="true"]::after { transform: rotate(90deg); }
 #mfSettingsModal .pf-adv:hover { color: #fff; }
-#mfSettingsModal .pf-adv-box { display: grid; gap: 8px; margin-top: 6px; }
+#mfSettingsModal .pf-adv-box { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 6px; }
+#mfSettingsModal .pf-adv-box .pf-row, #mfSettingsModal .pf-adv-box .pf-row-txt { min-width: 0; }
+#mfSettingsModal .pf-adv-box .pf-row small { white-space: normal; }
 #mfSettingsModal .pf-adv-box[hidden] { display: none; }
 
 /* Detail seriálu na telefonu: „Náhodná“ jen jako ikona, popisek Přehrát/Pokračovat se nikdy neusekne napůl */
@@ -1815,3 +1817,5 @@ html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
 #mfProfileGate.pg-empty .pg-sync-btn { margin-top: 28px !important; color: #b3b3b3 !important; font-weight: var(--fw-regular) !important; text-align: center; line-height: 1.4; }
 #mfProfileGate.pg-empty .pg-sync-btn svg { display: none; }
 #mfProfileGate.pg-empty .pg-sync-btn u { color: #fff; text-underline-offset: 3px; }
+
+#mfSettingsModal .pf-row.pf-danger small { color: #ff453a; }
