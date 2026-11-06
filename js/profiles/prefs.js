@@ -145,6 +145,9 @@
       ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno") + " · záloha dat"]
     ];
   }
+  function rowHtml(r) {
+    return '<button type="button" class="pf-row" data-st="' + r[0] + '"><span class="pf-row-ico">' + r[1] + '</span><span class="pf-row-txt"><strong>' + r[2] + "</strong><small>" + esc(r[3]) + '</small></span><span class="pf-row-go" aria-hidden="true">›</span></button>';
+  }
   function hubOpen() {
     if (!hub) {
       hub = document.createElement("div");
@@ -157,6 +160,12 @@
         var b = e.target.closest && e.target.closest("[data-st]");
         if (!b) return;
         var a = b.getAttribute("data-st");
+        if (a === "adv") {
+          var box = hub.querySelector(".pf-adv-box"), expand = box.hasAttribute("hidden");
+          if (expand) box.removeAttribute("hidden"); else box.setAttribute("hidden", "");
+          b.setAttribute("aria-expanded", expand ? "true" : "false");
+          return;
+        }
         hubClose();
         if (a === "close") return;
         if (a === "profile") { var pr = profile(); if (pr && window.ProfileGate) ProfileGate.openCreate(pr.id); }
@@ -171,9 +180,9 @@
       '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
       '<div class="pf-title">Nastavení</div>' +
       ((profile() || {}).name ? '<div class="pf-text">Profil <b>' + esc(profile().name) + "</b></div>" : "") +
-      '<div class="pf-rows">' + hubRows().map(function (r) {
-        return '<button type="button" class="pf-row" data-st="' + r[0] + '"><span class="pf-row-ico">' + r[1] + '</span><span class="pf-row-txt"><strong>' + r[2] + "</strong><small>" + esc(r[3]) + '</small></span><span class="pf-row-go" aria-hidden="true">›</span></button>';
-      }).join("") + "</div></div>";
+      '<div class="pf-rows">' + hubRows().filter(function (r) { return r[0] !== "sync"; }).map(rowHtml).join("") +
+      '<button type="button" class="pf-adv" aria-expanded="false" data-st="adv">Pokročilé</button>' +
+      '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return r[0] === "sync"; }).map(rowHtml).join("") + "</div></div></div>";
     hub.classList.add("show");
     var f = hub.querySelector(".pf-row"); if (f) f.focus();
   }

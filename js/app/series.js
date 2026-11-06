@@ -124,7 +124,10 @@ function openSeries(e) {
     }, 120))
   })), _sdTab("eps"), renderSeasons(), updatePanelProgress(), updateModalFavBtn(), _sdFill(e, n), _sdLogo(e), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
   const a = document.getElementById("modalRateBtn");
-  a && (a.style.display = calcProgress(e).seen > 0 ? "flex" : "none")
+  a && (a.style.display = calcProgress(e).seen > 0 ? "flex" : "none");
+  // „Náhodná epizoda“ dává smysl jen u seriálu s více epizodami
+  const sh = o.querySelector('[onclick="shuffleEpisode()"]');
+  if (sh) { let cnt = 0; for (let k = 1; k <= totalSeasons(e); k++) cnt += epsInSeason(e, k); sh.style.display = cnt > 1 ? "" : "none" }
 }
 
 /* Detail seriálu: řádek s metadaty (rok · žánry · série · HD), popis, herci a popisek tlačítka Pokračovat/Přehrát. */

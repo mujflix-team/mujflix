@@ -1737,11 +1737,6 @@ html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba
 @media (hover: none), (max-width: 520px) { html body #mfProfileGate .pg-version { display: none; } }
 
 /* Tlačítko Sdílet: v banneru stejné jako „Do oblíbených“, na úzké šířce jen ikona */
-.nf-btn-share svg { flex: 0 0 auto; }
-@media (max-width: 520px) {
-  .nf-btn-share { flex: 0 0 44px; padding: 0; }
-  .nf-btn-share span { display: none; }
-}
 
 /* ── Typografie: všech šest řezů Netflix Sans, každý má svou roli ──
    Th 100 = velké nadpisy na přihlašovací obrazovce
@@ -1786,3 +1781,11 @@ html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #ser
 @media (prefers-reduced-motion: reduce) {
   html body .modal-overlay.visible .modal-content, html body .nf-row .nf-card { animation: none !important; }
 }
+
+/* Nastavení: pokročilé věci jsou schované pod jednou položkou */
+#mfSettingsModal .pf-adv { display: block; margin: 10px 0 0; padding: 8px 2px; background: none; border: 0; color: #b3b3b3; font: inherit; font-weight: var(--fw-medium); cursor: pointer; }
+#mfSettingsModal .pf-adv::after { content: " ›"; display: inline-block; transition: transform .18s ease; }
+#mfSettingsModal .pf-adv[aria-expanded="true"]::after { transform: rotate(90deg); }
+#mfSettingsModal .pf-adv:hover { color: #fff; }
+#mfSettingsModal .pf-adv-box { display: grid; gap: 8px; margin-top: 6px; }
+#mfSettingsModal .pf-adv-box[hidden] { display: none; }

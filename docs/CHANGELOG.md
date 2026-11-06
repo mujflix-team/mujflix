@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.36
+- **Jednodušší:** v banneru zůstala jen tlačítka Přehrát a Do oblíbených (Sdílet je v detailu), řada žánrů má 5 nejčastějších a „Další“, „Náhodná epizoda“ se ukáže jen u seriálu s více epizodami, v Nastavení je propojení zařízení a záloha schované pod „Pokročilé“.
+
 ## 3.21.35
 - **Jemné animace:** okno detailu vyjede mírně zespodu, karty v řadě naskočí postupně, tlačítka, čipy a záložky mají jednotnou rychlou odezvu a při stisku se lehce zmenší. Jen CSS (průhlednost a posun, bez záře), při nastavení systému „omezit pohyb“ se vše vypne.
 

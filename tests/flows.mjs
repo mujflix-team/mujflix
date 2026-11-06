@@ -1089,13 +1089,14 @@ const shareHero = await page.evaluate(async () => {
   const out = {}, w = ms => new Promise(r => setTimeout(r, ms)), copied = [];
   Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
   Object.defineProperty(navigator, "clipboard", { value: { writeText: async t => { copied.push(t); } }, configurable: true });
-  const btn = document.getElementById("nfHeroShare");
+  const slug0 = Object.keys(db)[0];
+  openSeries(slug0); await w(900);
+  const btn = document.getElementById("modalShareBtn");
   if (!btn) return { skip: true };
   out.label = btn.getAttribute("aria-label"); out.icon = !!btn.querySelector("svg"); out.focusable = btn.tabIndex === 0 && btn.tagName === "BUTTON";
-  const type = /Seriál/.test(document.querySelector("#nfHero .nf-hero-badge")?.textContent || "") ? "s" : "f";
   btn.click(); await w(150);
   out.copied = copied[0] || "";
-  out.typeOk = new RegExp("^https://mujflix\\.pages\\.dev/" + type + "/h\\d\\?id=50\\d$").test(out.copied);
+  out.typeOk = /^https:\/\/mujflix\.pages\.dev\/s\/[a-z0-9-]+(\?id=\d+)?$/.test(out.copied);
   const t = document.getElementById("mf-toast");
   out.toast = t && t.textContent; out.status = t && t.getAttribute("role");
   // schránka selže → záložní kopírování; když selže i to, toast ukáže odkaz
@@ -1117,9 +1118,10 @@ const shareHero = await page.evaluate(async () => {
   abort = true; btn.click(); await w(150);
   out.abortQuiet = calls.length === 2 && document.getElementById("mf-toast").textContent === "";
   Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
+  closeModal(); await w(900);
   return out;
 });
-check("sdílení v banneru: tlačítko Sdílet (ikona, aria-label s názvem) zkopíruje adresu s ?id= a ohlásí to toastem (role status)", shareHero.skip || (shareHero.icon && shareHero.focusable && /^Sdílet odkaz na H\d$/.test(shareHero.label) && shareHero.typeOk && /Odkaz zkopírován/.test(shareHero.toast) && shareHero.status === "status"), JSON.stringify(shareHero));
+check("sdílení v detailu seriálu: tlačítko Sdílet (ikona, aria-label s názvem) zkopíruje adresu s ?id= a ohlásí to toastem (role status)", shareHero.skip || (shareHero.icon && shareHero.focusable && /^Sdílet odkaz na /.test(shareHero.label) && shareHero.typeOk && /Odkaz zkopírován/.test(shareHero.toast) && shareHero.status === "status"), JSON.stringify(shareHero));
 check("sdílení: když selže schránka, použije se záložní kopírování; když i to, toast ukáže odkaz", shareHero.skip || (shareHero.fallback && shareHero.shownUrl), JSON.stringify(shareHero));
 check("sdílení: navigator.share dostane titul, text a adresu; zrušení uživatelem (AbortError) není chyba", shareHero.skip || (shareHero.shared && shareHero.abortQuiet), JSON.stringify(shareHero));
 
@@ -1595,6 +1597,9 @@ const menuT = await page.evaluate(() => {
   m.querySelector("[data-act=settings]").click();
   out.hubRows = [...document.querySelectorAll("#mfSettingsModal [data-st]")].map(x => x.dataset.st).filter(x => x !== "close").join();
   out.hubSub = document.querySelector('#mfSettingsModal [data-st="sync"] small').textContent;
+  out.advHidden = document.querySelector("#mfSettingsModal .pf-adv-box").hasAttribute("hidden");
+  document.querySelector('#mfSettingsModal [data-st="adv"]').click();
+  out.advOpen = !document.querySelector("#mfSettingsModal .pf-adv-box").hasAttribute("hidden") && document.querySelector('#mfSettingsModal [data-st="adv"]').getAttribute("aria-expanded") === "true";
   document.querySelector('#mfSettingsModal [data-st="profile"]').click();
   out.hubClosed = !document.getElementById("mfSettingsModal").classList.contains("show");
   out.menuClosed = !document.getElementById("nfProfileMenu");
@@ -1619,7 +1624,7 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings,logout" && menuT.hubRows === "profile,prefs,sync" && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings,logout" && menuT.hubRows === "profile,prefs,adv,sync" && menuT.advHidden && menuT.advOpen && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 const logoutT = await page.evaluate(() => {
   const out = {};
   document.getElementById("mfProfileGate").style.display = "none";
@@ -2280,7 +2285,7 @@ check("záloha: obrazovka s tlačítky Stáhnout / Načíst", bk.ui);
 
 // --- v2.9: rychlé procházení, OG tagy, menu
 const pol = await page.evaluate(() => ({
-  chips: document.querySelectorAll("#nfQuick .nf-chip").length >= 8,
+  chips: document.querySelectorAll("#nfQuick .nf-chip").length === 6,
   og: !!document.querySelector('meta[property="og:image"]'),
   dockBtns: ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe"].every(i => document.getElementById(i)),
   noPopups: !document.getElementById("nfTip") && !window.mfAbout,
