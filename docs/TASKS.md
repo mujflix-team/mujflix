@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.36: zjednodušení (banner, žánrové čipy, Náhodná, Pokročilé v nastavení).
+- 3.21.37: drobnosti: placeholder hledání, vzhled Pokročilé v nastavení.
 - 3.21.35: jemné animace (vjezd okna, postupné karty, odezva tlačítek).
 - 3.21.34: typografie – všech šest řezů Netflix Sans v jasné hierarchii (Thin až Black).
 - 3.21.33: banner ukazuje důvod doporučení (podle tvých žánrů), jen když ho známe.
