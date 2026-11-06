@@ -302,7 +302,7 @@ function submitRating(e) {
       name: db[_ratingSlug]?.name || _ratingSlug,
       genres: db[_ratingSlug]?._genreIds?.length ? db[_ratingSlug]._genreIds : aiBrain.idsForNames(db[_ratingSlug]?._genres),
       ts: Date.now()
-    }, _ratingSignalCache = null, safeSetItem(uKey("mf_ratings"), JSON.stringify(t)), aiBrain && db[_ratingSlug]) {
+    }, safeSetItem(uKey("mf_ratings"), JSON.stringify(t)), aiBrain && db[_ratingSlug]) {
     const t = "loved" === e ? .25 : "liked" === e ? .15 : "ok" === e ? .05 : -.1;
     db[_ratingSlug]._genres && aiBrain.boostGenresFromTmdb(db[_ratingSlug]._genres, t)
   }

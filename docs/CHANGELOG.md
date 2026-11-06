@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.40
+- **Úklid:** pryč nepoužitý náklon dlaždic (`.ps-tile-wrapper`) a přechod postera v `sections.js`, nedefinovaná větev `MFProfilesDB` v `profiles-util.js` a nepoužívaný výpočet signálu hodnocení v `core.js`. Bez změny chování.
+
 ## 3.21.39
 - **Do oblíbených v banneru:** po kliknutí se tlačítko znatelně zesvětlí, srdce krátce „cukne“ a objeví se zpráva „Přidáno do Oblíbených“ / „Odebráno z Oblíbených“ (stejně jako v detailu).
 

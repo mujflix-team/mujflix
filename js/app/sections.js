@@ -170,31 +170,6 @@ function _bombujMovieUrlVariants(e, t) {
         n && (t === e ? n.classList.add("active") : n.classList.remove("active"))
       })
     }
-  }(), function() {
-    function e() {
-      function e(e) {
-        if (e._tiltInited) return;
-        e._tiltInited = !0;
-        const t = e.querySelector(".ps-tile");
-        t && (e.addEventListener("mousemove", n => {
-          const o = e.getBoundingClientRect(),
-            i = (n.clientX - o.left) / o.width - .5,
-            a = (n.clientY - o.top) / o.height - .5;
-          t.style.transform = `rotateY(${7*i*2}deg) rotateX(${7*-a}deg)`, t.style.transformStyle = "preserve-3d", t.style.transition = "transform 0.12s ease"
-        }), e.addEventListener("mouseleave", () => {
-          t.style.transform = "", t.style.transition = "transform 0.5s cubic-bezier(0.34,1.2,0.64,1)"
-        }))
-      }
-      document.querySelectorAll(".ps-tile-wrapper").forEach(e);
-      new MutationObserver(t => t.forEach(t => t.addedNodes.forEach(t => {
-        1 === t.nodeType && (t.classList?.contains("ps-tile-wrapper") && e(t), t.querySelectorAll?.(".ps-tile-wrapper").forEach(e))
-      }))).observe(document.body, {
-        childList: !0,
-        subtree: !0
-      })
-    }
-
-    "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", e) : e()
   }(), window.MFTransition = function() {
     const e = !!document.startViewTransition;
     return {
@@ -247,13 +222,4 @@ function _bombujMovieUrlVariants(e, t) {
       },
       SUPPORTS: e
     }
-  }(), document.addEventListener("DOMContentLoaded", function() {
-    document.addEventListener("click", function(e) {
-      const t = e.target.closest(".ps-tile-wrapper");
-      if (!t) return;
-      const n = t.querySelector(".tile-bg, img");
-      n && document.startViewTransition && (n.style.viewTransitionName = "movie-poster", setTimeout(() => {
-        n.style.viewTransitionName = ""
-      }, 700))
-    }, !0)
-  });
+  }()

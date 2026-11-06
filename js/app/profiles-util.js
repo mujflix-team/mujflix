@@ -14,15 +14,6 @@ function _getProfiles() {
     return [];
   };
   try {
-    const stored = window.MFProfilesDB && typeof window.MFProfilesDB.getSync === "function"
-      ? window.MFProfilesDB.getSync()
-      : [];
-    const databaseProfiles = normalize(stored);
-    if (databaseProfiles.length) return databaseProfiles;
-  } catch (e) {
-    console.warn("[ProfileGate] Nelze načíst profily z databáze:", e);
-  }
-  try {
     const keys = [PROFILES_KEY, "mf_profiles", "mujflix_users_v1", "mujflix_users"];
     for (const key of keys) {
       const profiles = normalize(safeLS(key, "[]"));
@@ -35,13 +26,6 @@ function _getProfiles() {
 }
 
 function _saveProfiles(profiles) {
-  try {
-    if (window.MFProfilesDB && typeof window.MFProfilesDB.saveProfiles === "function") {
-      window.MFProfilesDB.saveProfiles(profiles);
-    }
-  } catch (e) {
-    console.warn("[ProfileGate] Nelze uložit profily do databáze:", e);
-  }
   try { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); } catch(e) {
     console.warn("[ProfileGate] Nelze uložit profily do úložiště:", e);
   }
