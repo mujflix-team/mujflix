@@ -610,7 +610,6 @@
             '<div class="nf-hero-actions">' +
               '<button type="button" class="nf-btn nf-btn-primary" id="nfHeroPlay"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>' + esc(h.playLabel) + '</span></button>' +
               '<button type="button" class="nf-btn nf-btn-ghost" id="nfHeroFav"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + HEART_PATH + '"/></svg><span></span></button>' +
-              '<button type="button" class="nf-btn nf-btn-ghost nf-btn-share" id="nfHeroShare"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg><span>Sdílet</span></button>' +
             '</div>' +
           '</div>';
         var play = document.getElementById('nfHeroPlay');
@@ -630,14 +629,6 @@
           fav.querySelector('span').textContent = on ? 'V oblíbených' : 'Do oblíbených';
         }
         fav.addEventListener('click', function () { h.onFav(); paintFav(); });
-        var shareBtn = document.getElementById('nfHeroShare');
-        if (shareBtn) {
-          shareBtn.setAttribute('aria-label', 'Sdílet odkaz na ' + (h.title || 'titul'));
-          shareBtn.addEventListener('click', function () {
-            var sh = h.share ? h.share() : { type: 'tv', title: h.title };
-            if (typeof window.mfShareTitle === 'function') window.mfShareTitle(sh.type, sh.title, sh.id);
-          });
-        }
         paintFav();
         if (h.after) h.after();
       }
