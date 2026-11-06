@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.40: úklid mrtvého kódu (náklon dlaždic, MFProfilesDB, signál hodnocení).
+- 3.21.45: šipka zpět ze Zálohy vrací do Nastavení.
 - 3.21.44: Pokročilé v nastavení: záloha, verze a aktualizace, smazání dat.
 - 3.21.43: hodnocení na kartách úvodní stránky, soukromí ve stejném okně.
 - 3.21.42: úvodní obrazovka bez profilů (věta, bez Upravit), filtry v Objevovat se nevracejí samy.

@@ -1867,6 +1867,25 @@ check("záloha: lišta se neukáže při prvním spuštění (jen začne odpoče
 check("záloha: propojené zařízení lištu nedostane, „Zálohovat“ otevře obrazovku Záloha dat, po záloze je klid a klíče se nesynchronizují", bkRem.linked === false && bkRem.shown2 && bkRem.opened && bkRem.afterBackup === false && bkRem.notSynced, JSON.stringify(bkRem));
 await page.evaluate(() => { MFSyncUI.close(); MFSync.unlink(); });
 
+// záloha otevřená z Nastavení: šipka zpět vrací do Nastavení (ne na obrazovku propojení)
+const bkBack = await page.evaluate(async () => {
+  const w = ms => new Promise(r => setTimeout(r, ms)), out = {};
+  MFProfileSettings.open(); await w(100);
+  document.querySelector('#mfSettingsModal [data-st="adv"]').click();
+  document.querySelector('#mfSettingsModal [data-st="backup"]').click(); await w(150);
+  const sy = () => document.getElementById("mfSyncModal");
+  out.onBackup = sy().classList.contains("show") && /Záloha dat/.test(sy().textContent);
+  sy().querySelector(".sy-back").click(); await w(150);
+  out.backToSettings = document.getElementById("mfSettingsModal").classList.contains("show") && !sy().classList.contains("show");
+  MFProfileSettings.close();
+  MFSyncUI.open("backup"); await w(100);
+  sy().querySelector(".sy-back").click(); await w(100);
+  out.otherwiseHome = sy().classList.contains("show") && sy().querySelector(".sy-title").textContent !== "Záloha dat";
+  MFSyncUI.close();
+  return out;
+});
+check("záloha: otevřená z Nastavení vrací šipkou zpět do Nastavení, otevřená z propojení zpět na propojení", Object.values(bkBack).every(Boolean), JSON.stringify(bkBack));
+
 // úvodní obrazovka: bez profilů věta místo osamoceného tlačítka, „Upravit“ jen když je co upravovat
 const gateEmpty = await page.evaluate(() => {
   const keep = localStorage.getItem("mf_profiles_v2"), out = {};
