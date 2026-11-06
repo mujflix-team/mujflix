@@ -1,7 +1,10 @@
 # Changelog
 
-## 3.21.37
+## 3.21.38
 - **Opraveno:** v hledání na telefonu se nezkracuje text v poli (nově „Hledat…“), v Nastavení je „Pokročilé“ zarovnané doleva se šipkou těsně za textem.
+
+## 3.21.37
+- **Opraveno:** v detailu seriálu na telefonu se text tlačítka „Přehrát · S1 E1“ useknul napůl. „Náhodná“ je tam teď jen ikona a popisek tlačítka má vždy dost místa.
 
 ## 3.21.36
 - **Jednodušší:** v banneru zůstala jen tlačítka Přehrát a Do oblíbených (Sdílet je v detailu), řada žánrů má 5 nejčastějších a „Další“, „Náhodná epizoda“ se ukáže jen u seriálu s více epizodami, v Nastavení je propojení zařízení a záloha schované pod „Pokročilé“.

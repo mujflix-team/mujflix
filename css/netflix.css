@@ -1789,3 +1789,9 @@ html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #ser
 #mfSettingsModal .pf-adv:hover { color: #fff; }
 #mfSettingsModal .pf-adv-box { display: grid; gap: 8px; margin-top: 6px; }
 #mfSettingsModal .pf-adv-box[hidden] { display: none; }
+
+/* Detail seriálu na telefonu: „Náhodná“ jen jako ikona, popisek Přehrát/Pokračovat se nikdy neusekne napůl */
+html body #seriesModal .btn-continue .bc-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+@media (max-width: 700px) {
+  html body #seriesModal .btn-shuffle .bs-txt, html body #seriesModal .btn-shuffle .kb { display: none; }
+}
