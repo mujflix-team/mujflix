@@ -1085,7 +1085,7 @@
         var mine = mfhMyListItems();
         try { if (mine.some(function (m) { return !m.image && m.fav && m.fav.tmdbId; }) && window.mfBackfillFavPosters) window.mfBackfillFavPosters(); } catch (e) {}
         var genres = mfhOnlyAnime() ? [] : mfhTopGenreIdsWithProfile();
-        var seeds = mfhOnlyAnime() ? [] : mfhSeedTitles(2);
+        var seeds = mfhOnlyAnime() ? [] : mfhSeedTitles(1);
 
         var sig = JSON.stringify([
           cont && [cont.slug, cont.progress, cont.episode],
@@ -1115,8 +1115,6 @@
         nfRowShell('mfhForYou', forYouTitle, forYouSub);
         var oa = mfhOnlyAnime();
         nfRowShell('mfhTop10', oa ? 'Top 10 anime' : 'Top 10 tento týden', '', true);
-        var genreRows = genres.slice(0, 2).filter(function (g) { return GENRE_LABELS[g]; });
-        genreRows.forEach(function (g) { nfRowShell('mfhGenre' + g, GENRE_LABELS[g]); });
         nfRowShell('mfhTopTv', oa ? 'Nejlepší anime seriály' : 'Nejlépe hodnocené seriály');
         nfRowShell('mfhTopMovie', oa ? 'Nejlepší anime filmy' : 'Nejlépe hodnocené filmy');
 
@@ -1125,7 +1123,6 @@
 
         if (!getTmdbKey()) {
           ['mfhForYou', 'mfhTop10', 'mfhTopTv', 'mfhTopMovie'].forEach(function (id) { nfFillRow(id, []); });
-          genreRows.forEach(function (g) { nfFillRow('mfhGenre' + g, []); });
           var h = document.getElementById('nfHero');
           if (h) h.className = 'nf-hero nf-hero-none';
           return;
@@ -1173,17 +1170,6 @@
         nfJson(oa ? '/discover/tv?sort_by=popularity.desc&vote_count.gte=50' + AQ : '/trending/all/week').then(function (d) {
           if (myRun !== _nfRun) return;
           nfFillRow('mfhTop10', (oa ? nfItems(d, 'tv') : nfItems(d)).slice(0, 10), true);
-        });
-        genreRows.forEach(function (g) {
-          Promise.all(['tv', 'movie'].map(function (t) {
-            return nfJson('/discover/' + t + '?sort_by=popularity.desc&vote_count.gte=100&with_genres=' + g)
-              .then(function (d) { return nfItems(d, t); });
-          })).then(function (l) {
-            if (myRun !== _nfRun) return;
-            var out = [], max = Math.max(l[0].length, l[1].length);
-            for (var i = 0; i < max; i++) { if (l[0][i]) out.push(l[0][i]); if (l[1][i]) out.push(l[1][i]); }
-            nfFillRow('mfhGenre' + g, fresh(out).slice(0, 20));
-          });
         });
         nfJson(oa ? '/discover/tv?sort_by=vote_average.desc&vote_count.gte=300' + AQ : '/tv/top_rated').then(function (d) {
           if (myRun !== _nfRun) return;

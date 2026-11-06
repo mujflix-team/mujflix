@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.37
+- **Kratší úvodní stránka:** pryč dvě řady podle jednotlivých žánrů (opakovaly „Vybráno pro tebe“) a „Protože jsi viděl“ je jen jedna místo dvou.
+
 ## 3.21.36
 - **Jednodušší:** v banneru zůstala jen tlačítka Přehrát a Do oblíbených (Sdílet je v detailu), řada žánrů má 5 nejčastějších a „Další“, „Náhodná epizoda“ se ukáže jen u seriálu s více epizodami, v Nastavení je propojení zařízení a záloha schované pod „Pokročilé“.
 
