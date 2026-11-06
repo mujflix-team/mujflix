@@ -1795,3 +1795,9 @@ html body #seriesModal .btn-continue .bc-txt { overflow: hidden; text-overflow: 
 @media (max-width: 700px) {
   html body #seriesModal .btn-shuffle .bs-txt, html body #seriesModal .btn-shuffle .kb { display: none; }
 }
+
+/* Do oblíbených: po přidání je tlačítko znatelně světlejší a srdce krátce „cukne“ */
+@keyframes mfHeartPop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+html body .nf-btn-ghost.on { background: rgba(255, 255, 255, 0.26) !important; }
+html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
+@media (prefers-reduced-motion: reduce) { html body .nf-btn-ghost.on svg { animation: none; } }
