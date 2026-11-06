@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.41
+- **Opraveno:** na notebooku (nižší okno) logo nebo nadpis banneru zasahoval pod horní lištu a překrýval „MůjFlix Domů“. Na nízkých oknech je banner pevně vyšší a logo a spodní odstup menší. Na velkém monitoru a na telefonu se nic nemění.
+
 ## 3.21.40
 - **Úklid:** pryč nepoužitý náklon dlaždic (`.ps-tile-wrapper`) a přechod postera v `sections.js`, nedefinovaná větev `MFProfilesDB` v `profiles-util.js` a nepoužívaný výpočet signálu hodnocení v `core.js`. Bez změny chování.
 
