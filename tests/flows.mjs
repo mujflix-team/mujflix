@@ -1585,7 +1585,7 @@ const lockT = await page.evaluate(() => {
 });
 check("PIN: po špatném pokusu zbývající počet, po 5. zámek, který se stupňuje; správný PIN ho nuluje", /Zbývá 4 pokusy/.test(lockT.m1) && /Zbývá 1 pokus$/.test(lockT.m4) && /Zkus to znovu za 0:\d\d/.test(lockT.m5) && lockT.level1 === 1 && lockT.left1 > 0 && lockT.blocked && lockT.level2 === 2 && lockT.longer && lockT.resetOk, JSON.stringify(lockT));
 
-const menuT = await page.evaluate(() => {
+const menuT = await page.evaluate(async () => {
   const a = ProfileGate.createProfile({ name: "MenuA", avatar: "🎬", color: "#007aff", pin: null });
   const b = ProfileGate.createProfile({ name: "MenuB", avatar: "🦊", color: "#ff6b6b", pin: null });
   localStorage.setItem("mf_active_pid", a);
@@ -1599,6 +1599,12 @@ const menuT = await page.evaluate(() => {
   out.advHidden = document.querySelector("#mfSettingsModal .pf-adv-box").hasAttribute("hidden");
   document.querySelector('#mfSettingsModal [data-st="adv"]').click();
   out.advOpen = !document.querySelector("#mfSettingsModal .pf-adv-box").hasAttribute("hidden") && document.querySelector('#mfSettingsModal [data-st="adv"]').getAttribute("aria-expanded") === "true";
+  const pidKeep = localStorage.getItem("mf_active_pid");
+  document.querySelector('#mfSettingsModal [data-st="reset"]').click();
+  out.resetArmed = document.querySelector('#mfSettingsModal [data-st="reset"]').classList.contains("pf-danger") && localStorage.getItem("mf_active_pid") === pidKeep && !!document.querySelector("#mfSettingsModal.show");
+  document.querySelector('#mfSettingsModal [data-st="version"]').click();
+  await new Promise(r => setTimeout(r, 900));
+  out.verTxt = /Máš nejnovější verzi|Je dostupná nová verze/.test(document.querySelector('#mfSettingsModal [data-st="version"] small').textContent);
   document.querySelector('#mfSettingsModal [data-st="profile"]').click();
   out.hubClosed = !document.getElementById("mfSettingsModal").classList.contains("show");
   out.menuClosed = !document.getElementById("nfProfileMenu");
@@ -1623,7 +1629,7 @@ const menuT = await page.evaluate(() => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings,logout" && menuT.hubRows === "profile,prefs,adv,sync" && menuT.advHidden && menuT.advOpen && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings,logout" && menuT.hubRows === "profile,prefs,adv,sync,backup,version,reset" && menuT.advHidden && menuT.advOpen && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 const logoutT = await page.evaluate(() => {
   const out = {};
   document.getElementById("mfProfileGate").style.display = "none";

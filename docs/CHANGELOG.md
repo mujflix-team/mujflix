@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.44
+- **Nastavení › Pokročilé:** kromě Propojení zařízení přibyly Záloha a obnova dat (přímo, bez cesty přes propojení), Verze a aktualizace (ukáže verzi a zkontroluje novou) a Smazat data v tomto zařízení (dvoustupňové potvrzení: první klik jen upozorní, druhý do 5 s smaže profily a data MůjFlixu v tomto zařízení).
+
 ## 3.21.43
 - **Karty na úvodní stránce** ukazují pod názvem rok a hodnocení (např. „2020 · ★ 8.1“).
 - **Soukromí a podmínky** se otevírají ve stejném okně (stránka má „Zpět do aplikace“), ne v nové kartě.

@@ -142,7 +142,10 @@
     return [
       ["profile", ic('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'), "Upravit profil", (p.name || "Profil") + " · jméno, avatar, PIN"],
       ["prefs", ic('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'), "Zaměření a žánry", (only ? "Jen anime" : "Všechno") + " · " + (n ? n + " oblíbených žánrů" : "žánry nevybrány") + ((window.MFAge && MFAge.limit()) ? " · do " + MFAge.limit() + " let" : "")],
-      ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno") + " · záloha dat"]
+      ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno")],
+      ["backup", ic('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>'), "Záloha a obnova dat", "Stáhnout nebo načíst soubor"],
+      ["version", ic('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>'), "Verze a aktualizace", "Verze " + (window.MF_VERSION || "?") + " · zkontrolovat novou"],
+      ["reset", ic('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>'), "Smazat data v tomto zařízení", "Profily a historie. Nejdřív zálohuj"]
     ];
   }
   function rowHtml(r) {
@@ -166,6 +169,25 @@
           b.setAttribute("aria-expanded", expand ? "true" : "false");
           return;
         }
+        if (a === "version") {
+          var vs = b.querySelector("small"), vcur = window.MF_VERSION || "?";
+          vs.textContent = "Kontroluji…";
+          Promise.resolve(window.mfCheckUpdate ? window.mfCheckUpdate(true) : null).then(function () {
+            vs.textContent = document.getElementById("mfUpdateBar") ? "Je dostupná nová verze, tlačítko Obnovit je dole" : "Máš nejnovější verzi (" + vcur + ")";
+          });
+          return;
+        }
+        if (a === "reset") {
+          var rs = b.querySelector("small");
+          if (!b.classList.contains("pf-danger")) {
+            b.classList.add("pf-danger"); rs.textContent = "Klikni ještě jednou, smaže se vše";
+            setTimeout(function () { b.classList.remove("pf-danger"); rs.textContent = "Profily a historie. Nejdřív zálohuj"; }, 5000);
+            return;
+          }
+          try { Object.keys(localStorage).filter(function (k) { return /^(mf_|mujflix_)/.test(k); }).forEach(function (k) { localStorage.removeItem(k); }); sessionStorage.clear(); } catch (er) {}
+          location.reload();
+          return;
+        }
         hubClose();
         if (a === "close") return;
         if (a === "profile") { var pr = profile(); if (pr && window.ProfileGate) ProfileGate.openCreate(pr.id); }
@@ -180,9 +202,9 @@
       '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
       '<div class="pf-title">Nastavení</div>' +
       ((profile() || {}).name ? '<div class="pf-text">Profil <b>' + esc(profile().name) + "</b></div>" : "") +
-      '<div class="pf-rows">' + hubRows().filter(function (r) { return r[0] !== "sync"; }).map(rowHtml).join("") +
+      '<div class="pf-rows">' + hubRows().filter(function (r) { return r[0] === "profile" || r[0] === "prefs"; }).map(rowHtml).join("") +
       '<button type="button" class="pf-adv" aria-expanded="false" data-st="adv">Pokročilé</button>' +
-      '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return r[0] === "sync"; }).map(rowHtml).join("") + "</div></div></div>";
+      '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return r[0] !== "profile" && r[0] !== "prefs"; }).map(rowHtml).join("") + "</div></div></div>";
     hub.classList.add("show");
     var f = hub.querySelector(".pf-row"); if (f) f.focus();
   }
