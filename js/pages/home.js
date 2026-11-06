@@ -628,7 +628,10 @@
           fav.classList.toggle('on', on);
           fav.querySelector('span').textContent = on ? 'V oblíbených' : 'Do oblíbených';
         }
-        fav.addEventListener('click', function () { h.onFav(); paintFav(); });
+        fav.addEventListener('click', function () {
+          h.onFav(); paintFav();
+          if (typeof showToast === 'function') showToast(h.isFav() ? 'Přidáno do Oblíbených' : 'Odebráno z Oblíbených');
+        });
         paintFav();
         if (h.after) h.after();
       }

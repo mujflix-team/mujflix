@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.39
+- **Do oblíbených v banneru:** po kliknutí se tlačítko znatelně zesvětlí, srdce krátce „cukne“ a objeví se zpráva „Přidáno do Oblíbených“ / „Odebráno z Oblíbených“ (stejně jako v detailu).
+
 ## 3.21.38
 - **Opraveno:** v hledání na telefonu se nezkracuje text v poli (nově „Hledat…“), v Nastavení je „Pokročilé“ zarovnané doleva se šipkou těsně za textem.
 
