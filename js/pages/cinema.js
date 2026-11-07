@@ -695,8 +695,15 @@
   }
 
   function updateEpCurrentLabel() {
-    modal.querySelector("#mfCinEpCurrent").textContent =
-      "S" + pad2(current.season) + " · E" + pad2(current.episode);
+    var lab = modal.querySelector("#mfCinEpCurrent");
+    lab.hidden = false;
+    lab.textContent = "S" + pad2(current.season) + " · E" + pad2(current.episode);
+  }
+  // Přehrávač je cizí web: appka nevidí, na jaké epizodě v něm je. Když se po načtení načte znovu
+  // (uživatel přepnul epizodu přímo na webu), štítek S · E by lhal, a tak se skryje.
+  function hideStaleEpLabel() {
+    var lab = modal && modal.querySelector("#mfCinEpCurrent");
+    if (lab) lab.hidden = true;
   }
 
   function stepEpisode(dir) {
@@ -845,6 +852,11 @@
       },
       { once: true }
     );
+    var firstLoadAt = 0;
+    playerFrame.addEventListener("load", function () {
+      if (!firstLoadAt) { firstLoadAt = Date.now(); return; }
+      if (Date.now() - firstLoadAt > 1500) hideStaleEpLabel(); // krátké přesměrování hned po startu se nepočítá
+    });
   }
 
   function toggleCurrentFavorite() {

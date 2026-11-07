@@ -1815,3 +1815,5 @@ html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
 
 /* Kino na telefonu: tlačítko Sdílet se nezobrazuje (zbytečně zabírá místo v liště přehrávače) */
 @media (max-width: 720px) { html body #mfCinShareBtn { display: none !important; } }
+
+html body #mfStandaloneCinema .mf-cin-ep-current[hidden] { display: none; }

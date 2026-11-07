@@ -1296,10 +1296,15 @@ const cm = await page.evaluate(async () => {
   MFCinemaPlayer.open("1399", "Hra o trůny", "tv", { season: 1, episode: 1 });
   await new Promise(r => setTimeout(r, 400));
   const ifr = document.querySelector("#mfStandaloneCinema iframe"), fav = document.getElementById("mfCinFavBtn");
-  const out = { src: ifr && ifr.src, sandbox: ifr && ifr.hasAttribute("sandbox"), protect: !!document.getElementById("mfCinProtect"), adtip: !!document.getElementById("mfCinAdTipBtn"), fav: fav && fav.textContent };
+  const lab = document.getElementById("mfCinEpCurrent"), shown = !lab.hidden && /S01/.test(lab.textContent);
+  ifr.dispatchEvent(new Event("load")); // první načtení
+  await new Promise(r => setTimeout(r, 1700));
+  ifr.dispatchEvent(new Event("load")); // přepnutí epizody přímo v přehrávači
+  const out = { stale: shown && lab.hidden, src: ifr && ifr.src, sandbox: ifr && ifr.hasAttribute("sandbox"), protect: !!document.getElementById("mfCinProtect"), adtip: !!document.getElementById("mfCinAdTipBtn"), fav: fav && fav.textContent };
   MFCinemaPlayer.close();
   return out;
 });
+check("cinema: štítek epizody se po novém načtení přehrávače skryje", cm.stale === true, JSON.stringify(cm));
 check("cinema: přehrávač běží bez sandboxu (Filemoon)", /svetserialu/.test(cm.src || "") && cm.sandbox === false, JSON.stringify(cm));
 check("cinema: bez přepínače ochrany a varovné ikony, oblíbené je jen srdce", !cm.protect && !cm.adtip && /^[♡♥]$/.test(cm.fav || ""), JSON.stringify(cm));
 
