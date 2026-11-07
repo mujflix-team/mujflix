@@ -566,8 +566,6 @@ html body #mfDock.mf-dock.mf-dock-hidden { transform: translateY(130%); }
 #seriesModal #episodesGrid .ep-play-ring svg { width: 12px; height: 14px; fill: #fff; margin-left: 3px; }
 #seriesModal #episodesGrid .ep-seen-dot { display: none; }
 #seriesModal #episodesGrid .episode-card.watched .ep-seen-dot { display: flex; position: absolute; right: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%; background: #46d369; color: #000; font-size: 0.72rem; font-weight: 800; align-items: center; justify-content: center; }
-#seriesModal #episodesGrid .ep-progress-bar-wrap { height: 3px; background: #4d4d4d; border-radius: 2px; overflow: hidden; }
-#seriesModal #episodesGrid .ep-progress-bar-fill { height: 100%; background: var(--accent); }
 @media (max-width: 700px) {
   #seriesModal #episodesGrid .episode-card { grid-template-columns: 112px minmax(0, 1fr); column-gap: 12px; padding: 14px 6px !important; }
   #seriesModal #episodesGrid .episode-card::before, #seriesModal #episodesGrid .episode-card.next-ep::before { display: none !important; }
@@ -1491,8 +1489,6 @@ html body #seriesModal #episodesGrid .ep-actions { position: absolute; top: 8px;
 html body #seriesModal #episodesGrid .ep-btn-mark { width: 32px; height: 32px; border-radius: 50% !important; border: 0 !important; background: rgba(0, 0, 0, 0.6) !important; color: #fff !important; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.15s, background 0.15s; }
 html body #seriesModal #episodesGrid .ep-btn-mark:hover { opacity: 1; background: rgba(0, 0, 0, 0.85) !important; }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-btn-mark { background: #fff !important; color: #141414 !important; opacity: 1; }
-html body #seriesModal #episodesGrid .ep-thumb .ep-progress-bar-wrap { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; margin: 0; border-radius: 0; background: rgba(255, 255, 255, 0.3); z-index: 2; }
-html body #seriesModal #episodesGrid .ep-thumb .ep-progress-bar-fill { background: var(--accent, #0a84ff); }
 
 /* Telefon: řádky (obrázek vlevo), ať se vejde víc epizod */
 @media (max-width: 700px) {
@@ -1815,3 +1811,7 @@ html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
 #mfProfileGate.pg-empty .pg-sync-btn u { color: #fff; text-underline-offset: 3px; }
 
 #mfSettingsModal .pf-row.pf-danger small { color: #ff453a; }
+
+
+/* Kino na telefonu: tlačítko Sdílet se nezobrazuje (zbytečně zabírá místo v liště přehrávače) */
+@media (max-width: 720px) { html body #mfCinShareBtn { display: none !important; } }

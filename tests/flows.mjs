@@ -1889,6 +1889,10 @@ const bkBack = await page.evaluate(async () => {
 });
 check("záloha: otevřená z Nastavení vrací šipkou zpět do Nastavení, otevřená z propojení zpět na propojení", Object.values(bkBack).every(Boolean), JSON.stringify(bkBack));
 
+// rozkoukanost epizody („jak daleko jsi sledoval“) je pryč: žádný dialog, žádný proužek
+const noPartial = await page.evaluate(() => ({ dlg: typeof showEpisodeProgressDialog === "undefined" && typeof setEpisodeProgress === "undefined" && typeof getPartialWatched === "undefined", noBar: !document.querySelector(".ep-progress-bar-wrap") }));
+check("epizody: funkce „Rozkoukanost“ (procenta u epizody) už neexistuje", noPartial.dlg && noPartial.noBar, JSON.stringify(noPartial));
+
 // úvodní obrazovka: bez profilů věta místo osamoceného tlačítka, „Upravit“ jen když je co upravovat
 const gateEmpty = await page.evaluate(() => {
   const keep = localStorage.getItem("mf_profiles_v2"), out = {};

@@ -978,24 +978,6 @@ body {
 .ep-btn-play {
   display: none;
 }
-.ep-progress-bar-wrap {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.07);
-  z-index: 5;
-}
-.ep-progress-bar-fill {
-  height: 100%;
-  
-  transition: width 0.5s ease;
-  
-}
-.ep-card-partial .ep-num {
-  color: var(--accent);
-}
 .episode-grid > div[style*="grid-column"] {
   grid-column: 1/-1;
 }
@@ -2971,10 +2953,6 @@ body {
 .ep-hover-play,
 .ep-play-ring {
   display: none !important;
-}
-.ep-progress-bar-fill {
-  background: linear-gradient(90deg, #007aff, #5ac8fa) !important;
-  box-shadow: 0 0 6px rgba(0, 122, 255, 0.5) !important;
 }
 .ep-next-tag {
   position: static !important;
