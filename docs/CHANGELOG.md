@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.50
+- **Wrapped:** jedna plochá tmavá barva místo barevných přechodů, akcent #0a84ff na sloupcích a značce, plakáty a dlaždice se zaoblením 12 px jako zbytek appky, bez stínů.
+
 ## 3.21.49
 - **Nově:** Wrapped (měsíční přehled sledování ve stylu příběhu) v menu profilu, jen jako jedna položka. Na úvodní stránce žádná pozvánka. Plakáty jen z TMDB.
 

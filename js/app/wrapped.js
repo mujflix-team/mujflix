@@ -534,9 +534,7 @@
     var W = 1080, H = 1920, c = document.createElement("canvas");
     c.width = W; c.height = H;
     var x = c.getContext("2d"), ff = (getComputedStyle(document.body).fontFamily || "sans-serif");
-    var g = x.createLinearGradient(0, 0, W * 0.4, H);
-    g.addColorStop(0, "#0066d6"); g.addColorStop(0.55, "#5b21b6"); g.addColorStop(1, "#1e1b4b");
-    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    x.fillStyle = "#0a0a0a"; x.fillRect(0, 0, W, H);
     x.fillStyle = "#fff"; x.textBaseline = "alphabetic";
     x.globalAlpha = 0.85; x.font = "600 40px " + ff; x.fillText("MŮJFLIX WRAPPED", 90, 150); x.globalAlpha = 1;
     x.font = "900 170px " + ff; x.fillText(gender(s.month).my, 90, 330); x.fillText(MONTHS[s.month], 90, 500);
