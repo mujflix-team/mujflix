@@ -931,10 +931,6 @@ html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfPrefsModal .pf-cancel { background: none; color: #fff; border: 1px solid #808080; }
 #mfPrefsModal .pf-cancel:hover { border-color: #fff; }
 #mfPrefsModal button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-html body #mfProfileWelcome .pw-only-anime { display: flex; align-items: flex-start; gap: 12px; margin: 16px 0 4px; padding: 12px 14px; border: 1px solid #595959; border-radius: 4px; cursor: pointer; text-align: left; }
-html body #mfProfileWelcome .pw-only-anime input { margin-top: 4px; width: 18px; height: 18px; flex: none; }
-html body #mfProfileWelcome .pw-only-anime strong { display: block; font-size: 1rem; color: #fff; }
-html body #mfProfileWelcome .pw-only-anime small { display: block; color: #b3b3b3; font-size: 0.85rem; line-height: 1.4; margin-top: 2px; }
 #mfSettingsModal .pf-rows { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
 #mfSettingsModal .pf-row { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #2a2a2a; border: 1px solid transparent; border-radius: 4px; color: #fff; font: inherit; padding: 14px 16px; cursor: pointer; }
 #mfSettingsModal .pf-row:hover, #mfSettingsModal .pf-row:focus-visible { background: #3a3a3a; border-color: #fff; outline: 0; }
