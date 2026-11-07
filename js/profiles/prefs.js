@@ -193,7 +193,7 @@
         if (a === "profile") { var pr = profile(); if (pr && window.ProfileGate) ProfileGate.openCreate(pr.id); }
         else if (a === "prefs") open();
         else if (a === "sync" && window.MFSyncUI) MFSyncUI.open("home");
-        else if (a === "backup" && window.MFSyncUI) MFSyncUI.open("backup");
+        else if (a === "backup" && window.MFSyncUI) MFSyncUI.open("backup", { from: "settings" });
       });
       hub.addEventListener("keydown", function (e) { if (e.key === "Escape") hubClose(); });
       document.body.appendChild(hub);

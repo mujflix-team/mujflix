@@ -4,6 +4,8 @@
 
   function detectBrowser() {
     var ua = (navigator.userAgent || "");
+    // Telefon a tablet: rozšíření pro počítačové prohlížeče tam nejdou nainstalovat, doporučí se prohlížeč s vlastním blokováním
+    if (/android|iphone|ipad|ipod|mobile/i.test(ua)) return "mobile";
     if (/firefox|fxios/i.test(ua)) return "firefox";
     if (/safari/i.test(ua) && !/chrome|chromium|crios|edg|opr\//i.test(ua)) return "safari";
     return "chromium"; // Chrome, Edge, Brave, Opera, Vivaldi… (instalují z Chrome Web Store)
@@ -12,6 +14,7 @@
   var LINKS = {
     firefox: { name: "Firefox", label: "uBlock Origin pro Firefox", url: "https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/" },
     chromium: { name: "Chrome", label: "uBlock Origin Lite pro Chrome", url: "https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh" },
+    mobile: { name: "telefon", label: "prohlížeč Brave (blokuje reklamy sám)", url: "https://brave.com/download/" },
     safari: { name: "Safari", label: "AdGuard pro Safari", url: "https://adguard.com/cs/adguard-safari/overview.html" }
   };
 

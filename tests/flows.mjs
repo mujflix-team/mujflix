@@ -136,7 +136,9 @@ const tut = await page.evaluate(() => {
   return { s1, s2, stillOpen, links, closed,
     ff: ua("Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0"),
     ch: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"),
-    ed: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36 Edg/130.0") };
+    ed: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36 Edg/130.0"),
+    ph: ua("Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36"),
+    ip: ua("Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Version/17.5 Mobile/15E148 Safari/604.1") };
 });
 check("onboarding: má jedinou obrazovku (žánry)", tut.s1);
 check("onboarding: jediná obrazovka obsahuje věk i upozornění na reklamy a po potvrzení se průvodce zavře", tut.s2 && tut.stillOpen, JSON.stringify(tut));
@@ -145,6 +147,7 @@ check("onboarding: „Začít sledovat“ zavře průvodce", tut.closed);
 check("blokovač: Firefox → addons.mozilla.org", /addons\.mozilla\.org/.test(tut.ff), tut.ff);
 check("blokovač: Chrome → chromewebstore", /chromewebstore\.google\.com/.test(tut.ch), tut.ch);
 check("blokovač: Edge → chromewebstore", /chromewebstore\.google\.com/.test(tut.ed), tut.ed);
+check("blokovač: telefon (Android i iPhone) → prohlížeč Brave, ne rozšíření pro počítač", /brave\.com/.test(tut.ph) && /brave\.com/.test(tut.ip), tut.ph + " | " + tut.ip);
 
 // --- Uzi.la: ověřený tvar odkazů
 const uzi = await page.evaluate(() => {
@@ -1866,6 +1869,25 @@ const bkRem = await page.evaluate(() => {
 check("záloha: lišta se neukáže při prvním spuštění (jen začne odpočet), po 30 dnech se ukáže a „✕“ ji odloží", bkRem.fresh === false && bkRem.firstSet && bkRem.shown && bkRem.snoozed && bkRem.again === false, JSON.stringify(bkRem));
 check("záloha: propojené zařízení lištu nedostane, „Zálohovat“ otevře obrazovku Záloha dat, po záloze je klid a klíče se nesynchronizují", bkRem.linked === false && bkRem.shown2 && bkRem.opened && bkRem.afterBackup === false && bkRem.notSynced, JSON.stringify(bkRem));
 await page.evaluate(() => { MFSyncUI.close(); MFSync.unlink(); });
+
+// záloha otevřená z Nastavení: šipka zpět vrací do Nastavení (ne na obrazovku propojení)
+const bkBack = await page.evaluate(async () => {
+  const w = ms => new Promise(r => setTimeout(r, ms)), out = {};
+  MFProfileSettings.open(); await w(100);
+  document.querySelector('#mfSettingsModal [data-st="adv"]').click();
+  document.querySelector('#mfSettingsModal [data-st="backup"]').click(); await w(150);
+  const sy = () => document.getElementById("mfSyncModal");
+  out.onBackup = sy().classList.contains("show") && /Záloha dat/.test(sy().textContent);
+  sy().querySelector(".sy-back").click(); await w(150);
+  out.backToSettings = document.getElementById("mfSettingsModal").classList.contains("show") && !sy().classList.contains("show");
+  MFProfileSettings.close();
+  MFSyncUI.open("backup"); await w(100);
+  sy().querySelector(".sy-back").click(); await w(100);
+  out.otherwiseHome = sy().classList.contains("show") && sy().querySelector(".sy-title").textContent !== "Záloha dat";
+  MFSyncUI.close();
+  return out;
+});
+check("záloha: otevřená z Nastavení vrací šipkou zpět do Nastavení, otevřená z propojení zpět na propojení", Object.values(bkBack).every(Boolean), JSON.stringify(bkBack));
 
 // úvodní obrazovka: bez profilů věta místo osamoceného tlačítka, „Upravit“ jen když je co upravovat
 const gateEmpty = await page.evaluate(() => {
