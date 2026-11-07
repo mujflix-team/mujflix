@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.56
+- **Hledání:** japonské názvy zapsané hiraganou se převedou na katakanu (v ní bývají názvy v TMDB) a když nic nenajde, zkusí se i kratší dotazy bez posledních znaků, takže „おーばーふろぉ“ najde Overflow.
+
 ## 3.21.55
 - **Hledání:** pořadí a oprava překlepů se počítají i podle původního názvu, takže přesný anglický nebo původní název se dostane na první místo.
 
