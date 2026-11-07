@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.47
+- **Průvodce:** pryč zaškrtávátko „Jen anime“, aby nový uživatel omylem nezúžil nabídku. Nastavit se dál dá v Nastavení › Zaměření a žánry. Žánr „Anime“ mezi oblíbenými v průvodci zůstává.
+
 ## 3.21.46
 - **Opraveno:** v průvodci po vytvoření profilu se na telefonu a tabletu doporučovalo rozšíření „uBlock Origin Lite pro Chrome“, které tam nejde nainstalovat. Nově se na mobilu doporučí prohlížeč Brave, který blokuje reklamy sám. Na počítači beze změny.
 

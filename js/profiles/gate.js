@@ -523,8 +523,6 @@ const ProfileGate = {
       ["10749", "Romantika"], ["14", "Fantasy"], ["53", "Thriller"]
     ];
     n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" onclick="this.classList.toggle('selected')">${t}</button>`).join("");
-    const ao = document.getElementById("pwAnimeOnly");
-    ao && (ao.checked = !1);
     const ag = document.getElementById("pwAge");
     ag && (ag.onclick = ev => { const b = ev.target.closest(".pw-agebtn"); b && (ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x === b))); }, ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x.dataset.age === "0")));
     t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");
@@ -553,7 +551,7 @@ const ProfileGate = {
     if (!e) return;
     const t = e.dataset.profileId || getActiveProfileId(),
       sel = [...e.querySelectorAll(".pw-genre.selected")].map(e => e.dataset.genre),
-      animeOnlyBox = !!(document.getElementById("pwAnimeOnly") && document.getElementById("pwAnimeOnly").checked),
+      animeOnlyBox = !1,
       ageBtn = e.querySelector("#pwAge .pw-agebtn.pw-on"),
       maxAge = ageBtn ? Number(ageBtn.dataset.age) || 0 : 0,
       likesAnime = sel.includes("anime") || animeOnlyBox,

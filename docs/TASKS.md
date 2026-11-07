@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.46: doporučení blokátoru reklam na telefonu (Brave místo rozšíření pro Chrome).
+- 3.21.47: pryč Jen anime z průvodce (zůstává v Nastavení).
 - 3.21.45: šipka zpět ze Zálohy vrací do Nastavení.
 - 3.21.44: Pokročilé v nastavení: záloha, verze a aktualizace, smazání dat.
 - 3.21.43: hodnocení na kartách úvodní stránky, soukromí ve stejném okně.
