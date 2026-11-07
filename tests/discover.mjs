@@ -67,5 +67,50 @@ const dUrls = an.urls.filter(u => u.includes("/discover/"));
 check("Objevovat: Jen anime ptá se jen na anime (animace + japonština), žádné obecné trendy", dUrls.length > 0 && dUrls.every(u => /with_genres=16(&|$)/.test(u) && /with_original_language=ja/.test(u)) && !an.urls.some(u => u.includes("/trending/")), JSON.stringify(an.urls.slice(0, 4)));
 check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an.errors.length === 0, an.titles + " " + an.errors.join("|"));
 
+// Hledání: rok v dotazu a řazení podle shody názvu
+{
+  const urls = [];
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  await page.route(/^(?!http:\/\/localhost)/, r => {
+    const u = r.request().url();
+    if (u.endsWith(".js")) return r.fulfill({ contentType: "text/javascript", body: STUB });
+    if (u.includes("/search/")) {
+      urls.push(u);
+      return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, results: [
+        { id: 1, media_type: "movie", title: "Matrix Reloaded", release_date: "2003-05-15", poster_path: "/a.jpg", popularity: 90 },
+        { id: 2, media_type: "movie", title: "Dokument o Matrixu", release_date: "2010-01-01", poster_path: "/b.jpg", popularity: 80 },
+        { id: 3, media_type: "movie", title: "Matrix", release_date: "1999-03-31", poster_path: "/c.jpg", popularity: 70 },
+        { id: 4, media_type: "movie", title: "Matrix Revolutions", release_date: "2003-11-05", poster_path: "/d.jpg", popularity: 60 },
+      ] }) });
+    }
+    if (u.includes("api.themoviedb.org") || u.includes(".workers.dev")) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ results: [], page: 1, total_pages: 1 }) });
+    return r.abort();
+  });
+  await page.addInitScript(() => {
+    if (location.protocol !== "http:" || localStorage.getItem("__s")) return; localStorage.setItem("__s", "1");
+    localStorage.setItem("mf_profiles_v2", JSON.stringify([{ id: "p1", name: "Test", avatar: "🎬", color: "#007aff" }]));
+    localStorage.setItem("mf_active_pid", "p1"); localStorage.setItem("mf_tmdb_key", "K");
+  });
+  await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.openSearch());
+  await page.waitForTimeout(800);
+  const titles = async () => page.evaluate(() => [...document.querySelectorAll("#dvBody .dv-card-title")].map(n => n.textContent));
+  await page.fill("#dvSearch", "matrix");
+  await page.waitForTimeout(1500);
+  const t1 = await titles();
+  check("Hledání: přesný název je první, pak názvy začínající hledaným textem", t1[0] === "Matrix" && t1[1] === "Matrix Reloaded" && t1[3] === "Dokument o Matrixu", t1.join("|"));
+  urls.length = 0;
+  await page.fill("#dvSearch", "matrix 2003");
+  await page.waitForTimeout(1500);
+  const t2 = await titles();
+  check("Hledání: rok v dotazu se TMDB neposílá a filmy z toho roku jdou první", !urls.some(u => /2003/.test(u)) && t2[0] === "Matrix Reloaded" && t2[1] === "Matrix Revolutions", urls.join(" ") + " " + t2.join("|"));
+  await page.fill("#dvSearch", "MATRIX");
+  await page.waitForTimeout(1500);
+  const t3 = await titles();
+  check("Hledání: velikost písmen nevadí", t3[0] === "Matrix", t3.join("|"));
+  await page.close();
+}
+
 await browser.close(); server.close();
 finish();

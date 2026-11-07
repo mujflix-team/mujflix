@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.53
+- **Hledání:** výsledky se řadí podle shody názvu (přesný název první, pak názvy začínající hledaným textem, bez ohledu na diakritiku a velikost písmen) a jde zadat i rok, např. „matrix 1999“.
+
 ## 3.21.52
 - **Opraveno:** v cinema mode se štítek „S01 · E03“ skryje, když se přehrávač po načtení načte znovu (epizoda přepnutá přímo na webu přehrávače), aby neukazoval nepravdivý údaj. Appka cizí web nevidí, jinak to zjistit nejde.
 
