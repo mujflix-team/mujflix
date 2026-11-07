@@ -97,6 +97,7 @@
       id: r.id,
       type: type,
       title: r.title || r.name || r.original_title || r.original_name || '',
+      orig: r.original_title || r.original_name || '',
       year: date.slice(0, 4),
       date: date,
       rating: Number(r.vote_average) || 0,
@@ -654,11 +655,13 @@
     var m = /^(.*\S)\s+((?:19|20)\d{2})$/.exec(q);
     return m ? { text: m[1], year: m[2] } : { text: q, year: '' };
   }
-  // Přesný název první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
+  // 0 = přesná shoda, 1 = název začíná hledaným textem, 2 = ostatní
+  function titleScore(t, needle) { return !t ? 2 : t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2; }
+  // Přesný název (český i původní) první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
   function rankByMatch(items, pq) {
     var needle = fold(pq.text);
     function score(it) {
-      var t = fold(it.title), v = t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2;
+      var v = Math.min(titleScore(fold(it.title), needle), titleScore(fold(it.orig), needle));
       return (pq.year && it.year === pq.year ? 0 : pq.year ? 4 : 0) + v;
     }
     return items.map(function (it, i) { return { it: it, i: i, s: score(it) }; })
@@ -693,7 +696,9 @@
           var key = it.type + it.id;
           if (seen[key]) return;
           seen[key] = 1;
-          var t = fold(it.title), dist = Math.min(editDistance(t, needle), editDistance(t.slice(0, needle.length), needle));
+          var dist = Math.min.apply(null, [fold(it.title), fold(it.orig)].filter(Boolean).map(function (t) {
+            return Math.min(editDistance(t, needle), editDistance(t.slice(0, needle.length), needle));
+          }).concat([99]));
           if (dist <= max) out.push({ it: it, d: dist });
         });
       });

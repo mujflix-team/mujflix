@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.55
+- **Hledání:** pořadí a oprava překlepů se počítají i podle původního názvu, takže přesný anglický nebo původní název se dostane na první místo.
+
 ## 3.21.54
 - **Hledání:** toleruje překlepy (když nic nenajde, zkusí podobné názvy, např. „breking bad“ najde Breaking Bad) a při psaní reaguje rychleji (250 ms místo 350 ms).
 

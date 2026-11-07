@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.55: Hledání porovnává i původní název (anglický, původní jazyk).
 - 3.21.54: Hledání toleruje překlepy a rychleji reaguje při psaní.
 - 3.21.53: Hledání řadí podle shody názvu a umí rok v dotazu („matrix 1999“).
 - 3.21.52: Cinema mode skryje štítek epizody, když se epizoda přepne přímo v přehrávači.
