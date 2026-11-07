@@ -109,3 +109,6 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
   #mfWrapped, #mfWrapped .mfw-slide > *, #mfWrapped .mfw-prog i { animation: none !important; transition: none !important; }
   #mfWrapped .mfw-bt i { transition: none !important; width: var(--w); }
 }
+
+/* Seriál měsíce: velký plakát (zbytek slidů zůstává) */
+#mfWrapped .mfw-posterwrap .mfw-poster { width: auto; height: min(38vh, 360px); max-width: 80vw; }

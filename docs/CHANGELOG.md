@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.51
+- **Wrapped:** kratší (až 8 slidů místo 10, „kdy se díváš“, série a typ diváka jsou v jednom slidu), seriál měsíce s velkým plakátem, při méně než 5 záznamech jen úvod, celkem a souhrn, uložený obrázek má plakát seriálu měsíce (když se nenačte, vznikne bez něj), na počítači se obrázek stahuje na šířku 1920×1080 s jiným rozložením, na telefonu na výšku 1080×1920, jednodušší ikona v menu profilu.
+
 ## 3.21.50
 - **Wrapped:** jedna plochá tmavá barva místo barevných přechodů, akcent #0a84ff na sloupcích a značce, plakáty a dlaždice se zaoblením 12 px jako zbytek appky, bez stínů.
 

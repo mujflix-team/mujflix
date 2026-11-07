@@ -94,19 +94,21 @@ check("rod: září je střední (Tvé, Moje, hotové), ostatní měsíce mužsk
 // Slidy
 const ctx = { name: "Jana", months };
 const slides = C.buildSlides(oct, ctx);
-check("slidy: úvod, celkem, seriál, žánry, kdy, série, filmy, milované, typ, souhrn", slides.map(s => s.theme).join() === "blue,red,teal,amber,night,green,pink,rose,sky,dark", slides.map(s => s.theme).join());
-check("slidy: úvod má Tvůj říjen a výběr měsíce, souhrn tlačítko Uložit obrázek", /Tvůj <br>.*říjen/.test(slides[0].html) && slides[0].html.includes("mfw-select") && slides[9].html.includes('data-act="share"'));
+check("slidy: úvod, celkem, seriál, žánry, filmy, milované, styl (kdy + série + typ), souhrn", slides.map(s => s.id).join() === "intro,total,show,genres,movies,loved,style,summary", slides.map(s => s.id).join());
+check("slidy: úvod má Tvůj říjen a výběr měsíce, souhrn tlačítko Uložit obrázek", /Tvůj <br>.*říjen/.test(slides[0].html) && slides[0].html.includes("mfw-select") && slides[7].html.includes('data-act="share"'));
 const sep = C.compute({ year: 2026, month: 8, timeline, movies, ratings });
 check("slidy: u září „Tvé září“, nikdy „Tvůj září“", /Tvé <br>.*září/.test(C.buildSlides(sep, ctx)[0].html) && !C.buildSlides(sep, ctx).some(s => /Tvůj\s*(<br>)?\s*(<span[^>]*>)?\s*září/.test(s.html)));
 const emptySlides = C.buildSlides(aug, ctx);
 check("slidy: prázdný měsíc je jeden slide se zprávou a tlačítkem Zavřít", emptySlides.length === 1 && emptySlides[0].html.includes("Za tento měsíc zatím není co ukázat") && emptySlides[0].html.includes('data-act="close"'));
 const lone = C.compute({ year: 2026, month: 9, timeline: [ep("a", T(2026, 10, 2))], movies: [], ratings: {} });
-check("slidy: jediná epizoda bez žánrů a filmů nepadá a vynechá žánry, filmy i milované", C.buildSlides(lone, {}).map(s => s.theme).join() === "blue,red,teal,night,green,sky,dark");
+check("slidy: málo záznamů (méně než 5) = jen úvod, celkem a souhrn", C.buildSlides(lone, {}).map(s => s.id).join() === "intro,total,summary");
+const plain = C.compute({ year: 2026, month: 9, timeline: [1, 2, 3, 4, 5].map(d => ep("a", T(2026, 10, d, 20))), movies: [], ratings: {} });
+check("slidy: bez žánrů, filmů a milovaných nepadá a vynechá je", C.buildSlides(plain, {}).map(s => s.id).join() === "intro,total,show,style,summary");
 
 // Bezpečnost: data ze zálohy se nikdy nevkládají jako HTML ani cizí obrázek
 const evil = C.compute({
   year: 2026, month: 9, movies: [{ tmdbId: "9", title: '"><script>alert(1)</script>', poster: "https://evil.example/x.jpg", ts: T(2026, 10, 2) }],
-  timeline: [ep("x", T(2026, 10, 2), { name: "<img src=x onerror=alert(1)>", poster: "javascript:alert(1)", genres: [18] }), ep("y", T(2026, 10, 3), { name: "Y", poster: "https://image.tmdb.org/t/p/w400/../../evil.js\"onerror=\"1" })],
+  timeline: [ep("x", T(2026, 10, 2), { name: "<img src=x onerror=alert(1)>", poster: "javascript:alert(1)", genres: [18] }), ep("y", T(2026, 10, 3), { name: "Y", poster: "https://image.tmdb.org/t/p/w400/../../evil.js\"onerror=\"1" }), ...[5, 6, 7].map(d => ep("x", T(2026, 10, d), { name: "<img src=x onerror=alert(1)>", genres: [18] }))],
   ratings: { x: { rating: "loved", name: "<b>milé</b>", ts: T(2026, 10, 4) } }
 });
 const evilHtml = C.buildSlides(evil, { name: "<i>Jana</i>", months }).map(s => s.html).join("\n");
@@ -130,7 +132,7 @@ await page.evaluate(() => MFWrapped.open({ month: "2026-10" }));
 await page.waitForTimeout(400);
 check("ui: otevře se (dialog, aria-modal) a první slide je „Tvůj říjen“ se jménem měsíce v nadpisu",
   await isOpen() && await page.evaluate(() => { const r = document.getElementById("mfWrapped"); return r.getAttribute("role") === "dialog" && r.getAttribute("aria-modal") === "true"; }) && /Tvůj říjen/.test(await title()), await title());
-check("ui: postup má 10 segmentů a svítí první", await page.evaluate(() => document.querySelectorAll("#mfWrapped .mfw-prog i").length) === 10 && await segs() === 1);
+check("ui: postup má 8 segmentů a svítí první", await page.evaluate(() => document.querySelectorAll("#mfWrapped .mfw-prog i").length) === 8 && await segs() === 1);
 
 await page.keyboard.press("ArrowRight");
 check("ui: šipka vpravo přejde na další slide (celkem)", await segs() === 2 && /Celkem/.test(await title()) && /9\s*epizod/.test(await title()), await title());
@@ -153,15 +155,24 @@ await page.selectOption("#mfWrapped .mfw-select", "2026-10");
 await page.evaluate(() => document.activeElement && document.activeElement.blur()); // fokus na výběru by šipky bral sobě (mění měsíc)
 
 // poslední slide, uložení obrázku
+const RED_PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAYAAAC56t6BAAAAEklEQVR4nGP4z8Dwn4GBgYEBAB0IAgDUiVcnAAAAAElFTkSuQmCC", "base64");
+await page.route("https://image.tmdb.org/**", r => r.fulfill({ status: 200, contentType: "image/png", headers: { "access-control-allow-origin": "*" }, body: RED_PNG })); // plakát pro obrázek ke sdílení
 for (let i = 0; i < 9; i++) await page.keyboard.press("ArrowRight");
-check("ui: na posledním slidu je souhrn a Dál zmizí", await segs() === 10 && await page.evaluate(() => document.querySelector('#mfWrapped [data-go="next"]').hidden) && /Uložit obrázek/.test(await title()));
+check("ui: na posledním slidu je souhrn a Dál zmizí", await segs() === 8 && await page.evaluate(() => document.querySelector('#mfWrapped [data-go="next"]').hidden) && /Uložit obrázek/.test(await title()));
 const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 8000 }), page.click('#mfWrapped [data-act="share"]')]).catch(() => [null]);
 let dlOk = false, dlInfo = "žádné stažení";
 if (dl) {
   const path = await dl.path(); const { statSync } = await import("node:fs"); const size = path ? statSync(path).size : 0;
   dlOk = dl.suggestedFilename() === "mujflix-wrapped-2026-10.png" && size > 8000; dlInfo = dl.suggestedFilename() + " " + size + " B";
 }
+const pngSize = async (d) => { const { readFileSync } = await import("node:fs"); const b = readFileSync(await d.path()); return b.readUInt32BE(16) + "x" + b.readUInt32BE(20); };
 check("ui: Uložit obrázek stáhne PNG mujflix-wrapped-2026-10.png", dlOk, dlInfo);
+check("ui: na počítači je obrázek na šířku 1920×1080", dl && await pngSize(dl) === "1920x1080", dl ? await pngSize(dl) : "bez stažení");
+await page.setViewportSize({ width: 390, height: 760 });
+await page.waitForTimeout(300);
+const [dl2] = await Promise.all([page.waitForEvent("download", { timeout: 8000 }), page.click('#mfWrapped [data-act="share"]')]).catch(() => [null]);
+check("ui: na telefonu je obrázek na výšku 1080×1920", dl2 && await pngSize(dl2) === "1080x1920", dl2 ? await pngSize(dl2) : "bez stažení");
+await page.setViewportSize({ width: 1280, height: 800 });
 
 // Esc zavře a vrátí fokus
 await page.keyboard.press("Escape");
