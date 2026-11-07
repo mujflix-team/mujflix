@@ -74,6 +74,11 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.route(/^(?!http:\/\/localhost)/, r => {
     const u = r.request().url();
     if (u.endsWith(".js")) return r.fulfill({ contentType: "text/javascript", body: STUB });
+    if (u.includes("/search/") && /query=breking/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 0, total_results: 0, results: [] }) });
+    if (u.includes("/search/") && /query=bad(&|$)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 2, results: [
+      { id: 11, media_type: "movie", title: "Bad Boys", release_date: "1995-04-07", poster_path: "/e.jpg", popularity: 99 },
+      { id: 12, media_type: "tv", name: "Breaking Bad", first_air_date: "2008-01-20", poster_path: "/f.jpg", popularity: 50 },
+    ] }) });
     if (u.includes("/search/")) {
       urls.push(u);
       return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, results: [
@@ -109,6 +114,10 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(1500);
   const t3 = await titles();
   check("Hledání: velikost písmen nevadí", t3[0] === "Matrix", t3.join("|"));
+  await page.fill("#dvSearch", "breking bad");
+  await page.waitForTimeout(1800);
+  const t4 = await titles();
+  check("Hledání: překlep („breking bad“) najde Breaking Bad a nepřidá nepodobné názvy", t4.length === 1 && t4[0] === "Breaking Bad", t4.join("|"));
   await page.close();
 }
 

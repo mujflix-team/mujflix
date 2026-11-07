@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.54
+- **Hledání:** toleruje překlepy (když nic nenajde, zkusí podobné názvy, např. „breking bad“ najde Breaking Bad) a při psaní reaguje rychleji (250 ms místo 350 ms).
+
 ## 3.21.53
 - **Hledání:** výsledky se řadí podle shody názvu (přesný název první, pak názvy začínající hledaným textem, bez ohledu na diakritiku a velikost písmen) a jde zadat i rok, např. „matrix 1999“.
 
