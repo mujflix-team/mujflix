@@ -683,11 +683,21 @@
   // TMDB překlepy nezná. Když hledání nic nenajde, zkusí se dvě nejdelší slova zvlášť
   // a nechají se jen názvy, které se hledanému textu podobají (třeba „breking bad“ → Breaking Bad)
   function fuzzySearch(pq) {
-    var needle = fold(pq.text);
-    var words = needle.split(/\s+/).filter(function (w) { return w.length >= 3; })
-      .sort(function (a, b) { return b.length - a.length; }).slice(0, 2);
-    if (!words.length || needle.length < 4) return Promise.resolve([]);
-    return Promise.all(words.map(function (w) {
+    var raw = String(pq.text || '').toLowerCase(), needle = fold(raw);
+    // Japonština: hiragana → katakana (TMDB je bere jako různé znaky; názvy bývají v katakaně)
+    var kata = /[\u3041-\u3096]/.test(raw) ? raw.replace(/[\u3041-\u3096]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); }) : '';
+    var cands = [];
+    function add(q) { if (q && q.length >= 2 && cands.indexOf(q) < 0) cands.push(q); }
+    needle.split(/\s+/).filter(function (w) { return w.length >= 3; }).sort(function (a, b) { return b.length - a.length; }).slice(0, 2).forEach(add);
+    add(kata);
+    if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(raw) && !/\s/.test(raw)) { // zkrácené dotazy, když je poslední znak překlep
+      var base = kata || raw;
+      if (base.length >= 4) add(base.slice(0, -1));
+      if (base.length >= 5) add(base.slice(0, -2));
+    }
+    if (!cands.length || needle.length < 4) return Promise.resolve([]);
+    var needles = [needle].concat(kata ? [fold(kata)] : []);
+    return Promise.all(cands.slice(0, 4).map(function (w) {
       return api('/search/multi?language=cs-CZ&include_adult=false&page=1&query=' + encodeURIComponent(w)).catch(function () { return null; });
     })).then(function (rs) {
       var seen = {}, max = Math.max(2, Math.floor(needle.length * 0.3)), out = [];
@@ -696,9 +706,10 @@
           var key = it.type + it.id;
           if (seen[key]) return;
           seen[key] = 1;
-          var dist = Math.min.apply(null, [fold(it.title), fold(it.orig)].filter(Boolean).map(function (t) {
-            return Math.min(editDistance(t, needle), editDistance(t.slice(0, needle.length), needle));
-          }).concat([99]));
+          var dist = 99;
+          [fold(it.title), fold(it.orig)].filter(Boolean).forEach(function (t) {
+            needles.forEach(function (nd) { dist = Math.min(dist, editDistance(t, nd), editDistance(t.slice(0, nd.length), nd)); });
+          });
           if (dist <= max) out.push({ it: it, d: dist });
         });
       });

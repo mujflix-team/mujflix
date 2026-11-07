@@ -75,6 +75,11 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
     const u = r.request().url();
     if (u.endsWith(".js")) return r.fulfill({ contentType: "text/javascript", body: STUB });
     if (u.includes("/search/") && /query=breking/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 0, total_results: 0, results: [] }) });
+    if (u.includes("/search/") && /query=オーバーフロ(decodeURIComponent(u).includes("query=オーバーフロ&")|$)/.test(decodeURIComponent(u))) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 2, results: [
+      { id: 21, media_type: "tv", name: "Overflow", original_name: "オーバーフロー", first_air_date: "2016-01-01", poster_path: "/g.jpg", popularity: 5 },
+      { id: 22, media_type: "tv", name: "Jiné anime", original_name: "別のアニメ", first_air_date: "2016-01-01", poster_path: "/h.jpg", popularity: 9 },
+    ] }) });
+    if (u.includes("/search/") && /query=(breking|%E3)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 0, total_results: 0, results: [] }) });
     if (u.includes("/search/") && /query=bad(&|$)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 2, results: [
       { id: 11, media_type: "movie", title: "Bad Boys", release_date: "1995-04-07", poster_path: "/e.jpg", popularity: 99 },
       { id: 12, media_type: "tv", name: "Breaking Bad", first_air_date: "2008-01-20", poster_path: "/f.jpg", popularity: 50 },
@@ -122,6 +127,10 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(1800);
   const t4 = await titles();
   check("Hledání: překlep („breking bad“) najde Breaking Bad a nepřidá nepodobné názvy", t4.length === 1 && t4[0] === "Breaking Bad", t4.join("|"));
+  await page.fill("#dvSearch", "おーばーふろぉ");
+  await page.waitForTimeout(2000);
+  const t6 = await titles();
+  check("Hledání: japonský název v hiraganě s překlepem („おーばーふろぉ“) najde Overflow", t6.length === 1 && t6[0] === "Overflow", t6.join("|"));
   await page.close();
 }
 
