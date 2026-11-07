@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.50: Wrapped sjednocený do ploché tmavé barvy s akcentem, plakáty zaoblené 12 px.
 - 3.21.49: Wrapped (měsíční přehled) jako položka v menu profilu, bez pozvánky na úvodní stránce.
 - 3.21.46: doporučení blokátoru reklam na telefonu (Brave místo rozšíření pro Chrome).
 - 3.21.48: odebrána Rozkoukanost u epizody a Sdílet v kinu na telefonu.
