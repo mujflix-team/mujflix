@@ -97,6 +97,7 @@
       id: r.id,
       type: type,
       title: r.title || r.name || r.original_title || r.original_name || '',
+      orig: r.original_title || r.original_name || '',
       year: date.slice(0, 4),
       date: date,
       rating: Number(r.vote_average) || 0,
@@ -654,16 +655,56 @@
     var m = /^(.*\S)\s+((?:19|20)\d{2})$/.exec(q);
     return m ? { text: m[1], year: m[2] } : { text: q, year: '' };
   }
-  // Přesný název první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
+  // 0 = přesná shoda, 1 = název začíná hledaným textem, 2 = ostatní
+  function titleScore(t, needle) { return !t ? 2 : t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2; }
+  // Přesný název (český i původní) první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
   function rankByMatch(items, pq) {
     var needle = fold(pq.text);
     function score(it) {
-      var t = fold(it.title), v = t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2;
+      var v = Math.min(titleScore(fold(it.title), needle), titleScore(fold(it.orig), needle));
       return (pq.year && it.year === pq.year ? 0 : pq.year ? 4 : 0) + v;
     }
     return items.map(function (it, i) { return { it: it, i: i, s: score(it) }; })
       .sort(function (a, b) { return a.s - b.s || a.i - b.i; })
       .map(function (x) { return x.it; });
+  }
+
+  // Vzdálenost dvou textů (počet oprav písmen), pro toleranci překlepů
+  function editDistance(a, b) {
+    var prev = [], cur, i, j;
+    for (j = 0; j <= b.length; j++) prev[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      cur = [i];
+      for (j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  // TMDB překlepy nezná. Když hledání nic nenajde, zkusí se dvě nejdelší slova zvlášť
+  // a nechají se jen názvy, které se hledanému textu podobají (třeba „breking bad“ → Breaking Bad)
+  function fuzzySearch(pq) {
+    var needle = fold(pq.text);
+    var words = needle.split(/\s+/).filter(function (w) { return w.length >= 3; })
+      .sort(function (a, b) { return b.length - a.length; }).slice(0, 2);
+    if (!words.length || needle.length < 4) return Promise.resolve([]);
+    return Promise.all(words.map(function (w) {
+      return api('/search/multi?language=cs-CZ&include_adult=false&page=1&query=' + encodeURIComponent(w)).catch(function () { return null; });
+    })).then(function (rs) {
+      var seen = {}, max = Math.max(2, Math.floor(needle.length * 0.3)), out = [];
+      rs.forEach(function (d) {
+        normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; }).forEach(function (it) {
+          var key = it.type + it.id;
+          if (seen[key]) return;
+          seen[key] = 1;
+          var dist = Math.min.apply(null, [fold(it.title), fold(it.orig)].filter(Boolean).map(function (t) {
+            return Math.min(editDistance(t, needle), editDistance(t.slice(0, needle.length), needle));
+          }).concat([99]));
+          if (dist <= max) out.push({ it: it, d: dist });
+        });
+      });
+      out.sort(function (a, b) { return a.d - b.d; });
+      return out.map(function (x) { return x.it; });
+    });
   }
 
   function fetchPageRaw(ctx) {
@@ -674,6 +715,7 @@
         var items = normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
         else items = rankByMatch(items, pq);
+        if (!items.length && page === 1 && !(d && d.total_results)) return fuzzySearch(pq).then(function (r) { return { items: r, pages: 1 }; });
         return { items: items, pages: (d && d.total_pages) || 0 };
       });
     }
@@ -803,7 +845,7 @@
       if (q === state.query) return;
       state.query = q;
       refresh();
-    }, v.length >= 2 ? 350 : 0);
+    }, v.length >= 2 ? 250 : 0);
   }
 
   /* ---------- Sestavení rozhraní ---------- */
