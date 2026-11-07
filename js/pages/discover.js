@@ -657,6 +657,11 @@
   }
   // 0 = přesná shoda, 1 = název začíná hledaným textem, 2 = ostatní
   function titleScore(t, needle) { return !t ? 2 : t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2; }
+  // Žádný výsledek nezačíná hledaným textem (českým ani původním názvem)
+  function noPrefixMatch(items, pq) {
+    var needle = fold(pq.text);
+    return !items.some(function (it) { return Math.min(titleScore(fold(it.title), needle), titleScore(fold(it.orig), needle)) < 2; });
+  }
   // Přesný název (český i původní) první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
   function rankByMatch(items, pq) {
     var needle = fold(pq.text);
@@ -689,6 +694,8 @@
     var cands = [];
     function add(q) { if (q && q.length >= 2 && cands.indexOf(q) < 0) cands.push(q); }
     needle.split(/\s+/).filter(function (w) { return w.length >= 3; }).sort(function (a, b) { return b.length - a.length; }).slice(0, 2).forEach(add);
+    // „ろぉ“ se v katakaně píše jako dlouhé „ロー“: malé samohlásky ァィゥェォ se zkusí i jako „ー“
+    add(kata.replace(/[\u30A1\u30A3\u30A5\u30A7\u30A9]/g, '\u30FC'));
     add(kata);
     if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(raw) && !/\s/.test(raw)) { // zkrácené dotazy, když je poslední znak překlep
       var base = kata || raw;
@@ -726,7 +733,14 @@
         var items = normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
         else items = rankByMatch(items, pq);
-        if (!items.length && page === 1 && !(d && d.total_results)) return fuzzySearch(pq).then(function (r) { return { items: r, pages: 1 }; });
+        // Nic nezačíná hledaným textem (překlep, jiné písmo): zkusí se i podobné názvy a dají se na začátek
+        if (page === 1 && (!items.length || noPrefixMatch(items, pq))) {
+          return fuzzySearch(pq).then(function (f) {
+            var seen = {};
+            f.forEach(function (it) { seen[it.type + it.id] = 1; });
+            return { items: f.concat(items.filter(function (it) { return !seen[it.type + it.id]; })), pages: items.length ? (d && d.total_pages) || 0 : 1 };
+          });
+        }
         return { items: items, pages: (d && d.total_pages) || 0 };
       });
     }
