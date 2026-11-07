@@ -16,6 +16,7 @@
     { id: "vecer", label: "Večer", range: "18–24 h" }
   ];
   var DEFAULT_EP_MIN = 40; // délka epizody, když ji appka u seriálu nezná (jen odhad)
+  var FEW_EVENTS = 5; // méně záznamů v měsíci = zkrácený Wrapped
   var MOVIE_MIN = 105; // film nemá uloženou délku, počítá se průměr
   var GENRES = {
     28: "Akční", 12: "Dobrodružný", 16: "Animovaný", 35: "Komedie", 80: "Krimi", 99: "Dokumentární", 18: "Drama",
@@ -258,15 +259,15 @@
     return rows;
   }
 
-  // ctx: { name: jméno profilu, months: [klíče měsíců s daty] } → [{ theme, html }]
+  // ctx: { name: jméno profilu, months: [klíče měsíců s daty] } → [{ id, html }]
   function buildSlides(s, ctx) {
     ctx = ctx || {};
     var out = [], mname = MONTHS[s.month], gm = gender(s.month), note = "Počítá se jen sledování zaznamenané v tomto prohlížeči a profilu.";
-    function add(theme, html) { out.push({ theme: theme, html: html }); stag = 0; }
+    function add(id, html) { out.push({ id: id, html: html }); stag = 0; }
     stag = 0;
 
     if (s.empty) {
-      add("blue",
+      add("empty",
         el("p", "mfw-eyebrow", "MůjFlix Wrapped") +
         el("h1", "mfw-title", gm.your + " <br><span class=\"mfw-mark\">" + esc(mname) + "</span>") +
         el("p", "mfw-lead", "Za tento měsíc zatím není co ukázat.") +
@@ -276,18 +277,19 @@
         el("div", "mfw-actions", '<button type="button" class="mfw-btn mfw-btn-main" data-act="close">Zavřít</button>'));
       return out;
     }
+    var few = s.events < FEW_EVENTS; // pár záznamů: jen úvod, celkem a souhrn, ať nejsou slidy plné nul
 
-    // 1) Úvod
-    add("blue",
+    // Úvod
+    add("intro",
       el("p", "mfw-eyebrow", "MůjFlix Wrapped") +
       el("h1", "mfw-title", gm.your + " <br><span class=\"mfw-mark\">" + esc(mname) + "</span>") +
       el("p", "mfw-sub", s.year + (ctx.name ? " · " + esc(ctx.name) : "")) +
       pickerHtml(ctx, s.key) +
       el("p", "mfw-hint", "Dál se jde klepnutím vpravo nebo šipkou →"));
 
-    // 2) Celkem
+    // Celkem
     var dur = fmtDuration(s.minutes), eq = Math.round(s.minutes / 110), bigN = s.episodes || s.movies;
-    add("red",
+    add("total",
       el("p", "mfw-eyebrow", "Celkem") +
       el("div", "mfw-num", String(bigN)) +
       el("p", "mfw-lead", (s.episodes ? plural(bigN, "epizoda", "epizody", "epizod") : plural(bigN, "film", "filmy", "filmů")) + " zhlédnuto" +
@@ -296,75 +298,64 @@
       (eq >= 3 ? el("p", "mfw-sub", "To vydá na asi " + eq + " " + plural(eq, "celovečerní film", "celovečerní filmy", "celovečerních filmů") + ".") : "") +
       el("p", "mfw-small", "Odhad podle délky epizod, film se počítá za " + MOVIE_MIN + " minut."));
 
-    // 3) Seriál měsíce
-    if (s.topShows.length) {
-      var t = s.topShows[0], rest = s.topShows.slice(1, 5);
-      add("teal",
-        el("p", "mfw-eyebrow", "Seriál měsíce") +
-        el("div", "mfw-posterwrap", posterHtml(t.poster, t.name, "mfw-poster")) +
-        el("h2", "mfw-h", esc(t.name)) +
-        el("p", "mfw-lead", t.count + " " + plural(t.count, "epizoda", "epizody", "epizod")) +
-        (rest.length ? el("ol", "mfw-list", rest.map(function (r) {
-          return "<li><span>" + esc(r.name) + "</span><b>" + r.count + "</b></li>";
-        }).join("")) : ""));
+    if (!few) {
+      // Seriál měsíce: velký plakát
+      if (s.topShows.length) {
+        var t = s.topShows[0], rest = s.topShows.slice(1, 3);
+        add("show",
+          el("p", "mfw-eyebrow", "Seriál měsíce") +
+          el("div", "mfw-posterwrap", posterHtml(t.poster, t.name, "mfw-poster")) +
+          el("h2", "mfw-h", esc(t.name)) +
+          el("p", "mfw-lead", t.count + " " + plural(t.count, "epizoda", "epizody", "epizod")) +
+          (rest.length ? el("ol", "mfw-list", rest.map(function (r) {
+            return "<li><span>" + esc(r.name) + "</span><b>" + r.count + "</b></li>";
+          }).join("")) : ""));
+      }
+
+      // Žánry
+      if (s.topGenres.length) {
+        add("genres",
+          el("p", "mfw-eyebrow", "Tvoje žánry") +
+          el("h2", "mfw-h", "Nejvíc " + esc(s.topGenres[0].name)) +
+          el("div", "mfw-barswrap", barsHtml(s.topGenres.map(function (g) { return { label: g.name, count: g.count }; }))) +
+          el("p", "mfw-small", "Počet epizod v žánru. Jedna epizoda může spadat do víc žánrů."));
+      }
+
+      // Filmy
+      if (s.movieList.length) {
+        var shown = s.movieList.slice(-6).reverse(), more = s.movieList.length - shown.length;
+        add("movies",
+          el("p", "mfw-eyebrow", "Filmy") +
+          el("h2", "mfw-h", s.movieList.length + " " + plural(s.movieList.length, "film", "filmy", "filmů") + " v tomto měsíci") +
+          el("div", "mfw-films", shown.map(function (m) {
+            return "<figure>" + posterHtml(m.poster, m.title, "mfw-poster") + "<figcaption>" + esc(m.title || "Film") + "</figcaption></figure>";
+          }).join("")) +
+          (more > 0 ? el("p", "mfw-small", "a " + more + " " + plural(more, "další", "další", "dalších")) : ""));
+      }
+
+      // Milované
+      if (s.loved.length) {
+        add("loved",
+          el("p", "mfw-eyebrow", "Hodnocení") +
+          el("h2", "mfw-h", "Milované tituly") +
+          el("ul", "mfw-list mfw-loved", s.loved.map(function (l) { return "<li><span>♥ " + esc(l.name) + "</span></li>"; }).join("")));
+      }
+
+      // Tvůj styl: typ diváka, kdy se díváš a série v jednom slidu
+      var st = s.streak;
+      add("style",
+        el("p", "mfw-eyebrow", "Jaký jsi divák") +
+        el("h2", "mfw-title", esc(s.persona.title)) +
+        el("p", "mfw-lead", esc(s.persona.blurb)) +
+        el("div", "mfw-stats",
+          '<div class="mfw-stat"><b>' + esc(s.peakBucket.label) + "</b><span>nejčastěji " + WEEKDAYS_ON[s.peakWeekday] + "</span></div>" +
+          (st ? '<div class="mfw-stat"><b>' + st.len + "</b><span>" + plural(st.len, "den", "dny", "dní") + " v řadě" +
+            (st.len > 1 ? " · " + st.fromDom + ".\u2013" + fmtDM(st.toDom, s.month) : " · " + fmtDM(st.fromDom, s.month)) + "</span></div>" : "") +
+          '<div class="mfw-stat"><b>' + s.activeDays + "</b><span>" + plural(s.activeDays, "aktivní den", "aktivní dny", "aktivních dní") + " z " + s.daysInMonth + "</span></div>"));
     }
 
-    // 4) Žánry
-    if (s.topGenres.length) {
-      add("amber",
-        el("p", "mfw-eyebrow", "Tvoje žánry") +
-        el("h2", "mfw-h", "Nejvíc " + esc(s.topGenres[0].name)) +
-        el("div", "mfw-barswrap", barsHtml(s.topGenres.map(function (g) { return { label: g.name, count: g.count }; }))) +
-        el("p", "mfw-small", "Počet epizod v žánru. Jedna epizoda může spadat do víc žánrů."));
-    }
-
-    // 5) Kdy
-    add("night",
-      el("p", "mfw-eyebrow", "Kdy se díváš") +
-      el("h2", "mfw-h", esc(s.peakBucket.label)) +
-      el("div", "mfw-barswrap", barsHtml(BUCKETS.map(function (b) { return { label: b.label, count: s.hours[b.id] }; }))) +
-      el("p", "mfw-lead", "Nejčastěji " + WEEKDAYS_ON[s.peakWeekday] + ".") +
-      el("p", "mfw-small", BUCKETS.map(function (b) { return b.label.toLowerCase() + " " + b.range; }).join(", ") + "."));
-
-    // 6) Série a nejrušnější den
-    var st = s.streak, bd = s.busiest;
-    add("green",
-      el("p", "mfw-eyebrow", "Série a maratony") +
-      el("div", "mfw-stats",
-        '<div class="mfw-stat"><b>' + s.activeDays + "</b><span>" + plural(s.activeDays, "aktivní den", "aktivní dny", "aktivních dní") + " z " + s.daysInMonth + "</span></div>" +
-        (st ? '<div class="mfw-stat"><b>' + st.len + "</b><span>" + plural(st.len, "den", "dny", "dní") + " v řadě" +
-          (st.len > 1 ? " · " + st.fromDom + ".\u2013" + fmtDM(st.toDom, s.month) : " · " + fmtDM(st.fromDom, s.month)) + "</span></div>" : "") +
-        (bd ? '<div class="mfw-stat"><b>' + bd.count + "</b><span>zhlédnutí za jediný den · " + fmtDM(bd.dom, s.month) +
-          (bd.top ? " (" + esc(bd.top) + ")" : "") + "</span></div>" : "")));
-
-    // 7) Filmy
-    if (s.movieList.length) {
-      var shown = s.movieList.slice(-6).reverse(), more = s.movieList.length - shown.length;
-      add("pink",
-        el("p", "mfw-eyebrow", "Filmy") +
-        el("h2", "mfw-h", s.movieList.length + " " + plural(s.movieList.length, "film", "filmy", "filmů") + " v tomto měsíci") +
-        el("div", "mfw-films", shown.map(function (m) {
-          return "<figure>" + posterHtml(m.poster, m.title, "mfw-poster") + "<figcaption>" + esc(m.title || "Film") + "</figcaption></figure>";
-        }).join("")) +
-        (more > 0 ? el("p", "mfw-small", "a " + more + " " + plural(more, "další", "další", "dalších")) : ""));
-    }
-
-    // 8) Milované
-    if (s.loved.length) {
-      add("rose",
-        el("p", "mfw-eyebrow", "Hodnocení") +
-        el("h2", "mfw-h", "Milované tituly") +
-        el("ul", "mfw-list mfw-loved", s.loved.map(function (l) { return "<li><span>♥ " + esc(l.name) + "</span></li>"; }).join("")));
-    }
-
-    // 9) Typ diváka
-    add("sky",
-      el("p", "mfw-eyebrow", "Jaký jsi divák") +
-      el("h2", "mfw-title", esc(s.persona.title)) +
-      el("p", "mfw-lead", esc(s.persona.blurb)));
-
-    // 10) Souhrn
-    add("dark",
+    // Souhrn
+    add("summary",
       el("p", "mfw-eyebrow", gm.your + " " + esc(mname) + " " + s.year) +
       el("div", "mfw-card", shareRows(s).map(function (r, i) {
         return '<div class="' + (i < 3 ? "mfw-wide" : "") + '"><small>' + esc(r.label) + "</small><b>" + esc(r.value) + "</b></div>";
@@ -459,7 +450,6 @@
   function render() {
     var sl = state.slides[state.i], n = state.slides.length;
     if (!sl) return;
-    root.dataset.theme = sl.theme;
     stage.classList.remove("mfw-in");
     stage.innerHTML = '<div class="mfw-slide">' + sl.html + "</div>";
     stage.scrollTop = 0;
@@ -530,21 +520,60 @@
     while (text.length > 1 && ctx.measureText(text + "…").width > maxW) text = text.slice(0, -1);
     return text + "…";
   }
-  function drawShareCanvas(s) {
-    var W = 1080, H = 1920, c = document.createElement("canvas");
+  // Plakát seriálu měsíce pro obrázek; když se nenačte (offline, CORS), obrázek vznikne bez něj
+  function loadPoster(url) {
+    return new Promise(function (resolve) {
+      if (!url) return resolve(null);
+      var img = new Image(), done = false;
+      function fin(v) { if (!done) { done = true; resolve(v); } }
+      img.crossOrigin = "anonymous"; img.referrerPolicy = "no-referrer";
+      img.onload = function () { fin(img.naturalWidth ? img : null); };
+      img.onerror = function () { fin(null); };
+      setTimeout(function () { fin(null); }, 4000);
+      img.src = url;
+    });
+  }
+  function roundRectPath(x, px, py, w, h, r) {
+    x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r); x.arcTo(px + w, py + h, px, py + h, r);
+    x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath();
+  }
+  // Počítač (nad 720 px, stejná hranice jako zbytek appky) = obrázek na šířku 1920 × 1080, telefon = na výšku 1080 × 1920
+  function isWideScreen() { try { return window.matchMedia("(min-width: 721px)").matches; } catch (e) { return false; } }
+  function drawShareCanvas(s, poster, wide) {
+    var W = wide ? 1920 : 1080, H = wide ? 1080 : 1920, PAD = wide ? 110 : 90, c = document.createElement("canvas");
     c.width = W; c.height = H;
     var x = c.getContext("2d"), ff = (getComputedStyle(document.body).fontFamily || "sans-serif");
     x.fillStyle = "#0a0a0a"; x.fillRect(0, 0, W, H);
     x.fillStyle = "#fff"; x.textBaseline = "alphabetic";
-    x.globalAlpha = 0.85; x.font = "600 40px " + ff; x.fillText("MŮJFLIX WRAPPED", 90, 150); x.globalAlpha = 1;
-    x.font = "900 170px " + ff; x.fillText(gender(s.month).my, 90, 330); x.fillText(MONTHS[s.month], 90, 500);
-    var rows = shareRows(s), y = 720;
-    rows.forEach(function (r) {
-      x.globalAlpha = 0.75; x.font = "500 38px " + ff; x.fillText(r.label, 90, y);
-      x.globalAlpha = 1; x.font = "800 66px " + ff; x.fillText(ellipsize(x, r.value, W - 180), 90, y + 76);
-      y += 190;
-    });
-    x.globalAlpha = 0.8; x.font = "500 40px " + ff; x.fillText("mujflix.pages.dev", 90, H - 90); x.globalAlpha = 1;
+    x.globalAlpha = 0.85; x.font = "600 " + (wide ? 36 : 40) + "px " + ff; x.fillText("MŮJFLIX WRAPPED", PAD, wide ? 120 : 150); x.globalAlpha = 1;
+    var my = gender(s.month).my, mn = MONTHS[s.month], size = wide ? 150 : 170;
+    // plakát: na výšku vpravo nahoře 230 × 345, na šířku vpravo 320 × 480 (zaoblení 12 px jako v appce, na plátně 24)
+    var pw = wide ? 320 : 230, ph = wide ? 480 : 345, px = W - PAD - pw, py = wide ? 90 : 110;
+    if (wide) { // název v jednom řádku
+      var line = my + " " + mn, maxW = (poster ? px - 60 : W - 2 * PAD) - PAD;
+      x.font = "900 " + size + "px " + ff;
+      var lw = x.measureText(line).width;
+      if (lw > maxW) { size = Math.floor(size * maxW / lw); x.font = "900 " + size + "px " + ff; }
+      x.fillText(line, PAD, 300);
+    } else {
+      var maxTitle = poster ? 620 : W - 2 * PAD;
+      x.font = "900 " + size + "px " + ff;
+      var wd = Math.max(x.measureText(my).width, x.measureText(mn).width);
+      if (wd > maxTitle) { size = Math.floor(size * maxTitle / wd); x.font = "900 " + size + "px " + ff; }
+      x.fillText(my, PAD, 330); x.fillText(mn, PAD, 500);
+    }
+    if (poster) { x.save(); roundRectPath(x, px, py, pw, ph, 24); x.clip(); x.drawImage(poster, px, py, pw, ph); x.restore(); }
+    var rows = shareRows(s);
+    function row(r, rx, ry, maxW) {
+      x.globalAlpha = 0.75; x.font = "500 " + (wide ? 34 : 38) + "px " + ff; x.fillText(r.label, rx, ry);
+      x.globalAlpha = 1; x.font = "800 " + (wide ? 60 : 66) + "px " + ff; x.fillText(ellipsize(x, r.value, maxW), rx, ry + (wide ? 68 : 76));
+    }
+    if (wide) { // dva sloupce po třech řádcích pod názvem, vpravo zůstává plakát
+      rows.forEach(function (r, i) { row(r, PAD + Math.floor(i / 3) * 620, 520 + (i % 3) * 170, 560); });
+    } else {
+      rows.forEach(function (r, i) { row(r, PAD, 720 + i * 190, W - 2 * PAD); });
+    }
+    x.globalAlpha = 0.8; x.font = "500 " + (wide ? 34 : 40) + "px " + ff; x.fillText("mujflix.pages.dev", PAD, H - (wide ? 70 : 90)); x.globalAlpha = 1;
     return c;
   }
   function download(blob, name) {
@@ -558,9 +587,10 @@
     var s = state.stats;
     if (!s || s.empty) return;
     var ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-    Promise.resolve(ready).catch(function () {}).then(function () {
+    var top = s.topShows && s.topShows[0];
+    Promise.all([Promise.resolve(ready).catch(function () {}), loadPoster(top && top.poster)]).then(function (res) {
       var name = "mujflix-wrapped-" + s.key + ".png";
-      drawShareCanvas(s).toBlob(function (blob) {
+      drawShareCanvas(s, res[1], isWideScreen()).toBlob(function (blob) {
         if (!blob) return toast("Obrázek se nepodařilo vytvořit");
         var file = null; try { file = new File([blob], name, { type: "image/png" }); } catch (e) {}
         if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
