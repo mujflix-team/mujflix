@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.48
+- **Odebráno:** nastavení „Rozkoukanost“ u epizody (dlouhý stisk nebo pravé tlačítko → procenta, proužek postupu na náhledu epizody). Označení epizody jako zhlédnuté zůstává. Řada Rozkoukané v Oblíbených a Pokračovat ve sledování zůstává.
+- **Kino na telefonu:** tlačítko Sdílet v liště přehrávače se na telefonu nezobrazuje.
+
 ## 3.21.47
 - **Průvodce:** pryč zaškrtávátko „Jen anime“, aby nový uživatel omylem nezúžil nabídku. Nastavit se dál dá v Nastavení › Zaměření a žánry. Žánr „Anime“ mezi oblíbenými v průvodci zůstává.
 

@@ -13,32 +13,8 @@ function saveGenrePrefs() {
 }
 
 function buildEpCard(e, t, n, o, i, a, s) {
-  const r = _buildEpCardBase(e, t, n, o, i, a, s),
-    l = getPartialWatched(),
-    c = l[e] || 0;
-  if (c > 0 && !i) {
-    const e = r.querySelector(".ep-thumb");
-    if (e) {
-      const t = document.createElement("div");
-      t.className = "ep-progress-bar-wrap", t.innerHTML = `<div class="ep-progress-bar-fill" style="width:${c}%"></div>`, e.appendChild(t), r.classList.add("ep-card-partial")
-    }
-  }
-  let d;
-  if (r.addEventListener("contextmenu", o => {
-      o.preventDefault(), o.stopPropagation();
-      const a = l[e] || (i ? 100 : 0);
-      showEpisodeProgressDialog(e, t, n, a)
-    }), r.addEventListener("touchstart", o => {
-      d = setTimeout(() => {
-        r._lp = Date.now(), showEpisodeProgressDialog(e, t, n, l[e] || (i ? 100 : 0))
-      }, 600)
-    }, {
-      passive: !0
-    }), r.addEventListener("touchend", () => clearTimeout(d), {
-      passive: !0
-    }), r.addEventListener("touchmove", () => clearTimeout(d), {
-      passive: !0
-    }), "function" == typeof getEpRating) {
+  const r = _buildEpCardBase(e, t, n, o, i, a, s);
+  if ("function" == typeof getEpRating) {
     const t = getEpRating(e);
     if (t > 0) {
       const n = r.querySelector(".ep-meta-row");

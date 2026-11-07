@@ -616,7 +616,6 @@ function _buildEpCardBase(e, t, n, o, i, a, s) {
   }), y.addEventListener("click", o => {
     /* Celý řádek epizodu pouští přehrávání (kromě kolečka „zhlédnuto“ a po dlouhém stisku, který otevírá dialog postupu). */
     if (o.target.closest && (o.target.closest(".ep-btn-mark") || o.target.closest(".ep-user-rating"))) return;
-    if (y._lp && Date.now() - y._lp < 900) return;
     playWithConfirm(e, t, n, c)
   }), y
 }

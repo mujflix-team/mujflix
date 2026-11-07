@@ -92,9 +92,6 @@
       function mfhGetWatched() {
         return mfhReadJSON(mfhProfileScopedKey('mf_watched'), {});
       }
-      function mfhGetPartialWatched() {
-        return mfhReadJSON(mfhProfileScopedKey('mf_partial_watched'), {});
-      }
 
       function mfhHasWatchHistory() {
         try {
@@ -102,8 +99,6 @@
           if (timeline && timeline.length) return true;
           var watched = mfhGetWatched();
           if (watched && Object.keys(watched).some(function (k) { return !!watched[k]; })) return true;
-          var partial = mfhGetPartialWatched();
-          if (partial && Object.keys(partial).length) return true;
         } catch (e) {}
         return false;
       }
