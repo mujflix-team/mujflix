@@ -79,6 +79,12 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
       { id: 21, media_type: "tv", name: "Overflow", original_name: "オーバーフロー", first_air_date: "2016-01-01", poster_path: "/g.jpg", popularity: 5 },
       { id: 22, media_type: "tv", name: "Jiné anime", original_name: "別のアニメ", first_air_date: "2016-01-01", poster_path: "/h.jpg", popularity: 9 },
     ] }) });
+    if (u.includes("/search/") && /query=オーバーフロー(&|$)/.test(decodeURIComponent(u))) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 1, results: [
+      { id: 21, media_type: "tv", name: "Overflow", original_name: "オーバーフロー", first_air_date: "2016-01-01", poster_path: "/g.jpg", popularity: 5 },
+    ] }) });
+    if (u.includes("/search/") && /query=%E3%81%8A/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 1, results: [
+      { id: 31, media_type: "tv", name: "Nesouvisející seriál", original_name: "ぜんぜん違う", first_air_date: "2010-01-01", poster_path: "/i.jpg", popularity: 8 },
+    ] }) });
     if (u.includes("/search/") && /query=(breking|%E3)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 0, total_results: 0, results: [] }) });
     if (u.includes("/search/") && /query=bad(&|$)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 2, results: [
       { id: 11, media_type: "movie", title: "Bad Boys", release_date: "1995-04-07", poster_path: "/e.jpg", popularity: 99 },
@@ -130,7 +136,7 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.fill("#dvSearch", "おーばーふろぉ");
   await page.waitForTimeout(2000);
   const t6 = await titles();
-  check("Hledání: japonský název v hiraganě s překlepem („おーばーふろぉ“) najde Overflow", t6.length === 1 && t6[0] === "Overflow", t6.join("|"));
+  check("Hledání: japonský název v hiraganě s překlepem („おーばーふろぉ“) najde Overflow", t6[0] === "Overflow", t6.join("|"));
   await page.close();
 }
 

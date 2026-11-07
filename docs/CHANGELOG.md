@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.57
+- **Opraveno:** hledání podobných názvů se spustí i tehdy, když TMDB vrátí něco nepodobného (ne jen prázdný výsledek), a malé samohlásky v japonštině („ぉ“) se zkusí jako dlouhé „ー“, takže „おーばーふろぉ“ najde Overflow.
+
 ## 3.21.56
 - **Hledání:** japonské názvy zapsané hiraganou se převedou na katakanu (v ní bývají názvy v TMDB) a když nic nenajde, zkusí se i kratší dotazy bez posledních znaků, takže „おーばーふろぉ“ najde Overflow.
 
