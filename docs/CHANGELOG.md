@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.45
+- **Opraveno:** v průvodci po vytvoření profilu se na telefonu a tabletu doporučovalo rozšíření „uBlock Origin Lite pro Chrome“, které tam nejde nainstalovat. Nově se na mobilu doporučí prohlížeč Brave, který blokuje reklamy sám. Na počítači beze změny.
+
 ## 3.21.44
 - **Nastavení › Pokročilé:** kromě Propojení zařízení přibyly Záloha a obnova dat (přímo, bez cesty přes propojení), Verze a aktualizace (ukáže verzi a zkontroluje novou) a Smazat data v tomto zařízení (dvoustupňové potvrzení: první klik jen upozorní, druhý do 5 s smaže profily a data MůjFlixu v tomto zařízení).
 

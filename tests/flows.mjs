@@ -136,7 +136,9 @@ const tut = await page.evaluate(() => {
   return { s1, s2, stillOpen, links, closed,
     ff: ua("Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0"),
     ch: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"),
-    ed: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36 Edg/130.0") };
+    ed: ua("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/130.0 Safari/537.36 Edg/130.0"),
+    ph: ua("Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36"),
+    ip: ua("Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Version/17.5 Mobile/15E148 Safari/604.1") };
 });
 check("onboarding: má jedinou obrazovku (žánry)", tut.s1);
 check("onboarding: jediná obrazovka obsahuje věk i upozornění na reklamy a po potvrzení se průvodce zavře", tut.s2 && tut.stillOpen, JSON.stringify(tut));
@@ -145,6 +147,7 @@ check("onboarding: „Začít sledovat“ zavře průvodce", tut.closed);
 check("blokovač: Firefox → addons.mozilla.org", /addons\.mozilla\.org/.test(tut.ff), tut.ff);
 check("blokovač: Chrome → chromewebstore", /chromewebstore\.google\.com/.test(tut.ch), tut.ch);
 check("blokovač: Edge → chromewebstore", /chromewebstore\.google\.com/.test(tut.ed), tut.ed);
+check("blokovač: telefon (Android i iPhone) → prohlížeč Brave, ne rozšíření pro počítač", /brave\.com/.test(tut.ph) && /brave\.com/.test(tut.ip), tut.ph + " | " + tut.ip);
 
 // --- Uzi.la: ověřený tvar odkazů
 const uzi = await page.evaluate(() => {
