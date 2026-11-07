@@ -641,12 +641,39 @@
     });
   }
 
+  /* ---------- Hledání: rok v dotazu a řazení podle shody názvu ---------- */
+
+  // Bez diakritiky a malými písmeny, aby „Pán prstenů“ našel i „pan prstenu“
+  function fold(str) {
+    var t = String(str || '').toLowerCase();
+    try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+    return t.trim();
+  }
+  // „matrix 1999“ → text „matrix“ a rok 1999 (TMDB roky v dotazu nezná)
+  function parseQuery(q) {
+    var m = /^(.*\S)\s+((?:19|20)\d{2})$/.exec(q);
+    return m ? { text: m[1], year: m[2] } : { text: q, year: '' };
+  }
+  // Přesný název první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
+  function rankByMatch(items, pq) {
+    var needle = fold(pq.text);
+    function score(it) {
+      var t = fold(it.title), v = t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2;
+      return (pq.year && it.year === pq.year ? 0 : pq.year ? 4 : 0) + v;
+    }
+    return items.map(function (it, i) { return { it: it, i: i, s: score(it) }; })
+      .sort(function (a, b) { return a.s - b.s || a.i - b.i; })
+      .map(function (x) { return x.it; });
+  }
+
   function fetchPageRaw(ctx) {
     var page = ctx.page + 1;
     if (ctx.mode === 'search') {
-      return api('/search/multi?language=cs-CZ&include_adult=false&page=' + page + '&query=' + encodeURIComponent(state.query)).then(function (d) {
+      var pq = parseQuery(state.query);
+      return api('/search/multi?language=cs-CZ&include_adult=false&page=' + page + '&query=' + encodeURIComponent(pq.text)).then(function (d) {
         var items = normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
+        else items = rankByMatch(items, pq);
         return { items: items, pages: (d && d.total_pages) || 0 };
       });
     }

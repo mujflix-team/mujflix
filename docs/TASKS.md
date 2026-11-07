@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.53: Hledání řadí podle shody názvu a umí rok v dotazu („matrix 1999“).
 - 3.21.52: Cinema mode skryje štítek epizody, když se epizoda přepne přímo v přehrávači.
 - 3.21.51: Wrapped kratší (8 slidů), velký plakát, zkrácená verze při málo záznamech, plakát v obrázku ke sdílení (na počítači na šířku 1920×1080), jednodušší ikona.
 - 3.21.50: Wrapped sjednocený do ploché tmavé barvy s akcentem, plakáty zaoblené 12 px.
