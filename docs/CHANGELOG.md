@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.22.0
+- **Nově: Wrapped.** Měsíční přehled sledování ve stylu příběhu: kolik epizod a filmů jsi zhlédl, odhad času, seriál měsíce, nejčastější žánry, kdy se díváš, nejdelší série dní po sobě a nejrušnější den, filmy, milované tituly a typ diváka. Otevře se z menu profilu (Wrapped) a na úvodní stránce se začátkem měsíce (do 10.) a poslední tři dny měsíce objeví pozvánka, kterou jde skrýt. Dá se přepnout na starší měsíc a na posledním slidu uložit (nebo sdílet) jako obrázek. Počítá se jen z dat uložených v zařízení, nic se neodesílá.
+
 ## 3.21.44
 - **Nastavení › Pokročilé:** kromě Propojení zařízení přibyly Záloha a obnova dat (přímo, bez cesty přes propojení), Verze a aktualizace (ukáže verzi a zkontroluje novou) a Smazat data v tomto zařízení (dvoustupňové potvrzení: první klik jen upozorní, druhý do 5 s smaže profily a data MůjFlixu v tomto zařízení).
 

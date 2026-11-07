@@ -9,7 +9,7 @@ Jedna kostra pro celou aplikaci. Když přidáváš novou obrazovku, řiď se pr
 | Navigace (vždy vidět) | `#nfTop` (logo, hledání, profil) + `#mfDock` (Domů · Seriály · Filmy · Oblíbené · Profil) | PC: dock je vedle loga v horní liště, telefon: spodní lišta. Zůstává vidět v Procházení i v Oblíbených. |
 | Sekce (obsah pod navigací) | `#mfSectionHome` (úvodní stránka), `#mfSectionProtebe` (starý kontejner Oblíbených) | Přepíná `mfShowSection`, `mfGoHome`, `mfShowHomeSection` |
 | Obrazovky přes celou stránku | Procházení `#universeOverlay`, Oblíbené `#watchlistOverlay` | Smí být otevřená jen jedna. Otevření jedné zavře druhou. |
-| Obrazovky bez navigace | Detail `#seriesModal`, přehrávač `#mfStandaloneCinema`, žánry `#genreEditorOverlay` | Zavírají se křížkem (vpravo nahoře, 44/40 px) a Esc |
+| Obrazovky bez navigace | Detail `#seriesModal`, přehrávač `#mfStandaloneCinema`, žánry `#genreEditorOverlay`, Wrapped `#mfWrapped` (menu profilu nebo pozvánka `#mfWrappedInvite`) | Zavírají se křížkem (vpravo nahoře, 44/40 px) a Esc |
 | Okna | Propojení `#mfSyncModal`, Nastavení `#mfSettingsModal`, `#mfPrefsModal`, PIN `#mfPinModal`, menu profilu `#nfProfileMenu` | Křížek vpravo nahoře, tmavé pozadí, 8 px zaoblení |
 | Úvod | Kdo se dívá `#mfProfileGate`, Nový profil `#mfProfileCreate`, Vítej `#mfProfileWelcome` | Před nimi je splash `#mfSplash` |
 | Oznámení | `#mfUpdateBar` (nová verze), toasty `showToast` | |

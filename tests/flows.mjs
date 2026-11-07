@@ -1629,7 +1629,7 @@ const menuT = await page.evaluate(async () => {
   _saveProfiles(_getProfiles().filter(p => p.id !== a && p.id !== b));
   return out;
 });
-check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,settings,logout" && menuT.hubRows === "profile,prefs,adv,sync,backup,version,reset" && menuT.advHidden && menuT.advOpen && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
+check("menu profilu: přepnutí, Upravit profil (stejná obrazovka, jiný nadpis), Spravovat profily", menuT.open && menuT.others.length >= 1 && menuT.acts.join() === "manage,wrapped,settings,logout" && menuT.hubRows === "profile,prefs,adv,sync,backup,version,reset" && menuT.advHidden && menuT.advOpen && menuT.hubClosed && /nepropojeno|Propojeno/.test(menuT.hubSub) && menuT.menuClosed && menuT.title === "Uprav si svůj profil" && /Uložit změny/.test(menuT.save) && menuT.name === "MenuA" && menuT.del, JSON.stringify(menuT));
 const logoutT = await page.evaluate(() => {
   const out = {};
   document.getElementById("mfProfileGate").style.display = "none";

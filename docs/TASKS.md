@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.22.0: Wrapped, měsíční přehled sledování ve stylu příběhu (menu profilu, pozvánka na úvodní stránce, uložení jako obrázek, `tests/wrapped.mjs`). Typ diváka a odhad času jsou jen orientační; u filmů appka neukládá žánr ani délku, proto se žánry počítají jen z epizod a film se počítá za 105 minut.
 - 3.21.40: úklid mrtvého kódu (náklon dlaždic, MFProfilesDB, signál hodnocení).
 - 3.21.44: Pokročilé v nastavení: záloha, verze a aktualizace, smazání dat.
 - 3.21.43: hodnocení na kartách úvodní stránky, soukromí ve stejném okně.
