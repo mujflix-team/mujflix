@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- Repozitář: přidána pravidla chování (`docs/CODE_OF_CONDUCT.md`), návod pro přispěvatele (`docs/CONTRIBUTING.md`) a šablony issue (`docs/ISSUE_TEMPLATE/`). Bez licence kvůli písmu NetflixSans.
 - 3.21.56: Hledání umí japonštinu v hiraganě a překlep na konci názvu.
 - 3.21.55: Hledání porovnává i původní název (anglický, původní jazyk).
 - 3.21.54: Hledání toleruje překlepy a rychleji reaguje při psaní.
