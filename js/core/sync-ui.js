@@ -68,7 +68,9 @@
       inner + '</div>';
   }
 
+  var curScreen = "", fromSettings = false;
   function render(screen, data) {
+    curScreen = screen;
     ensure();
     stopTick();
     data = data || {};
@@ -284,6 +286,8 @@
   function act(a) {
     var S = window.MFSync;
     if (a === "close") return close();
+    // z Nastavení otevřená Záloha se šipkou zpět vrací do Nastavení, ne na obrazovku propojení
+    if (a === "home" && fromSettings && curScreen === "backup") { close(); fromSettings = false; if (window.MFProfileSettings) window.MFProfileSettings.open(); return; }
     if (a === "home") return render("home");
     if (a === "show") return showCode();
     if (a === "qr") return drawQr();
@@ -307,6 +311,7 @@
   }
 
   function open(screen, data) {
+    fromSettings = !!(data && data.from === "settings");
     render(screen || "home", data);
     if ((screen || "home") === "home" && window.MFSync && window.MFSync.available()) loadQr(function () {});
   }

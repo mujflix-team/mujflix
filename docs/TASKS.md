@@ -18,12 +18,13 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
-- 3.21.40: úklid mrtvého kódu (náklon dlaždic, MFProfilesDB, signál hodnocení).
-- 3.21.45: doporučení blokátoru reklam na telefonu (Brave místo rozšíření pro Chrome).
+- 3.21.46: doporučení blokátoru reklam na telefonu (Brave místo rozšíření pro Chrome).
+- 3.21.45: šipka zpět ze Zálohy vrací do Nastavení.
 - 3.21.44: Pokročilé v nastavení: záloha, verze a aktualizace, smazání dat.
 - 3.21.43: hodnocení na kartách úvodní stránky, soukromí ve stejném okně.
 - 3.21.42: úvodní obrazovka bez profilů (věta, bez Upravit), filtry v Objevovat se nevracejí samy.
 - 3.21.41: oprava překrývání banneru s horní lištou na notebooku.
+- 3.21.40: úklid mrtvého kódu (náklon dlaždic, MFProfilesDB, signál hodnocení).
 - 3.21.39: jasnější potvrzení při přidání do Oblíbených v banneru.
 - 3.21.38: drobnosti: placeholder hledání, vzhled Pokročilé v nastavení.
 - 3.21.37: oprava useknutého tlačítka Přehrát v detailu na telefonu.
