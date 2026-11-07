@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.49
+- **Nově:** Wrapped (měsíční přehled sledování ve stylu příběhu) v menu profilu, jen jako jedna položka. Na úvodní stránce žádná pozvánka. Plakáty jen z TMDB.
+
 ## 3.21.48
 - **Odebráno:** nastavení „Rozkoukanost“ u epizody (dlouhý stisk nebo pravé tlačítko → procenta, proužek postupu na náhledu epizody). Označení epizody jako zhlédnuté zůstává. Řada Rozkoukané v Oblíbených a Pokračovat ve sledování zůstává.
 - **Kino na telefonu:** tlačítko Sdílet v liště přehrávače se na telefonu nezobrazuje.
