@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.63
+- **Nově:** na telefonu jde dlouze podržet kartu filmu nebo seriálu (úvodní stránka, Objevovat) a vybrat „Ukazovat víc podobného“ nebo „méně podobného“. Mění jen doporučování. Text v prázdných Oblíbených líp vysvětluje, k čemu srdíčko je.
+
 ## 3.21.62
 - **Úklid:** odstraněny nepoužité zbytky po starém dlaždicovém menu (tři skripty v `index.html`, styly `.ps-tile` a `.ps-list`, zmínky v `notify.js`) a nepoužité pole `trakt` v profilu. Vzhled ani chování se nemění.
 

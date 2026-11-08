@@ -355,6 +355,42 @@ const scrT = await page.evaluate(async () => {
 check("detail seriálu: rozkoukaný seriál se otevře odrolovaný k epizodě, kde jsi skončil", scrT.scrolled && scrT.visible, JSON.stringify(scrT));
 check("detail seriálu: seriál bez zhlédnutí zůstane nahoře, i po odrolovaném seriálu", scrT.freshTop && scrT.afterTop, JSON.stringify(scrT));
 
+// Dlouhé podržení karty (telefon): nabídka víc / méně podobného
+const cmT = await page.evaluate(async () => {
+  const w = ms => new Promise(r => setTimeout(r, ms)), out = {};
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  const host = document.createElement("div"); host.id = "cmHost"; host.style.cssText = "position:fixed;left:0;top:0;z-index:5";
+  host.innerHTML = '<div class="nf-card" id="cmCard" data-cid="cmRow" data-idx="0"></div>';
+  document.body.appendChild(host);
+  const row = document.createElement("div"); row.id = "cmRow";
+  row._mfhItems = [{ title: "Testovací film", mediaType: "movie", tmdbId: "", slug: "" }]; document.body.appendChild(row);
+  const ev = (type, x, y) => { const e = new Event(type, { bubbles: true }); e.touches = type === "touchend" ? [] : [{ clientX: x, clientY: y }]; document.getElementById("cmCard").dispatchEvent(e); };
+  const ids = [18, 35], mem = () => aiBrain.memory.genreIdPrefs;
+  ids.forEach(i => { delete mem()[i]; });
+  const item = MFCardMenu.itemFor(document.getElementById("cmCard")); item.genreIds = ids;
+  ev("touchstart", 10, 10); ev("touchend"); await w(600);
+  out.shortNoSheet = !document.getElementById("mfCardSheet") || document.getElementById("mfCardSheet").hidden;
+  ev("touchstart", 10, 10); await w(600);
+  out.opened = !!document.getElementById("mfCardSheet") && !document.getElementById("mfCardSheet").hidden && document.querySelector("#mfCardSheet .cs-title").textContent === "Testovací film";
+  ev("touchend");
+  document.querySelector('#mfCardSheet [data-cs="close"].cs-cancel').click();
+  out.closed = document.getElementById("mfCardSheet").hidden;
+  ev("touchstart", 10, 10); await w(100); ev("touchmove", 80, 80); await w(600);
+  out.moveCancels = document.getElementById("mfCardSheet").hidden;
+  aiBrain.boostGenreIds(ids, 0.4); const before = mem()[18];
+  aiBrain.penalizeGenreIds(ids, 0.3);
+  out.penalty = Math.abs(mem()[18] - (before - 0.3)) < 1e-9;
+  aiBrain.penalizeGenreIds([99999], 0.3); out.negative = mem()[99999] < 0;
+  aiBrain.memory.lastDecay = Date.now() - 5 * 864e5; aiBrain.applyDecay();
+  out.negativeKept = mem()[99999] < 0 && mem()[99999] > -0.3;
+  ids.concat([99999]).forEach(i => { delete mem()[i]; }); aiBrain.save();
+  host.remove(); row.remove(); document.getElementById("mfCardSheet")?.remove();
+  return out;
+});
+check("podržení karty: krátké klepnutí nabídku neotevře, dlouhé ji otevře s názvem titulu", cmT.shortNoSheet && cmT.opened, JSON.stringify(cmT));
+check("podržení karty: Zrušit zavře a posun prstu podržení zruší", cmT.closed && cmT.moveCancels, JSON.stringify(cmT));
+check("podržení karty: „méně podobného“ sníží váhu žánru i pod nulu a záporná váha se nerozpadne", cmT.penalty && cmT.negative && cmT.negativeKept, JSON.stringify(cmT));
+
 const sdT = await page.evaluate(async () => {
   const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
   document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");

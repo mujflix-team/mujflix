@@ -234,6 +234,7 @@
 
   function card(it, showType) {
     var c = el('div', 'dv-card');
+    c._dvItem = it; // pro dlouhé podržení na telefonu (js/app/card-menu.js)
     c.tabIndex = 0;
     c.setAttribute('role', 'button');
     c.setAttribute('aria-label', 'Otevřít ' + it.title);
@@ -404,7 +405,7 @@
 
   function ageFilter(items) { return window.MFAge ? window.MFAge.filter(items, 24) : Promise.resolve(items); }
 
-  // true jen u profilu bez věkového omezení, který si to v Nastavení zapnul
+  // true jen u profilu bez věkového omezení
   function adultFlag() { return window.MFAge && MFAge.adultOn && MFAge.adultOn() ? 'true' : 'false'; }
 
   function onlyAnime() { return !!(window.mfOnlyAnime && window.mfOnlyAnime()); }

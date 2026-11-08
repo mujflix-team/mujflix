@@ -372,6 +372,7 @@
 
       /* Při startu volá překreslení víc míst za sebou (profil, historie, oblíbené…); sloučí se do jednoho, ať řady neblikají víckrát */
       var _rhT = 0;
+      window.mfhRefresh = function () { _nfSig = ''; try { window.renderHomepage(); } catch (e) { void e; } }; /* po změně doporučování se řady obnoví */
       window.renderHomepage = function () {
         clearTimeout(_rhT);
         _rhT = setTimeout(function () { try { renderHomepage(); } catch (e) {} }, 140);
@@ -423,6 +424,7 @@
         if (it.rating > 0 && (!epTxt || /^\d{4}$/.test(epTxt))) epTxt = (epTxt ? epTxt + ' · ' : '') + '★ ' + Number(it.rating).toFixed(1);
         return (
           '<div class="nf-card' + (rank ? ' nf-ranked' : '') + '" tabindex="0" role="button" aria-label="' + esc(it.title) + '" ' +
+            'data-cid="' + cid + '" data-idx="' + idx + '" ' +
             'onclick="' + open + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + open + '}">' +
             (rank ? '<span class="nf-rank" aria-hidden="true">' + rank + '</span>' : '') +
             '<div class="nf-poster nf-skeleton">' +
