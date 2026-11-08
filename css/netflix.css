@@ -1817,3 +1817,15 @@ html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
 @media (max-width: 720px) { html body #mfCinShareBtn { display: none !important; } }
 
 html body #mfStandaloneCinema .mf-cin-ep-current[hidden] { display: none; }
+
+/* Nabídka po dlouhém podržení karty (telefon) */
+html body #mfCardSheet[hidden] { display: none; }
+html body #mfCardSheet { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: flex-end; }
+html body #mfCardSheet .cs-back { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); }
+html body #mfCardSheet .cs-box { position: relative; width: 100%; padding: 18px 16px calc(16px + env(safe-area-inset-bottom)); background: #1c1c1e; border-radius: 12px 12px 0 0; animation: mfCardIn 0.22s ease-out; }
+html body #mfCardSheet .cs-title { margin: 0; font-weight: var(--fw-bold, 700); font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body #mfCardSheet .cs-sub { margin: 2px 0 12px; font-size: 0.85rem; opacity: 0.6; }
+html body #mfCardSheet .cs-btn { display: block; width: 100%; min-height: 48px; margin-top: 8px; padding: 0 16px; border: 0; border-radius: 12px; background: rgba(255, 255, 255, 0.08); color: #fff; font: inherit; font-size: 1rem; text-align: left; }
+html body #mfCardSheet .cs-btn:first-of-type { background: #0a84ff; }
+html body #mfCardSheet .cs-cancel { text-align: center; background: transparent; opacity: 0.7; }
+html body .nf-card, html body .dv-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }

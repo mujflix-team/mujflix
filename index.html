@@ -56,7 +56,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
-    <link rel="stylesheet" href="css/netflix.css?v=45" />
+    <link rel="stylesheet" href="css/netflix.css?v=46" />
     <link rel="stylesheet" href="css/wrapped.css?v=3" />
 
     <style>
@@ -867,7 +867,7 @@
         <div class="wl-list" id="watchlistList">
           <div class="wl-empty" id="watchlistEmpty">
             <div class="wl-empty-icon"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z"/></svg></div>
-            <div>V oblíbených zatím nic není.<br>Přidej filmy nebo seriály srdíčkem a najdeš je tu na jednom místě.</div>
+            <div>V oblíbených zatím nic není.<br>Srdíčkem u filmu nebo seriálu si ho uložíš na jedno místo. Podle toho, co si oblíbíš, ti MůjFlix na úvodní stránce nabídne víc podobného.</div>
             <button type="button" class="wl-empty-btn" onclick="closeWatchlist(); mfShowSection('filmy')">Objevovat</button>
           </div>
         </div>
@@ -1732,7 +1732,7 @@
     <script src="js/core/age.js" defer></script>
     <script src="js/core/sync.js?v=3" defer></script>
     <script src="js/core/sync-ui.js?v=4" defer></script>
-    <script src="js/ai/brain.js?v=1" defer></script>
+    <script src="js/ai/brain.js?v=2" defer></script>
     <script src="js/profiles/gate.js?v=10" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
     <script src="js/app/core.js?v=6" defer></script>
@@ -1747,7 +1747,7 @@
     <script src="js/app/sections.js?v=6" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
-    <script src="js/pages/discover.js?v=12" defer></script>
+    <script src="js/pages/discover.js?v=13" defer></script>
 
     <script>
       (function () {
@@ -1799,9 +1799,10 @@
       })();
     </script>
 
+<script src="js/app/card-menu.js?v=1" defer></script>
 <script src="js/pages/cinema.js?v=17" defer></script>
     <script src="js/app/wrapped.js?v=3" defer></script>
-    <script src="js/pages/home.js?v=24" defer></script>
+    <script src="js/pages/home.js?v=25" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/backup-reminder.js?v=1" defer></script>

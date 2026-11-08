@@ -117,6 +117,12 @@ class AIBrain {
       this.memory.genreIdPrefs[e] = Math.min(1, (this.memory.genreIdPrefs[e] || 0) + t)
     }), this.save())
   }
+  /** „Méně podobného“: sníží váhu žánrů (může jít i pod nulu, a tak se žánr nebude doporučovat). */
+  penalizeGenreIds(e, t = .3) {
+    e?.length && (e.forEach(e => {
+      this.memory.genreIdPrefs[e] = Math.max(-1, (this.memory.genreIdPrefs[e] || 0) - t)
+    }), this.save())
+  }
   recordWatch(e, t) {
     this.memory.watchedCount = (this.memory.watchedCount || 0) + 1, this.memory.totalEpsWatched = (this.memory.totalEpsWatched || 0) + 1, this.memory.watchedSlugs[e] = (this.memory.watchedSlugs[e] || 0) + 1, t?.length && this.boostGenresFromTmdb(t, .06), this.memory.sessionGenres || (this.memory.sessionGenres = []), t?.length && (this.memory.sessionGenres = [...t.slice(0, 2), ...this.memory.sessionGenres].slice(0, 10)), this.memory.lastActive = Date.now(), typeof db !== "undefined" && db[e]?.name && t?.length && (this.memory.lastWatchedName = db[e].name, this.memory.lastWatchedGenres = t, this.memory.lastWatchedSlug = e), this.save()
   }
@@ -133,7 +139,7 @@ class AIBrain {
     Object.keys(this.memory.genrePreferences).forEach(e => {
       this.memory.genrePreferences[e] *= n, this.memory.genrePreferences[e] < .01 && delete this.memory.genrePreferences[e]
     }), Object.keys(this.memory.genreIdPrefs).forEach(e => {
-      this.memory.genreIdPrefs[e] *= n, this.memory.genreIdPrefs[e] < .01 && delete this.memory.genreIdPrefs[e]
+      this.memory.genreIdPrefs[e] *= n, Math.abs(this.memory.genreIdPrefs[e]) < .01 && delete this.memory.genreIdPrefs[e]
     }), this.save()
   }
   recordWatchTime() {
