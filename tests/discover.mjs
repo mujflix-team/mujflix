@@ -69,10 +69,11 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
 
 // Hledání: rok v dotazu a řazení podle shody názvu
 {
-  const urls = [];
+  const urls = []; let decomposed = false;
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   await page.route(/^(?!http:\/\/localhost)/, r => {
     const u = r.request().url();
+    if (/%E3%82%99|%E3%82%9A/.test(u)) decomposed = true; // rozložená dakuten v dotazu = rozbitá japonština
     if (u.endsWith(".js")) return r.fulfill({ contentType: "text/javascript", body: STUB });
     if (u.includes("/search/") && /query=breking/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 0, total_results: 0, results: [] }) });
     if (u.includes("/search/") && /query=オーバーフロ(decodeURIComponent(u).includes("query=オーバーフロ&")|$)/.test(decodeURIComponent(u))) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 2, results: [
@@ -137,6 +138,7 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(2000);
   const t6 = await titles();
   check("Hledání: japonský název v hiraganě s překlepem („おーばーふろぉ“) najde Overflow", t6[0] === "Overflow", t6.join("|"));
+  check("Hledání: do TMDB se neposílá rozložená japonština (dakuten jako zvláštní znak)", !decomposed, String(decomposed));
   await page.close();
 }
 
