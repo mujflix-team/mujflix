@@ -29,10 +29,11 @@
       else if (a === "save") save();
       else if (a === "mode") { state.only = b.getAttribute("data-v") === "only"; render(); }
       else if (a === "genre") toggleGenre(b.getAttribute("data-v"));
-      else if (a === "age") { state.age = Number(b.getAttribute("data-v")); render(); }
+      else if (a === "age") { state.age = Number(b.getAttribute("data-v")); if (state.age) state.adult = false; render(); }
     });
     el.addEventListener("change", function (e) {
       if (e.target && e.target.id === "mfPrefsMix") { state.mix = !!e.target.checked; }
+      if (e.target && e.target.id === "mfPrefsAdult") { state.adult = !!e.target.checked; render(); }
     });
     el.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
     document.body.appendChild(el);
@@ -46,6 +47,9 @@
     else { msg("Vyber nejvýš " + MAX_GENRES + " žánrů.", true); return; }
     render();
   }
+
+  // PIN profilu se chce při změně věku
+  function needPin() { return !!state.pin && state.age !== state.age0; }
 
   function msg(t, err) {
     var m = el && el.querySelector(".pf-msg");
@@ -77,7 +81,8 @@
           return '<button type="button" class="pf-segbtn' + (state.age === a[0] ? " pf-on" : "") + '" data-pf="age" data-v="' + a[0] + '" aria-pressed="' + (state.age === a[0]) + '">' + a[1] + "</button>";
         }).join("") + "</div>" +
         '<div class="pf-note">' + (state.age ? "Doporučení, Objevovat i hledání ukážou jen tituly vhodné " + AGES.filter(function (a) { return a[0] === state.age; })[0][2] + ". Hodnocení bere z TMDB (americká škála); titul bez hodnocení se skryje." : "Bez omezení: ukáže se všechno.") + "</div>" +
-        (state.pin && state.age !== state.age0 ? '<input type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="pf-pin" id="mfPrefsPin" placeholder="PIN profilu pro změnu věku" aria-label="PIN profilu">' : "") +
+        (state.age ? "" : '<label class="pf-mix"><input type="checkbox" id="mfPrefsAdult"' + (state.adult ? " checked" : "") + '><span>Zahrnout tituly pro dospělé (18+) do hledání a Objevovat</span></label>') +
+        (needPin() ? '<input type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="pf-pin" id="mfPrefsPin" placeholder="PIN profilu pro změnu věku" aria-label="PIN profilu">' : "") +
         '<div class="pf-label">Oblíbené žánry <span class="pf-count">' + state.genres.length + "/" + MAX_GENRES + "</span></div>" +
         '<div class="pf-tags' + (state.only ? " pf-dim" : "") + '">' + chips + "</div>" +
         '<div class="pf-msg" role="status"></div>' +
@@ -100,6 +105,7 @@
       mix: !!(p.prefs && p.prefs.likesAnime),
       age: (window.MFAge && MFAge.levels.indexOf(Number(p.prefs && p.prefs.maxAge)) > 0) ? Number(p.prefs.maxAge) : 0,
       age0: 0,
+      adult: !!(p.prefs && p.prefs.adult === true),
       pin: p.pin ? String(p.pin) : "",
       genres: (p.likedGenres || []).map(String).filter(function (g) { return GENRES.some(function (x) { return x[0] === g; }); }).slice(0, MAX_GENRES)
     };
@@ -114,13 +120,13 @@
   function save() {
     var all = _getProfiles(), p = all.find(function (x) { return x.id === state.id; });
     if (!p) return close();
-    if (state.pin && state.age !== state.age0) {
+    if (needPin()) {
       var pinEl = el.querySelector("#mfPrefsPin");
       if (!pinEl || pinEl.value !== state.pin) { msg("Pro změnu věku zadej správný PIN profilu.", true); if (pinEl) pinEl.focus(); return; }
     }
     var old = (p.likedGenres || []).map(String);
     p.likedGenres = state.genres.map(Number);
-    p.prefs = Object.assign({}, p.prefs, { animeOnly: state.only, likesAnime: state.only ? true : state.mix, maxAge: state.age });
+    p.prefs = Object.assign({}, p.prefs, { animeOnly: state.only, likesAnime: state.only ? true : state.mix, maxAge: state.age, adult: state.age ? false : !!state.adult });
     _saveProfiles(all);
     // nově přidané žánry se hned zohlední v učení doporučení
     try {

@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.60
+- **Nově:** tituly pro dospělé (18+) v hledání a Objevovat: při zakládání profilu stačí zvolit „18+“, později jde zapnout nebo vypnout v Zaměření a žánrech. U profilu s věkovým omezením se volba vypne. Mění jen to, co TMDB v hledání vrací.
+
 ## 3.21.59
 - **Nově:** detail rozkoukaného seriálu se otevře odrolovaný k epizodě, kde jsi skončil (u seriálu bez zhlédnutí zůstane nahoře). **Opraveno:** další seriál se po odrolovaném seriálu otevřel taky odrolovaný.
 

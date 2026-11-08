@@ -403,10 +403,13 @@
 
   function ageFilter(items) { return window.MFAge ? window.MFAge.filter(items, 24) : Promise.resolve(items); }
 
+  // true jen u profilu bez věkového omezení, který si to v Nastavení zapnul
+  function adultFlag() { return window.MFAge && MFAge.adultOn && MFAge.adultOn() ? 'true' : 'false'; }
+
   function onlyAnime() { return !!(window.mfOnlyAnime && window.mfOnlyAnime()); }
 
   function discoverUrl(type, page, o) {
-    var q = ['language=cs-CZ', 'include_adult=false', 'page=' + page];
+    var q = ['language=cs-CZ', 'include_adult=' + adultFlag(), 'page=' + page];
     if (o.sort === 'rating') {
       q.push('sort_by=vote_average.desc', 'vote_count.gte=' + (type === 'movie' ? 300 : 150));
     } else if (o.sort === 'newest') {
@@ -707,7 +710,7 @@
     if (!cands.length || needle.length < 4) return Promise.resolve([]);
     var needles = [needle].concat(kata ? [fold(kata)] : []);
     return Promise.all(cands.slice(0, 4).map(function (w) {
-      return api('/search/multi?language=cs-CZ&include_adult=false&page=1&query=' + encodeURIComponent(w)).catch(function () { return null; });
+      return api('/search/multi?language=cs-CZ&include_adult=' + adultFlag() + '&page=1&query=' + encodeURIComponent(w)).catch(function () { return null; });
     })).then(function (rs) {
       var seen = {}, max = Math.max(2, Math.floor(needle.length * 0.3)), out = [];
       rs.forEach(function (d) {
@@ -731,7 +734,7 @@
     var page = ctx.page + 1;
     if (ctx.mode === 'search') {
       var pq = parseQuery(state.query);
-      return api('/search/multi?language=cs-CZ&include_adult=false&page=' + page + '&query=' + encodeURIComponent(pq.text)).then(function (d) {
+      return api('/search/multi?language=cs-CZ&include_adult=' + adultFlag() + '&page=' + page + '&query=' + encodeURIComponent(pq.text)).then(function (d) {
         var items = normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
         else items = rankByMatch(items, pq);

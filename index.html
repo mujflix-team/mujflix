@@ -56,7 +56,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
-    <link rel="stylesheet" href="css/netflix.css?v=43" />
+    <link rel="stylesheet" href="css/netflix.css?v=44" />
     <link rel="stylesheet" href="css/wrapped.css?v=3" />
 
     <style>
@@ -269,12 +269,13 @@
             <div class="pw-subtitle">Tvůj profil je hotový. Klepni na pár žánrů, které máš rád(a), a hned ti ukážeme něco dobrého. Nic z toho není povinné a všechno půjde později změnit.</div>
             <div class="pw-genres" id="pwGenres"></div>
             <div class="pw-age">
-              <div class="pw-age-t"><strong>Věk</strong> <small>nepovinné · hodí se pro děti, ukážeme jen vhodné tituly</small></div>
+              <div class="pw-age-t"><strong>Věk</strong> <small>nepovinné · u dětí ukážeme jen vhodné tituly, u 18+ i tituly pro dospělé</small></div>
               <div class="pw-age-row" id="pwAge">
                 <button type="button" class="pw-agebtn pw-on" data-age="0">Bez omezení</button>
                 <button type="button" class="pw-agebtn" data-age="7">Do 7</button>
                 <button type="button" class="pw-agebtn" data-age="12">Do 12</button>
                 <button type="button" class="pw-agebtn" data-age="15">Do 15</button>
+                <button type="button" class="pw-agebtn" data-age="18">18+</button>
               </div>
             </div>
             <div class="pw-adwarn">
@@ -1738,7 +1739,7 @@
     <script src="js/core/sync.js?v=3" defer></script>
     <script src="js/core/sync-ui.js?v=4" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
-    <script src="js/profiles/gate.js?v=8" defer></script>
+    <script src="js/profiles/gate.js?v=9" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
     <script src="js/app/core.js?v=6" defer></script>
     <script src="js/app/series.js?v=15" defer></script>
@@ -1752,7 +1753,7 @@
     <script src="js/app/sections.js?v=6" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
-    <script src="js/pages/discover.js?v=10" defer></script>
+    <script src="js/pages/discover.js?v=11" defer></script>
 
     <script id="mf-img-patch">
       (function () {

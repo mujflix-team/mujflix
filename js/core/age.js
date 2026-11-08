@@ -26,6 +26,13 @@
       return LEVELS.indexOf(v) > 0 ? v : 0;
     } catch (e) { return 0; }
   }
+  // Tituly označené v TMDB jako pro dospělé se v hledání a Objevovat ukážou jen na výslovné přání profilu bez věkového omezení
+  function adultOn() {
+    try {
+      var p = typeof getActiveProfile === "function" ? getActiveProfile() : null;
+      return !!(p && p.prefs && p.prefs.adult === true) && limit() === 0;
+    } catch (e) { return false; }
+  }
   function load() { try { var o = JSON.parse(localStorage.getItem(KEY) || "{}"); return o && typeof o === "object" ? o : {}; } catch (e) { return {}; } }
   function save(o) {
     try {
@@ -124,5 +131,5 @@
     return c ? "&certification_country=US&certification.lte=" + c : "";
   }
 
-  window.MFAge = { wide: wide, rewrite: rewrite, certQuery: certQuery, stats: stats, limit: limit, filter: filter, levels: LEVELS, _rating: rating, _allowed: allowed, _certOf: certOf };
+  window.MFAge = { wide: wide, rewrite: rewrite, certQuery: certQuery, stats: stats, limit: limit, filter: filter, levels: LEVELS, adultOn: adultOn, _rating: rating, _allowed: allowed, _certOf: certOf };
 })();
