@@ -2185,6 +2185,11 @@ const pfT = await page.evaluate(async () => {
     MFPrefs.open(); ["80", "12", "878"].forEach(g => click("genre", g)); click("genre", "14");
     out.max5 = document.querySelectorAll('#mfPrefsModal .pf-tag.pf-on').length === 5 && /nejvýš 5/.test(document.querySelector("#mfPrefsModal .pf-msg").textContent);
     MFPrefs.close();
+    // tituly pro dospělé: dostane je profil bez věkového omezení, s omezením ne
+    out.adultDefault = MFAge.adultOn() === true;
+    { const ps = _getProfiles(), pp = ps.find(x => x.id === id); pp.prefs.maxAge = 12; _saveProfiles(ps); }
+    out.adultOffByAge = MFAge.adultOn() === false;
+    { const ps = _getProfiles(), pp = ps.find(x => x.id === id); delete pp.prefs.maxAge; _saveProfiles(ps); }
     // zakládání profilu: „Jen anime“ už v průvodci není (zůstává jen v Zaměření a žánry), po průvodci je běžný režim
     reset();
     ProfileGate.openOnboarding(id); await wait(30);
@@ -2212,6 +2217,7 @@ const pfT = await page.evaluate(async () => {
 check("zaměření: Nastavení v menu profilu → Zaměření a žánry otevře okno (s popiskem aktuální volby)", pfT.menuItem && pfT.opened && pfT.startAll && /Všechno/.test(pfT.hubSub), JSON.stringify(pfT));
 check("zaměření: Jen anime + žánry se uloží do profilu a po otevření jsou vidět; zpět na Všechno funguje", pfT.only && pfT.genres && pfT.closed && pfT.reopenOnly && pfT.backAll, JSON.stringify(pfT));
 check("zaměření: nejvýš 5 žánrů", pfT.max5, JSON.stringify(pfT));
+check("tituly pro dospělé: zapnuté bez věkového omezení, s omezením vypnuté", pfT.adultDefault && pfT.adultOffByAge, JSON.stringify(pfT));
 check("zakládání profilu: věk je nepovinný (výchozí Bez omezení), zvolený se uloží a příště se vrátí na výchozí", pfT.obAgeDefault && pfT.obAgeOn && pfT.obAge12 && pfT.obAgeReset && pfT.obAgeCleared, JSON.stringify(pfT));
 check("zakládání profilu: v průvodci už není „Jen anime“ a po něm je běžný režim se zvolenými žánry", pfT.obBox && pfT.obAll, JSON.stringify(pfT));
 

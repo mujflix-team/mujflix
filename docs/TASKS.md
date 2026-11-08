@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.60: Profil bez věkového omezení dostává v hledání a Objevovat i tituly pro dospělé z TMDB, s omezením ne.
 - 3.21.59: Detail seriálu se otevře u epizody, kde jsi skončil; oprava odrolování po zavření jiného seriálu.
 - 3.21.58: Hledání: japonské dotazy se do TMDB neposílají rozložené.
 - 3.21.57: Hledání: podobné názvy i při nepodobných výsledcích z TMDB, japonské malé samohlásky jako dlouhé „ー“.

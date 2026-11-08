@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.60
+- **Nově:** profil bez věkového omezení dostává v hledání a Objevovat i tituly označené v TMDB jako pro dospělé (nic se nezaškrtává). U profilu s věkovým omezením (do 7, 12, 15) se nezobrazují. Mění jen to, co TMDB vrací, nový zdroj videa to není.
+
 ## 3.21.59
 - **Nově:** detail rozkoukaného seriálu se otevře odrolovaný k epizodě, kde jsi skončil (u seriálu bez zhlédnutí zůstane nahoře). **Opraveno:** další seriál se po odrolovaném seriálu otevřel taky odrolovaný.
 
