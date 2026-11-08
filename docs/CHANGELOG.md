@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.64
+- **Nově:** dlouhé podržení karty na telefonu („víc / méně podobného“) funguje i v seznamu Oblíbených (v hledání už fungovalo, výsledky jsou karty z Objevovat).
+
 ## 3.21.63
 - **Nově:** na telefonu jde dlouze podržet kartu filmu nebo seriálu (úvodní stránka, Objevovat) a vybrat „Ukazovat víc podobného“ nebo „méně podobného“. Mění jen doporučování. Text v prázdných Oblíbených líp vysvětluje, k čemu srdíčko je.
 

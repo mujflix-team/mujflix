@@ -17,6 +17,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.64: Podržení karty (víc / méně podobného) i v seznamu Oblíbených.
 - 3.21.63: Podržení karty na telefonu: ukazovat víc / méně podobného (doporučování), srozumitelnější prázdné Oblíbené.
 - 3.21.62: Úklid mrtvého kódu po starém dlaždicovém menu (`.ps-tile`, `.ps-list`) a pole `trakt` v profilu.
 - 3.21.61: Hledání zobrazí i tituly bez plakátu.
