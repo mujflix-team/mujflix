@@ -553,14 +553,12 @@ const ProfileGate = {
       sel = [...e.querySelectorAll(".pw-genre.selected")].map(e => e.dataset.genre),
       animeOnlyBox = !1,
       ageBtn = e.querySelector("#pwAge .pw-agebtn.pw-on"),
-      ageSel = ageBtn ? Number(ageBtn.dataset.age) || 0 : 0,
-      adult = ageSel === 18, // „18+“ = bez omezení a rovnou i tituly pro dospělé
-      maxAge = adult ? 0 : ageSel,
+      maxAge = ageBtn ? Number(ageBtn.dataset.age) || 0 : 0,
       likesAnime = sel.includes("anime") || animeOnlyBox,
       n = [...new Set(sel.map(Number).filter(Number.isFinite))];
     if (t) {
       const o = _getProfiles(), i = o.find(e => e.id === t);
-      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, maxAge ? i.prefs.maxAge = maxAge : delete i.prefs.maxAge, adult ? i.prefs.adult = !0 : delete i.prefs.adult, animeOnlyBox || (likesAnime && !n.length) ? i.prefs.animeOnly = !0 : delete i.prefs.animeOnly, _saveProfiles(o));
+      i && (n.length && (i.likedGenres = n.slice(0, 5)), i.prefs = { ...i.prefs, onboardingDone: !0, likesAnime }, maxAge ? i.prefs.maxAge = maxAge : delete i.prefs.maxAge, animeOnlyBox || (likesAnime && !n.length) ? i.prefs.animeOnly = !0 : delete i.prefs.animeOnly, _saveProfiles(o));
       if (getActiveProfileId() === t && void 0 !== aiBrain) n.forEach(e => aiBrain.boostGenreIds([e], .12));
       try { if (typeof window.renderHomepage === "function") window.renderHomepage(); } catch (e) {}
     }

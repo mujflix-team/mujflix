@@ -138,11 +138,10 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(2000);
   const t6 = await titles();
   check("Hledání: japonský název v hiraganě s překlepem („おーばーふろぉ“) najde Overflow", t6[0] === "Overflow", t6.join("|"));
-  // Tituly pro dospělé: výchozí vypnuto, zapnout jde jen u profilu bez věkového omezení
+  // Tituly pro dospělé: profil bez věkového omezení je dostane, s omezením ne
   const adultOf = async (prefs) => { await page.evaluate((pr) => { const a = _getProfiles(); a[0].prefs = pr; _saveProfiles(a); }, prefs); urls.length = 0; await page.fill("#dvSearch", "adult" + Math.random().toString(36).slice(2, 7)); await page.waitForTimeout(1500); return urls.some(u => /include_adult=true/.test(u)); };
-  check("Hledání: tituly pro dospělé jsou ve výchozím stavu vypnuté", (await adultOf({})) === false);
-  check("Hledání: profil bez omezení si tituly pro dospělé může zapnout", (await adultOf({ adult: true })) === true);
-  check("Hledání: profil s věkovým omezením je nedostane ani se zapnutou volbou", (await adultOf({ adult: true, maxAge: 12 })) === false);
+  check("Hledání: profil bez věkového omezení dostane tituly pro dospělé", (await adultOf({})) === true);
+  check("Hledání: profil s věkovým omezením je nedostane", (await adultOf({ maxAge: 12 })) === false);
   await page.evaluate(() => { const a = _getProfiles(); a[0].prefs = {}; _saveProfiles(a); });
   check("Hledání: do TMDB se neposílá rozložená japonština (dakuten jako zvláštní znak)", !decomposed, String(decomposed));
   await page.close();
