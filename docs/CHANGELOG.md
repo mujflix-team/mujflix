@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.61
+- **Opraveno:** hledání už nevyřazuje tituly bez plakátu (málo známé a tituly pro dospělé ho v TMDB často nemají). Ukážou se s písmenem místo plakátu.
+
 ## 3.21.60
 - **Nově:** profil bez věkového omezení dostává v hledání a Objevovat i tituly označené v TMDB jako pro dospělé (nic se nezaškrtává). U profilu s věkovým omezením (do 7, 12, 15) se nezobrazují. Mění jen to, co TMDB vrací, nový zdroj videa to není.
 

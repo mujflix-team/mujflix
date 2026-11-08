@@ -87,6 +87,9 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
       { id: 31, media_type: "tv", name: "Nesouvisející seriál", original_name: "ぜんぜん違う", first_air_date: "2010-01-01", poster_path: "/i.jpg", popularity: 8 },
     ] }) });
     if (u.includes("/search/") && /query=(breking|%E3)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 0, total_results: 0, results: [] }) });
+    if (u.includes("/search/") && /query=bezplakatu(&|$)/.test(decodeURIComponent(u))) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 1, results: [
+      { id: 41, media_type: "tv", name: "Bezplakatu", original_name: "ポスターなし", first_air_date: "2018-01-01", poster_path: null, popularity: 1 },
+    ] }) });
     if (u.includes("/search/") && /query=bad(&|$)/.test(u)) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ page: 1, total_pages: 1, total_results: 2, results: [
       { id: 11, media_type: "movie", title: "Bad Boys", release_date: "1995-04-07", poster_path: "/e.jpg", popularity: 99 },
       { id: 12, media_type: "tv", name: "Breaking Bad", first_air_date: "2008-01-20", poster_path: "/f.jpg", popularity: 50 },
@@ -143,6 +146,11 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   check("Hledání: profil bez věkového omezení dostane tituly pro dospělé", (await adultOf({})) === true);
   check("Hledání: profil s věkovým omezením je nedostane", (await adultOf({ maxAge: 12 })) === false);
   await page.evaluate(() => { const a = _getProfiles(); a[0].prefs = {}; _saveProfiles(a); });
+  await page.fill("#dvSearch", "bezplakatu");
+  await page.waitForTimeout(1500);
+  const t7 = await titles();
+  const fb7 = await page.evaluate(() => !!document.querySelector("#dvBody .dv-poster-fallback"));
+  check("Hledání: titul bez plakátu se najde a ukáže s písmenem místo plakátu", t7[0] === "Bezplakatu" && fb7, t7.join("|") + " " + fb7);
   check("Hledání: do TMDB se neposílá rozložená japonština (dakuten jako zvláštní znak)", !decomposed, String(decomposed));
   await page.close();
 }

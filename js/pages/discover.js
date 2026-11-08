@@ -110,12 +110,13 @@
     };
   }
 
-  function normList(results, forcedType) {
+  // V hledání se berou i tituly bez plakátu (málo známé a tituly pro dospělé ho v TMDB často nemají); jinde jen s plakátem
+  function normList(results, forcedType, keepNoPoster) {
     var out = [];
     (results || []).forEach(function (r) {
       if (!r || typeof r !== 'object') return;
       var n = norm(r, forcedType);
-      if (n && n.poster && n.title) out.push(n);
+      if (n && (n.poster || keepNoPoster) && n.title) out.push(n);
     });
     return out;
   }
@@ -248,8 +249,8 @@
       img.remove();
       p.appendChild(el('div', 'dv-poster-fallback', (it.title || '?').trim().charAt(0).toUpperCase()));
     });
-    img.src = it.poster;
-    p.appendChild(img);
+    if (it.poster) { img.src = it.poster; p.appendChild(img); }
+    else { p.classList.remove('dv-skel'); p.appendChild(el('div', 'dv-poster-fallback', (it.title || '?').trim().charAt(0).toUpperCase())); }
     if (it.rating > 0) p.appendChild(el('span', 'dv-rate', '★ ' + it.rating.toFixed(1)));
     if (showType) p.appendChild(el('span', 'dv-type', it.type === 'tv' ? 'Seriál' : 'Film'));
     p.appendChild(favButton(it));
@@ -714,7 +715,7 @@
     })).then(function (rs) {
       var seen = {}, max = Math.max(2, Math.floor(needle.length * 0.3)), out = [];
       rs.forEach(function (d) {
-        normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; }).forEach(function (it) {
+        normList(d && d.results, undefined, true).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; }).forEach(function (it) {
           var key = it.type + it.id;
           if (seen[key]) return;
           seen[key] = 1;
@@ -735,7 +736,7 @@
     if (ctx.mode === 'search') {
       var pq = parseQuery(state.query);
       return api('/search/multi?language=cs-CZ&include_adult=' + adultFlag() + '&page=' + page + '&query=' + encodeURIComponent(pq.text)).then(function (d) {
-        var items = normList(d && d.results).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
+        var items = normList(d && d.results, undefined, true).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
         else items = rankByMatch(items, pq);
         // Nic nezačíná hledaným textem (překlep, jiné písmo): zkusí se i podobné názvy a dají se na začátek
