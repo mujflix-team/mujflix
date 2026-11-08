@@ -327,6 +327,34 @@ const stT = await page.evaluate(async () => {
 check("rozkoukané: první řada s tlačítkem Dokoukal jsem u karty (odebere ji), banner je doporučený titul", stT.noStack && stT.heroNotContinue && stT.cards >= 2 && stT.cx === stT.cards && stT.removed, JSON.stringify(stT));
 
 // --- Detail seriálu: Další epizody / Podobné
+// Detail seriálu: u rozkoukaného seriálu se seznam odroluje k epizodě, kde jsi skončil
+const scrT = await page.evaluate(async () => {
+  document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
+  const w = ms => new Promise(r => setTimeout(r, ms));
+  const slug = Object.keys(db).find(k => epsInSeason(k, 1) >= 10) || Object.keys(db)[0];
+  const wk = uKey("mf_watched"), snap = localStorage.getItem(wk), out = {};
+  try {
+    const other = Object.keys(db).find(k => k !== slug); // jiný seriál bez zhlédnutí
+    openSeries(other); await w(900);
+    out.freshTop = document.getElementById("modalBody").scrollTop === 0; out.freshAt = document.getElementById("modalBody").scrollTop;
+    closeModal(); await w(500);
+    const m = {}; for (let e = 1; e <= 8; e++) m[`${slug}-S1-E${e}`] = 1;
+    localStorage.setItem(wk, JSON.stringify(m));
+    openSeries(slug); await w(900);
+    const body = document.getElementById("modalBody"), card = document.querySelector("#episodesGrid .episode-card.next-ep");
+    const br = body.getBoundingClientRect(), cr = card && card.getBoundingClientRect();
+    out.scrolled = body.scrollTop > 0;
+    out.visible = !!cr && cr.top >= br.top - 2 && cr.bottom <= br.bottom + 2;
+    closeModal(); await w(500);
+    openSeries(other); await w(900); // po odrolovaném seriálu se další seriál otevře zase nahoře
+    out.afterTop = document.getElementById("modalBody").scrollTop === 0;
+    closeModal(); await w(500);
+  } finally { snap === null ? localStorage.removeItem(wk) : localStorage.setItem(wk, snap); try { closeModal(); } catch (e) { void e; } }
+  return out;
+});
+check("detail seriálu: rozkoukaný seriál se otevře odrolovaný k epizodě, kde jsi skončil", scrT.scrolled && scrT.visible, JSON.stringify(scrT));
+check("detail seriálu: seriál bez zhlédnutí zůstane nahoře, i po odrolovaném seriálu", scrT.freshTop && scrT.afterTop, JSON.stringify(scrT));
+
 const sdT = await page.evaluate(async () => {
   const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
   document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
