@@ -1829,3 +1829,4 @@ html body #mfCardSheet .cs-btn { display: block; width: 100%; min-height: 48px; 
 html body #mfCardSheet .cs-btn:first-of-type { background: #0a84ff; }
 html body #mfCardSheet .cs-cancel { text-align: center; background: transparent; opacity: 0.7; }
 html body .nf-card, html body .dv-card, html body .wl-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+html body .nf-card img, html body .dv-card img, html body .wl-card img { pointer-events: none; -webkit-user-drag: none; }

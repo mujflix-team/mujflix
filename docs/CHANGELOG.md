@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.65
+- **Opraveno:** dlouhé podržení karty na telefonu už neotevře i systémovou nabídku prohlížeče („Kopírovat odkaz, Uložit obrázek“), jen nabídku MůjFlixu.
+
 ## 3.21.64
 - **Nově:** dlouhé podržení karty na telefonu („víc / méně podobného“) funguje i v seznamu Oblíbených (v hledání už fungovalo, výsledky jsou karty z Objevovat).
 
