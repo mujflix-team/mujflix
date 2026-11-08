@@ -12,12 +12,12 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Service worker: celý „stale-while-revalidate“ zatím ne (hrozil by starý kód po opravě); písma už jdou z cache.
 - Průhledný obdélník vlevo nahoře (nereprodukovatelný v headless Chromiu): zjistit prvek přes pravý klik → Prozkoumat.
 - Ověřit, jestli NajSerialy.io nebrání vložení do iframe; pokud ano, označit zdroj jako `noEmbed`.
-- Úklid dál: zbylé zmínky `.ps-tile-wrapper` v inline stylech v `index.html` a v `notify.js`; starý přehrávač `cinema-legacy.js` (nejde jen smazat: `CINEMA_SOURCES`, `_cinState`, `openMovieInCinema` používají sections.js, finder.js, home.js a testy – nejdřív přesunout do nového přehrávače).
-- Nepoužité pole `trakt: null` v profilu (`js/profiles/gate.js`) – buď dodělat, nebo smazat.
+- Úklid dál: starý přehrávač `cinema-legacy.js` (nejde jen smazat: `CINEMA_SOURCES`, `_cinState`, `openMovieInCinema` používají sections.js, finder.js, home.js a testy – nejdřív přesunout do nového přehrávače).
 - Bezpečnost (dluh): CSP `script-src 'unsafe-inline'` kvůli inline `onclick` v generovaném HTML – postupně nahradit `addEventListener` a pak přepnout na `script-src 'self'`. Iframe přehrávače běží bez `sandbox` (hostingy ho detekují); zkusit užší `sandbox` zdroj od zdroje a ručně ověřit všechny 4 zdroje. Limity ve Workeru (`probeHits`, `srcHits`) jsou v paměti jedné instance; do KV až při skutečném zneužití (KV zápis na free tarifu max. 1000/den, každý požadavek jako zápis by kvótu vyčerpal). Opatření mimo kód: branch protection na `main`, ověřit hlavičky na securityheaders.com a observatory.mozilla.org.
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.62: Úklid mrtvého kódu po starém dlaždicovém menu (`.ps-tile`, `.ps-list`) a pole `trakt` v profilu.
 - 3.21.61: Hledání zobrazí i tituly bez plakátu.
 - 3.21.60: Profil bez věkového omezení dostává v hledání a Objevovat i tituly pro dospělé z TMDB, s omezením ne.
 - 3.21.59: Detail seriálu se otevře u epizody, kde jsi skončil; oprava odrolování po zavření jiného seriálu.

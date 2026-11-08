@@ -509,8 +509,7 @@ const ProfileGate = {
         },
         contentPref: "all",
         lang: "cs"
-      },
-      trakt: null
+      }
     }), _saveProfiles(a), i
   },
   openOnboarding(e) {

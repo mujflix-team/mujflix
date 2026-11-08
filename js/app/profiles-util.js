@@ -159,8 +159,7 @@ function refreshUserContent() {
             created: n.created || Date.now(),
             history: n.history || [],
             likedGenres: n.likedGenres || [],
-            prefs: n.prefs || {},
-            trakt: null
+            prefs: n.prefs || {}
           };
         _getProfiles();
         const i = _getProfiles();
