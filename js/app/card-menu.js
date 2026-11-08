@@ -2,7 +2,7 @@
  * Ovlivňuje jen doporučování (váhy žánrů v aiBrain), nic dalšího. Karty: .nf-card (úvodní stránka), .dv-card (Objevovat a hledání), .wl-card (Oblíbené). */
 (function () {
   "use strict";
-  var HOLD_MS = 450, MOVE_PX = 10;
+  var HOLD_MS = 450, MOVE_PX = 10, CARDS = ".nf-card, .dv-card, .wl-card";
   var timer = null, startX = 0, startY = 0, suppressUntil = 0, sheet = null, current = null;
 
   // Z karty vytáhne, o jaký titul jde: { title, type, tmdbId, genreIds, slug }
@@ -72,7 +72,7 @@
 
   document.addEventListener("touchstart", function (e) {
     cancel();
-    var card = e.target && e.target.closest && e.target.closest(".nf-card, .dv-card, .wl-card");
+    var card = e.target && e.target.closest && e.target.closest(CARDS);
     var t = e.touches && e.touches[0];
     if (!card || !t || e.touches.length > 1) return;
     startX = t.clientX; startY = t.clientY;
@@ -91,7 +91,14 @@
   ["touchend", "touchcancel"].forEach(function (n) { document.addEventListener(n, cancel, { passive: true }); });
   // Po dlouhém podržení vznikne klik na kartu: zahodí se, ať se titul neotevře
   document.addEventListener("click", function (e) {
-    if (Date.now() < suppressUntil && e.target.closest && e.target.closest(".nf-card, .dv-card, .wl-card")) { e.stopPropagation(); e.preventDefault(); }
+    if (Date.now() < suppressUntil && e.target.closest && e.target.closest(CARDS)) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+  // Android při dlouhém podržení obrázku nabízí vlastní nabídku („Kopírovat odkaz, Uložit obrázek“): na kartách se zablokuje.
+  // Pravé tlačítko myši na počítači zůstává, blokuje se jen krátce po dotyku.
+  var lastTouch = 0;
+  document.addEventListener("touchstart", function () { lastTouch = Date.now(); }, { passive: true, capture: true });
+  document.addEventListener("contextmenu", function (e) {
+    if (Date.now() - lastTouch < 1500 && e.target.closest && e.target.closest(CARDS)) e.preventDefault();
   }, true);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheet && !sheet.hidden) close(); });
 

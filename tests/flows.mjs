@@ -371,6 +371,8 @@ const cmT = await page.evaluate(async () => {
   ids.forEach(i => { delete mem()[i]; });
   const item = MFCardMenu.itemFor(document.getElementById("cmCard")); item.genreIds = ids;
   ev("touchstart", 10, 10); ev("touchend"); await w(600);
+  { ev("touchstart", 10, 10); const cm = new Event("contextmenu", { bubbles: true, cancelable: true }); document.getElementById("cmCard").dispatchEvent(cm); out.noNativeMenu = cm.defaultPrevented; ev("touchend"); }
+  { const cm2 = new Event("contextmenu", { bubbles: true, cancelable: true }); await w(1700); document.getElementById("cmCard").dispatchEvent(cm2); out.mouseMenuKept = !cm2.defaultPrevented; }
   out.shortNoSheet = !document.getElementById("mfCardSheet") || document.getElementById("mfCardSheet").hidden;
   ev("touchstart", 10, 10); await w(600);
   out.opened = !!document.getElementById("mfCardSheet") && !document.getElementById("mfCardSheet").hidden && document.querySelector("#mfCardSheet .cs-title").textContent === "Testovací film";
@@ -389,7 +391,7 @@ const cmT = await page.evaluate(async () => {
   host.remove(); row.remove(); document.getElementById("mfCardSheet")?.remove();
   return out;
 });
-check("podržení karty: krátké klepnutí nabídku neotevře, dlouhé ji otevře s názvem titulu", cmT.shortNoSheet && cmT.opened, JSON.stringify(cmT));
+check("podržení karty: krátké klepnutí nabídku neotevře, dlouhé ji otevře; systémová nabídka prohlížeče se po dotyku zablokuje, myš ne", cmT.shortNoSheet && cmT.opened && cmT.noNativeMenu && cmT.mouseMenuKept, JSON.stringify(cmT));
 check("podržení karty: Zrušit zavře a posun prstu podržení zruší; karta z Oblíbených se rozpozná", cmT.closed && cmT.moveCancels && cmT.wlItem, JSON.stringify(cmT));
 check("podržení karty: „méně podobného“ sníží váhu žánru i pod nulu a záporná váha se nerozpadne", cmT.penalty && cmT.negative && cmT.negativeKept, JSON.stringify(cmT));
 
