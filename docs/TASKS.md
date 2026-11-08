@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.58: Hledání: japonské dotazy se do TMDB neposílají rozložené.
 - 3.21.57: Hledání: podobné názvy i při nepodobných výsledcích z TMDB, japonské malé samohlásky jako dlouhé „ー“.
 - Repozitář: přidána pravidla chování (`docs/CODE_OF_CONDUCT.md`), návod pro přispěvatele (`docs/CONTRIBUTING.md`) a šablony issue (`docs/ISSUE_TEMPLATE/`). Bez licence kvůli písmu NetflixSans.
 - 3.21.56: Hledání umí japonštinu v hiraganě a překlep na konci názvu.

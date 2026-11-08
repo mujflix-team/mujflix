@@ -693,7 +693,9 @@
     var kata = /[\u3041-\u3096]/.test(raw) ? raw.replace(/[\u3041-\u3096]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); }) : '';
     var cands = [];
     function add(q) { if (q && q.length >= 2 && cands.indexOf(q) < 0) cands.push(q); }
-    needle.split(/\s+/).filter(function (w) { return w.length >= 3; }).sort(function (a, b) { return b.length - a.length; }).slice(0, 2).forEach(add);
+    // slova z původního textu; diakritika se odstraňuje jen u latinky (u japonštiny by se „ば“ rozložilo na dva znaky)
+    raw.split(/\s+/).map(function (w) { return /[\u3040-\u9fff]/.test(w) ? w : fold(w); })
+      .filter(function (w) { return w.length >= 3; }).sort(function (a, b) { return b.length - a.length; }).slice(0, 2).forEach(add);
     // „ろぉ“ se v katakaně píše jako dlouhé „ロー“: malé samohlásky ァィゥェォ se zkusí i jako „ー“
     add(kata.replace(/[\u30A1\u30A3\u30A5\u30A7\u30A9]/g, '\u30FC'));
     add(kata);

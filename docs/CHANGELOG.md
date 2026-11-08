@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.58
+- **Opraveno:** hledání japonských názvů už neposílá do TMDB rozložené znaky (např. „ば“ jako dva znaky), takže záložní hledání dostane správný dotaz.
+
 ## 3.21.57
 - **Opraveno:** hledání podobných názvů se spustí i tehdy, když TMDB vrátí něco nepodobného (ne jen prázdný výsledek), a malé samohlásky v japonštině („ぉ“) se zkusí jako dlouhé „ー“, takže „おーばーふろぉ“ najde Overflow.
 
