@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.59
+- **Nově:** detail rozkoukaného seriálu se otevře odrolovaný k epizodě, kde jsi skončil (u seriálu bez zhlédnutí zůstane nahoře). **Opraveno:** další seriál se po odrolovaném seriálu otevřel taky odrolovaný.
+
 ## 3.21.58
 - **Opraveno:** hledání japonských názvů už neposílá do TMDB rozložené znaky (např. „ば“ jako dva znaky), takže záložní hledání dostane správný dotaz.
 

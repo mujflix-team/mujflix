@@ -103,12 +103,28 @@ function closeConfirm() {
   e.classList.remove("visible"), clearTimeout(closeConfirm._t), closeConfirm._t = setTimeout(() => e.classList.remove("open"), 220)
 }
 
+/* Po otevření detailu seriálu, který už se sleduje, se seznam epizod odroluje tak, aby byla uprostřed epizoda, u které jsi skončil (ta s „next-ep“). Jednou za otevření. */
+let _sdScrollPending = null;
+function _sdScrollToNext() {
+  if (!_sdScrollPending || _sdScrollPending !== activeSeries) return;
+  const card = document.querySelector("#episodesGrid .episode-card.next-ep"), body = document.getElementById("modalBody");
+  _sdScrollPending = null;
+  if (!card || !body) return;
+  const go = () => {
+    const br = body.getBoundingClientRect(), cr = card.getBoundingClientRect(), k = br.height / (body.offsetHeight || 1) || 1;
+    const y = body.scrollTop + (cr.top - br.top) / k - (body.clientHeight - card.offsetHeight) / 2;
+    body.scrollTop = Math.max(0, Math.round(y))
+  };
+  go();
+  setTimeout(go, 450) // po sbalení hlavičky se obsah posune, a tak se poloha ještě jednou srovná
+}
+
 function openSeries(e) {
   if (!db[e]) return;
   try {
     aiBrain.recordWatchTime()
   } catch (e) {}
-  clearTimeout(closeModal._t), activeSeries = e, showAllSeasons = !1, modalOpen = !0; document.body.classList.add('modal-open');
+  clearTimeout(closeModal._t), activeSeries = e, showAllSeasons = !1, modalOpen = !0, _sdScrollPending = calcProgress(e).seen > 0 ? e : null; document.body.classList.add('modal-open');
   { const g = document.getElementById('episodesGrid'); g && delete g.dataset.enterKey }
   const t = db[e],
     n = findNextEp(e);
@@ -116,7 +132,7 @@ function openSeries(e) {
   document.getElementById("modalHeroImg").src = t._backdrop || t.poster, (function (b, g) { b.textContent = g.slice(0, 3).join(" · "), b.style.display = g.length ? "inline-flex" : "none" })(document.getElementById("tmdbBadge"), Array.isArray(t._genres) ? t._genres : []);
   const o = document.getElementById("seriesModal"),
     i = o.querySelector(".modal-body") || o.querySelector("#modalBody");
-  i && (i.scrollTop = 0), o.classList.add("open"), requestAnimationFrame(() => requestAnimationFrame(() => {
+  i && (i.scrollTop = 0), o.classList.add("open"), i && (i.scrollTop = 0), requestAnimationFrame(() => requestAnimationFrame(() => {
     o.classList.add("visible");
     const e = o.querySelector(".modal-hero-content");
     e && (e.style.opacity = "0", e.style.transform = "translateY(12px)", setTimeout(() => {
@@ -575,7 +591,7 @@ async function renderEpisodes() {
       const _ek = activeSeries + "|" + (showAllSeasons ? "all" : activeSeason);
       if (t.dataset.enterKey !== _ek) t.dataset.enterKey = _ek, t.classList.add("ep-enter"), clearTimeout(t._et), t._et = setTimeout(() => t.classList.remove("ep-enter"), 1800);
       t.classList.contains("ep-enter") && t.querySelectorAll(".episode-card").forEach((c, i) => c.style.setProperty("--ci", String(Math.min(i, 20))));
-      kbEpIndex >= 0 && setKbEpFocus(kbEpIndex)
+      kbEpIndex >= 0 && setKbEpFocus(kbEpIndex), _sdScrollToNext()
     }
     const _reqSeries = activeSeries, _reqSeason = activeSeason, _reqAll = showAllSeasons;
     const _still = () => _reqSeries === activeSeries && _reqSeason === activeSeason && _reqAll === showAllSeasons;
