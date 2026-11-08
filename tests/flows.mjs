@@ -365,6 +365,8 @@ const cmT = await page.evaluate(async () => {
   const row = document.createElement("div"); row.id = "cmRow";
   row._mfhItems = [{ title: "Testovací film", mediaType: "movie", tmdbId: "", slug: "" }]; document.body.appendChild(row);
   const ev = (type, x, y) => { const e = new Event(type, { bubbles: true }); e.touches = type === "touchend" ? [] : [{ clientX: x, clientY: y }]; document.getElementById("cmCard").dispatchEvent(e); };
+  const wl = document.createElement("div"); wl.className = "wl-card"; wl._wlItem = { name: "Oblíbený seriál", type: "series", tmdbId: "123", slug: "" }; host.appendChild(wl);
+  out.wlItem = (() => { const x = MFCardMenu.itemFor(wl); return x && x.title === "Oblíbený seriál" && x.type === "tv" && x.tmdbId === "123"; })();
   const ids = [18, 35], mem = () => aiBrain.memory.genreIdPrefs;
   ids.forEach(i => { delete mem()[i]; });
   const item = MFCardMenu.itemFor(document.getElementById("cmCard")); item.genreIds = ids;
@@ -388,7 +390,7 @@ const cmT = await page.evaluate(async () => {
   return out;
 });
 check("podržení karty: krátké klepnutí nabídku neotevře, dlouhé ji otevře s názvem titulu", cmT.shortNoSheet && cmT.opened, JSON.stringify(cmT));
-check("podržení karty: Zrušit zavře a posun prstu podržení zruší", cmT.closed && cmT.moveCancels, JSON.stringify(cmT));
+check("podržení karty: Zrušit zavře a posun prstu podržení zruší; karta z Oblíbených se rozpozná", cmT.closed && cmT.moveCancels && cmT.wlItem, JSON.stringify(cmT));
 check("podržení karty: „méně podobného“ sníží váhu žánru i pod nulu a záporná váha se nerozpadne", cmT.penalty && cmT.negative && cmT.negativeKept, JSON.stringify(cmT));
 
 const sdT = await page.evaluate(async () => {

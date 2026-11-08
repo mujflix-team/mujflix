@@ -1,5 +1,5 @@
 /* Dlouhé podržení karty filmu nebo seriálu na telefonu: nabídka „Ukazovat víc / méně podobného“.
- * Ovlivňuje jen doporučování (váhy žánrů v aiBrain), nic dalšího. Karty: .nf-card (úvodní stránka) a .dv-card (Objevovat). */
+ * Ovlivňuje jen doporučování (váhy žánrů v aiBrain), nic dalšího. Karty: .nf-card (úvodní stránka), .dv-card (Objevovat a hledání), .wl-card (Oblíbené). */
 (function () {
   "use strict";
   var HOLD_MS = 450, MOVE_PX = 10;
@@ -8,6 +8,11 @@
   // Z karty vytáhne, o jaký titul jde: { title, type, tmdbId, genreIds, slug }
   function itemFor(card) {
     if (card._dvItem) { var d = card._dvItem; return { title: d.title, type: d.type, tmdbId: d.id, genreIds: d.genreIds || [] }; }
+    if (card._wlItem) {
+      var w = card._wlItem, wi = { title: w.name, type: w.type === "series" ? "tv" : "movie", tmdbId: w.tmdbId || "", genreIds: [], slug: w.slug || "" };
+      try { if (w.slug && window.db && db[w.slug]) wi.genreIds = db[w.slug]._genreIds || aiBrain.idsForNames(db[w.slug]._genres); } catch (e) { void e; }
+      return wi;
+    }
     var cid = card.getAttribute("data-cid"), idx = Number(card.getAttribute("data-idx"));
     var host = cid && document.getElementById(cid), it = host && host._mfhItems && host._mfhItems[idx];
     if (!it) return null;
@@ -67,7 +72,7 @@
 
   document.addEventListener("touchstart", function (e) {
     cancel();
-    var card = e.target && e.target.closest && e.target.closest(".nf-card, .dv-card");
+    var card = e.target && e.target.closest && e.target.closest(".nf-card, .dv-card, .wl-card");
     var t = e.touches && e.touches[0];
     if (!card || !t || e.touches.length > 1) return;
     startX = t.clientX; startY = t.clientY;
@@ -86,7 +91,7 @@
   ["touchend", "touchcancel"].forEach(function (n) { document.addEventListener(n, cancel, { passive: true }); });
   // Po dlouhém podržení vznikne klik na kartu: zahodí se, ať se titul neotevře
   document.addEventListener("click", function (e) {
-    if (Date.now() < suppressUntil && e.target.closest && e.target.closest(".nf-card, .dv-card")) { e.stopPropagation(); e.preventDefault(); }
+    if (Date.now() < suppressUntil && e.target.closest && e.target.closest(".nf-card, .dv-card, .wl-card")) { e.stopPropagation(); e.preventDefault(); }
   }, true);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheet && !sheet.hidden) close(); });
 
