@@ -2012,7 +2012,7 @@ check("sync: změna profilu se odešle do ~10 s", sy2.fastPush, JSON.stringify(s
 await page.evaluate(() => { if (window.__origProxy === undefined) delete window.TMDB_PROXY_URL; else window.TMDB_PROXY_URL = window.__origProxy; });
 // Staré dlaždicové menu je pryč, nic nespouští trailer se zvukem na pozadí a data vestavěných seriálů se doplňují dál
 const trl = await page.evaluate(() => ({
-  tiles: document.querySelectorAll(".ps-tile-wrapper, #mainMenu").length,
+  tiles: document.querySelectorAll("#mainMenu").length,
   trailer: document.querySelectorAll(".tile-trailer, iframe[src*='youtube']").length,
   enrich: typeof loadTmdbDbData === "function",
 }));

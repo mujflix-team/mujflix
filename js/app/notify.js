@@ -47,9 +47,9 @@ window.addEventListener("load", () => {
     })
   }
   document.addEventListener("pointerdown", e => {
-    const t = e.target.closest("button, .dock-btn, .ps-tile-wrapper, .ssv-card, .episode-card, .sh-card, .mf-header-btn");
+    const t = e.target.closest("button, .dock-btn, .ssv-card, .episode-card, .sh-card, .mf-header-btn");
     if (!t || t.disabled) return;
-    if (t.classList.contains("ps-tile-wrapper") || t.classList.contains("episode-card")) return;
+    if (t.classList.contains("episode-card")) return;
     const n = t.style.transition;
     t.style.transition = "transform 0.07s ease", t.style.transform = (t.style.transform || "") + " scale(0.93)";
     const o = () => {

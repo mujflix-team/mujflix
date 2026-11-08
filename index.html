@@ -51,7 +51,7 @@
 
     <link rel="manifest" href="manifest.webmanifest?v=3" />
 
-    <link rel="stylesheet" href="css/styles.css?v=10" />
+    <link rel="stylesheet" href="css/styles.css?v=11" />
     <link rel="stylesheet" href="css/patches.css" />
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
@@ -74,15 +74,10 @@
         -webkit-backdrop-filter: blur(18px) !important;
         backdrop-filter: blur(18px) !important;
       }
-      .ps-tile {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
       .tile-watchlist-btn {
         -webkit-backdrop-filter: blur(12px) !important;
         backdrop-filter: blur(12px) !important;
       }
-      .ps-tile-wrapper,
       .pg-avatar {
         will-change: transform;
         transform: translateZ(0);
@@ -1738,14 +1733,14 @@
     <script src="js/core/sync.js?v=3" defer></script>
     <script src="js/core/sync-ui.js?v=4" defer></script>
     <script src="js/ai/brain.js?v=1" defer></script>
-    <script src="js/profiles/gate.js?v=9" defer></script>
+    <script src="js/profiles/gate.js?v=10" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
     <script src="js/app/core.js?v=6" defer></script>
     <script src="js/app/series.js?v=15" defer></script>
     <script src="js/app/watchlist.js?v=6" defer></script>
     <script src="js/app/interaction.js?v=4" defer></script>
-    <script src="js/app/notify.js?v=7" defer></script>
-    <script src="js/app/profiles-util.js?v=3" defer></script>
+    <script src="js/app/notify.js?v=8" defer></script>
+    <script src="js/app/profiles-util.js?v=4" defer></script>
     <script src="js/app/streak-mood.js?v=2" defer></script>
     <script src="js/app/dock-overlays.js?v=5" defer></script>
     <script src="js/app/tmdb-avatar.js?v=2" defer></script>
@@ -1753,44 +1748,6 @@
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
     <script src="js/pages/discover.js?v=12" defer></script>
-
-    <script id="mf-img-patch">
-      (function () {
-        var scrollTimer;
-        var styleEl = document.createElement("style");
-        document.head.appendChild(styleEl);
-        function onScroll() {
-          if (!scrollTimer) {
-            styleEl.textContent =
-              ".ps-tile-wrapper{transition:none!important;pointer-events:none}";
-          }
-          clearTimeout(scrollTimer);
-          scrollTimer = setTimeout(function () {
-            scrollTimer = null;
-            styleEl.textContent = "";
-          }, 150);
-        }
-        function attachScrollListeners() {
-          document
-            .querySelectorAll(".ps-list")
-            .forEach(function (el) {
-              if (el._mfSP) return;
-              el._mfSP = true;
-              el.addEventListener("scroll", onScroll, { passive: true });
-            });
-        }
-        var mo = new MutationObserver(attachScrollListeners);
-        if (document.body) {
-          mo.observe(document.body, { childList: true, subtree: true });
-          attachScrollListeners();
-        } else {
-          document.addEventListener("DOMContentLoaded", function () {
-            mo.observe(document.body, { childList: true, subtree: true });
-            attachScrollListeners();
-          });
-        }
-      })();
-    </script>
 
     <script>
       (function () {
@@ -1839,116 +1796,10 @@
           setTimeout(fixFailedImages, 800);
           setTimeout(fixFailedImages, 2000);
         });
-
-        var scrollTimer,
-          styleEl = document.createElement("style");
-        document.head.appendChild(styleEl);
-        function onScroll() {
-          if (!scrollTimer)
-            styleEl.textContent =
-              ".ps-tile-wrapper{transition:none!important;pointer-events:none}";
-          clearTimeout(scrollTimer);
-          scrollTimer = setTimeout(function () {
-            scrollTimer = null;
-            styleEl.textContent = "";
-          }, 150);
-        }
-        function attachScroll() {
-          document
-            .querySelectorAll(".ps-list")
-            .forEach(function (el) {
-              if (el._sp) return;
-              el._sp = true;
-              el.addEventListener("scroll", onScroll, { passive: true });
-            });
-        }
-        new MutationObserver(attachScroll).observe(document.documentElement, {
-          childList: true,
-          subtree: true,
-        });
-        document.addEventListener("DOMContentLoaded", attachScroll);
       })();
     </script>
 
-    <script>
-      (function () {
-        var SELECTORS = [
-          ".ps-tile-wrapper",
-        ];
-        var MAX_TILT = 8;
-        var SCALE_ON = 1.0;
-        var TRANSITION_ON = "transform 100ms linear";
-        var TRANSITION_OFF = "transform 0.32s cubic-bezier(0.16,1,0.3,1)";
-
-        function applyTilt(el, e) {
-          var r = el.getBoundingClientRect();
-          var x = e.clientX - r.left;
-          var y = e.clientY - r.top;
-          var cx = r.width / 2;
-          var cy = r.height / 2;
-          var dx = (x - cx) / cx;
-          var dy = (y - cy) / cy;
-          var rotX = -dy * MAX_TILT;
-          var rotY = dx * MAX_TILT;
-          el.style.transition = TRANSITION_ON;
-          el.style.transform =
-            "perspective(600px) rotateX(" +
-            rotX +
-            "deg) rotateY(" +
-            rotY +
-            "deg) scale(" +
-            SCALE_ON +
-            ") translateZ(0)";
-        }
-
-        function resetTilt(el) {
-          el.style.transition = TRANSITION_OFF;
-          el.style.transform =
-            "perspective(600px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0)";
-        }
-
-        function attachTilt(el) {
-          if (el._tilt) return;
-          el._tilt = true;
-          el.style.transformStyle = "preserve-3d";
-          el.style.willChange = "transform";
-          el.addEventListener(
-            "mousemove",
-            function (e) {
-              applyTilt(el, e);
-            },
-            { passive: true },
-          );
-          el.addEventListener("mouseleave", function () {
-            resetTilt(el);
-          });
-          el.addEventListener("mouseenter", function (e) {
-            applyTilt(el, e);
-          });
-        }
-
-        function attachAll() {
-          SELECTORS.forEach(function (sel) {
-            document.querySelectorAll(sel).forEach(attachTilt);
-          });
-        }
-
-        var mo = new MutationObserver(function (muts) {
-          var changed = false;
-          muts.forEach(function (m) {
-            if (m.addedNodes.length) changed = true;
-          });
-          if (changed) attachAll();
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-          attachAll();
-          mo.observe(document.body, { childList: true, subtree: true });
-        });
-      })();
-    </script>
-    
-    <script src="js/pages/cinema.js?v=17" defer></script>
+<script src="js/pages/cinema.js?v=17" defer></script>
     <script src="js/app/wrapped.js?v=3" defer></script>
     <script src="js/pages/home.js?v=24" defer></script>
     <script src="js/shell/dock.js" defer></script>

@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.62
+- **Úklid:** odstraněny nepoužité zbytky po starém dlaždicovém menu (tři skripty v `index.html`, styly `.ps-tile` a `.ps-list`, zmínky v `notify.js`) a nepoužité pole `trakt` v profilu. Vzhled ani chování se nemění.
+
 ## 3.21.61
 - **Opraveno:** hledání už nevyřazuje tituly bez plakátu (málo známé a tituly pro dospělé ho v TMDB často nemají). Ukážou se s písmenem místo plakátu.
 
