@@ -1,9 +1,5 @@
-@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Th.woff2") format("woff2"); font-weight: 100 200; font-style: normal; font-display: swap; }
-@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Lt.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
-@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Rg.woff2") format("woff2"); font-weight: 400 450; font-style: normal; font-display: swap; }
-@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Md.woff2") format("woff2"); font-weight: 500 650; font-style: normal; font-display: swap; }
-@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Bd.woff2") format("woff2"); font-weight: 700 850; font-style: normal; font-display: swap; }
-@font-face { font-family: "Netflix Sans"; src: url("../fonts/NetflixSans-Blk.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Inter Variable"; src: url("../fonts/inter-latin-ext-wght-normal.woff2") format("woff2-variations"); font-weight: 100 900; font-style: normal; font-display: swap; unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Inter Variable"; src: url("../fonts/inter-latin-wght-normal.woff2") format("woff2-variations"); font-weight: 100 900; font-style: normal; font-display: swap; unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 /* MůjFlix — domovská stránka a navigace ve stylu streamovací služby */
 :root {
   --nf-bg: #141414;
@@ -670,12 +666,12 @@ html body #mfProfileCreate.picker-open .pc-logo, html body #mfProfileCreate.pick
 #mfStandaloneCinema .mf-cin-rate-btn:hover { color: #ffd60a; }
 html body #epRatingOverlay { z-index: 1000002 !important; }
 
-/* Řezy Netflix Sans: Thin 100–200, Light 300, Regular 400–450, Medium 500–650 (štítky, tlačítka, chipy), Bold 700–850 (nadpisy), Black 900.
+/* Řezy písma Inter (variabilní, 100–900): Thin 100–200, Light 300, Regular 400–450, Medium 500–650 (štítky, tlačítka, chipy), Bold 700–850 (nadpisy), Black 900.
    Dřív 600 → Bold a 800 → Black, takže Medium se skoro nepoužíval a vše vypadalo stejně těžce. */
 html { font-weight: 400 !important; }
 .nf-hero-desc { font-weight: 300; }
-/* Písmo Netflix Sans (složka fonts/); když chybí, nastoupí systémové */
-:root { --nf-font: "Netflix Sans", "Helvetica Neue", Helvetica, "Segoe UI", Roboto, Arial, sans-serif; }
+/* Písmo Inter (složka fonts/, licence OFL); když chybí, nastoupí systémové. Latin-ext je kvůli češtině. */
+:root { --nf-font: "Inter Variable", "Helvetica Neue", Helvetica, "Segoe UI", Roboto, Arial, sans-serif; }
 html body, html body button, html body input, html body select, html body textarea,
 html body *:not(svg):not(svg *):not(code):not(pre):not(#mfFontLock) { font-family: var(--nf-font) !important; } /* :not(#id) zvedne váhu selektoru, aby přebil třídy se starým Inter/Sora */
 
@@ -1730,7 +1726,7 @@ html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba
 
 /* Tlačítko Sdílet: v banneru stejné jako „Do oblíbených“, na úzké šířce jen ikona */
 
-/* ── Typografie: všech šest řezů Netflix Sans, každý má svou roli ──
+/* ── Typografie: všech šest řezů písma Inter, každý má svou roli ──
    Th 100 = velké nadpisy na přihlašovací obrazovce
    Lt 300 = delší popisy a doplňkové texty
    Rg 400 = běžný text, popisky, vedlejší údaje

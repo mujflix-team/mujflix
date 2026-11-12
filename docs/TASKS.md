@@ -8,7 +8,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 | | | | |
 
 ## Další nápady / otevřené
-- Právní (potřebuje rozhodnutí): (1) logo TMDB v appce je povinné podle podmínek TMDB (zatím jen věta, stáhnout schválené logo z themoviedb.org/about/logos-attribution); (2) písmo Netflix Sans (`fonts/`) má „All rights reserved“ Netflixu – nahradit volným (OFL), jinak hrozí nároky; (3) u Soukromí chybí správce údajů a soukromý kontakt (e-mail) pro žádosti o smazání a oznámení o porušení práv; (4) odkazování na weby s nelicencovaným obsahem: upozornění „odpovídáš ty“ odpovědnost provozovatele neruší.
+- Právní (potřebuje rozhodnutí): (1) [vyřešeno v 3.21.67] logo TMDB je v Soukromí a podmínky; (2) [vyřešeno v 3.21.67] písmo – ale starý Netflix Sans zůstává v historii gitu; (3) u Soukromí chybí správce údajů a soukromý kontakt (e-mail) pro žádosti o smazání a oznámení o porušení práv; (4) odkazování na weby s nelicencovaným obsahem: upozornění „odpovídáš ty“ odpovědnost provozovatele neruší.
 - Rychlost: změřit v Chrome Lighthouse; velké soubory `js/app.js` (237 kB) a `css/styles.css` (187 kB, hodně přepsáno v `netflix.css`) – po změření rozdělit / odstranit mrtvé CSS.
 - Service worker: celý „stale-while-revalidate“ zatím ne (hrozil by starý kód po opravě); písma už jdou z cache.
 - Průhledný obdélník vlevo nahoře (nereprodukovatelný v headless Chromiu): zjistit prvek přes pravý klik → Prozkoumat.
@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.67: písmo Netflix Sans nahrazeno volným Inter (OFL), `fonts/` jen 2 soubory + licence.
 - 3.21.66: Soukromí a podmínky doplněno (JustWatch, YouTube, Cloudflare, IP při propojení, PIN nešifrovaně, práva a ÚOOÚ).
 - 3.21.65: Podržení karty: zablokována systémová nabídka prohlížeče (Android).
 - 3.21.64: Podržení karty (víc / méně podobného) i v seznamu Oblíbených.

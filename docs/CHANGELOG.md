@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.67
+- **Změněno:** písmo Netflix Sans (cizí autorská práva, nebylo volné) nahrazeno volným písmem Inter (licence SIL OFL 1.1, variabilní 100–900, podmnožiny latin a latin-ext kvůli češtině). Složka `fonts/` má jen dva soubory místo šesti (−250 kB → −133 kB), text licence je v `fonts/Inter-OFL.txt`. Přegenerovaný `icons/og-image.png`. Šířka písma je mírně větší než u Netflix Sans.
+- **Nově:** logo TMDB (Alt short, modré, `icons/tmdb-logo.svg`) v sekci Poděkování stránky Soukromí a podmínky, jak vyžadují podmínky TMDB.
+
 ## 3.21.66
 - **Nově:** Soukromí a podmínky doplněno podle skutečného chování aplikace: atribuce JustWatch (vyžadují ji podmínky TMDB u údajů o streamovacích službách), YouTube trailery po klepnutí, Cloudflare a IP adresa při neúspěšném zadání kódu propojení (10 minut), upozornění, že PIN se ukládá nešifrovaně a kopíruje se při propojení, výzva nepsat ID propojení do veřejného issue a odstavec o právech a stížnosti u ÚOOÚ.
 

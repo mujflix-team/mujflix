@@ -207,6 +207,7 @@ Repozitář zatím nemá volnou licenci (viz [docs/CONTRIBUTING.md](docs/CONTRIB
 
 - [TMDB](https://www.themoviedb.org/): metadata filmů a seriálů a údaje o dostupnosti na streamovacích službách (ty původně pochází z JustWatch). *Tento produkt využívá TMDB API, ale není jím schválen ani certifikován.*
 - AniList, Wikipedie, TVmaze, Fandom, Wikidata: obrázky postav pro avatary
+- [Inter](https://github.com/rsms/inter) (SIL OFL 1.1): písmo
 - [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT): QR kódy
 - [Cloudflare Pages & Workers](https://pages.cloudflare.com/): hosting a proxy
 - AI agenti: programování
