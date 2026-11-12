@@ -33,7 +33,7 @@
   <a class="back" href="./">‹ Zpět do aplikace</a>
   <p class="brand">Můj<i>Flix</i></p>
   <h1>Soukromí a podmínky</h1>
-  <p class="muted">Platí pro MůjFlix na této adrese. Poslední úprava: 28. 10. 2026.</p>
+  <p class="muted">Platí pro MůjFlix na této adrese. Poslední úprava: 12. 11. 2026.</p>
 
   <h2>Co MůjFlix je</h2>
   <p>MůjFlix je osobní tracker filmů a seriálů. Pomáhá ti najít, co sledovat, pamatuje si, co jsi viděl, a nabízí odkazy na místa, kde se titul dá pustit. Sám <strong>žádná videa nehostuje, nestahuje ani nevysílá</strong>. Nemáš tu účet, heslo ani e-mail.</p>
@@ -45,15 +45,18 @@
       <tr><td>Profily, oblíbené, co jsi viděl, hodnocení, nastavení</td><td>V tvém prohlížeči (localStorage). Neposílá se nikam, pokud nezapneš propojení zařízení.</td><td>Dokud je nesmažeš (smazání profilu, smazání dat webu v prohlížeči).</td></tr>
       <tr><td>Kopie těchto dat při <strong>propojení zařízení</strong> (volitelné)</td><td>V úložišti Cloudflare KV pod náhodným dlouhým ID. Neukládá se tam API klíč, aktivní profil ani stav PIN zámku.</td><td>Nejdéle 365 dní od poslední synchronizace. Jednorázový propojovací kód platí 10 minut.</td></tr>
       <tr><td>Zdroj, který pro titul fungoval (sdílená paměť zdrojů, volitelná)</td><td>Cloudflare KV. Posílá se jen „titul + název zdroje“, nic o tobě.</td><td>90 dní.</td></tr>
+      <tr><td>Neúspěšné pokusy o zadání propojovacího kódu (ochrana proti hádání)</td><td>Cloudflare KV. Ukládá se <strong>IP adresa</strong> a počet pokusů.</td><td>10 minut.</td></tr>
     </tbody>
   </table>
   <p>Aplikace nepoužívá <strong>cookies, reklamní ani analytické nástroje</strong>.</p>
 
   <h2>Co se posílá cizím službám</h2>
   <ul>
-    <li><strong>TMDB (themoviedb.org)</strong>: názvy, plakáty, popisy a hodnocení. Dotazy jdou přes náš server (Cloudflare Worker), který přidá API klíč. Posílá se jen to, co hledáš nebo otevíráš, a technické údaje běžné u každého spojení (třeba IP adresa).</li>
+    <li><strong>TMDB (themoviedb.org)</strong>: názvy, plakáty, popisy a hodnocení. Dotazy jdou přes náš server (Cloudflare Worker), který přidá API klíč. Posílá se jen to, co hledáš nebo otevíráš, a technické údaje běžné u každého spojení (třeba IP adresa). Plakáty a fotky herců stahuje tvůj prohlížeč přímo z TMDB, takže TMDB vidí tvou IP adresu.</li>
     <li><strong>Obrázky avatarů</strong> (Wikipedie, AniList, TVmaze, Fandom, Wikidata a další): posílá se jen hledané jméno postavy.</li>
     <li><strong>Ověření zdrojů</strong>: náš server se před přehráním podívá na stránky zdrojů, jestli titul mají. Posílá se jen název titulu.</li>
+    <li><strong>YouTube</strong> (youtube-nocookie.com): trailer se načte až po klepnutí na jeho tlačítko. Od té chvíle YouTube vidí tvou IP adresu a údaje běžné při přehrání videa a platí jeho podmínky.</li>
+    <li><strong>Cloudflare</strong>: web i náš server běží na Cloudflare (Pages, Workers, KV). Jako poskytovatel hostingu vidí technické údaje každého spojení (IP adresa, čas, prohlížeč) a mohou z nich vznikat provozní záznamy.</li>
     <li><strong>Externí weby</strong> (viz níže): až když na odkaz klikneš nebo si přehrávač otevřeš, spojení navazuje tvůj prohlížeč přímo s nimi a platí jejich podmínky.</li>
   </ul>
 
@@ -65,17 +68,19 @@
 
   <h2>PIN a věkové omezení</h2>
   <p>PIN zámek profilu a věkové omezení jsou <strong>jen pojistka pro domácí použití, ne skutečné zabezpečení</strong> ani rodičovská kontrola. Věk se řídí americkým hodnocením z TMDB, titul bez hodnocení se skryje.</p>
+  <p>PIN je čtyřmístný a ukládá se <strong>nešifrovaně</strong>. Při propojení zařízení se kopíruje spolu s daty profilu, takže ho zná každý, kdo má ID propojení. Nepoužívej proto PIN, který máš jinde (banka, telefon).</p>
 
   <h2>Tvoje data a jejich smazání</h2>
   <ul>
     <li><strong>Záloha:</strong> v menu profilu je export a import do souboru.</li>
     <li><strong>Smazání profilu</strong> smaže jeho sledování, hodnocení a nastavení z tohoto zařízení.</li>
-    <li><strong>Odpojení zařízení</strong> (menu profilu → Propojit zařízení) přestane data sdílet. Kopie v Cloudflare KV zmizí sama nejpozději po 365 dnech. Chceš ji smazat dřív, napiš nám (kontakt níže).</li>
+    <li><strong>Odpojení zařízení</strong> (menu profilu → Propojit zařízení) přestane data sdílet. Kopie v Cloudflare KV zmizí sama nejpozději po 365 dnech. Chceš ji smazat dřív, napiš nám (kontakt níže). <strong>Do veřejného issue nikdy nepiš ID ani kód propojení</strong>, kdokoli by s nimi mohl číst tvoje data.</li>
     <li><strong>Úplné smazání</strong> dat v prohlížeči: nastavení prohlížeče → data webu <code>mujflix.pages.dev</code>.</li>
+    <li><strong>Tvoje práva:</strong> data na serveru jsou vedená jen pod náhodným ID, bez jména a e-mailu, takže tě podle nich nenajdeme, dokud ID neznáme. S ID máš právo na přístup, opravu a výmaz. Případnou stížnost můžeš podat u Úřadu pro ochranu osobních údajů.</li>
   </ul>
 
   <h2 id="tmdb">Poděkování a značky</h2>
-  <p>Tento produkt používá TMDB API, ale není TMDB schválen ani certifikován. Metadata filmů a seriálů pocházejí z <a href="https://www.themoviedb.org/" rel="noopener" target="_blank">TMDB</a>. Obrázky avatarů z veřejných služeb (Wikipedie, AniList, TVmaze, Fandom, Wikidata). Názvy a loga služeb patří jejich majitelům.</p>
+  <p>Tento produkt používá TMDB API, ale není TMDB schválen ani certifikován. Metadata filmů a seriálů pocházejí z <a href="https://www.themoviedb.org/" rel="noopener" target="_blank">TMDB</a>. Údaje o tom, kde je titul dostupný na streamovacích službách, poskytuje <a href="https://www.justwatch.com/" rel="noopener" target="_blank">JustWatch</a> (přes TMDB). Obrázky avatarů z veřejných služeb (Wikipedie, AniList, TVmaze, Fandom, Wikidata). Názvy a loga služeb patří jejich majitelům.</p>
 
   <h2>Bez záruky</h2>
   <p>MůjFlix je osobní projekt a poskytuje se tak, jak je, bez záruky dostupnosti nebo správnosti. Odkazy na zdroje se mohou kdykoli změnit nebo přestat fungovat.</p>

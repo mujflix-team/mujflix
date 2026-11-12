@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.66
+- **Nově:** Soukromí a podmínky doplněno podle skutečného chování aplikace: atribuce JustWatch (vyžadují ji podmínky TMDB u údajů o streamovacích službách), YouTube trailery po klepnutí, Cloudflare a IP adresa při neúspěšném zadání kódu propojení (10 minut), upozornění, že PIN se ukládá nešifrovaně a kopíruje se při propojení, výzva nepsat ID propojení do veřejného issue a odstavec o právech a stížnosti u ÚOOÚ.
+
 ## 3.21.65
 - **Opraveno:** dlouhé podržení karty na telefonu už neotevře i systémovou nabídku prohlížeče („Kopírovat odkaz, Uložit obrázek“), jen nabídku MůjFlixu.
 
