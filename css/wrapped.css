@@ -9,7 +9,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
   position: fixed; inset: 0; z-index: 1000005; /* nad horní lištou a dockem, pod okny Nastavení */
   display: flex; flex-direction: column;
   color: #fff; color-scheme: dark;
-  font-family: var(--nf-font, "Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif);
+  font-family: var(--nf-font, "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif);
   background: #141414;
   opacity: 0; transition: opacity 0.25s ease;
   overscroll-behavior: contain;
