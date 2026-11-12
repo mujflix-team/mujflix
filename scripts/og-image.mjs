@@ -7,11 +7,11 @@ import { readFileSync } from "node:fs";
 // písmo se vloží přímo do stránky (ze setContent se soubory z disku nenačtou)
 const font = f => "data:font/woff2;base64," + readFileSync("fonts/" + f).toString("base64");
 const html = `<!doctype html><html lang="cs"><head><meta charset="utf-8"><style>
-@font-face { font-family: NS; font-weight: 900; src: url("${font("NetflixSans-Blk.woff2")}") format("woff2"); }
-@font-face { font-family: NS; font-weight: 500; src: url("${font("NetflixSans-Md.woff2")}") format("woff2"); }
+@font-face { font-family: NS; font-weight: 100 900; src: url("${font("inter-latin-ext-wght-normal.woff2")}") format("woff2-variations"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF; }
+@font-face { font-family: NS; font-weight: 100 900; src: url("${font("inter-latin-wght-normal.woff2")}") format("woff2-variations"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
 html, body { margin: 0; width: 1200px; height: 630px; background: #141414; overflow: hidden; }
 body { display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: NS, sans-serif; }
-.logo { font-weight: 900; font-size: 250px; line-height: 1; letter-spacing: -10px; color: #fff; }
+.logo { font-weight: 900; font-size: 250px; line-height: 1; letter-spacing: -4px; color: #fff; }
 .logo span { color: #84bbf4; }
 .claim { margin-top: 34px; font-weight: 500; font-size: 56px; color: #fff; letter-spacing: -0.5px; }
 .bar { margin-top: 44px; width: 120px; height: 8px; border-radius: 4px; background: #0a84ff; }
