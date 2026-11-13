@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.69
+- **Opraveno:** text v Soukromí tvrdil, že MůjFlix „jen odkazuje“, ale appka cizí přehrávače vkládá přímo do sebe (režim Cinema). Text teď říká, že appka sama nenabízí žádné filmy, odkazuje na externí weby, některé lze otevřít ve vloženém přehrávači, a že ten běží bez omezení (sandbox) a může otevírat vyskakovací okna.
+
+## 3.21.69
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.68
 ### Nově
 - 
