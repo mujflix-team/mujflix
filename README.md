@@ -2,7 +2,7 @@
 
 # 🎬 MůjFlix
 
-### Tvůj osobní filmový a seriálový tracker ve stylu Netflixu
+### Tvůj osobní filmový a seriálový tracker
 
 Najdi, co sledovat. Pamatuj si, kde jsi skončil. Mějte s rodinou každý svůj profil a seznamy, i na více zařízeních. Bez účtu a bez instalace.
 

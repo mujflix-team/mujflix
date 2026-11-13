@@ -49,12 +49,12 @@
 | --mat-blur | single | saturate(200%) blur(28px) | saturate(200%) blur(28px) | 1 | 0 | 0 | css/styles.css:4545 |
 | --mat-chrome | single | rgba(28, 28, 30, 0.92) | rgba(28, 28, 30, 0.92) | 1 | 0 | 0 | css/styles.css:4544 |
 | --muted | single | rgba(255,255,255,0.36) | rgba(255,255,255,0.36) | 19 | 11 | 1 | css/styles.css:6883 |
-| --nf-accent | single | var(--accent, #0a84ff) | var(--accent, #0a84ff) | 11 | 0 | 0 | css/netflix.css:5 |
-| --nf-bar-h | single | 68px | 68px | 5 | 0 | 0 | css/netflix.css:8, css/netflix.css:105[ctx] |
-| --nf-bg | single | #141414 | #141414 | 13 | 0 | 0 | css/netflix.css:3 |
-| --nf-dim | single | #b3b3b3 | #b3b3b3 | 2 | 0 | 0 | css/netflix.css:7 |
-| --nf-pad | single | clamp(16px, 4vw, 56px) | clamp(16px, 4vw, 56px) | 13 | 0 | 0 | css/netflix.css:4 |
-| --nf-text | single | #fff | #fff | 3 | 0 | 0 | css/netflix.css:6 |
+| --nf-accent | single | var(--accent, #0a84ff) | var(--accent, #0a84ff) | 11 | 0 | 0 | css/theme.css:5 |
+| --nf-bar-h | single | 68px | 68px | 5 | 0 | 0 | css/theme.css:8, css/theme.css:105[ctx] |
+| --nf-bg | single | #141414 | #141414 | 13 | 0 | 0 | css/theme.css:3 |
+| --nf-dim | single | #b3b3b3 | #b3b3b3 | 2 | 0 | 0 | css/theme.css:7 |
+| --nf-pad | single | clamp(16px, 4vw, 56px) | clamp(16px, 4vw, 56px) | 13 | 0 | 0 | css/theme.css:4 |
+| --nf-text | single | #fff | #fff | 3 | 0 | 0 | css/theme.css:6 |
 | --plexi-blur | single | blur(52px) saturate(2.2) brightness(0.87) | blur(52px) saturate(2.2) brightness(0.87) | 2 | 0 | 0 | css/styles.css:6878 |
 | --plexi-border | single | rgba(255,255,255,0.09) | rgba(255,255,255,0.09) | 1 | 0 | 0 | css/styles.css:6877 |
 | --radius | single | 12px | 12px | 3 | 2 | 0 | css/styles.css:7995 |

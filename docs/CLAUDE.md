@@ -16,7 +16,7 @@ Podrobnosti o struktuře a funkcích jsou v `README.md`, historie změn v `docs/
 - Každou změnu zapiš do `docs/CHANGELOG.md` (aktuální verze nahoře, jedna stručná odrážka).
 - Po dokončení aktualizuj `docs/TASKS.md` (přesuň položku do „Hotovo“).
 - Nový externí web nebo API musí být v CSP (`<meta http-equiv="Content-Security-Policy">` v `index.html`, `connect-src`).
-- Pořadí skriptů a CSS v `index.html` je důležité (klasické `<script defer>`, globální proměnné, Netflix vzhled přepisuje ostatní CSS přes `html body … !important`).
+- Pořadí skriptů a CSS v `index.html` je důležité (klasické `<script defer>`, globální proměnné, tmavý vzhled v `css/theme.css` přepisuje ostatní CSS přes `html body … !important`).
 - Parametry `?v=` u skriptů v `index.html` zvedni u souboru, který jsi změnil (v repozitáři a testech zůstávají ruční; na Cloudflare Pages je při sestavení přepíše hash obsahu, viz `scripts/hash-assets.mjs`).
 
 ## Zakázáno

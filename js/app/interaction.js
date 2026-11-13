@@ -12,7 +12,7 @@ function resumeBgParticles() {
 let _bgParticlesDraw = null;
 ! function() {
   const e = document.getElementById("particles");
-  // v Netflix stylu je plátno schované (display:none) – animace by jen zbytečně zatěžovala procesor
+  // v tmavém stylu je plátno schované (display:none) – animace by jen zbytečně zatěžovala procesor
   if (!e || "none" === getComputedStyle(e).display) return;
 
   function t() {
