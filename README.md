@@ -117,6 +117,7 @@ Z menu profilu (avatar vpravo nahoře → **Wrapped**) otevřeš měsíční př
 - **PIN** (4 číslice): po 5 špatných pokusech se profil zamkne a zámek se postupně prodlužuje (od 30 sekund až po 24 hodin).
 - **Věkové omezení** (do 7 / 12 / 15 let) skryje tituly nad zvolený věk podle hodnocení z TMDB. Titul bez hodnocení se skryje. Změnit věk jde u profilu s PINem jen s PINem.
 - **Zaměření a žánry**: „Jen anime“ nebo až 5 oblíbených žánrů.
+- **Co dnes pustíme dohromady?** (menu profilu): vyber aspoň dva profily a MůjFlix navrhne jeden film nebo seriál, který se hodí všem. Bere žánry, které mají profily rády, vynechá, co už viděli, a platí nejpřísnější věkové omezení z vybraných. Tlačítko **Jiný tip** ukáže další.
 - PIN a věkové omezení jsou pojistka pro domácí použití, ne skutečná rodičovská kontrola.
 
 ### ⚙️ Nastavení

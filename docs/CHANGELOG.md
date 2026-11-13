@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.70
+- **Nově:** Co dnes pustíme dohromady? (menu profilu). Vybereš aspoň dva profily a dostaneš jeden tip, který se hodí všem: společné oblíbené žánry, bez titulů, které už někdo viděl, a s nejpřísnějším věkovým omezením z vybraných. Tlačítko Jiný tip, otevření titulu rovnou z dialogu. Nový `js/app/together.js` (výpočty zvlášť od obrazovky), `css/together.css`, test `tests/together.mjs`. Nic se neposílá na server, z TMDB se stahují jen obecné seznamy podle žánrů.
+
+## 3.21.70
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.69
 - **Opraveno:** text v Soukromí tvrdil, že MůjFlix „jen odkazuje“, ale appka cizí přehrávače vkládá přímo do sebe (režim Cinema). Text teď říká, že appka sama nenabízí žádné filmy, odkazuje na externí weby, některé lze otevřít ve vloženém přehrávači, a že ten běží bez omezení (sandbox) a může otevírat vyskakovací okna.
 

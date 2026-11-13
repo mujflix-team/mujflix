@@ -1,13 +1,13 @@
 {
   "name": "mujflix",
-  "version": "3.21.69",
+  "version": "3.21.70",
   "private": true,
   "type": "module",
   "description": "MůjFlix — osobní tracker filmů a seriálů (statická PWA)",
   "scripts": {
     "lint": "eslint -c scripts/eslint.config.js .",
     "serve": "python3 -m http.server 8080",
-    "test": "node tests/smoke.mjs && node tests/flows.mjs && node tests/discover.mjs && node tests/worker.mjs && node tests/toky.mjs && node tests/wrapped.mjs && node tests/functions.mjs",
+    "test": "node tests/smoke.mjs && node tests/flows.mjs && node tests/discover.mjs && node tests/worker.mjs && node tests/toky.mjs && node tests/wrapped.mjs && node tests/together.mjs && node tests/functions.mjs",
     "pretest": "node scripts/version.mjs",
     "bump": "node scripts/version.mjs",
     "check-sources": "node scripts/check-sources.mjs",
