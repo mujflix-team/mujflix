@@ -252,7 +252,7 @@ const ProfileGate = {
     const e = document.getElementById("pcAvatarPicker"), c = document.getElementById("mfProfileCreate");
     c && e && c.classList.toggle("picker-open", !e.hidden)
   },
-  /* Výběr avatara jako v Netflixu: nahoře POSTAVY (AniList = anime postavy, Wikipedie = postavy ze seriálů a filmů),
+  /* Výběr avatara v tmavém stylu aplikace: nahoře POSTAVY (AniList = anime postavy, Wikipedie = postavy ze seriálů a filmů),
      pod nimi řady podle titulů z TMDB (záběry a plakáty). TMDB sám obrázky postav nemá. */
   async _fetchJson(url, opts) {
     const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 7000);

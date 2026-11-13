@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.68
+### Nově
+- 
+
+### Opraveno
+- 
+
+## 3.21.68
+- **Změněno:** `css/netflix.css` přejmenováno na `css/theme.css` (odkaz v `index.html`, `docs/css-vars.md`). V komentářích a dokumentaci odstraněny odkazy „ve stylu Netflixu“, ať projekt nevypadá jako značkový klon. Názvy streamovacích služeb (Netflix v panelu „Kde sledovat“) zůstávají, jsou to pravdivé odkazy na legální služby.
+
 ## 3.21.67
 - **Změněno:** písmo Netflix Sans (cizí autorská práva, nebylo volné) nahrazeno volným písmem Inter (licence SIL OFL 1.1, variabilní 100–900, podmnožiny latin a latin-ext kvůli češtině). Složka `fonts/` má jen dva soubory místo šesti (−250 kB → −133 kB), text licence je v `fonts/Inter-OFL.txt`. Přegenerovaný `icons/og-image.png`. Šířka písma je mírně větší než u Netflix Sans.
 - **Nově:** logo TMDB (Alt short, modré, `icons/tmdb-logo.svg`) v sekci Poděkování stránky Soukromí a podmínky, jak vyžadují podmínky TMDB.

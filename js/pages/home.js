@@ -292,7 +292,7 @@
         if (p && p.color) b.style.setProperty('--nf-avatar', p.color);
       }
 
-      /* Menu profilu vpravo nahoře (jako Netflix): rychlé přepnutí, Upravit profil, Spravovat profily */
+      /* Menu profilu vpravo nahoře: rychlé přepnutí, Upravit profil, Spravovat profily */
       function mfCloseProfileMenu() {
         var m = document.getElementById('nfProfileMenu');
         if (m) m.remove();
