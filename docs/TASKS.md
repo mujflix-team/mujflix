@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.69: text v Soukromí o externích webech sladěn s vloženým přehrávačem.
 - 3.21.68: `netflix.css` → `theme.css`, bez „Netflix“ v komentářích a docs.
 - 3.21.67: písmo Netflix Sans nahrazeno volným Inter (OFL), `fonts/` jen 2 soubory + licence.
 - 3.21.66: Soukromí a podmínky doplněno (JustWatch, YouTube, Cloudflare, IP při propojení, PIN nešifrovaně, práva a ÚOOÚ).
