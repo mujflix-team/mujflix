@@ -6,7 +6,7 @@ const CACHE = "mujflix-shell-" + (new URL(self.location.href).searchParams.get("
 
 /* Při instalaci si uložíme stránku „Jsi offline“, aby šla ukázat, i když cache nemá nic jiného. */
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.add("./offline.html")).catch(() => {}).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then((c) => c.add("./pages/offline.html")).catch(() => {}).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -39,7 +39,7 @@ self.addEventListener("fetch", (event) => {
         }
         return res;
       })
-      .catch(() => req.mode === "navigate" ? caches.match("./offline.html") : caches.match(req, { ignoreSearch: true })) // bez internetu se stránka neotvírá z cache, ale ukáže „Jsi offline“
+      .catch(() => req.mode === "navigate" ? caches.match("./pages/offline.html") : caches.match(req, { ignoreSearch: true })) // bez internetu se stránka neotvírá z cache, ale ukáže „Jsi offline“
   );
 });
 

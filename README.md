@@ -188,7 +188,7 @@ Zobrazí se stránka „Jsi offline“. K načtení titulů a plakátů je potř
 - Když se nějaký zdroj pro titul osvědčí, MůjFlix anonymně uloží jen dvojici „titul + název zdroje“ (nic o tobě). Server provozovatele také před přehráním ověřuje, jestli zdroje titul mají. Posílá se jen název titulu.
 - Obrázky avatarů se hledají u veřejných služeb (Wikipedie, AniList, TVmaze, Fandom, Wikidata). Trailer z YouTube se načte až po klepnutí.
 - Přehrávání probíhá na cizích webech, kde platí jejich podmínky.
-- Plné znění: [Soukromí a podmínky](https://mujflix.pages.dev/soukromi.html).
+- Plné znění: [Soukromí a podmínky](https://mujflix.pages.dev/pages/soukromi.html).
 
 ## ⚠️ Důležité upozornění
 
