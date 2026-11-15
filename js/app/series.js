@@ -124,7 +124,7 @@ function openSeries(e) {
   try {
     aiBrain.recordWatchTime()
   } catch (e) {}
-  clearTimeout(closeModal._t), activeSeries = e, showAllSeasons = !1, modalOpen = !0, _sdScrollPending = calcProgress(e).seen > 0 ? e : null; document.body.classList.add('modal-open');
+  clearTimeout(closeModal._t), activeSeries = e, showAllSeasons = !1, modalOpen = !0, _sdScrollPending = seriesStarted(e) ? e : null; document.body.classList.add('modal-open');
   { const g = document.getElementById('episodesGrid'); g && delete g.dataset.enterKey }
   const t = db[e],
     n = findNextEp(e);
@@ -338,7 +338,7 @@ function _sdResetTrailer(key) {
 function _sdFill(slug, next) {
   const t = db[slug], btn = document.querySelector("#seriesModal .btn-continue");
   if (btn) {
-    const seen = calcProgress(slug).seen > 0, lbl = next ? `S${next.se} E${next.ep}` : "";
+    const seen = seriesStarted(slug), lbl = next ? `S${next.se} E${next.ep}` : "";
     const svg = btn.querySelector("svg");
     btn.textContent = "", svg && btn.appendChild(svg), (() => { const sp = document.createElement("span"); sp.className = "bc-txt"; sp.textContent = (seen ? "Pokračovat" : "Přehrát") + (lbl ? " · " + lbl : ""); btn.appendChild(sp) })()
   }
@@ -622,8 +622,9 @@ function _buildEpCardBase(e, t, n, o, i, a, s) {
     p = o && o.rating ? o.rating.toFixed(1) : "",
     g = escapeHTML(o && o.still ? o.still : s),
     f = !1,
+    rs = !i && (lp => !!lp && `${r}-S${lp.se}-E${lp.ep}` === e)(getLastPlayed()[r]),
     y = document.createElement("div");
-  return y.className = "episode-card" + (i ? " watched" : "") + (a ? " next-ep" : "") + (f ? " spoiler-blur" : ""), y.id = `card-${e}`, y.dataset.n = n, y.innerHTML = `\n        <div class="ep-thumb">\n          <img src="${g}" alt="" loading="lazy">\n          ${a?'<div class="ep-next-tag">Další</div>':""}\n          <div class="ep-seen-dot">✓</div>\n          ${f?'<div class="spoiler-label" aria-label="Náhled je skrytý, aby ti nic neprozradil"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a12 12 0 0 1-2.6 3.3"/><path d="M6.3 7.6C4.5 9 3.3 10.8 2.5 12c1 2 4.5 6 9.5 6 1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg><span>Skryto</span></div>':""}\n          <div class="ep-hover-play">\n            <div class="ep-play-ring">\n              <svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>\n            </div>\n          </div>\n        </div>\n        <div class="ep-body">\n          <div class="ep-meta-row">\n            <span class="ep-num">S${t} · E${n}</span>\n            ${u?`<span class="ep-runtime">${u}</span>`:""}\n            ${p?`<span class="ep-rating">★ ${p}</span>`:""}\n          </div>\n          <div class="ep-title">${d}</div>\n          ${m?`<div class="ep-desc">${m}</div>`:""}\n          <div class="ep-actions">\n            <button class="ep-btn-play-hbo">\n              <svg viewBox="0 0 10 12" width="10" height="12"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg>\n                Otevřít epizodu\n            </button>\n            <button class="ep-btn-mark" title="${i?"Označit jako neshlédnuté":"Označit jako shlédnuté"}">${i?"✓":"○"}</button>\n          </div>\n        </div>`, y.querySelector(".ep-btn-play-hbo").addEventListener("click", o => {
+  return y.className = "episode-card" + (i ? " watched" : "") + (a ? " next-ep" : "") + (rs ? " resume" : "") + (f ? " spoiler-blur" : ""), y.id = `card-${e}`, y.dataset.n = n, y.innerHTML = `\n        <div class="ep-thumb">\n          <img src="${g}" alt="" loading="lazy">\n          ${a?`<div class="ep-next-tag">${rs?"Rozkoukáno":"Další"}</div>`:""}\n          <div class="ep-seen-dot">✓</div>\n          ${f?'<div class="spoiler-label" aria-label="Náhled je skrytý, aby ti nic neprozradil"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a12 12 0 0 1-2.6 3.3"/><path d="M6.3 7.6C4.5 9 3.3 10.8 2.5 12c1 2 4.5 6 9.5 6 1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg><span>Skryto</span></div>':""}\n          <div class="ep-hover-play">\n            <div class="ep-play-ring">\n              <svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg>\n            </div>\n          </div>\n        </div>\n        <div class="ep-body">\n          <div class="ep-meta-row">\n            <span class="ep-num">S${t} · E${n}</span>\n            ${u?`<span class="ep-runtime">${u}</span>`:""}\n            ${p?`<span class="ep-rating">★ ${p}</span>`:""}\n          </div>\n          <div class="ep-title">${d}</div>\n          ${m?`<div class="ep-desc">${m}</div>`:""}\n          <div class="ep-actions">\n            <button class="ep-btn-play-hbo">\n              <svg viewBox="0 0 10 12" width="10" height="12"><polygon points="0,0 10,6 0,12" fill="currentColor"/></svg>\n                Otevřít epizodu\n            </button>\n            <button class="ep-btn-mark" title="${i?"Označit jako neshlédnuté":"Označit jako shlédnuté"}">${i?"✓":"○"}</button>\n          </div>\n        </div>`, y.querySelector(".ep-btn-play-hbo").addEventListener("click", o => {
     o.stopPropagation(), playWithConfirm(e, t, n, c)
   }), y.querySelector(".ep-hover-play").addEventListener("click", o => {
     o.stopPropagation(), playWithConfirm(e, t, n, c)
@@ -641,8 +642,8 @@ function playWithConfirm(e, t, n, o) {
     a = db[activeSeries]?.tmdbId,
     s = `${i} — S${String(t).padStart(2,"0")}E${String(n).padStart(2,"0")}`;
   const _ps = (activeSeries.startsWith('__dtv_') && db[activeSeries]?._svetSlug) ? db[activeSeries]._svetSlug : activeSeries;
-  a ? (window._cinSiteSlug = _ps, _showCinemaOrFinderChoice(a + "/" + t + "/" + n, s, "tv_ep", o), markWatched(e)) : showConfirm("↗", "Otevřít epizodu?", s, "Otevřít na externím webu", () => {
-    markWatched(e), window.open(o, "_blank", "noopener,noreferrer")
+  a ? (window._cinSiteSlug = _ps, _showCinemaOrFinderChoice(a + "/" + t + "/" + n, s, "tv_ep", o), markWatchedSoon(e)) : showConfirm("↗", "Otevřít epizodu?", s, "Otevřít na externím webu", () => {
+    markWatchedSoon(e), window.open(o, "_blank", "noopener,noreferrer")
   })
 }
 
@@ -658,6 +659,57 @@ function persistSeriesRecord(slug) {
     const saved = JSON.parse(localStorage.getItem("mf_db_custom") || "{}");
     saved[slug] = light, localStorage.setItem("mf_db_custom", JSON.stringify(saved))
   } catch {}
+}
+
+/* Prokliknutí epizody ji hned neoznačí jako zhlédnutou (špatný klik by přeskočil díl). Zapamatuje se jako rozkoukaná (Pokračovat míří na ni)
+   a „zhlédnuto“ dostane až po WATCH_AFTER_MS v přehrávači. Zavření přehrávače nebo další výběr to před uplynutím času zruší. */
+const WATCH_AFTER_MS = 20000;
+let _watchSoon = null;
+
+function cancelPendingWatch() {
+  _watchSoon && (clearTimeout(_watchSoon.t), _watchSoon = null)
+}
+
+function markWatchedSoon(uid) {
+  cancelPendingWatch();
+  const m = /^(.*)-S(\d+)-E(\d+)$/.exec(String(uid));
+  if (!m || getWatched()[uid]) return;
+  setLastPlayed(m[1], +m[2], +m[3]);
+  updateContinueBadge(m[1]), activeSeries === m[1] && document.getElementById("episodesGrid") && _sdPaintResume(uid);
+  _watchSoon = {
+    uid,
+    t: setTimeout(() => {
+      _watchSoon = null;
+      getWatched()[uid] || (markWatched(uid), _showUndoToast(`S${+m[2]} · E${+m[3]} označeno jako zhlédnuté`, () => unmarkWatched(uid)))
+    }, WATCH_AFTER_MS)
+  }
+}
+window.mfWatchSoon = markWatchedSoon, window.mfCancelWatchSoon = cancelPendingWatch;
+
+/* Karta rozkoukané epizody je vidět v seznamu (jen jedna na seriál). */
+function _sdPaintResume(uid) {
+  document.querySelectorAll("#episodesGrid .episode-card.resume").forEach(c => c.classList.remove("resume"));
+  const c = document.getElementById(`card-${uid}`);
+  c && !c.classList.contains("watched") && c.classList.add("resume")
+}
+
+/* Vrátí epizodu mezi nezhlédnuté (použije ho „Zpět“ po automatickém označení). */
+function unmarkWatched(e) {
+  const t = getWatched();
+  delete t[e], saveWatched(t);
+  const slug = e.replace(/-S\d+-E\d+$/, "");
+  renderEpisodes(), renderSeasons(), updatePanelProgress(), updateTileProgress(slug), updateContinueBadge(slug), updateLogoProgress()
+}
+
+/* Krátká hláška s tlačítkem Zpět (běžný showToast je neklikací). */
+function _showUndoToast(text, onUndo) {
+  let n = document.getElementById("mf-undo-toast");
+  n || (n = document.createElement("div"), n.id = "mf-undo-toast", n.setAttribute("role", "status"), n.setAttribute("aria-live", "polite"), document.body.appendChild(n));
+  n.textContent = "";
+  const sp = document.createElement("span");
+  sp.textContent = text;
+  const b = document.createElement("button");
+  b.type = "button", b.textContent = "Zpět", b.addEventListener("click", () => { clearTimeout(n._tm), n.classList.remove("show"); try { onUndo() } catch (e) { console.warn("[Undo]", e) } }), n.append(sp, b), n.classList.add("show"), clearTimeout(n._tm), n._tm = setTimeout(() => n.classList.remove("show"), 7000)
 }
 
 function markWatched(e) {
@@ -742,8 +794,8 @@ function shuffleEpisode() {
     const i = `https://svetserialu.to/serial/${_ss}/s${String(t).padStart(2,"0")}e${String(o).padStart(2,"0")}`,
       a = db[activeSeries]?.tmdbId,
       s = `${db[activeSeries].name} — S${String(t).padStart(2,"0")}E${String(o).padStart(2,"0")}`;
-    a ? (markWatched(e), window._cinSiteSlug = _ss, _showCinemaOrFinderChoice(a + "/" + t + "/" + o, s, "tv_ep", i)) : showConfirm("🎲", "Náhodná epizoda", s, "Otevřít na externím webu", () => {
-      markWatched(e), window.open(i, "_blank", "noopener,noreferrer")
+    a ? (markWatchedSoon(e), window._cinSiteSlug = _ss, _showCinemaOrFinderChoice(a + "/" + t + "/" + o, s, "tv_ep", i)) : showConfirm("🎲", "Náhodná epizoda", s, "Otevřít na externím webu", () => {
+      markWatchedSoon(e), window.open(i, "_blank", "noopener,noreferrer")
     })
   }, 90)
 }

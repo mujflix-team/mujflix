@@ -169,6 +169,16 @@ function getWatched() {
 function saveWatched(e) {
   safeSetItem(uKey("mf_watched"), JSON.stringify(e))
 }
+
+/* Naposledy pustená (i nedokoukaná) epizoda každého seriálu: {slug: {se, ep}}. „Pokračovat“ míří na ni, dokud se neoznačí jako zhlédnutá. */
+function getLastPlayed() {
+  return safeLS(uKey("mf_lastplayed"), "{}")
+}
+
+function setLastPlayed(slug, se, ep) {
+  const o = getLastPlayed();
+  o[slug] = { se, ep }, safeSetItem(uKey("mf_lastplayed"), JSON.stringify(o))
+}
 const _tmdbMemCache = new Map();
 const TMDB_CACHE_MAX = 100;
 const TMDB_CACHE_TTL = 30 * 60 * 1000;
@@ -305,6 +315,11 @@ function calcProgress(e) {
   }
 }
 
+/* Seriál je rozkoukaný, když má zhlédnutý díl nebo pustený (ještě neoznačený) díl. */
+function seriesStarted(e) {
+  return calcProgress(e).seen > 0 || !!getLastPlayed()[e]
+}
+
 function findNextEp(e) {
   // Pokračuje se za nejvyšší zhlédnutou epizodou (ne první mezerou): když jsi viděl S1E2, nabídne se S1E3, ne S1E1.
   const t = getWatched(),
@@ -314,17 +329,19 @@ function findNextEp(e) {
   for (let o = 1; o <= n; o++)
     for (let n = 1; n <= epsInSeason(e, o); n++)
       if (t[`${e}-S${o}-E${n}`]) hs = o, he = n;
-  if (!hs) return {
-    se: 1,
-    ep: 1,
-    uid: `${e}-S1-E1`
-  };
-  let s = hs,
-    p = he + 1;
-  if (p > epsInSeason(e, s)) {
+  let s = hs || 1,
+    p = hs ? he + 1 : 1;
+  if (hs && p > epsInSeason(e, s)) {
     if (s >= n) return null;
     s++, p = 1
   }
+  // Rozkoukaná epizoda (pustená, ale ještě neoznačená) má přednost, pokud není před místem, kde jsi skončil
+  const lp = getLastPlayed()[e];
+  if (lp && lp.se >= 1 && lp.se <= n && lp.ep >= 1 && lp.ep <= epsInSeason(e, lp.se) && !t[`${e}-S${lp.se}-E${lp.ep}`] && (lp.se > s || lp.se === s && lp.ep >= p)) return {
+    se: lp.se,
+    ep: lp.ep,
+    uid: `${e}-S${lp.se}-E${lp.ep}`
+  };
   return {
     se: s,
     ep: p,

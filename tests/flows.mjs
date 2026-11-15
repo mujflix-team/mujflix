@@ -1745,6 +1745,29 @@ const nextT = await page.evaluate(() => {
 });
 check("pokračování: bere nejvyšší zhlédnutou epizodu, ne první mezeru", nextT.a === "the-simpsons-S1-E3" && nextT.b === "the-simpsons-S2-E1" && nextT.empty === "the-simpsons-S1-E1", JSON.stringify(nextT));
 
+const lpT = await page.evaluate(async () => {
+  const slug = "the-simpsons"; const out = {};
+  const w = getWatched(); Object.keys(w).filter(k => k.startsWith(slug + "-S")).forEach(k => delete w[k]); saveWatched(w);
+  const lpk = uKey("mf_lastplayed"), lsnap = localStorage.getItem(lpk); localStorage.removeItem(lpk);
+  setLastPlayed(slug, 1, 3);
+  out.fresh = findNextEp(slug).uid;                                   // nic nezhlédnuto, ale S1E3 rozkoukaná
+  w[slug + "-S1-E5"] = true; saveWatched(w);
+  out.behind = findNextEp(slug).uid;                                  // rozkoukaná je před zhlédnutou: ignoruje se
+  setLastPlayed(slug, 1, 8);
+  out.ahead = findNextEp(slug).uid;                                   // rozkoukaná je za zhlédnutou: má přednost
+  w[slug + "-S1-E8"] = true; saveWatched(w);
+  out.done = findNextEp(slug).uid;                                    // už zhlédnutá: ignoruje se
+  Object.keys(w).filter(k => k.startsWith(slug + "-S")).forEach(k => delete w[k]); saveWatched(w);
+  markWatchedSoon(slug + "-S1-E2");
+  out.notNow = !getWatched()[slug + "-S1-E2"] && getLastPlayed()[slug].ep === 2;
+  cancelPendingWatch();
+  out.cancelled = _watchSoon === null;
+  lsnap === null ? localStorage.removeItem(lpk) : localStorage.setItem(lpk, lsnap);
+  return out;
+});
+check("rozkoukáno: Pokračovat míří na pustenou epizodu, jen pokud není před zhlédnutou", lpT.fresh === "the-simpsons-S1-E3" && lpT.behind === "the-simpsons-S1-E6" && lpT.ahead === "the-simpsons-S1-E8" && lpT.done === "the-simpsons-S1-E9", JSON.stringify(lpT));
+check("prokliknutí: epizodu hned neoznačí jako zhlédnutou, jen jako rozkoukanou; jde zrušit", lpT.notNow && lpT.cancelled, JSON.stringify(lpT));
+
 const contT = await page.evaluate(() => {
   const pid = localStorage.getItem("mf_active_pid");
   const k = b => pid ? b + "_" + pid : b;
