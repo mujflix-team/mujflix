@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 3.21.73
+- **Změněno:** Potvrzení u loga je malá bublina přímo pod logem (vzhled jako menu profilu), ne velké okno uprostřed. „Přepnout“ je hned pod kurzorem.
+
 ## 3.21.72
 - **Úklid:** `offline.html` a `soukromi.html` jsou ve složce `pages/`, `SECURITY.md` v `docs/`. Staré adresy `/soukromi.html` a `/offline.html` přesměrují (`_redirects`). Na místě zůstává jen to, co být v kořeni musí (`index.html`, `404.html`, `sw.js`, `_headers`, `_redirects`, `manifest.webmanifest`, `config.js`).
 

@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.73: potvrzení u loga jako bublina pod logem.
 - 3.21.72: úklid kořene, stránky do `pages/`, SECURITY do `docs/`.
 - 3.21.71: logo otevírá „Kdo se dívá?“, Domů v docku vždy nahoru.
 - 3.21.70: Co dnes pustíme dohromady? (společný tip pro víc profilů).
