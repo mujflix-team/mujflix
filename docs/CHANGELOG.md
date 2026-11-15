@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.74
+- **Změněno:** Prokliknutí epizody ji už hned neoznačí jako zhlédnutou (špatný klik nepřeskočí díl). Označí se až po 20 s v přehrávači (i při Další / Předchozí a výběru v mřížce epizod); zavření přehrávače dřív označení zruší. Po automatickém označení se na 7 s ukáže „Zpět“.
+- **Nově:** Rozkoukaná epizoda: poslední pustená, ještě neoznačená epizoda se pamatuje (`mf_lastplayed`, podle profilu) a „Pokračovat“ i otevření detailu míří na ni. V seznamu má štítek „Rozkoukáno“ a oranžový proužek. Zdroj vložený přehrávač nevidí, na které epizodě v něm jsi, takže epizodu přepnutou přímo na webu zdroje appka nepozná.
+
 
 ## 3.21.73
 - **Změněno:** Potvrzení u loga je malá bublina přímo pod logem (vzhled jako menu profilu), ne velké okno uprostřed. „Přepnout“ je hned pod kurzorem.

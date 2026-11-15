@@ -560,6 +560,11 @@ html body #mfDock.mf-dock.mf-dock-hidden { transform: translateY(130%); }
 #seriesModal #episodesGrid .episode-card:hover .ep-hover-play { opacity: 1; }
 #seriesModal #episodesGrid .ep-play-ring { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); }
 #seriesModal #episodesGrid .ep-play-ring svg { width: 12px; height: 14px; fill: #fff; margin-left: 3px; }
+/* Rozkoukaná epizoda (pustená, ještě neoznačená jako zhlédnutá) a hláška „Zpět“ po automatickém označení */
+#seriesModal #episodesGrid .episode-card.resume { box-shadow: inset 3px 0 0 #e5a00d !important; }
+#mf-undo-toast { position: fixed; left: 50%; bottom: 85px; transform: translateX(-50%) translateY(12px); z-index: 2147483000; display: flex; align-items: center; gap: 14px; max-width: 90vw; padding: 10px 14px 10px 22px; border-radius: 50px; background: rgba(10, 10, 12, 0.96); color: #fff; border: 1px solid rgba(100, 255, 120, 0.5); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.8rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.3s; }
+#mf-undo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+#mf-undo-toast button { font: inherit; color: #46d369; background: transparent; border: 0; padding: 4px 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
 #seriesModal #episodesGrid .ep-seen-dot { display: none; }
 #seriesModal #episodesGrid .episode-card.watched .ep-seen-dot { display: flex; position: absolute; right: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%; background: #46d369; color: #000; font-size: 0.72rem; font-weight: 800; align-items: center; justify-content: center; }
 @media (max-width: 700px) {

@@ -308,6 +308,13 @@
     } catch (e) {}
   }
 
+  /** Epizoda se po výběru neoznačí hned (špatný klik by přeskočil díl), ale až po chvíli v přehrávači. */
+  function appWatchSoon(uid) {
+    try {
+      if (typeof window.mfWatchSoon === "function") window.mfWatchSoon(uid);
+    } catch (e) {}
+  }
+
   function isEpWatched(season, episode) {
     if (!current.localSlug) return false;
     var w = appGetWatched();
@@ -729,7 +736,7 @@
       }
       current.season = newSeason;
       current.episode = newEp;
-      if (current.localSlug) appMarkWatched(current.localSlug + "-S" + current.season + "-E" + current.episode);
+      if (current.localSlug) appWatchSoon(current.localSlug + "-S" + current.season + "-E" + current.episode);
       noteGoodIfStayed();
       current._manual = false; current._noneToast = false;
       current.sourceIdx = startIndex();
@@ -806,7 +813,7 @@
         b.title = watched ? "Zhlédnuto" : "Nezhlédnuto";
         b.onclick = function () {
           current.episode = e;
-          if (current.localSlug) appMarkWatched(current.localSlug + "-S" + current.season + "-E" + e);
+          if (current.localSlug) appWatchSoon(current.localSlug + "-S" + current.season + "-E" + e);
           noteGoodIfStayed();
               current.sourceIdx = startIndex();
           renderCurrent();
@@ -991,6 +998,7 @@
   function close() {
     if (!modal) return;
     if (current && modal.classList.contains("open")) noteGoodIfStayed();
+    try { if (typeof window.mfCancelWatchSoon === "function") window.mfCancelWatchSoon(); } catch (e) {}
     modal.classList.remove("open");
     frame.innerHTML = "";
     if (epGridPanel) epGridPanel.style.display = "none";
