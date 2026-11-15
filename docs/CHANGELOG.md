@@ -1,5 +1,8 @@
 # Changelog
 
+
+## 3.21.71
+- **Změněno:** Logo MůjFlix nahoře (i v Objevování) se zeptá „Přepnout profil?“ (jde vypnout „Příště se neptat“) a pak otevře „Kdo se dívá?“. Tlačítko Domů v docku vždy vrátí úplně nahoru k banneru, i když už na domovské stránce jsi.
 ## 3.21.70
 - **Nově:** Co dnes pustíme dohromady? (menu profilu). Vybereš aspoň dva profily a dostaneš jeden tip, který se hodí všem: společné oblíbené žánry, bez titulů, které už někdo viděl, a s nejpřísnějším věkovým omezením z vybraných. Tlačítko Jiný tip, otevření titulu rovnou z dialogu. Nový `js/app/together.js` (výpočty zvlášť od obrazovky), `css/together.css`, test `tests/together.mjs`. Nic se neposílá na server, z TMDB se stahují jen obecné seznamy podle žánrů.
 

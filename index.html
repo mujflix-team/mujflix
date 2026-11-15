@@ -54,7 +54,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=48" />
+    <link rel="stylesheet" href="css/theme.css?v=49" />
     <link rel="stylesheet" href="css/wrapped.css?v=3" />
     <link rel="stylesheet" href="css/together.css?v=1" />
 
@@ -363,7 +363,7 @@
     </header>
 
     <div class="nf-top" id="nfTop">
-      <button type="button" class="nf-logo" id="nfLogo" aria-label="MůjFlix – nahoru" onclick="window.mfGoHome&&window.mfGoHome()">Můj<span>Flix</span></button>
+      <button type="button" class="nf-logo" id="nfLogo" aria-label="MůjFlix – výběr profilu" onclick="window.mfLogoToGate&&window.mfLogoToGate()">Můj<span>Flix</span></button>
       <div class="nf-top-gap"></div>
       <button type="button" class="nf-icon-btn nf-search-pill" id="nfSearchBtn" aria-label="Hledat filmy a seriály" title="Hledat (/)" onclick="openSearch()">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -939,7 +939,7 @@
     <div id="universeOverlay" role="dialog" aria-modal="true" aria-label="Objevovat">
       <header class="dv-top">
         <div class="dv-bar">
-          <div class="dv-brand" role="button" tabindex="0" aria-label="Zpět na domovskou stránku" onclick="window.mfGoHome&&window.mfGoHome()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.mfGoHome&&window.mfGoHome()}">Můj<span>Flix</span></div>
+          <div class="dv-brand" role="button" tabindex="0" aria-label="MůjFlix – výběr profilu" onclick="window.mfLogoToGate&&window.mfLogoToGate()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.mfGoHome&&window.mfGoHome()}">Můj<span>Flix</span></div>
           <label class="dv-search">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="dvSearch" type="search" placeholder="Hledat…" aria-label="Hledat film nebo seriál" autocomplete="off" spellcheck="false" enterkeyhint="search" />
@@ -1802,7 +1802,7 @@
 <script src="js/pages/cinema.js?v=17" defer></script>
     <script src="js/app/wrapped.js?v=3" defer></script>
     <script src="js/app/together.js?v=1" defer></script>
-    <script src="js/pages/home.js?v=25" defer></script>
+    <script src="js/pages/home.js?v=27" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/backup-reminder.js?v=1" defer></script>

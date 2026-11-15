@@ -348,7 +348,39 @@
 
       window.nfRenderProfile = nfRenderProfile;
 
-      /* Logo vlevo nahoře: zpátky na domovskou stránku a nahoru k banneru */
+      /* Logo vlevo nahoře: vrátí na výběr profilu „Kdo se dívá?“ (jako Odhlásit se) */
+      window.mfLogoToGate = function () {
+        if (!window.ProfileGate) return;
+        var go = function () {
+          try { sessionStorage.removeItem('mf_gate_ok'); } catch (e) {}
+          ProfileGate.show();
+        };
+        var skip = false;
+        try { skip = localStorage.getItem('mf_logo_noask') === '1'; } catch (e) {}
+        if (skip || document.getElementById('mfLogoAsk')) return skip ? go() : undefined;
+        /* Ať to člověk neudělá omylem: nejdřív se zeptá, jde vypnout „Příště se neptat“ */
+        var d = document.createElement('div');
+        d.id = 'mfLogoAsk';
+        d.setAttribute('role', 'dialog');
+        d.setAttribute('aria-modal', 'true');
+        d.innerHTML = '<div class="la-back"></div><div class="la-box"><h3>Přepnout profil?</h3>' +
+          '<p>Vrátíš se na výběr „Kdo se dívá?“.</p>' +
+          '<label class="la-chk"><input type="checkbox" id="mfLogoAskNo"> Příště se neptat</label>' +
+          '<div class="la-btns"><button type="button" class="la-no">Zůstat</button><button type="button" class="la-yes">Přepnout profil</button></div></div>';
+        var close = function () { d.remove(); document.removeEventListener('keydown', key, true); };
+        var key = function (e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+        document.addEventListener('keydown', key, true);
+        d.querySelector('.la-back').onclick = close;
+        d.querySelector('.la-no').onclick = close;
+        d.querySelector('.la-yes').onclick = function () {
+          if (d.querySelector('#mfLogoAskNo').checked) { try { localStorage.setItem('mf_logo_noask', '1'); } catch (e) {} }
+          close(); go();
+        };
+        document.body.appendChild(d);
+        d.querySelector('.la-no').focus();
+      };
+
+      /* Tlačítko Domů v docku: zpátky na domovskou stránku a nahoru k banneru */
       window.mfGoHome = function () {
         try { if (typeof window.closeUniverse === 'function') window.closeUniverse(); } catch (e) {}
         try { var wo = document.getElementById('watchlistOverlay'); if (wo && (wo.classList.contains('open') || wo.classList.contains('visible')) && typeof window.closeWatchlist === 'function') window.closeWatchlist(); } catch (e) {}
@@ -1467,6 +1499,8 @@
           forceHome({ force: true });
           if (typeof closeUniverse === 'function') closeUniverse();
           if (typeof closeWatchlist === 'function') closeWatchlist();
+          /* Vždy úplně nahoru k banneru, i když už na domovské stránce jsme */
+          if (window.mfGoHome) window.mfGoHome();
         };
       }
 

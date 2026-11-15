@@ -225,13 +225,15 @@ const dk = await page.evaluate(async () => {
   window.closeUniverse(); await w(900);
   out.dock = dock(); out.home = document.documentElement.classList.contains("mfh-home-on");
   document.querySelector("#watchlistEmpty .wl-empty-btn")?.click(); await w(800);
-  document.querySelector("#universeOverlay .dv-brand").click(); await w(900);
-  out.brandHome = document.documentElement.classList.contains("mfh-home-on") && !document.getElementById("universeOverlay").classList.contains("open");
+  gate.style.display = "none";
+  document.querySelector("#universeOverlay .dv-brand").click(); await w(300);
+  out.brandGate = !!document.getElementById("mfLogoAsk"); document.getElementById("mfLogoAsk")?.remove();
+  gate.style.display = "none"; window.mfGoHome(); await w(600);
   gate.style.display = gd;
   return out;
 });
 check("dock: po Oblíbené → Objevovat → ✕ zůstane dock a domovská stránka", dk.dock !== "none" && dk.home, JSON.stringify(dk));
-check("objevování: logo MůjFlix vrací na domovskou stránku", /mfGoHome/.test(dk.brand) && dk.brandHome, JSON.stringify(dk));
+check("objevování: logo MůjFlix otevře „Kdo se dívá?“", /mfLogoToGate/.test(dk.brand) && dk.brandGate, JSON.stringify(dk));
 
 // --- Dávka C: uvítání, Oblíbené jako řady, obrázky se plynule objeví
 const bc = await page.evaluate(() => {
@@ -2359,9 +2361,15 @@ check("banner: stav „bez titulu“ je nízký, jen načítací stav je vysoký
 // --- Dávka A: zvonek, logo, žánrové štítky, spoiler
 const batchA = await page.evaluate(async () => {
   const out = {}, w = ms => new Promise(r => setTimeout(r, ms));
-  out.home = typeof window.mfGoHome === "function" && /mfGoHome/.test(document.getElementById("nfLogo").getAttribute("onclick") || "");
+  out.home = typeof window.mfGoHome === "function" && /mfLogoToGate/.test(document.getElementById("nfLogo").getAttribute("onclick") || "");
   const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none";
   try { window.mfGoHome && window.mfGoHome(); } catch { /* nic */ }
+  gate.style.display = "none"; document.getElementById("nfLogo").click(); out.asked = !!document.getElementById("mfLogoAsk") && gate.style.display !== "flex";
+  document.querySelector("#mfLogoAsk .la-no").click(); out.stay = !document.getElementById("mfLogoAsk") && gate.style.display !== "flex";
+  document.getElementById("nfLogo").click(); document.getElementById("mfLogoAskNo").checked = true; document.querySelector("#mfLogoAsk .la-yes").click(); out.logoGate = gate.style.display === "flex";
+  gate.style.display = "none"; document.getElementById("nfLogo").click(); out.noAsk = !document.getElementById("mfLogoAsk") && gate.style.display === "flex"; localStorage.removeItem("mf_logo_noask");
+  gate.style.display = "none"; document.getElementById("dockHome").click(); await w(900);
+  out.dockTop = (document.getElementById("mfSectionHome")?.scrollTop || 0) + window.scrollY;
   gate.style.display = gd;
   MFPrefs.open(); await w(100);
   const tags = document.querySelector("#mfPrefsModal .pf-tags"); out.tagsClass = !!tags && !document.querySelector('#mfPrefsModal [class*="-chip"]');
@@ -2370,7 +2378,7 @@ const batchA = await page.evaluate(async () => {
   out.noBlur = getComputedStyle(sp.querySelector("img")).filter === "none"; sp.remove();
   return out;
 });
-check("logo vrací na domovskou stránku", batchA.home, JSON.stringify(batchA));
+check("logo otevře „Kdo se dívá?“ a Domů v docku vrací nahoru", batchA.home && batchA.asked && batchA.stay && batchA.logoGate && batchA.noAsk && batchA.dockTop === 0, JSON.stringify(batchA));
 const bellGone = await page.evaluate(() => !document.getElementById("nfBellBtn") && !document.getElementById("notifBell") && !document.getElementById("hdrNotifBtn") && !document.getElementById("notifPanel"));
 check("zvonek Novinky už v aplikaci není", bellGone);
 check("žánry: štítky nespadají pod obecné pravidlo „-chip“ (šedá plocha), spoiler bez blur filtru", batchA.tagsClass && batchA.noBlur, JSON.stringify(batchA));
@@ -2443,8 +2451,8 @@ const nav4 = await page.evaluate(async () => {
     document.getElementById(a).click(); await w(700); document.getElementById(b).click(); await w(800);
     const s = st(); if (s.uo !== want[b].uo || s.wl !== want[b].wl || s.act !== b) bad.push(a + ">" + b + " " + JSON.stringify(s));
   }
-  document.getElementById("dockProtebe").click(); await w(700); document.getElementById("nfLogo").click(); await w(800);
-  let s = st(); if (s.wl || s.uo) bad.push("logo z Oblíbených " + JSON.stringify(s));
+  document.getElementById("dockProtebe").click(); await w(700); document.getElementById("dockHome").click(); await w(800);
+  let s = st(); if (s.wl || s.uo) bad.push("Domů z Oblíbených " + JSON.stringify(s));
   document.getElementById("dockProtebe").click(); await w(700); document.getElementById("nfSearchBtn").click(); await w(800);
   s = st(); if (s.wl || !s.uo) bad.push("lupa z Oblíbených " + JSON.stringify(s));
   window.closeUniverse(); await w(600); window.mfGoHome(); await w(400); gate.style.display = gd;
