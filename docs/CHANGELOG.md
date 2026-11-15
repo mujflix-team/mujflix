@@ -1,8 +1,11 @@
 # Changelog
 
+## 3.21.75
+- **Opraveno:** U rozkoukané epizody je pryč oranžový proužek vlevo. Verze zvednuta, aby si service worker stáhl nový styl místo starého z cache.
+
 ## 3.21.74
 - **Změněno:** Prokliknutí epizody ji už hned neoznačí jako zhlédnutou (špatný klik nepřeskočí díl). Označí se až po 20 s v přehrávači (i při Další / Předchozí a výběru v mřížce epizod); zavření přehrávače dřív označení zruší. Po automatickém označení se na 7 s ukáže „Zpět“.
-- **Nově:** Rozkoukaná epizoda: poslední pustená, ještě neoznačená epizoda se pamatuje (`mf_lastplayed`, podle profilu) a „Pokračovat“ i otevření detailu míří na ni. V seznamu má štítek „Rozkoukáno“ a oranžový proužek. Zdroj vložený přehrávač nevidí, na které epizodě v něm jsi, takže epizodu přepnutou přímo na webu zdroje appka nepozná.
+- **Nově:** Rozkoukaná epizoda: poslední pustená, ještě neoznačená epizoda se pamatuje (`mf_lastplayed`, podle profilu) a „Pokračovat“ i otevření detailu míří na ni. V seznamu má štítek „Rozkoukáno“. Zdroj vložený přehrávač nevidí, na které epizodě v něm jsi, takže epizodu přepnutou přímo na webu zdroje appka nepozná.
 
 
 ## 3.21.73
