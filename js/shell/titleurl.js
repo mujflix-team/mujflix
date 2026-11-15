@@ -44,7 +44,7 @@
   function sync() {
     var w = wanted(), cur = location.pathname, full = cur + location.search;
     if (w === full || (w === "/" && (cur === "/" || cur === "/index.html"))) { setShareLabels(); return; }
-    /* cizí cesty (např. /soukromi.html) nepřepisujeme */
+    /* cizí cesty (např. /pages/soukromi.html) nepřepisujeme */
     if (cur !== "/" && cur !== "/index.html" && !/^\/[sfc]\//.test(cur)) return;
     try { history.replaceState(history.state, "", w); } catch (e) {}
     setShareLabels();

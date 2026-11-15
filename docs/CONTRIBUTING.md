@@ -27,7 +27,7 @@ A dále:
 
 ## Pull request
 Vyplň šablonu (co se změnilo, jak to vyzkoušet) a počkej na kontrolu druhého člověka z týmu.
-Chyby a nápady jde hlásit přes [Issues](https://github.com/mujflix-team/mujflix/issues), zranitelnosti podle `SECURITY.md`.
+Chyby a nápady jde hlásit přes [Issues](https://github.com/mujflix-team/mujflix/issues), zranitelnosti podle `docs/SECURITY.md`.
 
 ## Licence a písma
 Repozitář zatím nemá volnou licenci: kód zůstává autorům a písmo Inter ve složce `fonts/` je pod licencí SIL OFL 1.1 (text v `fonts/Inter-OFL.txt`) a licence projektu se netýká.

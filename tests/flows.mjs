@@ -2499,13 +2499,13 @@ check("zpět: tlačítko Zpět zavře Procházení a nevyhodí z aplikace, zavř
 // --- v3.9: stránky Soukromí a podmínky + 404 a odkaz z přihlašovací obrazovky
 const legalT = await page.evaluate(async () => {
   const get = async u => { const r = await fetch(u); return { ok: r.ok, t: r.ok ? await r.text() : "" }; };
-  const [p, n] = await Promise.all([get("soukromi.html"), get("404.html")]);
+  const [p, n] = await Promise.all([get("pages/soukromi.html"), get("404.html")]);
   const a = document.querySelector("#mfProfileGate .pg-legal");
-  return { privacy: p.ok && /TMDB/.test(p.t) && /nehostuje/.test(p.t) && /Externí weby/.test(p.t), notFound: n.ok && /nenašli/.test(n.t), link: !!a && /soukromi\.html$/.test(a.getAttribute("href")) };
+  return { privacy: p.ok && /TMDB/.test(p.t) && /nehostuje/.test(p.t) && /Externí weby/.test(p.t), notFound: n.ok && /nenašli/.test(n.t), link: !!a && /pages\/soukromi\.html$/.test(a.getAttribute("href")) };
 });
 check("soukromí a podmínky: stránka s TMDB atribucí a upozorněním o externích webech, 404 a odkaz na přihlašovací obrazovce", legalT.privacy && legalT.notFound && legalT.link, JSON.stringify(legalT));
 
-const legalLink = await page.evaluate(() => [...document.querySelectorAll('a[href^="soukromi.html"]')].every(a => !a.target));
+const legalLink = await page.evaluate(() => [...document.querySelectorAll('a[href^="pages/soukromi.html"]')].every(a => !a.target));
 check("soukromí: odkazy se otevírají ve stejném okně (bez nové karty)", legalLink);
 
 // --- Výběr profilu se po obnovení stránky přeskočí (a bez příznaku se ukáže)

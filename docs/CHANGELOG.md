@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 3.21.72
+- **Úklid:** `offline.html` a `soukromi.html` jsou ve složce `pages/`, `SECURITY.md` v `docs/`. Staré adresy `/soukromi.html` a `/offline.html` přesměrují (`_redirects`). Na místě zůstává jen to, co být v kořeni musí (`index.html`, `404.html`, `sw.js`, `_headers`, `_redirects`, `manifest.webmanifest`, `config.js`).
+
 ## 3.21.71
 - **Změněno:** Logo MůjFlix nahoře (i v Objevování) se zeptá „Přepnout profil?“ (jde vypnout „Příště se neptat“) a pak otevře „Kdo se dívá?“. Tlačítko Domů v docku vždy vrátí úplně nahoru k banneru, i když už na domovské stránce jsi.
 ## 3.21.70
