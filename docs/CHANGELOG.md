@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.76
+- **Nově:** Na náhledu každé epizody v detailu seriálu je nenápadný symbol přehrání (kroužek s trojúhelníkem), ať je vidět, že sem jde kliknout; na telefonu, kde není hover, byl dřív vidět jen kroužek „zhlédnuto“. Při najetí myší se vyplní bíle. Jen CSS (`css/theme.css`), kliknutí propouští na kartu, zhlédnuté epizody jsou slabší.
+
 ## 3.21.75
 - **Opraveno:** U rozkoukané epizody je pryč oranžový proužek vlevo. Verze zvednuta, aby si service worker stáhl nový styl místo starého z cache.
 
