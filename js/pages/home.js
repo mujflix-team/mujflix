@@ -349,7 +349,7 @@
       window.nfRenderProfile = nfRenderProfile;
 
       /* Logo vlevo nahoře: vrátí na výběr profilu „Kdo se dívá?“ (jako Odhlásit se) */
-      window.mfLogoToGate = function () {
+      window.mfLogoToGate = function (anchor) {
         if (!window.ProfileGate) return;
         var go = function () {
           try { sessionStorage.removeItem('mf_gate_ok'); } catch (e) {}
@@ -363,10 +363,9 @@
         d.id = 'mfLogoAsk';
         d.setAttribute('role', 'dialog');
         d.setAttribute('aria-modal', 'true');
-        d.innerHTML = '<div class="la-back"></div><div class="la-box"><h3>Přepnout profil?</h3>' +
-          '<p>Vrátíš se na výběr „Kdo se dívá?“.</p>' +
-          '<label class="la-chk"><input type="checkbox" id="mfLogoAskNo"> Příště se neptat</label>' +
-          '<div class="la-btns"><button type="button" class="la-no">Zůstat</button><button type="button" class="la-yes">Přepnout profil</button></div></div>';
+        d.innerHTML = '<div class="la-back"></div><div class="la-box"><div class="la-t">Přepnout profil?</div>' +
+          '<div class="la-btns"><button type="button" class="la-yes">Přepnout</button><button type="button" class="la-no">Zůstat</button></div>' +
+          '<label class="la-chk"><input type="checkbox" id="mfLogoAskNo"> Příště se neptat</label></div>';
         var close = function () { d.remove(); document.removeEventListener('keydown', key, true); };
         var key = function (e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
         document.addEventListener('keydown', key, true);
@@ -377,7 +376,18 @@
           close(); go();
         };
         document.body.appendChild(d);
-        d.querySelector('.la-no').focus();
+        /* Bublina vyjede přímo pod logem, ať s myší nemusíš daleko */
+        try {
+          var box = d.querySelector('.la-box'), r = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
+          if (r && !r.width) r = null;
+          if (r) {
+            var left = Math.max(8, Math.min(r.left, window.innerWidth - box.offsetWidth - 8));
+            box.style.left = left + 'px';
+            box.style.top = (r.bottom + 10) + 'px';
+            box.style.setProperty('--la-arrow', Math.max(14, Math.min(r.left + r.width / 2 - left, box.offsetWidth - 20)) + 'px');
+          } else d.classList.add('la-center');
+        } catch (e) { d.classList.add('la-center'); }
+        d.querySelector('.la-yes').focus();
       };
 
       /* Tlačítko Domů v docku: zpátky na domovskou stránku a nahoru k banneru */
