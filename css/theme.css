@@ -1490,6 +1490,13 @@ html body #seriesModal #episodesGrid .ep-btn-mark { width: 32px; height: 32px; b
 html body #seriesModal #episodesGrid .ep-btn-mark:hover { opacity: 1; background: rgba(0, 0, 0, 0.85) !important; }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-btn-mark { background: #fff !important; color: #141414 !important; opacity: 1; }
 
+/* Nenápadný symbol přehrání uprostřed náhledu epizody: ať je vidět, že sem jde kliknout (na telefonu není hover). Jen ozdoba, kliknutí propouští na kartu. */
+html body #seriesModal #episodesGrid .ep-thumb::before { content: "\25B6\FE0E"; position: absolute; left: 50%; top: 50%; z-index: 2; width: 38px; height: 38px; margin: -19px 0 0 -19px; display: flex; align-items: center; justify-content: center; padding-left: 3px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.7); background: rgba(0, 0, 0, 0.45); color: #fff; font-size: 14px; line-height: 1; opacity: 0.8; pointer-events: none; transition: opacity 0.15s, transform 0.15s, background 0.15s, color 0.15s; }
+html body #seriesModal #episodesGrid .episode-card:hover .ep-thumb::before { opacity: 1; transform: scale(1.1); background: rgba(255, 255, 255, 0.92); color: #000; border-color: #fff; }
+html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb::before { opacity: 0.55; }
+@media (max-width: 700px) {
+  html body #seriesModal #episodesGrid .ep-thumb::before { width: 30px; height: 30px; margin: -15px 0 0 -15px; padding-left: 2px; font-size: 11px; }
+}
 /* Telefon: řádky (obrázek vlevo), ať se vejde víc epizod */
 @media (max-width: 700px) {
   html body #seriesModal .sd-head { padding: 12px 12px 8px; }
