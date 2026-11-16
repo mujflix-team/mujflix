@@ -155,5 +155,63 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.close();
 }
 
+/* Filtry: víc žánrů najednou, minimální hodnocení, skrýt už otevřené, přehled aktivních filtrů */
+{
+  const urls = [];
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(e.message));
+  const items = [
+    { id: 5, title: "Prvni film", poster_path: "/a.jpg", vote_average: 7.9, release_date: "2021-05-05", genre_ids: [35, 878] },
+    { id: 6, title: "Druhy film", poster_path: "/b.jpg", vote_average: 7.4, release_date: "2020-02-02", genre_ids: [35, 878] },
+  ];
+  await page.route(/^(?!http:\/\/localhost)/, r => {
+    const u = r.request().url();
+    if (u.includes("/discover/")) urls.push(u);
+    if (u.endsWith(".js")) return r.fulfill({ contentType: "text/javascript", body: STUB });
+    if (u.includes("api.themoviedb.org") || u.includes(".workers.dev")) return r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ results: items, page: 1, total_pages: 1 }) });
+    return r.abort();
+  });
+  await page.addInitScript(() => {
+    if (location.protocol !== "http:" || localStorage.getItem("__s")) return; localStorage.setItem("__s", "1");
+    localStorage.setItem("mf_profiles_v2", JSON.stringify([{ id: "p1", name: "Test", avatar: "🎬", color: "#007aff" }]));
+    localStorage.setItem("mf_active_pid", "p1"); localStorage.setItem("mf_tmdb_key", "K");
+  });
+  await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
+  await page.waitForTimeout(2000);
+  await page.getByText("Test", { exact: true }).first().click().catch(() => {});
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.openDiscover());
+  await page.waitForTimeout(2000);
+  await page.click('#dvGenres [data-genre="kom"]');
+  await page.click('#dvGenres [data-genre="scifi"]');
+  await page.selectOption("#dvRating", "7");
+  await page.waitForTimeout(2000);
+  const last = urls.slice(-2);
+  check("Filtry: dva žánry se pošlou TMDB najednou (film 35,878, seriál 35,10765) a minimální hodnocení", last.some(u => u.includes("/discover/movie") && /with_genres=35%2C878/.test(u)) && last.some(u => u.includes("/discover/tv") && /with_genres=35%2C10765/.test(u)) && last.every(u => /vote_average\.gte=7(&|$)/.test(u)), last.join(" | "));
+  const st = await page.evaluate(() => ({
+    chips: [...document.querySelectorAll("#dvBody .dv-achip")].map(b => b.textContent),
+    dot: document.querySelector("#dvFilterBtn .dv-filter-dot").textContent,
+    pressed: [...document.querySelectorAll("#dvGenres .dv-chip.active")].map(b => b.dataset.genre),
+    title: document.querySelector("#dvBody .dv-grid-title").textContent,
+  }));
+  check("Filtry: přehled aktivních filtrů, počet na tlačítku a nadpis odpovídají výběru", st.chips.join("|") === "Komedie ×|Sci-Fi a fantasy ×|★ 7+ ×" && st.dot === "3" && st.pressed.join() === "kom,scifi" && /Komedie \+ Sci-Fi a fantasy/.test(st.title), JSON.stringify(st));
+  await page.evaluate(() => aiBrain.recordTmdbSeen(5));
+  await page.click("#dvHideSeen");
+  await page.waitForTimeout(1500);
+  const seen = await page.evaluate(() => ({ titles: [...document.querySelectorAll("#dvBody .dv-grid .dv-card-title")].map(n => n.textContent), on: document.getElementById("dvHideSeen").getAttribute("aria-pressed") }));
+  check("Filtry: Skrýt už otevřené schová titul, který jsi otevřel, a ostatní nechá", seen.on === "true" && seen.titles.length > 0 && !seen.titles.includes("Prvni film") && seen.titles.includes("Druhy film"), JSON.stringify(seen));
+  await page.click("#dvBody .dv-achip");
+  await page.waitForTimeout(1500);
+  const after = await page.evaluate(() => ({ chips: [...document.querySelectorAll("#dvBody .dv-achip")].map(b => b.textContent), pressed: [...document.querySelectorAll("#dvGenres .dv-chip.active")].map(b => b.dataset.genre) }));
+  check("Filtry: klepnutí na štítek odebere jen ten filtr", after.chips.join("|") === "Sci-Fi a fantasy ×|★ 7+ ×|Bez už otevřených ×" && after.pressed.join() === "scifi", JSON.stringify(after));
+  await page.evaluate(() => document.getElementById("dvReset").click());
+  await page.waitForTimeout(1200);
+  const reset = await page.evaluate(() => ({ active: document.querySelectorAll("#dvBody .dv-achip").length, pressed: document.querySelectorAll("#dvGenres .dv-chip.active").length, rating: document.getElementById("dvRating").value, seen: document.getElementById("dvHideSeen").getAttribute("aria-pressed") }));
+  check("Filtry: Zrušit filtry vrátí vše (žánry, hodnocení i skrývání)", reset.active === 0 && reset.pressed === 0 && reset.rating === "" && reset.seen === "false", JSON.stringify(reset));
+  check("Filtry: bez JS chyb", errors.filter(e => !/Access is denied/.test(e)).length === 0, errors.join(" | "));
+  await page.close();
+}
+
 await browser.close(); server.close();
 finish();
