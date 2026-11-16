@@ -245,6 +245,21 @@
     return b;
   }
 
+  /* Symbol přehrání uprostřed plakátu při najetí myší (jen vizuální; klik na kartu otevírá jako dřív) */
+  function playCue() {
+    var ns = 'http://www.w3.org/2000/svg';
+    var w = el('span', 'dv-play');
+    w.setAttribute('aria-hidden', 'true');
+    var b = el('span', 'dv-play-btn');
+    var s = document.createElementNS(ns, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', 22); s.setAttribute('height', 22);
+    s.setAttribute('fill', 'currentColor'); s.setAttribute('aria-hidden', 'true');
+    var pa = document.createElementNS(ns, 'path');
+    pa.setAttribute('d', 'M8 5v14l11-7z');
+    s.appendChild(pa); b.appendChild(s); w.appendChild(b);
+    return w;
+  }
+
   function card(it, showType) {
     var c = el('div', 'dv-card');
     c._dvItem = it; // pro dlouhé podržení na telefonu (js/app/card-menu.js)
@@ -267,6 +282,7 @@
     else { p.classList.remove('dv-skel'); p.appendChild(el('div', 'dv-poster-fallback', (it.title || '?').trim().charAt(0).toUpperCase())); }
     if (it.rating > 0) p.appendChild(el('span', 'dv-rate', '★ ' + it.rating.toFixed(1)));
     if (showType) p.appendChild(el('span', 'dv-type', it.type === 'tv' ? 'Seriál' : 'Film'));
+    p.appendChild(playCue());
     p.appendChild(favButton(it));
     c.appendChild(p);
 
