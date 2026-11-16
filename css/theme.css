@@ -1507,7 +1507,9 @@ html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow { position: static
 html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow:hover { background: rgba(20, 20, 20, 0.88); }
 html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow-l { order: -1; }
 html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow[hidden] { display: flex; visibility: hidden; pointer-events: none; }
-html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { right: 50%; bottom: 50%; transform: translate(50%, 50%); }
+/* Zmenšená hlavička: řádek sérií je vodorovně uprostřed a svisle ve stejné výšce jako tlačítko Pokračovat */
+html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { right: 50%; bottom: 13px; transform: translateX(50%); }
+@media (max-width: 899px) { html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { bottom: 11px; } }
 @media (max-width: 700px) {
   /* Telefon: tlačítka zabírají celou šířku, proto je výběr sérií v samostatném řádku pod nimi (hlavička je o ten řádek vyšší) */
   html body #seriesModal .modal-hero .sd-seasons-wrap, html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { right: 50%; bottom: 10px; transform: translateX(50%); }
