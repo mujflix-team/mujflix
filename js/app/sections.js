@@ -184,42 +184,6 @@ function _bombujMovieUrlVariants(e, t) {
         });
         return s.finished.catch(() => {}), s
       },
-      skeleton: function(e, t) {
-        t = t || [{
-          w: "100%",
-          h: "220px",
-          r: "16px",
-          delay: 0
-        }, {
-          w: "60%",
-          h: "20px",
-          r: "8px",
-          delay: .1
-        }, {
-          w: "40%",
-          h: "14px",
-          r: "6px",
-          delay: .15
-        }, {
-          w: "100%",
-          h: "80px",
-          r: "10px",
-          delay: .2
-        }, {
-          w: "80%",
-          h: "12px",
-          r: "6px",
-          delay: .25
-        }], e && (e.innerHTML = t.map(e => `<div class="sk-block" style="width:${e.w};height:${e.h};border-radius:${e.r};margin-bottom:12px;animation-delay:${e.delay}s;"></div>`).join(""))
-      },
-      detailSkeleton: function(e) {
-        e && (e.innerHTML = '\n      <div class="sk-block" style="width:100%;height:260px;border-radius:16px 16px 0 0;margin-bottom:0;animation-delay:0s;"></div>\n      <div style="padding:20px 20px 0;">\n        <div class="sk-block" style="width:55%;height:22px;border-radius:8px;margin-bottom:10px;animation-delay:0.08s;"></div>\n        <div class="sk-block dark" style="width:35%;height:13px;border-radius:6px;margin-bottom:18px;animation-delay:0.13s;"></div>\n        <div class="sk-block dark" style="width:100%;height:12px;border-radius:5px;margin-bottom:7px;animation-delay:0.17s;"></div>\n        <div class="sk-block dark" style="width:90%;height:12px;border-radius:5px;margin-bottom:7px;animation-delay:0.20s;"></div>\n        <div class="sk-block dark" style="width:70%;height:12px;border-radius:5px;margin-bottom:20px;animation-delay:0.22s;"></div>\n        <div style="display:flex;gap:10px;">\n          <div class="sk-block light" style="flex:1;height:44px;border-radius:12px;animation-delay:0.27s;"></div>\n          <div class="sk-block" style="flex:1;height:44px;border-radius:12px;animation-delay:0.30s;"></div>\n        </div>\n      </div>')
-      },
-      searchSkeleton: function(e, t) {
-        t = t || 6, e && (e.innerHTML = Array.from({
-          length: t
-        }, (e, t) => `<div style="animation-delay:${.06*t}s;">\n        <div class="sk-block" style="width:100%;aspect-ratio:2/3;border-radius:14px;margin-bottom:8px;animation-delay:${.06*t}s;"></div>\n        <div class="sk-block dark" style="width:75%;height:11px;border-radius:5px;margin-bottom:5px;animation-delay:${.06*t+.05}s;"></div>\n        <div class="sk-block dark" style="width:45%;height:9px;border-radius:4px;animation-delay:${.06*t+.08}s;"></div>\n      </div>`).join(""))
-      },
       SUPPORTS: e
     }
   }()
