@@ -267,7 +267,7 @@ html body #seriesModal .tmdb-badge { background: none !important; border: 1px so
 html body #seriesModal .panel-progress-bar { height: 4px !important; background: rgba(255, 255, 255, 0.28) !important; border-radius: 2px !important; }
 html body #seriesModal .panel-progress-fill { background: var(--nf-accent) !important; box-shadow: none !important; }
 html body #seriesModal .btn-continue, html body #seriesModal .btn-shuffle {
-  height: 44px; padding: 0 22px !important; border: 0 !important; border-radius: 6px !important; box-shadow: none !important;
+  height: 44px; padding: 0 22px !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important;
   font-size: 0.98rem !important; font-weight: 700 !important; text-shadow: none !important; filter: none !important; transform: none;
 }
 html body #seriesModal .btn-continue { background: #fff !important; color: #000 !important; }
@@ -458,8 +458,8 @@ html body #mfProfileCreate .pc-pin-digit:focus { outline: 2px solid #fff !import
 html body #mfProfileCreate .pc-btn-row { display: flex !important; flex-direction: row-reverse; justify-content: flex-end; gap: 14px !important; margin-top: 34px !important; padding-top: 22px; border-top: 1px solid #333; }
 html body #mfProfileCreate .pc-btn-save { flex: 0 0 auto !important; background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; font-size: 1.05rem !important; padding: 0 28px !important; height: 46px; letter-spacing: 0.02em; }
 html body #mfProfileCreate .pc-btn-save:hover { background: #d9d9d9 !important; color: #141414 !important; }
-html body #mfProfileCreate .pc-btn-cancel { flex: 0 0 auto !important; background: transparent !important; color: #808080 !important; border: 1px solid #808080 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; padding: 0 24px !important; height: 46px; font-size: 1.05rem !important; text-transform: none; }
-html body #mfProfileCreate .pc-btn-cancel:hover { color: #fff !important; border-color: #fff !important; }
+html body #mfProfileCreate .pc-btn-cancel { flex: 0 0 auto !important; background: rgba(109, 109, 110, 0.7) !important; color: #fff !important; border: 0 !important; border-radius: 4px !important; box-shadow: none !important; font-weight: 700 !important; padding: 0 24px !important; height: 46px; font-size: 1.05rem !important; text-transform: none; }
+html body #mfProfileCreate .pc-btn-cancel:hover { background: rgba(109, 109, 110, 0.45) !important; color: #fff !important; }
 
 html body #mfProfileWelcome { background: #141414 !important; backdrop-filter: none !important; align-items: flex-start !important; overflow-y: auto; padding: 0 !important; }
 html body #mfProfileWelcome .pw-box { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; width: min(720px, 100%) !important; max-width: none !important; margin: 0 auto; padding: clamp(84px, 14vh, 140px) 20px 60px !important; }

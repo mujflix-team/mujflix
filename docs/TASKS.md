@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.88 – sekundární tlačítka sjednocena na šedou (claude/sekundarni-tlacitka)
 - 3.21.83: toast nad Wrapped, správné id Wrapped v seznamech otevřených oken.
 - 3.21.82: placeholdery řad na Domů, chybový stav + Zkusit znovu v Procházení, aria-busy.
 - 3.21.81: audit loading efektů – fade epizodních náhledů, zpoždění v Procházení, skeleton 9 karet, úklid mrtvých keyframes a skeleton helperů.
