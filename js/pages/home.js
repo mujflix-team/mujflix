@@ -1369,7 +1369,7 @@
           var OPEN_OVERLAY_IDS = [
             'cinemaModal', 'mfStandaloneCinema', 'universeOverlay', 'watchlistOverlay', 'seriesModal',
             'genreEditorOverlay',
-            'wrappedOverlay',
+            'mfWrapped',
             'dockMoreSheet'
           ];
           var anyOverlayOpen = OPEN_OVERLAY_IDS.some(function (id) {
@@ -1463,7 +1463,7 @@
       var DOCK_HIDE_OVERLAY_IDS = [
         'cinemaModal', 'mfStandaloneCinema',
         'seriesModal', 'genreEditorOverlay',
-        'wrappedOverlay',
+        'mfWrapped',
         'dockMoreSheet'
       ];
 
