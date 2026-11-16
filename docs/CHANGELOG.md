@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.83
+- **Opraveno:** Hláška (toast) je ve stejné vrstvě jako „Zpět“ a ukáže se i nad Wrapped (dřív zůstala schovaná pod ním). Seznamy „je otevřené okno“ na úvodní stránce a v docku mají správné id Wrapped (`mfWrapped`, dřív `wrappedOverlay`): Domů a dock Wrapped zohlední.
+
 ## 3.21.82
 - **Nově (načítání):** Řady na úvodní stránce, které čekají na data z TMDB (Vybráno pro tebe, Top 10, Nejlépe hodnocené seriály a filmy), ukážou hned kartičky-placeholdery s jemným pulzováním. Dřív byla stránka po splashi prázdná a řady pak naskočily. Řada, která nic nevrátí, se po odpovědi odstraní jako dřív.
 - **Opraveno (Procházení):** Chyba sítě už se nezobrazí jako „Žádné výsledky“ / „Nic jsme nenašli“. Ukáže se „Nepodařilo se načíst“ s tlačítkem Zkusit znovu; při chybě u dalších stránek zůstanou načtené karty a vedle zprávy je Zkusit znovu. Totéž tlačítko je i na domovské obrazovce Procházení.
