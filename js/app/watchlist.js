@@ -168,7 +168,7 @@ function renderWatchlist() {
     const nRes = all.filter(x => { const r = wlResumeInfo(x); return r && !r.done }).length, rb = document.getElementById("wlTabResume");
     rb && (rb.textContent = "Rozkoukané · " + nRes, rb.classList.toggle("active", "resume" === f), rb.style.display = nRes || "resume" === f ? "" : "none");
     const so = document.getElementById("wlSort");
-    so && so.value !== (window._wlSort || "new") && (so.value = window._wlSort || "new")
+    so && so.value !== (window._wlSort || "new") && (so.value = window._wlSort || "new", window.mfSyncDropdown && window.mfSyncDropdown(so))
   }
   if (!all.length) return void(empty.style.display = "flex");
   empty.style.display = "none";
@@ -315,3 +315,5 @@ document.getElementById("watchlistOverlay").addEventListener("click", e => {
 window.addEventListener("mf:profile-changed", () => {
   try { const o = document.getElementById("watchlistOverlay"); o && o.classList.contains("open") && renderWatchlist() } catch (e) {}
 });
+
+mfEnhanceDropdown(document.getElementById("wlSort"));

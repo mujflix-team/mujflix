@@ -935,6 +935,7 @@
     els.sort.value = state.sort;
     els.year.value = state.year;
     els.rating.value = state.minRating;
+    [els.sort, els.year, els.rating].forEach(function (s) { window.mfSyncDropdown && window.mfSyncDropdown(s); });
     els.seen.classList.toggle('active', state.hideSeen);
     els.seen.setAttribute('aria-pressed', state.hideSeen ? 'true' : 'false');
   }
@@ -1020,6 +1021,7 @@
       o3.value = r[0];
       els.rating.appendChild(o3);
     });
+    [els.sort, els.year, els.rating].forEach(function (s) { window.mfEnhanceDropdown && window.mfEnhanceDropdown(s); });
 
     [].forEach.call(els.type.children, function (b) {
       b.addEventListener('click', function () { setType(b.getAttribute('data-type')); });

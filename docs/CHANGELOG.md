@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.89
+### Změněno
+- **Rozbalovací seznamy:** vlastní tmavý seznam z Oblíbených (řazení) je nově i v Objevování (Řadit, Rok, Hodnocení – seznam roků je posuvný) a ve Wrapped (výběr měsíce). Funguje myší, dotykem i klávesnicí (šipky, Home/End, Enter, Esc). Funkce `mfEnhanceDropdown` je teď v `js/app/core.js`. Původní `<select>` zůstává skrytý jako zdroj hodnoty.
+
 ## 3.21.88
 ### Změněno
 - **Sekundární tlačítka:** „Zrušit“ (tvorba profilu) je nově plná šedá jako „Do oblíbených“ a „Náhodná“ (dřív šedý obrys); „Náhodná“ a „Pokračovat“ v detailu seriálu mají rohy 4 px jako ostatní tlačítka. „Všechny díly“ zůstává beze změny (je součástí řádku sérií).
