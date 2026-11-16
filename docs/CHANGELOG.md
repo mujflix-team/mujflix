@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.81
+- **Opraveno (načítání):** Náhledy epizod v detailu seriálu se po načtení plynule rozsvítí (přechod `opacity` byl přebitý pravidlem pro hover). Zpoždění rozsvícení karet v Procházení se počítá v rámci řádku (max. 12 × 45 ms), takže karty z dalších stránek nečekají 0,6 s. Skeleton řady při ověřování věku má 9 karet místo 8.
+- **Úklid:** Smazané duplicitní `@keyframes nfHeroIn` (platila stejně jen poslední varianta, vzhled se nemění), nepoužité `shimmer`, `mf-shimmer`, `mf-pulse-red`, `sk-pulse`, `.sk-block`, prázdný `<style id="mf-ai-redesign">` a nevolané `MFTransition.skeleton / detailSkeleton / searchSkeleton`.
+
 ## 3.21.80
 - **Změněno (přehlednost, podle auditu UI):** Nadpisy „Kdo se dívá?“ a „Vítej“ mají normální tučnost (400) místo extra tenké (100). Panel „Legálně dostupné na“ v přehrávači má popisky aspoň 0.75rem (dřív 0.5–0.68rem) a čitelnější barvu. Okno „Zdroj nenalezen“ používá styl aplikace (bílé tlačítko 44 px, radius 4 px, okno 8 px). Okno Together má radiusy z designových tokenů (8 / 6 px).
 - **Úklid:** Z toastů pryč nenačítané písmo Outfit (písmo vynucuje `--nf-font`), z panelu poskytovatelů inline `-apple-system`.
