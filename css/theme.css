@@ -1301,7 +1301,8 @@ html body #mfSyncModal .sy-x:hover, html body #mfPrefsModal .pf-x:hover, html bo
 html body #mfSyncModal .sy-x, html body #mfPrefsModal .pf-x, html body #mfSettingsModal .pf-x { position: absolute; top: 12px; right: 12px; }
 /* přehrávač: křížek vpravo nahoře (název a ovládání jsou vlevo) */
 html body #mfStandaloneCinema .mf-standalone-cinema-top { padding-right: calc(var(--mf-x) + clamp(12px, 2vw, 28px) + 12px); }
-html body #mfStandaloneCinemaClose { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: clamp(12px, 2vw, 28px); margin: 0; z-index: 4; }
+/* střed křížku ve stejné výšce jako střed tlačítek v liště (ta mají 36 px a začínají 10 px od horního okraje) */
+html body #mfStandaloneCinemaClose { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px) + (36px - var(--mf-x)) / 2); right: clamp(12px, 2vw, 28px); margin: 0; z-index: 4; }
 /* hlavičky obrazovek přes celou stránku mají stejné okraje jako úvodní stránka */
 #universeOverlay { --dv-pad: var(--nf-pad); }
 html body #seriesModal .close-btn { position: absolute !important; top: 14px; right: 14px; }
