@@ -1230,11 +1230,11 @@
 
     const panelLabel = document.createElement('div');
     panelLabel.style.cssText = `
-      font-size: 0.52rem;
+      font-size: 0.75rem;
       font-weight: 800;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.55);
       margin-bottom: 2px;
     `;
     panelLabel.textContent = 'Legálně dostupné na';
@@ -1267,9 +1267,8 @@
       -webkit-backdrop-filter: blur(20px);
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       color: rgba(255,255,255,0.55);
-      font-size: 0.68rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      font-family: -apple-system, sans-serif;
       white-space: nowrap;
     `;
     badge.innerHTML = `
@@ -1338,7 +1337,7 @@
         if (allP.length > 3) {
           const more = document.createElement('span');
           more.textContent = '+' + (allP.length - 3);
-          more.style.cssText = 'margin-left:6px;font-size:0.68rem;font-weight:700;color:rgba(255,255,255,0.7);';
+          more.style.cssText = 'margin-left:6px;font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.7);';
           stack.appendChild(more);
         }
         badge.insertBefore(stack, badge.firstChild);
@@ -1359,7 +1358,7 @@
         if (!list.length) return;
         if (czData.groups.flatrate.length || Object.keys(GROUP_LABELS).filter(k => (czData.groups[k] || []).length).length > 1) {
           const gl = document.createElement('div');
-          gl.style.cssText = 'width:100%;text-align:right;font-size:0.5rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:4px;';
+          gl.style.cssText = 'width:100%;text-align:right;font-size:0.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:4px;';
           gl.textContent = GROUP_LABELS[kind];
           providersRow.appendChild(gl);
         }
@@ -1405,7 +1404,7 @@
 
           const name = document.createElement('span');
           if (logoUrl) name.style.display = 'none';
-          name.style.cssText += `font-size:0.65rem;font-weight:600;color:rgba(255,255,255,0.8);white-space:nowrap;font-family:-apple-system,sans-serif;`;
+          name.style.cssText += `font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.8);white-space:nowrap;`;
           name.textContent = providerName;
           btn.appendChild(name);
           providersRow.appendChild(btn);
