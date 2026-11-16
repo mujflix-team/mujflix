@@ -4,6 +4,14 @@
 ### Změněno
 - **Sekundární tlačítka:** „Zrušit“ (tvorba profilu) je nově plná šedá jako „Do oblíbených“ a „Náhodná“ (dřív šedý obrys); „Náhodná“ a „Pokračovat“ v detailu seriálu mají rohy 4 px jako ostatní tlačítka. „Všechny díly“ zůstává beze změny (je součástí řádku sérií).
 
+## 3.21.87
+### Změněno
+- **Tlačítko Pokračovat/Přehrát v detailu seriálu:** má stejné ostré rohy jako „Přehrát“ v banneru (dřív kulatá pilulka). Zbytek přehrávacích tlačítek (banner, Objevování, epizoda) i ikony play na náhledech už ve stejném stylu byly.
+
+## 3.21.86
+### Opraveno
+- **Hlavní banner na notebooku:** na nižších oknech (do 900 px výšky) se trailer vpravo nahoře už nepřekrývá s popisem filmu; trailer je menší a popis se vejde pod něj (a je posuvný). Na velkém monitoru beze změny.
+
 ## 3.21.85
 - **Nově (Domů, Objevovat, Oblíbené):** Karty mají při najetí myší uprostřed plakátu symbol přehrání ve stylu náhledu epizody: šedý trojúhelník bez kolečka, který při najetí přímo na něj (okolí 64 px) zbělá a zvětší se; plakát lehce ztmavne. V Oblíbených nahradil text „▶“. Je jen vizuální, klik funguje jako dřív; na dotykovém displeji se neukazuje.
 - **Změněno (hlavní banner):** Na počítači (od 900 px) je popis filmu vždy celý vidět v panelu vpravo (průhledný, s bílým proužkem vlevo), bez „Více / Méně“; název, žánry a tlačítka zůstávají vlevo. Na telefonu se popis v banneru nezobrazuje vůbec (ani „Více / Méně“). Detail seriálu beze změny.

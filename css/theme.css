@@ -1072,7 +1072,7 @@ html body #seriesModal.sd-detail .modal-hero-left { flex: 0 0 auto !important; w
 html body #seriesModal.sd-detail .panel-progress-wrap { max-width: 340px; }
 html body #seriesModal.sd-detail .panel-btns { display: grid !important; grid-template-columns: auto auto 1fr; gap: 10px !important; align-items: center; width: min(340px, 100%); margin-top: 16px; flex-wrap: nowrap !important; }
 html body #seriesModal.sd-detail .panel-btns > .btn-shuffle { grid-row: 1; }
-html body #seriesModal.sd-detail .panel-btns > .btn-continue { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; height: 46px; border-radius: 24px !important; padding: 0 20px !important; font-size: 1rem !important; }
+html body #seriesModal.sd-detail .panel-btns > .btn-continue { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; height: 46px; border-radius: 4px !important; padding: 0 20px !important; font-size: 1rem !important; }
 @media (max-width: 899px) {
   html body #seriesModal.sd-detail .modal-hero-overlay { background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.15) 100%) !important; }
   html body #seriesModal.sd-detail .modal-hero-content { justify-content: flex-end !important; padding: 70px 18px 28px !important; }
@@ -1150,6 +1150,15 @@ html body .nf-hero-desc.is-open {
     -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
     border-left: 3px solid rgba(255, 255, 255, 0.55); border-radius: 4px 12px 12px 4px;
   }
+}
+/* notebook / nižší okno: trailer je menší a popis se vejde POD něj (dřív se překrývaly) */
+@media (min-width: 900px) and (max-height: 900px) {
+  html body .nf-hero-body:has(> .nf-hero-desc) { --mf-pb: 56px; --mf-trw: clamp(150px, 17vw, 230px); }
+  html body .nf-hero-body > .nf-hero-desc {
+    max-height: max(150px, calc(100% - var(--mf-pb) - var(--nf-bar-h) - 22px - var(--mf-trw) * 9 / 16 - 36px - 14px));
+    padding: 14px 18px; font-size: 0.94rem; line-height: 1.5;
+  }
+  html body #nfHero .nf-trailer { --nf-tr-w: clamp(150px, 17vw, 230px); }
 }
 @media (max-width: 899px) {
   /* na telefonu se popis v banneru nezobrazuje (ani „Více / Méně“); detail seriálu to neovlivní */
