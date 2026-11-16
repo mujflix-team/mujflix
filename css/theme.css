@@ -1117,6 +1117,28 @@ html body .nf-hero-desc.is-open.is-scrollable, html body #seriesModal .sd-overvi
   .mf-desc-more:hover { text-decoration: underline; }
 }
 
+/* Rozbalený popis v banneru: čitelný panel, text se rozepíše do šířky (na počítači do 2 sloupců, bez vnitřního posuvníku).
+   Název, žánry a tlačítka zůstávají vlevo; panel se jen roztáhne doprava. */
+@keyframes mfDescOpen { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+html body .nf-hero-desc.is-open {
+  padding: 16px 20px; border-radius: 12px; background: rgba(12, 12, 14, 0.62);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1); text-shadow: none; line-height: 1.6;
+  animation: mfDescOpen 0.22s ease both;
+}
+@media (min-width: 900px) {
+  html body .nf-hero-body:has(> .nf-hero-desc.is-open) { width: min(1000px, 100%); }
+  html body .nf-hero-body > .nf-hero-desc.is-open {
+    max-height: none; overflow: visible; padding: 20px 26px;
+    -webkit-mask-image: none; mask-image: none;
+    column-count: 2; column-gap: 40px; column-fill: balance; font-size: 1.02rem; text-align: left;
+  }
+}
+@media (max-width: 899px) {
+  html body .nf-hero-desc.is-open { font-size: 0.95rem; max-height: 46vh; }
+}
+@media (prefers-reduced-motion: reduce) { html body .nf-hero-desc.is-open { animation: none; } }
+
 /* Mini přehrávač traileru: tlačítka dole vpravo, ať nepřekrývají název videa, který YouTube ukazuje nahoře */
 .nf-tr-ctl { top: auto; bottom: 8px; right: 8px; }
 .nf-trailer:fullscreen .nf-tr-ctl { top: auto; bottom: 22px; right: 22px; }
