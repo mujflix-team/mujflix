@@ -3,6 +3,7 @@
 ## 3.21.84
 - **Změněno (detail seriálu):** Play na náhledu epizody je jen větší šedý trojúhelník (30×36 px) bez kolečka; zbělá a zvětší se, až když na něj najedeš myší (ne na celý náhled). Místo pseudo-elementu `.ep-thumb::before` se používá skutečný prvek `.ep-hover-play` (kliknutí dál obsluhuje `series.js`).
 - **Změněno (detail seriálu):** Náhled zhlédnuté epizody je skoro černý (černobílý, ~25 % jasu), ale pořád trochu vidět; při najetí myší zešedne (~60 % jasu).
+- **Opraveno (Objevovat):** `js/pages/discover.js` byl starší verze bez ošetření chyby sítě (3.21.82) a novější kód byl omylem uložený v `css/discover.css`, takže Objevovat (Seriály/Filmy v docku) nemělo žádné styly a otevřelo se jen pod stránkou. Aktuální kód je zpět v `discover.js` (`?v=16`); skutečné CSS se musí vrátit do `css/discover.css` z historie gitu.
 
 ## 3.21.83
 - **Opraveno:** Hláška (toast) je ve stejné vrstvě jako „Zpět“ a ukáže se i nad Wrapped (dřív zůstala schovaná pod ním). Seznamy „je otevřené okno“ na úvodní stránce a v docku mají správné id Wrapped (`mfWrapped`, dřív `wrappedOverlay`): Domů a dock Wrapped zohlední.
