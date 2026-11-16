@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.21.78
+- **Změněno:** Ve zmenšené hlavičce seriálu je řádek sérií (S1, S2 …) svisle ve stejné výšce jako tlačítko Pokračovat (dřív byl o 16 až 22 px výš). Jen CSS.
+
 ## 3.21.77
 - **Změněno:** Výběr sérií (S1, S2 …) v detailu seriálu je v pravém dolním rohu hlavičky: vidět jsou 4 čísla, po stranách šipky (i na telefonu) a vybraná série je uprostřed. Když se hlavička při scrollu zmenší, přesune se doprostřed hlavičky; na telefonu je ve vlastním řádku pod tlačítky. Vzhled tlačítek zůstal původní. U seriálu s jednou sérií a v záložkách Podobné / Popis se nezobrazuje.
 - **Opraveno:** Symbol přehrání na náhledech epizod (3.21.76) se do `main` nedostal, protože #94 se sloučil jen do už sloučené větve; je tu znovu.
