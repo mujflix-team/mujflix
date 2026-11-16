@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.87 – sjednocení play tlačítka: Pokračovat v detailu seriálu jako banner (claude/play-icons)
+- 3.21.86 – banner na notebooku: trailer se nepřekrývá s popisem (claude/hero-notebook)
 - 3.21.83: toast nad Wrapped, správné id Wrapped v seznamech otevřených oken.
 - 3.21.82: placeholdery řad na Domů, chybový stav + Zkusit znovu v Procházení, aria-busy.
 - 3.21.81: audit loading efektů – fade epizodních náhledů, zpoždění v Procházení, skeleton 9 karet, úklid mrtvých keyframes a skeleton helperů.
