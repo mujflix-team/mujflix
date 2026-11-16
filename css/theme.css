@@ -561,7 +561,7 @@ html body #mfDock.mf-dock.mf-dock-hidden { transform: translateY(130%); }
 #seriesModal #episodesGrid .ep-play-ring { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); }
 #seriesModal #episodesGrid .ep-play-ring svg { width: 12px; height: 14px; fill: #fff; margin-left: 3px; }
 /* Hláška „Zpět“ po automatickém označení epizody jako zhlédnuté */
-#mf-undo-toast { position: fixed; left: 50%; bottom: 85px; transform: translateX(-50%) translateY(12px); z-index: 2147483000; display: flex; align-items: center; gap: 14px; max-width: 90vw; padding: 10px 14px 10px 22px; border-radius: 50px; background: rgba(10, 10, 12, 0.96); color: #fff; border: 1px solid rgba(100, 255, 120, 0.5); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.8rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.3s; }
+#mf-undo-toast { position: fixed; left: 50%; bottom: 85px; transform: translateX(-50%) translateY(12px); z-index: 2147483000; display: flex; align-items: center; gap: 14px; max-width: 90vw; padding: 10px 14px 10px 22px; border-radius: 50px; background: rgba(10, 10, 12, 0.96); color: #fff; border: 1px solid rgba(100, 255, 120, 0.5); font-weight: 700; font-size: 0.8rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.3s; }
 #mf-undo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
 #mf-undo-toast button { font: inherit; color: #46d369; background: transparent; border: 0; padding: 4px 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
 #seriesModal #episodesGrid .ep-seen-dot { display: none; }
@@ -1765,7 +1765,7 @@ html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba
    Bd 700 = nadpisy řádků, tlačítka, aktivní záložky
    Blk 900 = hlavní nadpisy (hero, detail), čísla Top 10 */
 :root { --fw-thin: 100; --fw-light: 300; --fw-regular: 400; --fw-medium: 500; --fw-bold: 700; --fw-black: 900; }
-html body #mfProfileGate .pg-title, html body #mfProfileWelcome .pw-title { font-weight: var(--fw-thin) !important; letter-spacing: -0.02em !important; }
+html body #mfProfileGate .pg-title, html body #mfProfileWelcome .pw-title { font-weight: var(--fw-regular) !important; letter-spacing: -0.02em !important; }
 html body .nf-hero-title, html body #seriesModal .modal-hero-left h2 { font-weight: var(--fw-black) !important; letter-spacing: -0.035em !important; }
 html body .nf-rank { font-weight: var(--fw-black); }
 html body .nf-hero-eyebrow { font-weight: var(--fw-medium); letter-spacing: 0.14em; }
