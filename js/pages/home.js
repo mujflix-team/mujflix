@@ -1725,7 +1725,16 @@
     d.setAttribute('aria-expanded', open ? 'true' : 'false');
     d.classList.toggle('is-scrollable', open && d.scrollHeight > d.clientHeight + 1);
   }
+  /* Hero na širokém displeji: popis je vždy rozbalený v panelu vpravo (bez „Více / Méně“); přepínač platí jen na telefonu a v detailu seriálu */
+  var HERO_WIDE = window.matchMedia ? window.matchMedia('(min-width: 900px)') : { matches: false };
+  function mfDescWide(d) { return d.classList.contains('nf-hero-desc') && HERO_WIDE.matches; }
   function mfDescMeasure(d) {
+    if (mfDescWide(d)) {
+      d.classList.remove('is-open', 'is-expandable', 'is-scrollable');
+      d.removeAttribute('role'); d.removeAttribute('tabindex'); d.removeAttribute('aria-expanded');
+      if (d._mfMore) d._mfMore.classList.remove('show');
+      return;
+    }
     if (d.classList.contains('is-open')) return mfDescSync(d);
     if (!d.offsetParent && !d.getClientRects().length) return; /* skryté: změří se, až se zobrazí (ResizeObserver) */
     var cut = d.scrollHeight > d.clientHeight + 1, m = mfDescMarker(d);
@@ -1742,7 +1751,7 @@
     mfDescMeasure(d);
   }
   function mfDescToggle(d) {
-    if (!d || !d.classList.contains('is-expandable')) return;
+    if (!d || mfDescWide(d) || !d.classList.contains('is-expandable')) return;
     d.classList.toggle('is-open');
     mfDescSync(d);
   }
