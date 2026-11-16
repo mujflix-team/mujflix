@@ -568,7 +568,7 @@
           var run = _nfRun;
           // Během ověřování hodnocení je vidět načítací stav (ne prázdné místo), ať je jasné, že se něco děje
           var trk = document.getElementById(id);
-          if (trk) trk.innerHTML = new Array(9).join('<div class="nf-card nf-card-sk" aria-hidden="true"><div class="nf-poster nf-skeleton"></div></div>');
+          if (trk) trk.innerHTML = new Array(9).fill('<div class="nf-card nf-card-sk" aria-hidden="true"><div class="nf-poster nf-skeleton"></div></div>').join('');
           sec.hidden = false;
           window.MFAge.filter(items, 20).then(function (ok) {
             if (run !== _nfRun) return;
