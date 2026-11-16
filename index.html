@@ -52,8 +52,8 @@
     <link rel="stylesheet" href="css/styles.css?v=11" />
     <link rel="stylesheet" href="css/patches.css" />
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
-    <link rel="stylesheet" href="css/discover.css?v=2" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="css/discover.css?v=2" /></noscript>
+    <link rel="stylesheet" href="css/discover.css?v=3" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="css/discover.css?v=3" /></noscript>
     <link rel="stylesheet" href="css/theme.css?v=54" />
     <link rel="stylesheet" href="css/wrapped.css?v=3" />
     <link rel="stylesheet" href="css/together.css?v=1" />
@@ -957,6 +957,8 @@
           <div class="dv-selects">
             <label class="dv-select"><span>Řadit</span><select id="dvSort" aria-label="Řadit podle"></select></label>
             <label class="dv-select"><span>Rok</span><select id="dvYear" aria-label="Rok vydání"></select></label>
+            <label class="dv-select"><span>Hodnocení</span><select id="dvRating" aria-label="Minimální hodnocení"></select></label>
+            <button type="button" class="dv-toggle" id="dvHideSeen" aria-pressed="false" title="Skryje tituly, které jsi tu už otevřel">Skrýt už otevřené</button>
             <button type="button" class="dv-reset" id="dvReset" hidden>Zrušit filtry</button>
           </div>
         </div>
@@ -1746,7 +1748,7 @@
     <script src="js/app/sections.js?v=6" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
-    <script src="js/pages/discover.js?v=13" defer></script>
+    <script src="js/pages/discover.js?v=14" defer></script>
 
     <script>
       (function () {

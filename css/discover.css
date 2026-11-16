@@ -33,7 +33,8 @@
   z-index: 3;
 }
 #universeOverlay .dv-filter-btn { display: none; position: relative; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 0; border-radius: 4px; background: var(--dv-surface-2); color: #fff; font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; flex: none; }
-#universeOverlay .dv-filter-dot { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--dv-accent); }
+#universeOverlay .dv-filter-dot { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 8px; background: var(--dv-accent); color: #fff; font-size: 10px; font-weight: 800; line-height: 16px; text-align: center; }
+#universeOverlay .dv-filter-dot[hidden] { display: none; }
 #universeOverlay .dv-bar { display: flex; align-items: center; gap: 14px; }
 #universeOverlay .dv-brand { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; flex: none; }
 #universeOverlay .dv-brand span { color: var(--dv-accent); }
@@ -81,6 +82,18 @@
   height: 38px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(255, 69, 58, 0.5);
   background: rgba(255, 69, 58, 0.12); color: #ff6961; font-size: 0.85rem; font-weight: 600; cursor: pointer;
 }
+#universeOverlay .dv-toggle {
+  height: 38px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--dv-line); background: var(--dv-surface);
+  color: var(--dv-text); font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s;
+}
+#universeOverlay .dv-toggle:hover { background: var(--dv-surface-2); }
+#universeOverlay .dv-toggle.active { background: #fff; color: #0b0b10; border-color: #fff; }
+#universeOverlay .dv-active { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px var(--dv-pad) 0; }
+#universeOverlay .dv-achip {
+  padding: 5px 12px; border-radius: 999px; border: 1px solid var(--dv-line); background: var(--dv-surface); color: var(--dv-text);
+  font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+#universeOverlay .dv-achip:hover { background: rgba(255, 69, 58, 0.18); border-color: rgba(255, 69, 58, 0.5); }
 #universeOverlay .dv-reset[hidden] { display: none; }
 #universeOverlay .dv-reset:hover { background: rgba(255, 69, 58, 0.22); }
 #universeOverlay .dv-chips {
@@ -246,6 +259,7 @@
   #universeOverlay .dv-select span { display: none; }
   #universeOverlay .dv-select select { flex: 1; min-width: 0; max-width: none; }
   #universeOverlay .dv-reset { flex: 1 1 100%; }
+  #universeOverlay .dv-toggle { flex: 1 1 100%; }
   #universeOverlay .dv-hero { height: 58vh; min-height: 340px; }
   #universeOverlay .dv-hero-desc { -webkit-line-clamp: 2; font-size: 0.9rem; }
   #universeOverlay .dv-hero-body { padding-bottom: 20px; }
