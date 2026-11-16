@@ -1,7 +1,7 @@
 /* Co dnes pustíme dohromady? (js/app/together.js) */
 html.mft-lock, html.mft-lock body { overflow: hidden; }
 #mfTogether { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, 0.72); }
-#mfTogether .mft-card { position: relative; width: min(520px, 100%); max-height: 100%; overflow: auto; padding: 24px 20px 20px; border-radius: 14px; background: #181818; color: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+#mfTogether .mft-card { position: relative; width: min(520px, 100%); max-height: 100%; overflow: auto; padding: 24px 20px 20px; border-radius: var(--mf-r-panel, 8px); background: #181818; color: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
 #mfTogether .mft-x { position: absolute; top: 8px; right: 10px; width: 40px; height: 40px; border: 0; background: none; color: #b3b3b3; font-size: 28px; line-height: 1; cursor: pointer; }
 #mfTogether .mft-x:hover { color: #fff; }
 #mfTogether .mft-h { margin: 0 40px 6px 0; font-size: 22px; font-weight: 700; }
@@ -18,7 +18,7 @@ html.mft-lock, html.mft-lock body { overflow: hidden; }
 #mfTogether .mft-go { width: 100%; margin-top: 8px; }
 #mfTogether .mft-res { margin-top: 16px; }
 #mfTogether .mft-pick { display: flex; gap: 14px; }
-#mfTogether .mft-poster { flex: none; width: 110px; height: 165px; object-fit: cover; border-radius: 10px; background: #2a2a2a; }
+#mfTogether .mft-poster { flex: none; width: 110px; height: 165px; object-fit: cover; border-radius: var(--mf-r-card, 6px); background: #2a2a2a; }
 #mfTogether .mft-info { min-width: 0; flex: 1; }
 #mfTogether .mft-title { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
 #mfTogether .mft-meta { margin-bottom: 8px; color: #b3b3b3; font-size: 14px; }
