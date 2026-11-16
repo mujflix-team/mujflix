@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.80
+- **Změněno (přehlednost, podle auditu UI):** Nadpisy „Kdo se dívá?“ a „Vítej“ mají normální tučnost (400) místo extra tenké (100). Panel „Legálně dostupné na“ v přehrávači má popisky aspoň 0.75rem (dřív 0.5–0.68rem) a čitelnější barvu. Okno „Zdroj nenalezen“ používá styl aplikace (bílé tlačítko 44 px, radius 4 px, okno 8 px). Okno Together má radiusy z designových tokenů (8 / 6 px).
+- **Úklid:** Z toastů pryč nenačítané písmo Outfit (písmo vynucuje `--nf-font`), z panelu poskytovatelů inline `-apple-system`.
+
 ## 3.21.79
 - **Změněno:** Ve zmenšené hlavičce seriálu je řádek sérií (S1, S2 …) svisle ve stejné výšce jako tlačítko Pokračovat (dřív byl o 16 až 22 px výš). Jen CSS.
 
