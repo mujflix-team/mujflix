@@ -1,13 +1,6 @@
 # Changelog
 
 ## 3.21.87
-### Nově
-- 
-
-### Opraveno
-- 
-
-## 3.21.87
 ### Změněno
 - **Tlačítko Pokračovat/Přehrát v detailu seriálu:** má stejné ostré rohy jako „Přehrát“ v banneru (dřív kulatá pilulka). Zbytek přehrávacích tlačítek (banner, Objevování, epizoda) i ikony play na náhledech už ve stejném stylu byly.
 
