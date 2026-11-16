@@ -445,7 +445,7 @@
 
   function fetchDiscover(type, page, o) {
     return api(discoverUrl(type, page, o)).then(function (d) {
-      return { items: normList(d && d.results, type), pages: (d && d.total_pages) || 0 };
+      return { items: normList(d && d.results, type), pages: (d && d.total_pages) || 0, failed: !d }; // !d = chyba sítě / HTTP (api() ji mění na null)
     });
   }
 
@@ -573,7 +573,12 @@
         // Když se nenačetla žádná řada (offline, špatný klíč), nenechávej prázdnou stránku
         if (myRun === run && --rowsLeft === 0 && !rowsKept) {
           heroSlot.remove();
-          body.appendChild(emptyState('📡', 'Nepodařilo se načíst nabídku', 'Zkontroluj připojení a klíč TMDB v Nastavení a zkus to znovu.'));
+          var es = emptyState('📡', 'Nepodařilo se načíst nabídku', 'Zkontroluj připojení a klíč TMDB v Nastavení a zkus to znovu.');
+          var rb = el('button', 'dv-btn dv-btn-primary', 'Zkusit znovu');
+          rb.type = 'button';
+          rb.addEventListener('click', refresh);
+          es.appendChild(rb);
+          body.appendChild(es);
         }
       });
     });
@@ -637,11 +642,13 @@
     var sentinel = el('div', 'dv-sentinel');
     body.appendChild(sentinel);
     var status = el('div', 'dv-status');
+    status.setAttribute('role', 'status');
     body.appendChild(status);
 
     gridCtx = { mode: mode, run: myRun, page: 0, pages: 1, loading: false, done: false, total: 0, grid: grid, status: status, head: head, sentinel: sentinel };
     for (var i = 0; i < 12; i++) {
       var s = el('div', 'dv-card dv-ph');
+      s.setAttribute('aria-hidden', 'true');
       s.appendChild(el('div', 'dv-poster dv-skel'));
       s.appendChild(el('div', 'dv-card-title dv-skel-line'));
       grid.appendChild(s);
@@ -769,6 +776,7 @@
     if (ctx.mode === 'search') {
       var pq = parseQuery(state.query);
       return api('/search/multi?language=cs-CZ&include_adult=' + adultFlag() + '&page=' + page + '&query=' + encodeURIComponent(pq.text)).then(function (d) {
+        if (!d) throw new Error('tmdb'); // chyba sítě: ať se nezobrazí „Žádné výsledky“
         var items = normList(d && d.results, undefined, true).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
         if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
         else items = rankByMatch(items, pq);
@@ -795,6 +803,7 @@
     });
     if (!jobs.length) return Promise.resolve({ items: [], pages: 0 });
     return Promise.all(jobs).then(function (r) {
+      if (r.some(function (x) { return x.failed; })) throw new Error('tmdb');
       var pages = 0, lists = [];
       r.forEach(function (x) { pages = Math.max(pages, x.pages); lists.push(x.items); });
       var merged = lists.length === 2 ? mergeBy(state.sort, lists[0], lists[1]) : lists[0];
@@ -807,6 +816,7 @@
     var ctx = gridCtx;
     if (!ctx || ctx.loading || ctx.done || ctx.run !== run) return;
     ctx.loading = true;
+    ctx.grid.setAttribute('aria-busy', 'true');
     var added = 0, guard = 0;
 
     function step() {
@@ -822,9 +832,21 @@
       });
     }
 
-    step().catch(function () { ctx.done = true; }).then(function () {
+    step().catch(function () { ctx.done = true; ctx.failed = true; }).then(function () {
       if (ctx.run !== run) return;
       ctx.loading = false;
+      ctx.grid.removeAttribute('aria-busy');
+      if (ctx.failed && !ctx.total) {
+        // Nic se nenačetlo kvůli síti: ne „Žádné výsledky“, ale chyba s možností zkusit znovu
+        ctx.grid.textContent = '';
+        ctx.status.textContent = '';
+        ctx.status.appendChild(emptyState('📡', 'Nepodařilo se načíst', 'Zkontroluj připojení a zkus to znovu.'));
+        var rt = el('button', 'dv-btn dv-btn-primary', 'Zkusit znovu');
+        rt.type = 'button';
+        rt.addEventListener('click', refresh);
+        ctx.status.appendChild(rt);
+        return;
+      }
       if (!ctx.total) {
         ctx.grid.textContent = '';
         ctx.status.textContent = '';
@@ -838,6 +860,15 @@
       var c = ctx.head.querySelector('.dv-grid-count');
       if (!c) { c = el('span', 'dv-grid-count'); ctx.head.appendChild(c); }
       c.textContent = ctx.total + (ctx.done ? '' : '+') + ' ' + (ctx.done ? mfPlural(ctx.total, 'titul', 'tituly', 'titulů') : 'titulů');
+      if (ctx.failed) {
+        // Chyba u dalších stránek: už načtené karty zůstanou, dalších se jde znovu dotázat
+        ctx.status.textContent = 'Další tituly se nepodařilo načíst. ';
+        var rt2 = el('button', 'dv-btn dv-btn-ghost', 'Zkusit znovu');
+        rt2.type = 'button';
+        rt2.addEventListener('click', function () { ctx.failed = false; ctx.done = false; ctx.status.textContent = ''; loadMore(); });
+        ctx.status.appendChild(rt2);
+        return;
+      }
       ctx.status.textContent = ctx.done ? '' : 'Načítám další…';
       if (!ctx.done) {
         var rect = ctx.sentinel.getBoundingClientRect(), root = els.body.getBoundingClientRect();
