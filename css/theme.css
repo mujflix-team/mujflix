@@ -1117,21 +1117,23 @@ html body .nf-hero-desc.is-open.is-scrollable, html body #seriesModal .sd-overvi
   .mf-desc-more:hover { text-decoration: underline; }
 }
 
-/* Rozbalený popis v banneru: čitelný panel, text se rozepíše do šířky (na počítači do 2 sloupců, bez vnitřního posuvníku).
-   Název, žánry a tlačítka zůstávají vlevo; panel se jen roztáhne doprava. */
+/* Rozbalený popis v banneru: na počítači se text otevře jako samostatný sloupec VPRAVO (na úrovni názvu a tlačítek),
+   vlevo zůstane název, žánry, tlačítka a přepínač „Méně“. Na telefonu jeden čitelný panel pod názvem. */
 @keyframes mfDescOpen { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 html body .nf-hero-desc.is-open {
-  padding: 16px 20px; border-radius: 12px; background: rgba(12, 12, 14, 0.62);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.1); text-shadow: none; line-height: 1.6;
-  animation: mfDescOpen 0.22s ease both;
+  padding: 14px 18px; border-radius: 12px; background: rgba(12, 12, 14, 0.55);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  text-shadow: none; line-height: 1.6; animation: mfDescOpen 0.22s ease both;
 }
 @media (min-width: 900px) {
-  html body .nf-hero-body:has(> .nf-hero-desc.is-open) { width: min(1000px, 100%); }
+  html body .nf-hero-body:has(> .nf-hero-desc.is-open) { --mf-pb: clamp(90px, 13vh, 120px); width: 100%; padding-bottom: var(--mf-pb); }
+  html body .nf-hero-body:has(> .nf-hero-desc.is-open) > :not(.nf-hero-desc) { max-width: min(560px, 52vw); }
   html body .nf-hero-body > .nf-hero-desc.is-open {
-    max-height: none; overflow: visible; padding: 20px 26px;
-    -webkit-mask-image: none; mask-image: none;
-    column-count: 2; column-gap: 40px; column-fill: balance; font-size: 1.02rem; text-align: left;
+    position: absolute; right: var(--nf-pad); bottom: var(--mf-pb); z-index: 2;
+    width: min(560px, 40vw); min-height: 0; max-height: max(260px, calc(100% - var(--mf-pb) - 300px));
+    padding: 20px 24px; font-size: 1.02rem; margin: 0;
+    background: linear-gradient(180deg, rgba(14, 14, 16, 0.62), rgba(14, 14, 16, 0.78));
+    border-left: 3px solid rgba(255, 255, 255, 0.55); border-radius: 4px 12px 12px 4px;
   }
 }
 @media (max-width: 899px) {

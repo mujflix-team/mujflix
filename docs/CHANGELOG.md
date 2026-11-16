@@ -1,7 +1,7 @@
 # Changelog
 
 ## 3.21.85
-- **Změněno (hlavní banner):** Rozbalený popis („Více“) je v čitelném průhledném panelu, na počítači se rozepíše doprava do 2 sloupců bez vnitřního posuvníku (banner se rozšíří na 1000 px). Na telefonu zůstává jeden sloupec s panelem a posuvem.
+- **Změněno (hlavní banner):** Rozbalený popis („Více“) se na počítači otevře jako samostatný sloupec vpravo (průhledný panel s bílým proužkem vlevo, posuv jen u opravdu dlouhého textu); název, žánry, tlačítka a „Méně“ zůstávají vlevo. Na telefonu jeden sloupec v panelu s posuvem.
 
 ## 3.21.84
 - **Změněno (detail seriálu):** Play na náhledu epizody je jen větší šedý trojúhelník (30×36 px) bez kolečka; zbělá a zvětší se, až když na něj najedeš myší (ne na celý náhled). Místo pseudo-elementu `.ep-thumb::before` se používá skutečný prvek `.ep-hover-play` (kliknutí dál obsluhuje `series.js`).
