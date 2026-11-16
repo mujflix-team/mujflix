@@ -392,7 +392,7 @@ function _sdHideSimilar() {
 /* Záložky detailu: Epizody (sezóny + díly na jedné obrazovce) a Podobné. */
 function _sdTab(name) {
   const sim = name === "sim", info = name === "info", eps = document.getElementById("episodesView"), box = document.getElementById("sdSimilar"), inf = document.getElementById("sdInfo");
-  document.getElementById("seriesModal").classList.remove("sd-detail");
+  document.getElementById("seriesModal").classList.remove("sd-detail"), document.getElementById("seriesModal").classList.toggle("sd-plain", sim || info);
   [["sdTabEps", !sim && !info], ["sdTabSim", sim], ["sdTabInfo", info]].forEach(([id, on]) => {
     const b = document.getElementById(id);
     b && (b.classList.toggle("active", on), b.setAttribute("aria-selected", on ? "true" : "false"))
@@ -504,8 +504,9 @@ function toggleSeasonWatched() {
 function renderSeasonStrip(t) {
   const box = document.getElementById("sdSeasons");
   if (!box) return;
-  if (t < 2) return void(box.hidden = !0, box.textContent = "");
-  box.hidden = !1;
+  const sm = document.getElementById("seriesModal");
+  if (t < 2) return sm && sm.classList.remove("sd-has-seasons"), void(box.hidden = !0, box.textContent = "");
+  box.hidden = !1, sm && sm.classList.add("sd-has-seasons");
   const w = getWatched();
   const done = n => { const c = epsInSeason(activeSeries, n); if (!c) return !1; for (let e = 1; e <= c; e++) if (!w[`${activeSeries}-S${n}-E${e}`]) return !1; return !0 };
   const key = activeSeries + "|" + t;

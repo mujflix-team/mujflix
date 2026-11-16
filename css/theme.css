@@ -1497,6 +1497,24 @@ html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb::before { o
 @media (max-width: 700px) {
   html body #seriesModal #episodesGrid .ep-thumb::before { width: 30px; height: 30px; margin: -15px 0 0 -15px; padding-left: 2px; font-size: 11px; }
 }
+/* Výběr sérií (S1, S2 …) v pravém dolním rohu hlavičky seriálu: vidět 4 čísla, po stranách šipky; vybraná série uprostřed.
+   Když se hlavička při scrollu zmenší (nf-compact), přesune se doprostřed hlavičky. Vzhled tlačítek zůstává původní. */
+html body #seriesModal .modal-hero .sd-seasons-wrap { position: absolute; right: var(--nf-pad, 5%); bottom: 16px; z-index: 6; margin: 0; display: flex; align-items: center; gap: 6px; transition: right 0.35s ease, bottom 0.35s ease, transform 0.35s ease; }
+html body #seriesModal .modal-hero .sd-seasons-wrap:has(.sd-seasons[hidden]) { display: none; }
+html body #seriesModal.sd-plain .modal-hero .sd-seasons-wrap { display: none; }
+html body #seriesModal .modal-hero .sd-seasons-wrap .sd-seasons { position: relative; flex: 0 0 auto; width: 216px; margin: 0; padding: 0; }
+html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow { position: static; flex: 0 0 auto; width: 34px; height: 42px; top: auto; bottom: auto; opacity: 1; display: flex; border-radius: 6px; background: rgba(20, 20, 20, 0.6); }
+html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow:hover { background: rgba(20, 20, 20, 0.88); }
+html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow-l { order: -1; }
+html body #seriesModal .modal-hero .sd-seasons-wrap .nf-arrow[hidden] { display: flex; visibility: hidden; pointer-events: none; }
+html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { right: 50%; bottom: 50%; transform: translate(50%, 50%); }
+@media (max-width: 700px) {
+  /* Telefon: tlačítka zabírají celou šířku, proto je výběr sérií v samostatném řádku pod nimi (hlavička je o ten řádek vyšší) */
+  html body #seriesModal .modal-hero .sd-seasons-wrap, html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { right: 50%; bottom: 10px; transform: translateX(50%); }
+  html body #seriesModal.sd-has-seasons:not(.nf-compact) .modal-hero-content { padding-bottom: 66px !important; }
+  html body #seriesModal.sd-has-seasons.nf-compact .modal-hero { height: 140px !important; }
+  html body #seriesModal.sd-has-seasons.nf-compact .modal-hero-content { padding-bottom: 58px !important; }
+}
 /* Telefon: řádky (obrázek vlevo), ať se vejde víc epizod */
 @media (max-width: 700px) {
   html body #seriesModal .sd-head { padding: 12px 12px 8px; }

@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.77: výběr sérií v pravém dolním rohu hlavičky seriálu (4 čísla + šipky, při zmenšení hlavičky uprostřed).
 - 3.21.76: nenápadný symbol přehrání na náhledech epizod v detailu seriálu.
 - 3.21.75: pryč oranžový proužek u rozkoukané epizody (+ nová verze kvůli cache service workeru).
 - 3.21.74: prokliknutí epizody ji neoznačí hned jako zhlédnutou (až po 20 s v přehrávači, s tlačítkem Zpět); Pokračovat míří na rozkoukanou epizodu.
