@@ -1,7 +1,7 @@
 # Changelog
 
 ## 3.21.85
-- **Změněno (hlavní banner):** Na počítači (od 900 px) je popis filmu vždy celý vidět v panelu vpravo (průhledný, s bílým proužkem vlevo), bez „Více / Méně“; název, žánry a tlačítka zůstávají vlevo. Na telefonu zůstává useknutý popis s „Více / Méně“, po rozbalení v panelu. Detail seriálu beze změny.
+- **Změněno (hlavní banner):** Na počítači (od 900 px) je popis filmu vždy celý vidět v panelu vpravo (průhledný, s bílým proužkem vlevo), bez „Více / Méně“; název, žánry a tlačítka zůstávají vlevo. Na telefonu se popis v banneru nezobrazuje vůbec (ani „Více / Méně“). Detail seriálu beze změny.
 
 ## 3.21.84
 - **Změněno (detail seriálu):** Play na náhledu epizody je jen větší šedý trojúhelník (30×36 px) bez kolečka; zbělá a zvětší se, až když na něj najedeš myší (ne na celý náhled). Místo pseudo-elementu `.ep-thumb::before` se používá skutečný prvek `.ep-hover-play` (kliknutí dál obsluhuje `series.js`).

@@ -1118,7 +1118,7 @@ html body .nf-hero-desc.is-open.is-scrollable, html body #seriesModal .sd-overvi
 }
 
 /* Popis v banneru: na počítači je vždy vidět celý v panelu VPRAVO (na úrovni názvu a tlačítek), bez „Více / Méně“.
-   Na telefonu zůstává useknutý text s přepínačem a po rozbalení jeden panel pod názvem. */
+   Na telefonu se popis v banneru nezobrazuje. */
 @keyframes mfDescOpen { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 html body .nf-hero-desc.is-open {
   padding: 14px 18px; border-radius: 12px; background: rgba(12, 12, 14, 0.55);
@@ -1140,7 +1140,8 @@ html body .nf-hero-desc.is-open {
   }
 }
 @media (max-width: 899px) {
-  html body .nf-hero-desc.is-open { font-size: 0.95rem; max-height: 46vh; }
+  /* na telefonu se popis v banneru nezobrazuje (ani „Více / Méně“); detail seriálu to neovlivní */
+  html body .nf-hero-desc, html body .nf-hero-desc + .mf-desc-more { display: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { html body .nf-hero-desc.is-open { animation: none; } }
 
