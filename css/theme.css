@@ -1490,19 +1490,19 @@ html body #seriesModal #episodesGrid .ep-btn-mark { width: 32px; height: 32px; b
 html body #seriesModal #episodesGrid .ep-btn-mark:hover { opacity: 1; background: rgba(0, 0, 0, 0.85) !important; }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-btn-mark { background: #fff !important; color: #141414 !important; opacity: 1; }
 
-/* Play na náhledu epizody: jen šedý trojúhelník bez kolečka. Zbělá a zvětší se, až když na něj (na jeho okolí 44 px) najedeš myší, ne na celý náhled.
+/* Play na náhledu epizody: jen šedý trojúhelník bez kolečka. Zbělá a zvětší se, až když na něj (na jeho okolí 64 px) najedeš myší, ne na celý náhled.
    Používá skutečný prvek .ep-hover-play (kliknutí ošetřuje series.js), ne pseudo-element, protože pseudo-element hover sám o sobě nerozliší. */
 html body #seriesModal #episodesGrid .ep-thumb::before { content: none !important; display: none !important; }
-html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play { position: absolute !important; inset: auto !important; left: 50% !important; top: 50% !important; width: 44px !important; height: 44px !important; margin: -22px 0 0 -22px !important; display: flex !important; align-items: center; justify-content: center; background: none !important; border-radius: 0 !important; opacity: 1 !important; pointer-events: auto !important; cursor: pointer; z-index: 4; }
+html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play { position: absolute !important; inset: auto !important; left: 50% !important; top: 50% !important; width: 64px !important; height: 64px !important; margin: -32px 0 0 -32px !important; display: flex !important; align-items: center; justify-content: center; background: none !important; border-radius: 0 !important; opacity: 1 !important; pointer-events: auto !important; cursor: pointer; z-index: 4; }
 html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring { display: flex !important; width: auto !important; height: auto !important; border: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; transform: none !important; }
-html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring svg { display: block; width: 20px !important; height: 24px !important; margin: 0 0 0 3px !important; fill: rgba(255, 255, 255, 0.6) !important; filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)); transition: fill 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1) !important; }
+html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring svg { display: block; width: 30px !important; height: 36px !important; margin: 0 0 0 4px !important; fill: rgba(255, 255, 255, 0.6) !important; filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)); transition: fill 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1) !important; }
 html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play:hover .ep-play-ring svg { fill: #fff !important; transform: scale(1.2); }
 html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play:active .ep-play-ring svg { transform: scale(0.95); }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb .ep-hover-play .ep-play-ring svg { fill: rgba(255, 255, 255, 0.4) !important; }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb .ep-hover-play:hover .ep-play-ring svg { fill: #fff !important; }
 @media (max-width: 700px) {
-  html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play { width: 40px !important; height: 40px !important; margin: -20px 0 0 -20px !important; }
-  html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring svg { width: 16px !important; height: 19px !important; }
+  html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play { width: 52px !important; height: 52px !important; margin: -26px 0 0 -26px !important; }
+  html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring svg { width: 24px !important; height: 29px !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring svg { transition: fill 0.01s !important; }
