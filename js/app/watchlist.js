@@ -168,7 +168,7 @@ function renderWatchlist() {
     const nRes = all.filter(x => { const r = wlResumeInfo(x); return r && !r.done }).length, rb = document.getElementById("wlTabResume");
     rb && (rb.textContent = "Rozkoukané · " + nRes, rb.classList.toggle("active", "resume" === f), rb.style.display = nRes || "resume" === f ? "" : "none");
     const so = document.getElementById("wlSort");
-    so && so.value !== (window._wlSort || "new") && (so.value = window._wlSort || "new")
+    so && so.value !== (window._wlSort || "new") && (so.value = window._wlSort || "new", window.mfSyncDropdown && window.mfSyncDropdown(so))
   }
   if (!all.length) return void(empty.style.display = "flex");
   empty.style.display = "none";
@@ -315,3 +315,71 @@ document.getElementById("watchlistOverlay").addEventListener("click", e => {
 window.addEventListener("mf:profile-changed", () => {
   try { const o = document.getElementById("watchlistOverlay"); o && o.classList.contains("open") && renderWatchlist() } catch (e) {}
 });
+
+/* Vlastní rozbalovací seznam místo systémového (ten je na tmavém pozadí špatně čitelný, hlavně vybraná položka).
+   Původní <select> zůstává skrytý jako zdroj hodnoty: výběr v seznamu ho přepne a vyvolá jeho událost change, takže se nic dalšího nemění. */
+function mfEnhanceDropdown(sel) {
+  if (!sel || sel._mfdd || !sel.parentNode) return;
+  const wrap = document.createElement("div"), btn = document.createElement("button"), lab = document.createElement("span"), list = document.createElement("ul");
+  wrap.className = "mf-dd", btn.type = "button", btn.className = "mf-dd-btn", btn.setAttribute("aria-haspopup", "listbox"), btn.setAttribute("aria-expanded", "false");
+  const lblId = sel.getAttribute("aria-labelledby");
+  lblId && btn.setAttribute("aria-labelledby", lblId + " " + (btn.id = (sel.id || "mfdd") + "Btn"));
+  lab.className = "mf-dd-label";
+  btn.appendChild(lab), btn.insertAdjacentHTML("beforeend", '<svg class="mf-dd-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>');
+  list.className = "mf-dd-list", list.setAttribute("role", "listbox"), list.tabIndex = -1, list.hidden = !0;
+  const lblRef = lblId && document.getElementById(lblId);
+  lblRef && list.setAttribute("aria-labelledby", lblId);
+  const opts = [...sel.options].map((o, i) => {
+    const li = document.createElement("li");
+    li.className = "mf-dd-opt", li.id = (sel.id || "mfdd") + "Opt" + i, li.setAttribute("role", "option"), li.textContent = o.text;
+    li.addEventListener("click", () => choose(i)), li.addEventListener("pointermove", () => mark(i));
+    list.appendChild(li);
+    return li
+  });
+  let cur = 0;
+  function mark(i) {
+    cur = Math.max(0, Math.min(opts.length - 1, i));
+    opts.forEach((o, k) => o.classList.toggle("active", k === cur));
+    list.setAttribute("aria-activedescendant", opts[cur].id), opts[cur].scrollIntoView && opts[cur].scrollIntoView({ block: "nearest" })
+  }
+  function sync() {
+    const i = Math.max(0, sel.selectedIndex);
+    lab.textContent = sel.options[i] ? sel.options[i].text : "";
+    opts.forEach((o, k) => o.setAttribute("aria-selected", k === i ? "true" : "false"))
+  }
+  function isOpen() { return !list.hidden }
+  function open() {
+    if (isOpen()) return;
+    sync(), list.hidden = !1, wrap.classList.add("open"), btn.setAttribute("aria-expanded", "true");
+    wrap.classList.remove("up");
+    const r = list.getBoundingClientRect();
+    r.bottom > innerHeight - 8 && btn.getBoundingClientRect().top > r.height + 16 && wrap.classList.add("up");
+    mark(Math.max(0, sel.selectedIndex)), list.focus({ preventScroll: !0 })
+  }
+  function close(refocus) {
+    if (!isOpen()) return;
+    list.hidden = !0, wrap.classList.remove("open", "up"), btn.setAttribute("aria-expanded", "false"), refocus && btn.focus()
+  }
+  function choose(i) {
+    const changed = sel.selectedIndex !== i;
+    sel.selectedIndex = i, sync(), close(!0), changed && sel.dispatchEvent(new Event("change", { bubbles: !0 }))
+  }
+  btn.addEventListener("click", () => isOpen() ? close(!0) : open());
+  btn.addEventListener("keydown", e => { if ("ArrowDown" === e.key || "ArrowUp" === e.key) e.preventDefault(), open() });
+  list.addEventListener("keydown", e => {
+    const k = e.key;
+    if ("ArrowDown" === k) e.preventDefault(), mark(cur + 1);
+    else if ("ArrowUp" === k) e.preventDefault(), mark(cur - 1);
+    else if ("Home" === k) e.preventDefault(), mark(0);
+    else if ("End" === k) e.preventDefault(), mark(opts.length - 1);
+    else if ("Enter" === k || " " === k) e.preventDefault(), choose(cur);
+    else if ("Escape" === k) e.preventDefault(), e.stopPropagation(), close(!0);
+    else if ("Tab" === k) close(!1)
+  });
+  document.addEventListener("pointerdown", e => { wrap.contains(e.target) || close(!1) });
+  list.addEventListener("focusout", e => { e.relatedTarget && !wrap.contains(e.relatedTarget) && close(!1) });
+  wrap.append(btn, list), sel.parentNode.insertBefore(wrap, sel), sel.hidden = !0, sel._mfdd = { sync };
+  sync()
+}
+window.mfSyncDropdown = sel => { sel && sel._mfdd && sel._mfdd.sync() };
+mfEnhanceDropdown(document.getElementById("wlSort"));

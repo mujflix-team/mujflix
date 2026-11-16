@@ -856,12 +856,12 @@
             <button type="button" class="wl-tab" id="wlTabMovie" data-f="movie" onclick="wlSetFilter('movie')">Filmy</button>
             <button type="button" class="wl-tab" id="wlTabSeries" data-f="series" onclick="wlSetFilter('series')">Seriály</button>
           </div>
-          <label class="wl-sort"><span>Řadit</span>
-            <select id="wlSort" onchange="wlSetSort(this.value)" aria-label="Řazení oblíbených">
+          <div class="wl-sort"><span id="wlSortLbl">Řadit</span>
+            <select id="wlSort" onchange="wlSetSort(this.value)" aria-labelledby="wlSortLbl">
               <option value="new">Nejnovější přidané</option>
               <option value="az">Podle abecedy</option>
             </select>
-          </label>
+          </div>
         </div>
         <div class="wl-list" id="watchlistList">
           <div class="wl-empty" id="watchlistEmpty">
