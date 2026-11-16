@@ -806,7 +806,7 @@
           box.innerHTML =
             '<button type="button" class="nf-tr-open" aria-label="Přehrát trailer: ' + esc(it.title) + '">' +
               '<img src="https://i.ytimg.com/vi/' + vid + '/hqdefault.jpg" alt="" loading="lazy">' +
-              '<span class="nf-tr-play"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>' +
+              '<span class="nf-tr-play"><svg viewBox="0 0 10 12" aria-hidden="true"><polygon points="0,0 10,6 0,12"/></svg></span>' +
               '<span class="nf-tr-label">Trailer</span>' +
             '</button>';
           hero.appendChild(box);
