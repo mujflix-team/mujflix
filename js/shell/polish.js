@@ -136,7 +136,7 @@
       var card = im.closest('.episode-card, .sd-sim-card, .sd-actor, .dv-card');
       if (card && card.parentElement) {
         var idx = Array.prototype.indexOf.call(card.parentElement.children, card);
-        im.style.setProperty('--i', String(Math.min(Math.max(idx, 0), 14)));
+        im.style.setProperty('--i', String(Math.max(idx, 0) % 12)); /* pozice v řádku/dávce: karty z dalších stránek Procházení nečekají 0,6 s */
       }
       if (im.complete && (im.naturalWidth > 0 || !im.getAttribute('src'))) { done(im); return; }
       im.addEventListener('load', function () { done(im); }, { once: true });
