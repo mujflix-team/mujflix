@@ -991,6 +991,18 @@ html body #watchlistOverlay .wl-card-name { margin: 0; padding: 8px 2px 0; font-
 html body #watchlistOverlay .wl-card-badge { border-radius: 3px; background: rgba(0, 0, 0, 0.7); backdrop-filter: none; font-size: 0.62rem; padding: 3px 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 html body #watchlistOverlay .wl-card-remove { width: 28px; height: 28px; border-radius: 50%; background: rgba(20, 20, 20, 0.8); backdrop-filter: none; border: 1px solid rgba(255, 255, 255, 0.35); }
 html body #watchlistOverlay .wl-card-play { background: rgba(0, 0, 0, 0.25); }
+/* Oblíbené: stejný play jako v Objevovat a na náhledu epizody – šedý trojúhelník, při najetí přímo na něj zbělá a zvětší se */
+html body #watchlistOverlay .wl-card-play { font-size: 0; }
+html body #watchlistOverlay .wl-card-play-btn {
+  width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer;
+  color: rgba(255, 255, 255, 0.6); filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7));
+  transition: color 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+html body #watchlistOverlay .wl-card-play-btn svg { display: block; margin-left: 4px; }
+html body #watchlistOverlay .wl-card-play-btn:hover { color: #fff; transform: scale(1.2); }
+html body #watchlistOverlay .wl-card-play-btn:active { transform: scale(0.95); }
+@media (hover: none) { html body #watchlistOverlay .wl-card-play { display: none; } }
+@media (prefers-reduced-motion: reduce) { html body #watchlistOverlay .wl-card-play-btn { transition: none; } html body #watchlistOverlay .wl-card-play-btn:hover, html body #watchlistOverlay .wl-card-play-btn:active { transform: none; } }
 html body #watchlistOverlay .wl-empty-btn { border-radius: 4px; }
 @media (max-width: 899px) {
   html body #watchlistOverlay .wl-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 8px; }

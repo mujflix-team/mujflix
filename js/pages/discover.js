@@ -245,14 +245,15 @@
     return b;
   }
 
-  /* Symbol přehrání uprostřed plakátu při najetí myší (jen vizuální; klik na kartu otevírá jako dřív) */
+  /* Symbol přehrání uprostřed plakátu: jen šedý trojúhelník jako na náhledu epizody, zbělá a zvětší se při najetí přímo na něj.
+     Je jen vizuální, klik (i na trojúhelník) otevírá kartu jako dřív. */
   function playCue() {
     var ns = 'http://www.w3.org/2000/svg';
     var w = el('span', 'dv-play');
     w.setAttribute('aria-hidden', 'true');
     var b = el('span', 'dv-play-btn');
     var s = document.createElementNS(ns, 'svg');
-    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', 22); s.setAttribute('height', 22);
+    s.setAttribute('viewBox', '8 5 11 14'); s.setAttribute('width', 30); s.setAttribute('height', 36);
     s.setAttribute('fill', 'currentColor'); s.setAttribute('aria-hidden', 'true');
     var pa = document.createElementNS(ns, 'path');
     pa.setAttribute('d', 'M8 5v14l11-7z');
