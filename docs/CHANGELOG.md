@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.82
+- **Nově (načítání):** Řady na úvodní stránce, které čekají na data z TMDB (Vybráno pro tebe, Top 10, Nejlépe hodnocené seriály a filmy), ukážou hned kartičky-placeholdery s jemným pulzováním. Dřív byla stránka po splashi prázdná a řady pak naskočily. Řada, která nic nevrátí, se po odpovědi odstraní jako dřív.
+- **Opraveno (Procházení):** Chyba sítě už se nezobrazí jako „Žádné výsledky“ / „Nic jsme nenašli“. Ukáže se „Nepodařilo se načíst“ s tlačítkem Zkusit znovu; při chybě u dalších stránek zůstanou načtené karty a vedle zprávy je Zkusit znovu. Totéž tlačítko je i na domovské obrazovce Procházení.
+- **Přístupnost:** `aria-busy` na řadách a mřížce během načítání, `role="status"` u stavového řádku Procházení, placeholdery jsou `aria-hidden`.
+
 ## 3.21.81
 - **Opraveno (načítání):** Náhledy epizod v detailu seriálu se po načtení plynule rozsvítí (přechod `opacity` byl přebitý pravidlem pro hover). Zpoždění rozsvícení karet v Procházení se počítá v rámci řádku (max. 12 × 45 ms), takže karty z dalších stránek nečekají 0,6 s. Skeleton řady při ověřování věku má 9 karet místo 8.
 - **Úklid:** Smazané duplicitní `@keyframes nfHeroIn` (platila stejně jen poslední varianta, vzhled se nemění), nepoužité `shimmer`, `mf-shimmer`, `mf-pulse-red`, `sk-pulse`, `.sk-block`, prázdný `<style id="mf-ai-redesign">` a nevolané `MFTransition.skeleton / detailSkeleton / searchSkeleton`.
