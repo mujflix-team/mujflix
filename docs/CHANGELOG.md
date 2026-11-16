@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.88
+### Změněno
+- **Sekundární tlačítka:** „Zrušit“ (tvorba profilu) je nově plná šedá jako „Do oblíbených“ a „Náhodná“ (dřív šedý obrys); „Náhodná“ a „Pokračovat“ v detailu seriálu mají rohy 4 px jako ostatní tlačítka. „Všechny díly“ zůstává beze změny (je součástí řádku sérií).
+
 ## 3.21.87
 ### Změněno
 - **Tlačítko Pokračovat/Přehrát v detailu seriálu:** má stejné ostré rohy jako „Přehrát“ v banneru (dřív kulatá pilulka). Zbytek přehrávacích tlačítek (banner, Objevování, epizoda) i ikony play na náhledech už ve stejném stylu byly.

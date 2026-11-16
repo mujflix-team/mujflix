@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.88 – sekundární tlačítka sjednocena na šedou (claude/sekundarni-tlacitka)
 - 3.21.87 – sjednocení play tlačítka: Pokračovat v detailu seriálu jako banner (claude/play-icons)
 - 3.21.86 – banner na notebooku: trailer se nepřekrývá s popisem (claude/hero-notebook)
 - 3.21.83: toast nad Wrapped, správné id Wrapped v seznamech otevřených oken.
