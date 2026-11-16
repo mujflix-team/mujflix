@@ -2,6 +2,7 @@
 
 ## 3.21.84
 - **Změněno (detail seriálu):** Play na náhledu epizody je jen šedý trojúhelník bez kolečka; zbělá a zvětší se, až když na něj najedeš myší (ne na celý náhled). Místo pseudo-elementu `.ep-thumb::before` se používá skutečný prvek `.ep-hover-play` (kliknutí dál obsluhuje `series.js`).
+- **Změněno (detail seriálu):** Náhled zhlédnuté epizody je skoro černý (černobílý, ~25 % jasu), ale pořád trochu vidět; při najetí myší zešedne (~60 % jasu).
 
 ## 3.21.83
 - **Opraveno:** Hláška (toast) je ve stejné vrstvě jako „Zpět“ a ukáže se i nad Wrapped (dřív zůstala schovaná pod ním). Seznamy „je otevřené okno“ na úvodní stránce a v docku mají správné id Wrapped (`mfWrapped`, dřív `wrappedOverlay`): Domů a dock Wrapped zohlední.
