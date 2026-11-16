@@ -185,7 +185,8 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(2000);
   await page.click('#dvGenres [data-genre="kom"]');
   await page.click('#dvGenres [data-genre="scifi"]');
-  await page.selectOption("#dvRating", "7");
+  await page.locator("#universeOverlay .dv-select .mf-dd-btn").nth(2).click();
+  await page.locator("#universeOverlay .mf-dd.open .mf-dd-opt", { hasText: "7+" }).click();
   await page.waitForTimeout(2000);
   const last = urls.slice(-2);
   check("Filtry: dva žánry se pošlou TMDB najednou (film 35,878, seriál 35,10765) a minimální hodnocení", last.some(u => u.includes("/discover/movie") && /with_genres=35%2C878/.test(u)) && last.some(u => u.includes("/discover/tv") && /with_genres=35%2C10765/.test(u)) && last.every(u => /vote_average\.gte=7(&|$)/.test(u)), last.join(" | "));
@@ -209,6 +210,11 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(1200);
   const reset = await page.evaluate(() => ({ active: document.querySelectorAll("#dvBody .dv-achip").length, pressed: document.querySelectorAll("#dvGenres .dv-chip.active").length, rating: document.getElementById("dvRating").value, seen: document.getElementById("dvHideSeen").getAttribute("aria-pressed") }));
   check("Filtry: Zrušit filtry vrátí vše (žánry, hodnocení i skrývání)", reset.active === 0 && reset.pressed === 0 && reset.rating === "" && reset.seen === "false", JSON.stringify(reset));
+  await page.locator("#universeOverlay .dv-select .mf-dd-btn").nth(2).click();
+  await page.locator("#universeOverlay .mf-dd.open .mf-dd-opt", { hasText: "8+" }).click();
+  await page.waitForTimeout(1200);
+  const dd = await page.evaluate(() => ({ val: document.getElementById("dvRating").value, hidden: document.getElementById("dvRating").hidden, label: document.querySelectorAll("#universeOverlay .dv-select .mf-dd-label")[2].textContent, chips: [...document.querySelectorAll("#dvBody .dv-achip")].map(b => b.textContent) }));
+  check("Filtry: vlastní rozbalovací seznam (hodnocení) přepne hodnotu a vznikne štítek", dd.val === "8" && dd.hidden && /8\+/.test(dd.label) && dd.chips.some(c => /8\+/.test(c)), JSON.stringify(dd));
   check("Filtry: bez JS chyb", errors.filter(e => !/Access is denied/.test(e)).length === 0, errors.join(" | "));
   await page.close();
 }

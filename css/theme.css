@@ -1677,7 +1677,32 @@ html body #watchlistOverlay .wl-tools { display: flex; flex-wrap: wrap; align-it
 html body #watchlistOverlay .wl-tabs { flex-wrap: wrap; }
 html body #watchlistOverlay .wl-sort { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }
 html body #watchlistOverlay .wl-sort select { height: 40px; padding: 0 12px; border: 0; border-radius: 8px; background: rgba(109, 109, 110, 0.35); color: #fff; font: inherit; font-size: 0.88rem; font-weight: 600; max-width: 100%; }
-@media (max-width: 700px) { html body #watchlistOverlay .wl-sort { margin-left: 0; width: 100%; } html body #watchlistOverlay .wl-sort select { flex: 1; } }
+/* Vlastní rozbalovací seznam (mfEnhanceDropdown) */
+html body .mf-dd { position: relative; display: inline-block; }
+html body .mf-dd-btn { height: 40px; padding: 0 12px 0 14px; display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 0; border-radius: 8px; background: rgba(109, 109, 110, 0.35); color: #fff; font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+html body .mf-dd-btn:hover, html body .mf-dd.open .mf-dd-btn { background: rgba(109, 109, 110, 0.6); }
+html body .mf-dd-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body .mf-dd-chev { flex: none; transition: transform 0.18s; }
+html body .mf-dd.open .mf-dd-chev { transform: rotate(180deg); }
+html body .mf-dd-list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; min-width: 100%; width: max-content; max-width: min(320px, 90vw); margin: 0; padding: 6px; list-style: none; background: #1c1c1c; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 12px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); outline: 0; animation: mfddIn 0.14s ease-out; }
+html body .mf-dd-list[hidden] { display: none; }
+html body .mf-dd.up .mf-dd-list { top: auto; bottom: calc(100% + 6px); }
+html body .mf-dd-opt { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 10px 12px; border-radius: 8px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+html body .mf-dd-opt.active { background: rgba(255, 255, 255, 0.12); color: #fff; }
+html body .mf-dd-opt[aria-selected="true"] { color: #fff; font-weight: 800; }
+html body .mf-dd-opt[aria-selected="true"]::after { content: "✓"; font-size: 0.95rem; }
+html body .mf-dd-list { max-height: min(320px, 50vh); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.35) transparent; }
+/* Objevování: seznam uvnitř „pilulky“ filtrů – tlačítko bez vlastního pozadí, seznam zarovnaný doleva */
+html body #universeOverlay .dv-select .mf-dd-btn { height: 36px; padding: 0 2px 0 0; background: transparent; border-radius: 0; font-size: 0.9rem; color: var(--dv-text); }
+html body #universeOverlay .dv-select .mf-dd-btn:hover, html body #universeOverlay .dv-select .mf-dd.open .mf-dd-btn { background: transparent; }
+html body #universeOverlay .dv-select .mf-dd-list { right: auto; left: -12px; top: calc(100% + 8px); min-width: 150px; }
+@media (max-width: 700px) { html body #universeOverlay .dv-select { position: relative; } html body #universeOverlay .dv-select .mf-dd { flex: 1; min-width: 0; } html body #universeOverlay .dv-select .mf-dd-btn { width: 100%; } html body #universeOverlay .dv-select .mf-dd-list { left: 0; right: auto; min-width: 100%; } }
+/* Wrapped: výběr měsíce */
+html body #mfWrapped .mfw-pick .mf-dd-btn { height: 44px; min-width: 200px; padding: 0 12px 0 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.5); background: rgba(0, 0, 0, 0.35); font-size: 1rem; letter-spacing: 0; text-transform: none; }
+html body #mfWrapped .mfw-pick .mf-dd-list { left: 0; right: auto; }
+@keyframes mfddIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { html body .mf-dd-list { animation: none; } html body .mf-dd-chev { transition: none; } }
+@media (max-width: 700px) { html body #watchlistOverlay .wl-sort { margin-left: 0; width: 100%; } html body #watchlistOverlay .wl-sort .mf-dd { flex: 1; } html body #watchlistOverlay .wl-sort .mf-dd-btn { width: 100%; } html body #watchlistOverlay .wl-sort .mf-dd-list { left: 0; right: 0; max-width: none; } }
 
 /* ═════════ Cinema mód 3.15: lišta se nikdy nezalamuje (PC 1 řádek, telefon 2 řádky), „Další seriál“ jen na velkém PC ═════════ */
 html body #mfStandaloneCinema .mf-cin-ep-btn { white-space: nowrap; }

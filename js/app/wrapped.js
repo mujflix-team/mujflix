@@ -241,7 +241,7 @@
     var months = (ctx.months || []).slice();
     if (months.indexOf(currentKey) < 0) months.unshift(currentKey);
     if (months.length < 2) return "";
-    return el("label", "mfw-pick", "<span>Měsíc</span>" +
+    return el("div", "mfw-pick", "<span>Měsíc</span>" +
       '<select class="mfw-select" aria-label="Vybrat měsíc">' + months.map(function (k) {
         return '<option value="' + esc(k) + '"' + (k === currentKey ? " selected" : "") + ">" + esc(monthLabel(k)) + "</option>";
       }).join("") + "</select>");
@@ -452,6 +452,7 @@
     if (!sl) return;
     stage.classList.remove("mfw-in");
     stage.innerHTML = '<div class="mfw-slide">' + sl.html + "</div>";
+    [].forEach.call(stage.querySelectorAll(".mfw-select"), function (s) { window.mfEnhanceDropdown && window.mfEnhanceDropdown(s); });
     stage.scrollTop = 0;
     var segs = ""; for (var k = 0; k < n; k++) segs += "<i" + (k <= state.i ? ' class="on"' : "") + "></i>";
     prog.innerHTML = segs; prog.style.visibility = n > 1 ? "visible" : "hidden";

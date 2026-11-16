@@ -146,12 +146,17 @@ check("ui: klik na levou třetinu zpět", await segs() === 1);
 await page.click('#mfWrapped [data-go="next"]');
 check("ui: tlačítko Dál", await segs() === 2);
 
+async function pickMonth(v) {
+  await page.click("#mfWrapped .mf-dd-btn");
+  const i = await page.evaluate(v => [...document.querySelector("#mfWrapped .mfw-select").options].findIndex(o => o.value === v), v);
+  await page.locator("#mfWrapped .mf-dd.open .mf-dd-opt").nth(i).click();
+}
 // měsíc se přepíná výběrem na úvodním slidu
 await page.click('#mfWrapped [data-go="prev"]');
-await page.selectOption("#mfWrapped .mfw-select", "2026-09");
+await pickMonth("2026-09");
 await page.waitForTimeout(100);
 check("ui: výběr měsíce přepočítá Wrapped (září: Tvé září, 1 film ze září)", /Tvé září/.test(await title()) && await segs() === 1, await title());
-await page.selectOption("#mfWrapped .mfw-select", "2026-10");
+await pickMonth("2026-10");
 await page.evaluate(() => document.activeElement && document.activeElement.blur()); // fokus na výběru by šipky bral sobě (mění měsíc)
 
 // poslední slide, uložení obrázku

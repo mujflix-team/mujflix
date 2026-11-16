@@ -54,7 +54,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=5" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=5" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=70" />
+    <link rel="stylesheet" href="css/theme.css?v=71" />
     <link rel="stylesheet" href="css/wrapped.css?v=3" />
     <link rel="stylesheet" href="css/together.css?v=2" />
 
@@ -846,12 +846,12 @@
             <button type="button" class="wl-tab" id="wlTabMovie" data-f="movie" onclick="wlSetFilter('movie')">Filmy</button>
             <button type="button" class="wl-tab" id="wlTabSeries" data-f="series" onclick="wlSetFilter('series')">Seriály</button>
           </div>
-          <label class="wl-sort"><span>Řadit</span>
-            <select id="wlSort" onchange="wlSetSort(this.value)" aria-label="Řazení oblíbených">
+          <div class="wl-sort"><span id="wlSortLbl">Řadit</span>
+            <select id="wlSort" onchange="wlSetSort(this.value)" aria-labelledby="wlSortLbl">
               <option value="new">Nejnovější přidané</option>
               <option value="az">Podle abecedy</option>
             </select>
-          </label>
+          </div>
         </div>
         <div class="wl-list" id="watchlistList">
           <div class="wl-empty" id="watchlistEmpty">
@@ -945,9 +945,9 @@
             <button type="button" class="dv-seg-btn" data-type="tv">Seriály</button>
           </div>
           <div class="dv-selects">
-            <label class="dv-select"><span>Řadit</span><select id="dvSort" aria-label="Řadit podle"></select></label>
-            <label class="dv-select"><span>Rok</span><select id="dvYear" aria-label="Rok vydání"></select></label>
-            <label class="dv-select"><span>Hodnocení</span><select id="dvRating" aria-label="Minimální hodnocení"></select></label>
+            <div class="dv-select"><span>Řadit</span><select id="dvSort" aria-label="Řadit podle"></select></div>
+            <div class="dv-select"><span>Rok</span><select id="dvYear" aria-label="Rok vydání"></select></div>
+            <div class="dv-select"><span>Hodnocení</span><select id="dvRating" aria-label="Minimální hodnocení"></select></div>
             <button type="button" class="dv-toggle" id="dvHideSeen" aria-pressed="false" title="Skryje tituly, které jsi tu už otevřel">Skrýt už otevřené</button>
             <button type="button" class="dv-reset" id="dvReset" hidden>Zrušit filtry</button>
           </div>
@@ -1726,9 +1726,9 @@
     <script src="js/ai/brain.js?v=2" defer></script>
     <script src="js/profiles/gate.js?v=10" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
-    <script src="js/app/core.js?v=9" defer></script>
+    <script src="js/app/core.js?v=10" defer></script>
     <script src="js/app/series.js?v=16" defer></script>
-    <script src="js/app/watchlist.js?v=8" defer></script>
+    <script src="js/app/watchlist.js?v=9" defer></script>
     <script src="js/app/interaction.js?v=4" defer></script>
     <script src="js/app/notify.js?v=8" defer></script>
     <script src="js/app/profiles-util.js?v=4" defer></script>
@@ -1738,7 +1738,7 @@
     <script src="js/app/sections.js?v=7" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=1" defer></script>
-    <script src="js/pages/discover.js?v=18" defer></script>
+    <script src="js/pages/discover.js?v=19" defer></script>
 
     <script>
       (function () {
@@ -1792,7 +1792,7 @@
 
 <script src="js/app/card-menu.js?v=3" defer></script>
 <script src="js/pages/cinema.js?v=19" defer></script>
-    <script src="js/app/wrapped.js?v=3" defer></script>
+    <script src="js/app/wrapped.js?v=4" defer></script>
     <script src="js/app/together.js?v=1" defer></script>
     <script src="js/pages/home.js?v=35" defer></script>
     <script src="js/shell/dock.js" defer></script>
