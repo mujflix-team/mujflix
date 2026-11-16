@@ -653,14 +653,16 @@ const avFail = await page.evaluate(async () => {
 });
 check("avatary: bez AniListu se ukáže hláška + Zkusit znovu a ostatní řady zůstanou", avFail.msg && avFail.retry && avFail.rows >= 3, JSON.stringify(avFail));
 
-// --- Popis s „…“ se po kliknutí rozbalí
+// --- Popis v banneru na širokém displeji (od 900 px) je vždy rozbalený: klik ho nepřepíná a nemá roli tlačítka
 const dsT = await page.evaluate(() => {
   const p = document.createElement("p"); p.className = "nf-hero-desc"; p.textContent = "x ".repeat(400); document.body.appendChild(p);
   window.mfDescInit(p);
-  p.click(); const open = p.classList.contains("is-open"), dsp = getComputedStyle(p).webkitLineClamp; p.click(); const closed = !p.classList.contains("is-open"); p._mfMore && p._mfMore.remove(); p.remove();
-  return { open, dsp, closed };
+  const wide = window.matchMedia("(min-width: 900px)").matches;
+  p.click(); const open = p.classList.contains("is-open"), role = p.getAttribute("role"), exp = p.hasAttribute("aria-expanded"), tab = p.getAttribute("tabindex");
+  p._mfMore && p._mfMore.remove(); p.remove();
+  return { wide, open, role, exp, tab };
 });
-check("popis: klik rozbalí celý text a další klik ho sbalí", dsT.open && dsT.closed && (dsT.dsp === "none" || dsT.dsp === "unset"), JSON.stringify(dsT));
+check("popis: na širokém displeji klik popis nepřepíná a nemá roli tlačítka ani aria-expanded", dsT.wide && !dsT.open && dsT.role === null && !dsT.exp && dsT.tab === null, JSON.stringify(dsT));
 
 // --- Nová verze: lišta se ukáže, jen když server hlásí jinou verzi
 const updT = await page.evaluate(async () => {
@@ -1090,7 +1092,7 @@ const swT = await page.evaluate(async () => {
 });
 check("service worker: adresa skriptu nese verzi aplikace (nová verze = nová cache)", swT.none || swT.url.endsWith("/sw.js?v=" + encodeURIComponent(swT.v)), JSON.stringify(swT));
 
-// --- Popis v banneru: „Více ▾“ jen u useknutého textu, rozbalení nevytlačí tlačítka, klávesnice, reset při výměně titulu
+// --- Popis v banneru: na širokém displeji vždy rozbalený, na užším skrytý; v detailu seriálu se text při výměně titulu vrátí zavřený
 const descSetup = short => page.evaluate(short => {
   window.__origFetchDesc = window.__origFetchDesc || window.fetch;
   window.__SHORT = short;
@@ -1109,7 +1111,7 @@ const descState = () => page.evaluate(() => {
   const d = document.querySelector("#nfHero .nf-hero-desc"), play = document.getElementById("nfHeroPlay"), hero = document.getElementById("nfHero");
   if (!d || !play || !hero) return null;
   const more = d.nextElementSibling, pb = play.getBoundingClientRect(), hb = hero.getBoundingClientRect();
-  return { exp: d.getAttribute("aria-expanded"), role: d.getAttribute("role"), tab: d.getAttribute("tabindex"), title: d.getAttribute("title"), more: more && more.classList.contains("mf-desc-more") && getComputedStyle(more).display !== "none" ? more.textContent : null, playTop: Math.round(pb.top), inHero: pb.top >= hb.top && pb.bottom <= hb.bottom + 1 };
+  return { dsp: getComputedStyle(d).display, exp: d.getAttribute("aria-expanded"), role: d.getAttribute("role"), tab: d.getAttribute("tabindex"), title: d.getAttribute("title"), more: more && more.classList.contains("mf-desc-more") && getComputedStyle(more).display !== "none" ? more.textContent : null, playTop: Math.round(pb.top), inHero: pb.top >= hb.top && pb.bottom <= hb.bottom + 1 };
 });
 const descRes = {};
 for (const [w, h] of [[1280, 800], [768, 1024], [390, 844]]) {
@@ -1117,18 +1119,9 @@ for (const [w, h] of [[1280, 800], [768, 1024], [390, 844]]) {
   await descSetup(false); await page.waitForTimeout(4200);
   const a = await descState();
   if (!a) { descRes[w] = { skip: true }; continue; }
-  await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(250);
+  if (w >= 900) { await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(250); } // na širokém displeji klik nic nepřepíná
   const b = await descState();
-  await page.click("#nfHero .mf-desc-more"); await page.waitForTimeout(150);
-  const c = await descState();
-  await page.focus("#nfHero .nf-hero-desc"); await page.keyboard.press("Enter"); await page.waitForTimeout(150);
-  const d2 = await descState();
-  await page.keyboard.press(" "); await page.waitForTimeout(150);
-  const e2 = await descState();
-  await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(150);
-  await descSetup(false); await page.waitForTimeout(4200); // výměna titulu: banner se vykreslí znovu
-  const f = await descState();
-  descRes[w] = { a, b, c, d2, e2, f };
+  descRes[w] = { a, b };
 }
 await page.setViewportSize({ width: 1280, height: 800 });
 await descSetup(true); await page.waitForTimeout(4200);
@@ -1140,10 +1133,12 @@ const descDetail = await page.evaluate(async () => {
   return { reset: !o.classList.contains("is-open") && !o.classList.contains("is-scrollable"), noTitle: !o.hasAttribute("title") };
 });
 await page.evaluate(() => { window.fetch = window.__origFetchDesc || window.fetch; localStorage.removeItem("mf_tmdb_key"); });
-const descOk = w => { const r = descRes[w]; return !r || r.skip || (r.a.more === "Více ▾" && r.a.exp === "false" && r.a.role === "button" && r.a.tab === "0" && r.a.title === null && r.b.exp === "true" && r.b.more === "Méně ▴" && r.b.inHero && r.b.playTop === r.a.playTop && r.c.exp === "false" && r.c.more === "Více ▾" && r.d2.exp === "true" && r.e2.exp === "false" && r.f.exp === "false"); };
-check("popis v banneru: značka Více ▾, klik rozbalí (aria-expanded, tlačítko Přehrát zůstane na místě a v banneru), druhý klik, Enter a Mezerník ovládají, nová vykreslení je zavřené, bez title (1280 px)", descOk(1280), JSON.stringify(descRes[1280]));
-check("popis v banneru: totéž na šířce 768 px", descOk(768), JSON.stringify(descRes[768]));
-check("popis v banneru: totéž na šířce 390 px", descOk(390), JSON.stringify(descRes[390]));
+// Od 900 px je popis v banneru vždy rozbalený (bez Více / Méně, bez role tlačítka); pod 900 px se v banneru nezobrazuje
+const descWide = w => { const r = descRes[w]; return !r || r.skip || (r.a.dsp !== "none" && r.a.more === null && r.a.exp === null && r.a.role === null && r.a.tab === null && r.a.title === null && r.b.exp === null && r.b.more === null && r.b.inHero && r.b.playTop === r.a.playTop); };
+const descHidden = w => { const r = descRes[w]; return !r || r.skip || (r.a.dsp === "none" && r.a.more === null && r.a.inHero); };
+check("popis v banneru: na širokém displeji je popis vždy rozbalený (bez Více ▾ a role tlačítka), klik nic nepřepne a tlačítko Přehrát zůstane na místě v banneru (1280 px)", descWide(1280), JSON.stringify(descRes[1280]));
+check("popis v banneru: na šířce 768 px se popis v banneru nezobrazuje", descHidden(768), JSON.stringify(descRes[768]));
+check("popis v banneru: na šířce 390 px se popis v banneru nezobrazuje", descHidden(390), JSON.stringify(descRes[390]));
 check("popis v banneru: krátký popis nemá značku ani roli tlačítka; text v detailu seriálu se při výměně titulu vrátí zavřený", !descShort || (descShort.more === null && descShort.role === null) && (descDetail.skip || (descDetail.reset && descDetail.noTitle)), JSON.stringify({ descShort, descDetail }));
 
 // --- Sdílení: adresa titulu s ?id= (slug bez diakritiky), tlačítko Sdílet v banneru, detailu a přehrávači
