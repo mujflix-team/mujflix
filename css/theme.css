@@ -1528,6 +1528,11 @@ html body #seriesModal.nf-compact .modal-hero .sd-seasons-wrap { right: 50%; bot
   html body #seriesModal.sd-has-seasons.nf-compact .modal-hero { height: 140px !important; }
   html body #seriesModal.sd-has-seasons.nf-compact .modal-hero-content { padding-bottom: 58px !important; }
 }
+/* Široké obrazovky (od 1600 px): tlačítka jsou vpravo dole, proto jim vyhradíme místo vlevo od výběru sérií (S1, S2 …), ať se nepřekrývají.
+   Šířka pruhu = 216 px série + 2× šipka 34 px + 2× mezera 6 px = 296 px, k tomu 16 px odstup. */
+@media (min-width: 1600px) {
+  html body #seriesModal.sd-has-seasons:not(.nf-compact):not(.sd-detail) .modal-hero-content { padding-right: calc(var(--nf-pad, 5%) + 312px) !important; box-sizing: border-box; }
+}
 /* Telefon: řádky (obrázek vlevo), ať se vejde víc epizod */
 @media (max-width: 700px) {
   html body #seriesModal .sd-head { padding: 12px 12px 8px; }
