@@ -1366,15 +1366,6 @@ canvas#particles {
   color: rgba(255, 255, 255, 0.8);
 }
 
-@keyframes shimmer {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
 
 
 #_mfUserBadge:hover {
@@ -2163,26 +2154,6 @@ canvas#particles {
 }
 ::view-transition-new(movie-poster) {
   animation: 420ms cubic-bezier(0.34, 1.1, 0.64, 1) both vt-slide-up;
-}
-@keyframes sk-pulse {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 0.15;
-  }
-}
-.sk-block {
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  animation: sk-pulse 1.6s ease-in-out infinite;
-}
-.sk-block.dark {
-  background: rgba(255, 255, 255, 0.06);
-}
-.sk-block.light {
-  background: rgba(255, 255, 255, 0.14);
 }
 :root {
   --sys-bg1: #1c1c1e;
@@ -4086,11 +4057,6 @@ body::after { display: none !important; }
   font-family: var(--font-ui) !important;
 }
 
-@keyframes mf-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-
 .wl-close:hover {  color: #fff !important;  }
 
 .rating-box {
@@ -4148,10 +4114,6 @@ input:focus, textarea:focus {
 @keyframes mf-scale-in {
   from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
-}
-@keyframes mf-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
