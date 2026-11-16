@@ -115,7 +115,6 @@ html body.discover-open #mfDock { display: none !important; }
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 18%;
   animation: nfHeroIn 0.9s ease both;
 }
-@keyframes nfHeroIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
 .nf-hero-shade {
   position: absolute; inset: 0;
   background:
@@ -1322,7 +1321,6 @@ html body.mf-section-protebe #nfTop, html body:has(#watchlistOverlay.visible) #n
 /* ───────── Klidnější aplikace (v3.3) – nic se nehýbe, dokud o to člověk nestojí ───────── */
 .nf-row, .nf-quick { animation: none !important; }
 .nf-hero { animation: none; }
-@keyframes nfHeroIn { from { opacity: 0; } to { opacity: 1; } }
 .nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(1.03); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
 html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(1.03); }
 html body #seriesModal .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(1.02) !important; }
@@ -1467,7 +1465,7 @@ html body #seriesModal #episodesGrid .episode-card {
 html body #seriesModal #episodesGrid .episode-card:hover, html body #seriesModal #episodesGrid .episode-card.next-ep, html body #seriesModal #episodesGrid .episode-card.watched { background: transparent !important; }
 html body #seriesModal #episodesGrid .episode-card::before, html body #seriesModal #episodesGrid .episode-card::after { display: none !important; content: none !important; }
 html body #seriesModal #episodesGrid .ep-thumb { width: 100% !important; max-width: none !important; min-width: 0 !important; height: auto !important; aspect-ratio: 16 / 9; border-radius: 8px !important; overflow: hidden; background: #1f1f1f; box-shadow: none; position: relative; }
-html body #seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease, filter 0.2s; }
+html body #seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.5s ease calc(var(--i, 0) * 45ms), transform 0.25s ease, filter 0.2s; }
 html body #seriesModal #episodesGrid .episode-card:hover .ep-thumb img { transform: scale(1.04); }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb img { filter: brightness(0.5) !important; }
 html body #seriesModal #episodesGrid .ep-body { padding: 10px 2px 0 !important; gap: 3px; display: flex; flex-direction: column; min-width: 0; grid-column: auto; }
