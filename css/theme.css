@@ -1467,7 +1467,9 @@ html body #seriesModal #episodesGrid .episode-card::before, html body #seriesMod
 html body #seriesModal #episodesGrid .ep-thumb { width: 100% !important; max-width: none !important; min-width: 0 !important; height: auto !important; aspect-ratio: 16 / 9; border-radius: 8px !important; overflow: hidden; background: #1f1f1f; box-shadow: none; position: relative; }
 html body #seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.5s ease calc(var(--i, 0) * 45ms), transform 0.25s ease, filter 0.2s; }
 html body #seriesModal #episodesGrid .episode-card:hover .ep-thumb img { transform: scale(1.04); }
-html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb img { filter: brightness(0.5) !important; }
+html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb img { filter: grayscale(1) brightness(0.25) !important; }
+/* Zhlédnutá epizoda: náhled je skoro černý (černobílý, ~25 % jasu), ale pořád trochu vidět; při najetí zešedne (~60 % jasu). */
+html body #seriesModal #episodesGrid .episode-card.watched:hover .ep-thumb img { filter: grayscale(1) brightness(0.6) !important; }
 html body #seriesModal #episodesGrid .ep-body { padding: 10px 2px 0 !important; gap: 3px; display: flex; flex-direction: column; min-width: 0; grid-column: auto; }
 html body #seriesModal #episodesGrid .ep-title { order: 1; font-size: 0.98rem !important; font-weight: 600 !important; color: #fff !important; line-height: 1.3; display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden !important; white-space: normal !important; text-overflow: clip !important; opacity: 1 !important; }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-title { color: #8c8c8c !important; }
