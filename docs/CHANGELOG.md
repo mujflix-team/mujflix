@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.87
+### Změněno
+- **Tlačítko Pokračovat/Přehrát v detailu seriálu:** má stejné ostré rohy jako „Přehrát“ v banneru (dřív kulatá pilulka). Zbytek přehrávacích tlačítek (banner, Objevování, epizoda) i ikony play na náhledech už ve stejném stylu byly.
+
 ## 3.21.86
 ### Opraveno
 - **Hlavní banner na notebooku:** na nižších oknech (do 900 px výšky) se trailer vpravo nahoře už nepřekrývá s popisem filmu; trailer je menší a popis se vejde pod něj (a je posuvný). Na velkém monitoru beze změny.
