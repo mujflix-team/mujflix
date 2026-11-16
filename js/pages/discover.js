@@ -36,7 +36,8 @@
     { key: 'newest', label: 'Nejnovější' }
   ];
 
-  var state = { type: 'all', genre: '', sort: 'popular', year: '', query: '' };
+  function freshState() { return { type: 'all', genres: [], sort: 'popular', year: '', minRating: '', hideSeen: false, query: '' }; }
+  var state = freshState();
   var run = 0;
   var searchTimer = null;
   var gridCtx = null;
@@ -71,6 +72,18 @@
   function genreByKey(key) {
     for (var i = 0; i < GENRES.length; i++) if (GENRES[i].key === key) return GENRES[i];
     return null;
+  }
+
+  function selGenres() { return state.genres.map(genreByKey).filter(Boolean); }
+
+  /* Tituly, které jsi v Objevování otevřel (nebo v nabídce karty označil „Méně podobného“). Samotné Oblíbené sem nepatří. */
+  function openedIds() {
+    var seen = {};
+    try {
+      var m = aiBrain.memory;
+      if (m && m.watchedTmdbIds) Object.keys(m.watchedTmdbIds).forEach(function (k) { seen[k] = true; });
+    } catch (e) {}
+    return seen;
   }
 
   function genreIdsFor(g) {
@@ -422,10 +435,11 @@
     }
     if (onlyAnime()) {
       // „Jen anime“: animace (16) japonského původu; vybraný žánr se přidá jako další podmínka (čárka = a zároveň)
-      var extra = o.genres ? String(o.genres).split('|')[0] : '';
-      q.push('with_genres=' + encodeURIComponent(extra && extra !== '16' ? '16,' + extra : '16'), 'with_original_language=ja');
+      var extra = o.genres ? String(o.genres).split('|')[0].split(',').filter(function (x) { return x !== '16'; }).join(',') : '';
+      q.push('with_genres=' + encodeURIComponent(extra ? '16,' + extra : '16'), 'with_original_language=ja');
     } else if (o.genres) q.push('with_genres=' + encodeURIComponent(o.genres));
     if (o.year) q.push((type === 'movie' ? 'primary_release_year=' : 'first_air_date_year=') + o.year);
+    if (o.minRating) q.push('vote_average.gte=' + encodeURIComponent(o.minRating));
     return '/discover/' + type + '?' + q.join('&');
   }
 
@@ -587,9 +601,10 @@
 
   function describeFilters() {
     var parts = [];
-    if (state.genre) parts.push(genreByKey(state.genre).name);
+    if (state.genres.length) parts.push(selGenres().map(function (g) { return g.name; }).join(' + '));
     parts.push(state.type === 'movie' ? 'Filmy' : state.type === 'tv' ? 'Seriály' : 'Filmy a seriály');
     if (state.year) parts.push(state.year);
+    if (state.minRating) parts.push('★ ' + state.minRating + '+');
     var s = SORTS.filter(function (x) { return x.key === state.sort; })[0];
     if (s && state.sort !== 'popular') parts.push(s.label.toLowerCase());
     return parts.join(' · ');
@@ -605,6 +620,18 @@
     var head = el('div', 'dv-grid-head');
     head.appendChild(el('h2', 'dv-grid-title', mode === 'search' ? 'Výsledky pro „' + state.query + '“' : describeFilters()));
     body.appendChild(head);
+    var chips = activeChips();
+    if (chips.length) {
+      var act = el('div', 'dv-active');
+      chips.forEach(function (c) {
+        var b = el('button', 'dv-achip', c[0] + ' ×');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Zrušit filtr: ' + c[0]);
+        b.addEventListener('click', function () { c[1](); refresh(); });
+        act.appendChild(b);
+      });
+      body.appendChild(act);
+    }
     var grid = el('div', 'dv-grid');
     body.appendChild(grid);
     var sentinel = el('div', 'dv-sentinel');
@@ -632,8 +659,10 @@
   function matchesFilters(it) {
     if (state.type !== 'all' && it.type !== state.type) return false;
     if (state.year && it.year !== state.year) return false;
-    if (state.genre) {
-      var ids = genreIdsFor(genreByKey(state.genre));
+    if (state.minRating && it.rating < Number(state.minRating)) return false;
+    var sel = selGenres();
+    for (var k = 0; k < sel.length; k++) {
+      var ids = genreIdsFor(sel[k]);
       var ok = false;
       for (var i = 0; i < it.genreIds.length; i++) if (ids[it.genreIds[i]]) { ok = true; break; }
       if (!ok) return false;
@@ -643,7 +672,10 @@
 
   function fetchPage(ctx) {
     return fetchPageRaw(ctx).then(function (res) {
-      return ageFilter(res.items).then(function (items) { res.items = items; return res; });
+      return ageFilter(res.items).then(function (items) {
+        if (state.hideSeen) { var seen = openedIds(); items = items.filter(function (it) { return !seen[it.id]; }); }
+        res.items = items; return res;
+      });
     });
   }
 
@@ -751,20 +783,22 @@
         return { items: items, pages: (d && d.total_pages) || 0 };
       });
     }
-    var g = state.genre ? genreByKey(state.genre) : null;
+    var sel = selGenres();
     var types = state.type === 'all' ? ['movie', 'tv'] : [state.type];
     var jobs = [];
     types.forEach(function (t) {
-      var gid = g ? g[t] : '';
-      if (g && !gid) return;
-      jobs.push(fetchDiscover(t, page, { sort: state.sort, genres: gid, year: state.year }));
+      var ids = sel.map(function (g) { return g[t]; });
+      if (ids.some(function (x) { return !x; })) return;
+      /* Jeden žánr může být „A|B“ (nebo). Při více žánrech TMDB nepustí nebo uvnitř „a“, proto se vezme první ID z každého. */
+      var gid = ids.length > 1 ? ids.map(function (x) { return String(x).split('|')[0]; }).join(',') : (ids[0] || '');
+      jobs.push(fetchDiscover(t, page, { sort: state.sort, genres: gid, year: state.year, minRating: state.minRating }));
     });
     if (!jobs.length) return Promise.resolve({ items: [], pages: 0 });
     return Promise.all(jobs).then(function (r) {
       var pages = 0, lists = [];
       r.forEach(function (x) { pages = Math.max(pages, x.pages); lists.push(x.items); });
       var merged = lists.length === 2 ? mergeBy(state.sort, lists[0], lists[1]) : lists[0];
-      if (g && g.key === 'anim' && !onlyAnime()) merged = merged.filter(function (it) { return !it.anime; });
+      if (state.genres.indexOf('anim') > -1 && !onlyAnime()) merged = merged.filter(function (it) { return !it.anime; });
       return { items: merged, pages: pages };
     });
   }
@@ -814,13 +848,28 @@
 
   /* ---------- Stav a ovládání ---------- */
 
-  function filtersActive() {
-    return state.type !== 'all' || !!state.genre || state.sort !== 'popular' || !!state.year;
+  function activeCount() {
+    return (state.type !== 'all' ? 1 : 0) + state.genres.length + (state.sort !== 'popular' ? 1 : 0) + (state.year ? 1 : 0) + (state.minRating ? 1 : 0) + (state.hideSeen ? 1 : 0);
+  }
+
+  function filtersActive() { return activeCount() > 0; }
+
+  /* Přehled aktivních filtrů nad mřížkou, každý jde odebrat jedním klepnutím. */
+  function activeChips() {
+    var out = [];
+    if (state.type !== 'all') out.push([state.type === 'movie' ? 'Filmy' : 'Seriály', function () { state.type = 'all'; }]);
+    state.genres.forEach(function (k) { var g = genreByKey(k); if (g) out.push([g.name, function () { state.genres = state.genres.filter(function (x) { return x !== k; }); }]); });
+    if (state.year) out.push([state.year, function () { state.year = ''; }]);
+    if (state.minRating) out.push(['★ ' + state.minRating + '+', function () { state.minRating = ''; }]);
+    if (state.hideSeen) out.push(['Bez už otevřených', function () { state.hideSeen = false; }]);
+    var so = SORTS.filter(function (x) { return x.key === state.sort; })[0];
+    if (so && state.sort !== 'popular') out.push([so.label, function () { state.sort = 'popular'; }]);
+    return out;
   }
 
   function syncControls() {
     els.reset.hidden = !(filtersActive() || state.query.length > 0);
-    if (els.fbtn) { var dot = els.fbtn.querySelector('.dv-filter-dot'); if (dot) dot.hidden = !filtersActive(); }
+    if (els.fbtn) { var dot = els.fbtn.querySelector('.dv-filter-dot'); if (dot) { dot.hidden = !filtersActive(); dot.textContent = activeCount() || ''; } }
     els.clear.hidden = !els.input.value;
     [].forEach.call(els.type.children, function (b) {
       var on = b.getAttribute('data-type') === state.type;
@@ -831,11 +880,15 @@
       var key = b.getAttribute('data-genre');
       var g = genreByKey(key);
       b.disabled = state.type !== 'all' && !g[state.type];
-      b.classList.toggle('active', state.genre === key);
-      b.setAttribute('aria-pressed', state.genre === key ? 'true' : 'false');
+      var on = state.genres.indexOf(key) > -1;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     els.sort.value = state.sort;
     els.year.value = state.year;
+    els.rating.value = state.minRating;
+    els.seen.classList.toggle('active', state.hideSeen);
+    els.seen.setAttribute('aria-pressed', state.hideSeen ? 'true' : 'false');
   }
 
   function refresh() {
@@ -851,19 +904,20 @@
 
   function setType(t) {
     state.type = t;
-    if (state.genre && t !== 'all' && !genreByKey(state.genre)[t]) state.genre = '';
+    if (t !== 'all') state.genres = state.genres.filter(function (k) { return genreByKey(k)[t]; });
     refresh();
   }
 
   function setGenre(key) {
-    state.genre = state.genre === key ? '' : key;
+    var at = state.genres.indexOf(key);
+    if (at > -1) state.genres.splice(at, 1); else state.genres.push(key);
     refresh();
     var b = els.genres.querySelector('[data-genre="' + key + '"]');
     if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
   }
 
   function resetAll() {
-    state = { type: 'all', genre: '', sort: 'popular', year: '', query: '' };
+    state = freshState();
     els.input.value = '';
     refresh();
   }
@@ -888,9 +942,9 @@
     if (!root) return false;
     els = {
       root: root, input: $('dvSearch'), clear: $('dvClear'), close: $('dvClose'), fbtn: $('dvFilterBtn'), reset: $('dvReset'),
-      type: $('dvType'), genres: $('dvGenres'), sort: $('dvSort'), year: $('dvYear'), body: $('dvBody')
+      type: $('dvType'), genres: $('dvGenres'), sort: $('dvSort'), year: $('dvYear'), rating: $('dvRating'), seen: $('dvHideSeen'), body: $('dvBody')
     };
-    if (!els.input || !els.body) return false;
+    if (!els.input || !els.body || !els.rating || !els.seen) return false;
 
     GENRES.forEach(function (g) {
       var b = el('button', 'dv-chip', g.name);
@@ -913,11 +967,19 @@
       els.year.appendChild(o2);
     }
 
+    [['', 'Libovolné'], ['6', '★ 6+'], ['7', '★ 7+'], ['8', '★ 8+']].forEach(function (r) {
+      var o3 = el('option', null, r[1]);
+      o3.value = r[0];
+      els.rating.appendChild(o3);
+    });
+
     [].forEach.call(els.type.children, function (b) {
       b.addEventListener('click', function () { setType(b.getAttribute('data-type')); });
     });
     els.sort.addEventListener('change', function () { state.sort = els.sort.value; refresh(); });
     els.year.addEventListener('change', function () { state.year = els.year.value; refresh(); });
+    els.rating.addEventListener('change', function () { state.minRating = els.rating.value; refresh(); });
+    els.seen.addEventListener('click', function () { state.hideSeen = !state.hideSeen; refresh(); });
     els.input.addEventListener('input', onInput);
     els.input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { pushHistory(els.input.value); els.input.blur(); }
@@ -973,7 +1035,7 @@
       run++;
       gridCtx = null;
       if (observer) observer.disconnect();
-      state = { type: 'all', genre: '', sort: 'popular', year: '', query: '' };
+      state = freshState();
       els.root.classList.remove('dv-filters-open');
       if (els.fbtn) els.fbtn.setAttribute('aria-expanded', 'false');
       els.input.value = '';
@@ -995,10 +1057,11 @@
     type = type || 'all';
     genre = genre && genreByKey(genre) && genreByKey(genre).key ? genre : '';
     if (genre && type !== 'all' && !genreByKey(genre)[type]) genre = '';
+    var gl = genre ? [genre] : [];
     var open = els.root.classList.contains('open');
-    if (open) { state.type = type; state.genre = genre; state.query = ''; els.input.value = ''; refresh(); return; }
+    if (open) { state.type = type; state.genres = gl; state.query = ''; els.input.value = ''; refresh(); return; }
     state.type = type;
-    state.genre = genre;
+    state.genres = gl;
     openUniverse(false);
   };
   window.mfDiscoverType = function () {

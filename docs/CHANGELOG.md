@@ -1,7 +1,12 @@
 # Changelog
 
-## 3.21.78
+## 3.21.79
 - **Změněno:** Ve zmenšené hlavičce seriálu je řádek sérií (S1, S2 …) svisle ve stejné výšce jako tlačítko Pokračovat (dřív byl o 16 až 22 px výš). Jen CSS.
+
+## 3.21.78
+- **Nově (Objevování):** Víc žánrů najednou (např. Komedie + Sci-Fi). Klepnutím se žánr přidá nebo odebere, TMDB dostane oba najednou. U žánrů typu „Akční a dobrodružné“ se při kombinaci použije první z nich, protože TMDB neumí „nebo“ uvnitř „a“.
+- **Nově (Objevování):** Filtr minimálního hodnocení (★ 6+ / 7+ / 8+) a přepínač „Skrýt už otevřené“, který schová tituly, které jsi v Objevování otevřel nebo v nabídce karty označil „Méně podobného“. Appka neví, co jsi opravdu viděl jinde, takže se řídí tímhle.
+- **Nově (Objevování):** Nad mřížkou je přehled aktivních filtrů a každý jde odebrat jedním klepnutím, na tlačítku Filtry (telefon) je počet aktivních filtrů.
 
 ## 3.21.77
 - **Změněno:** Výběr sérií (S1, S2 …) v detailu seriálu je v pravém dolním rohu hlavičky: vidět jsou 4 čísla, po stranách šipky (i na telefonu) a vybraná série je uprostřed. Když se hlavička při scrollu zmenší, přesune se doprostřed hlavičky; na telefonu je ve vlastním řádku pod tlačítky. Vzhled tlačítek zůstal původní. U seriálu s jednou sérií a v záložkách Podobné / Popis se nezobrazuje.
