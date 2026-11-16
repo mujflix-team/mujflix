@@ -499,6 +499,7 @@
         var el = document.getElementById(id);
         if (!el) return;
         el._mfhItems = items || [];
+        el.removeAttribute('aria-busy');
         el.innerHTML = el._mfhItems.map(function (it, i) { return mfhCardHtml(it, id, i, ranked ? i + 1 : 0); }).join('');
         mfhBindCardImages(el);
         if (id === 'mfhRecent') mfhMarkNewEpisodes(el);
@@ -559,6 +560,15 @@
         sec.querySelector('.nf-arrow-r').addEventListener('click', function () { track.scrollBy({ left: track.clientWidth * 0.85, behavior: 'smooth' }); });
       }
 
+      /* Řada, které teprve přicházejí data: kartičky-placeholdery (ne prázdné místo ani skok stránky); hotová data je nahradí */
+      function nfRowLoading(id) {
+        var sec = document.getElementById(id + 'Section'), trk = document.getElementById(id);
+        if (!sec || !trk) return;
+        trk.innerHTML = new Array(9).fill('<div class="nf-card nf-card-sk" aria-hidden="true"><div class="nf-poster nf-skeleton"></div></div>').join('');
+        trk.setAttribute('aria-busy', 'true');
+        sec.hidden = false;
+      }
+
       function nfFillRow(id, items, ranked) {
         var sec = document.getElementById(id + 'Section');
         if (!sec) return;
@@ -568,8 +578,7 @@
           var run = _nfRun;
           // Během ověřování hodnocení je vidět načítací stav (ne prázdné místo), ať je jasné, že se něco děje
           var trk = document.getElementById(id);
-          if (trk) trk.innerHTML = new Array(9).fill('<div class="nf-card nf-card-sk" aria-hidden="true"><div class="nf-poster nf-skeleton"></div></div>').join('');
-          sec.hidden = false;
+          nfRowLoading(id);
           window.MFAge.filter(items, 20).then(function (ok) {
             if (run !== _nfRun) return;
             var s2 = document.getElementById(id + 'Section');
@@ -1176,6 +1185,9 @@
           if (h) h.className = 'nf-hero nf-hero-none';
           return;
         }
+
+        // Řady z TMDB ukazují hned placeholdery, dokud nepřijdou data (prázdná řada se po odpovědi odstraní)
+        ['mfhForYou', 'mfhTop10', 'mfhTopTv', 'mfhTopMovie'].forEach(nfRowLoading);
 
         var seen = mfhSeenTmdbIds();
         var fresh = function (items) { return items.filter(function (it) { return !seen[it.tmdbId]; }); };
