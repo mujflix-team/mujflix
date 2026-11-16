@@ -1157,6 +1157,16 @@ html body .nf-hero-desc.is-open {
 }
 @media (prefers-reduced-motion: reduce) { html body .nf-hero-desc.is-open { animation: none; } }
 
+/* Domů: stejný play na kartách jako v Objevovat a na náhledu epizody (šedý trojúhelník, při najetí přímo na něj zbělá a zvětší se) */
+.nf-play { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(0, 0, 0, 0); opacity: 0; transition: opacity 0.18s ease, background 0.18s ease; }
+.nf-play-btn { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; color: rgba(255, 255, 255, 0.6); filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)); transition: color 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.nf-play-btn svg { display: block; margin-left: 4px; }
+.nf-card:hover .nf-play, .nf-card:focus-visible .nf-play { opacity: 1; background: rgba(0, 0, 0, 0.3); }
+.nf-play-btn:hover { color: #fff; transform: scale(1.2); }
+.nf-play-btn:active { transform: scale(0.95); }
+@media (hover: none) { .nf-play { display: none; } }
+@media (prefers-reduced-motion: reduce) { .nf-play, .nf-play-btn { transition: none; } .nf-play-btn:hover, .nf-play-btn:active { transform: none; } }
+
 /* Mini přehrávač traileru: tlačítka dole vpravo, ať nepřekrývají název videa, který YouTube ukazuje nahoře */
 .nf-tr-ctl { top: auto; bottom: 8px; right: 8px; }
 .nf-trailer:fullscreen .nf-tr-ctl { top: auto; bottom: 22px; right: 22px; }

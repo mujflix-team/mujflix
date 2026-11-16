@@ -473,6 +473,7 @@
             (rank ? '<span class="nf-rank" aria-hidden="true">' + rank + '</span>' : '') +
             '<div class="nf-poster nf-skeleton">' +
               '<img class="nf-img"' + (it.image ? ' src="' + esc(it.image) + '"' : '') + ' alt="" loading="lazy">' +
+              '<span class="nf-play" aria-hidden="true"><span class="nf-play-btn"><svg viewBox="8 5 11 14" width="30" height="36" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span>' +
               (typeof it.progress === 'number' ? '<div class="nf-cprog" aria-hidden="true"><i style="width:' + Math.round(it.progress) + '%"></i></div>' : '') +
                             (it.resume ? '<button type="button" class="nf-cx" title="Dokoukal jsem – odebrat z pokračování" aria-label="Dokoukal jsem – odebrat z pokračování" onclick="event.stopPropagation(); mfhFinishItem(\'' + esc(String(it.key || '')).replace(/'/g, '') + '\')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>' : mfhFavButton(it, cid, idx)) +
             '</div>' +
