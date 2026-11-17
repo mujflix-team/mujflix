@@ -132,13 +132,12 @@ function openSeries(e) {
   document.getElementById("modalHeroImg").src = t._backdrop || t.poster, (function (b, g) { b.textContent = g.slice(0, 3).join(" · "), b.style.display = g.length ? "inline-flex" : "none" })(document.getElementById("tmdbBadge"), Array.isArray(t._genres) ? t._genres : []);
   const o = document.getElementById("seriesModal"),
     i = o.querySelector(".modal-body") || o.querySelector("#modalBody");
-  i && (i.scrollTop = 0), o.classList.add("open"), i && (i.scrollTop = 0), requestAnimationFrame(() => requestAnimationFrame(() => {
-    o.classList.add("visible");
+  i && (i.scrollTop = 0), o.classList.add("open"), i && (i.scrollTop = 0), (() => {
+    // nástup hned (ne až po dvou snímcích): vynucený reflow stačí, aby se přechod spustil – po klepnutí není chvíli vidět stránka pod oknem
+    void o.offsetWidth, o.classList.add("visible");
     const e = o.querySelector(".modal-hero-content");
-    e && (e.style.opacity = "0", e.style.transform = "translateY(12px)", setTimeout(() => {
-      e.style.transition = "opacity 0.4s ease, transform 0.45s cubic-bezier(0.34,1.2,0.64,1)", e.style.opacity = "1", e.style.transform = "translateY(0)"
-    }, 120))
-  })), _sdTab("eps"), renderSeasons(), updatePanelProgress(), updateModalFavBtn(), _sdFill(e, n), _sdLogo(e), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
+    e && (e.style.transition = "none", e.style.opacity = "0", e.style.transform = "translateY(12px)", void e.offsetWidth, e.style.transition = "opacity 0.22s ease 40ms, transform 0.3s cubic-bezier(0.2,0.7,0.2,1) 40ms", e.style.opacity = "1", e.style.transform = "translateY(0)")
+  })(), _sdTab("eps"), renderSeasons(), updatePanelProgress(), updateModalFavBtn(), _sdFill(e, n), _sdLogo(e), kbLayer = "modal-season", kbSeasonIndex = activeSeason - 1, kbEpIndex = -1;
   const a = document.getElementById("modalRateBtn");
   a && (a.style.display = calcProgress(e).seen > 0 ? "flex" : "none");
   // „Náhodná epizoda“ dává smysl jen u seriálu s více epizodami

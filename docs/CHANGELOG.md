@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.95
+### Opraveno
+- **Detail seriálu se otevírá rychleji:** okno se objeví hned po klepnutí (dřív až po dvou snímcích a pak se ~0,5 s pomalu prolínalo, takže byla chvíli vidět stránka pod ním a vypadalo to, že se nic neděje; film se otevíral dřív). Prolnutí je ~0,16 s, nástup obsahu ~0,3 s.
+
 ## 3.21.94
 ### Opraveno
 - **Nový profil (telefon):** logo je přes celou šířku s plynulým přechodem, takže se text pod ním už neusekne uprostřed; zavírací křížek je jen jeden (text „×“ se zobrazoval navíc k nakreslenému); spodní lišta s tlačítky má stejný odstín jako pozadí (dřív namodralá).

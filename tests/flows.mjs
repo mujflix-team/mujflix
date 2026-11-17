@@ -1347,6 +1347,7 @@ check("detail: řada herců má šipky (vpravo viditelná, vlevo ne) a bez posuv
 const setHash = await page.evaluate(async () => {
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const out = { oldGone: typeof window.MFSettings === "undefined" && typeof window.openSettings === "undefined" };
+  if (location.hash === "#settings") { location.hash = "#serialy"; await wait(150); } // stejná adresa by hashchange nespustila
   location.hash = "#settings";
   let m = null;
   for (let i = 0; i < 30; i++) { await wait(100); m = document.getElementById("mfSettingsModal"); if (m && getComputedStyle(m).display !== "none") break; } // na pomalém CI trvá otevření déle než 300 ms
@@ -1571,6 +1572,11 @@ const rateT = await page.evaluate(() => {
 });
 check("kino: hvězdička označí epizodu a otevře hodnocení", rateT.exists && rateT.open && rateT.watched, JSON.stringify(rateT));
 
+const fastOpenT = await page.evaluate(() => {
+  const m = document.getElementById("seriesModal");
+  return { ov: parseFloat(getComputedStyle(m).transitionDuration), ct: parseFloat(getComputedStyle(m.querySelector(".modal-content")).transitionDuration) };
+});
+check("detail seriálu: rychlý nástup (prolnutí do 0,2 s), ne pomalé prolínání přes stránku", fastOpenT.ov <= 0.2 && fastOpenT.ct <= 0.3, JSON.stringify(fastOpenT));
 const pcCloseT = await page.evaluate(() => {
   const c = document.querySelector("#mfProfileCreate .pc-close"), l = document.querySelector("#mfProfileCreate .pc-logo");
   return { fs: c ? getComputedStyle(c).fontSize : null, logoL: l ? getComputedStyle(l).left : null, logoR: l ? getComputedStyle(l).right : null, pos: l ? getComputedStyle(l).position : null };
