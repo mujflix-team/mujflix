@@ -51,6 +51,24 @@ Pravidla: nepsat barvy hexem ani `rgba(255,255,255,…)`; značková červená N
 
 Pravidla: nepsat `0.3s` ani vlastní `cubic-bezier`; nekonečné smyčky (spinner, pozadí) a zpoždění zůstávají v sekundách. JS časovače, které čekají na konec přechodu (`setTimeout(... 280)`), musí být ≥ délce přechodu. Ambientní animace (>0,6 s) a `prefers-reduced-motion` se nemění. Inline styly v JS zatím zůstávají v původních hodnotách.
 
+## Písmo – tokeny na začátku `css/styles.css`
+
+Jedna rodina `--font` = **Inter Variable** (přibalený ve `/fonts`, takže vypadá stejně na iPhonu, Androidu i PC). Nikdy nepsat `font-family: -apple-system…` ani jiné fonty; `inherit` je v pořádku.
+
+| Token | Velikost | Kam patří |
+|---|---|---|
+| `--fs-xs` | 0,72 rem | drobné štítky, odznaky |
+| `--fs-sm` | 0,82 rem | popisky, vedlejší text |
+| `--fs-md` | 0,92 rem | menší běžný text, tlačítka |
+| `--fs-base` | 1 rem | běžný text |
+| `--fs-lg` | 1,12 rem | podnadpisy |
+| `--fs-xl` | 1,25 rem | nadpisy karet a sekcí |
+| `--fs-2xl` | 1,5 rem | nadpisy oken |
+| `--fs-3xl` | 1,8 rem | velké nadpisy |
+| `--fs-4xl` | 2,2 rem | nejvýraznější nadpisy |
+
+Tloušťky: 400 běžný · 500 střední · 600 polotučný · 700 tučný · 800 nadpisy · 900 logo/hero (jiné hodnoty typu 425 nebo 750 se nepoužívají). Hero titulky a `clamp()` velikosti zůstávají vlastní.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.

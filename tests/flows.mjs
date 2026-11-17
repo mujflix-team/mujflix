@@ -1631,6 +1631,13 @@ const retapT = await page.evaluate(async () => {
 });
 check("dock Domů: druhé klepnutí nejdřív vyjede nahoru, pak obnoví řady (a mimo Domů nic nedělá)", retapT.first && retapT.y1 < 5 && retapT.second && retapT.refreshed && retapT.notHome === false, JSON.stringify(retapT));
 
+const fontT = await page.evaluate(() => {
+  const fam = e => getComputedStyle(e).fontFamily;
+  const sel = ["body", ".nf-btn", "#dockHome", ".nf-hero-title"].map(q => document.querySelector(q)).filter(Boolean);
+  return { fams: [...new Set(sel.map(fam))], tok: getComputedStyle(document.documentElement).getPropertyValue("--fs-md").trim() };
+});
+check("písmo: všude jedna rodina (Inter Variable) a existují tokeny velikostí", fontT.fams.length === 1 && /Inter Variable/.test(fontT.fams[0]) && fontT.tok === "0.92rem", JSON.stringify(fontT));
+
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [{ id: 9001, name: "A", title: "A", poster_path: "/p.jpg", vote_average: 8, original_language: "ja", genre_ids: [16] }] }) }; };

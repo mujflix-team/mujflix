@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.98
+### Změněno
+- **Designový systém – písmo:** všude jedna rodina Inter Variable (dřív 5 různých definic, z toho Sora a „Inter“ ani nebyly načtené, takže se text lišil podle zařízení) a běžné velikosti písma (~360 míst) jsou tokeny `--fs-xs…4xl`; nestandardní tloušťky (100–300, 425, 650, 750) srovnány. Rozdíly velikostí jsou do ~0,05 rem u běžného textu. Pravidla v `docs/DESIGN.md`.
+
 ## 3.21.97
 ### Nově
 - **Druhé klepnutí na „Domů“ v docku** (když už jsi na Domů): nejdřív vyjede nahoru, a když už jsi nahoře, obnoví řady s doporučením (toast „Obnovuji doporučení…“). V oknech a jinde se chová jako dřív.
