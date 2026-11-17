@@ -3,6 +3,19 @@
    media 6 = postery, náhledy, karty · panel 8 = malé panely, rozbalovací seznamy, trailer
    modal 12 = okna a velké panely · sheet 16 = spodní listy a největší plochy · pill = chipy, štítky */
 :root { --r-xs: 2px; --r-ctl: 4px; --r-media: 6px; --r-panel: 8px; --r-modal: 12px; --r-sheet: 16px; --r-pill: 999px; }
+/* ═════════ Design tokeny: BARVY (pravidla viz docs/DESIGN.md) ═════════
+   povrchy: bg stránka · surface karty/panely · surface-2 zvýšené/hover · line okraje · line-hi výraznější okraj
+   text: text (#fff) · text-2 hlavní popisy · text-3 vedlejší · text-4 nejslabší
+   akcent: accent hlavní modrá · accent-hi světlejší (text/odkazy) · accent-a1..a3 průhledné varianty · danger chyba/smazat
+   průhledná bílá: w-1 jemná výplň · w-2 okraj · w-3 hover/výraznější okraj · w-4 slabý text · w-5 sekundární text · w-6 téměř plný text */
+:root {
+  --c-bg: #141414; --c-surface: #1f1f1f; --c-surface-2: #2a2a2a; --c-line: #333; --c-line-hi: #3a3a3a;
+  --c-text-2: #d2d2d2; --c-text-3: #b3b3b3; --c-text-4: #808080;
+  --c-accent: #0a84ff; --c-accent-hi: #72b8ff; --c-danger: #ff453a;
+  --c-accent-a1: rgba(10, 132, 255, 0.15); --c-accent-a2: rgba(10, 132, 255, 0.3); --c-accent-a3: rgba(10, 132, 255, 0.55);
+  --w-1: rgba(255, 255, 255, 0.06); --w-2: rgba(255, 255, 255, 0.1); --w-3: rgba(255, 255, 255, 0.18);
+  --w-4: rgba(255, 255, 255, 0.35); --w-5: rgba(255, 255, 255, 0.6); --w-6: rgba(255, 255, 255, 0.85);
+}
 
 
 #mfWelcomeNote {
