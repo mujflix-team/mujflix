@@ -1570,6 +1570,26 @@ const rateT = await page.evaluate(() => {
 });
 check("kino: hvězdička označí epizodu a otevře hodnocení", rateT.exists && rateT.open && rateT.watched, JSON.stringify(rateT));
 
+const noAutoRateT = await page.evaluate(async () => {
+  const ov0 = document.getElementById("epRatingOverlay");
+  if (ov0) { ov0.classList.remove("open"); ov0.style.display = "none"; }
+  toggleWatch("the-simpsons-S1-E3");
+  await new Promise(r => setTimeout(r, 600));
+  const ov = document.getElementById("epRatingOverlay");
+  const out = { open: !!ov && ov.style.display === "flex", watched: !!getWatched()["the-simpsons-S1-E3"] };
+  toggleWatch("the-simpsons-S1-E3");
+  return out;
+});
+check("epizody: označení jako viděno už samo nevyskočí s oknem hodnocení", !noAutoRateT.open && noAutoRateT.watched, JSON.stringify(noAutoRateT));
+
+const updZT = await page.evaluate(() => {
+  const b = document.createElement("div"); b.id = "mfUpdateBar"; document.body.appendChild(b);
+  const z = e => parseInt(getComputedStyle(e).zIndex, 10) || 0;
+  const out = { bar: z(b), cinema: z(document.getElementById("mfStandaloneCinema")) };
+  b.remove(); return out;
+});
+check("aktualizace: hláška „nová verze“ je nad Cinema módem", updZT.bar > updZT.cinema, JSON.stringify(updZT));
+
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [{ id: 9001, name: "A", title: "A", poster_path: "/p.jpg", vote_average: 8, original_language: "ja", genre_ids: [16] }] }) }; };
