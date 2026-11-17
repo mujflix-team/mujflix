@@ -378,7 +378,7 @@ html body #mfProfileCreate .pc-logo {
   left: 0 !important;
   z-index: 20 !important;
   padding: 18px 12px 12px var(--nf-pad, 20px) !important;
-  background: #141414 !important;
+  background: var(--c-bg) !important;
   pointer-events: none;
 }
 html body #mfProfileCreate .pc-box { position: relative; z-index: 1; }
@@ -386,7 +386,7 @@ html body #mfProfileCreate .pc-box { position: relative; z-index: 1; }
 html body #mfProfileCreate input:-webkit-autofill,
 html body #mfProfileCreate input:-webkit-autofill:focus {
   -webkit-text-fill-color: #fff !important;
-  -webkit-box-shadow: 0 0 0 1000px #262626 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--c-surface-2) inset !important;
   caret-color: #fff;
 }
 

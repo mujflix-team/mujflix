@@ -1171,7 +1171,7 @@ body {
   height: 70px;
   
   overflow: hidden;
-  background: #1a1a1a;
+  background: var(--c-surface);
   margin-bottom: 10px;
   position: relative;
 }

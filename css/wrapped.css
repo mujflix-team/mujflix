@@ -10,7 +10,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
   display: flex; flex-direction: column;
   color: #fff; color-scheme: dark;
   font-family: var(--nf-font, "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif);
-  background: #141414;
+  background: var(--c-bg);
   opacity: 0; transition: opacity 0.25s ease;
   overscroll-behavior: contain;
   outline: none;
@@ -92,7 +92,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 #mfWrapped .mfw-btn { min-height: 44px; padding: 0 18px; border: 0; border-radius: var(--r-modal); background: rgba(255, 255, 255, 0.2); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 #mfWrapped .mfw-btn:hover { background: rgba(255, 255, 255, 0.3); }
-#mfWrapped .mfw-btn-main { background: #fff; color: #141414; }
+#mfWrapped .mfw-btn-main { background: #fff; color: var(--c-bg); }
 #mfWrapped .mfw-btn-main:hover { background: #e6e6e6; }
 #mfWrapped .mfw-btn[hidden] { display: none; }
 #mfWrapped .mfw-btn:disabled { opacity: 0.35; pointer-events: none; }
