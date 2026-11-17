@@ -1440,6 +1440,19 @@
         document.body.classList.remove('mfh-home-on');
       }
 
+      /* Druhé klepnutí na „Domů“ v docku, když už na Domů jsi: nejdřív vyjede nahoru, a když už jsi nahoře, obnoví řady. Vrací true, když akci obsloužilo. */
+      window.mfHomeRetap = function () {
+        try {
+          var dock = document.getElementById('dockHome');
+          if (!dock || !dock.classList.contains('active') || !document.documentElement.classList.contains('mfh-home-on')) return false;
+          if (document.querySelector('#seriesModal.open, #universeOverlay.open, #watchlistOverlay.open, #mfStandaloneCinema.open')) return false;
+          var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+          if (y > 40) { window.scrollTo({ top: 0, behavior: 'smooth' }); return true; }
+          if (typeof showToast === 'function') showToast('Obnovuji doporučení…');
+          window.mfhRefresh && window.mfhRefresh();
+          return true;
+        } catch (e) { return false; }
+      };
       window.mfShowHomeSection = forceHome;
       window.mfhShowHome = forceHome;
 

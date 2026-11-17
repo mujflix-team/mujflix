@@ -1617,6 +1617,20 @@ const updZT = await page.evaluate(() => {
 });
 check("aktualizace: hláška „nová verze“ je nad Cinema módem", updZT.bar > updZT.cinema, JSON.stringify(updZT));
 
+const retapT = await page.evaluate(async () => {
+  const dock = document.getElementById("dockHome"); dock.classList.add("active"); document.documentElement.classList.add("mfh-home-on");
+  document.querySelectorAll("#seriesModal.open, #universeOverlay.open, #watchlistOverlay.open").forEach(e => e.classList.remove("open"));
+  window.scrollTo(0, 600); await new Promise(r => setTimeout(r, 80));
+  const first = mfHomeRetap();
+  await new Promise(r => setTimeout(r, 900));
+  const y1 = window.pageYOffset;
+  window.scrollTo(0, 0); let refreshed = false; const old = window.mfhRefresh; window.mfhRefresh = () => { refreshed = true; };
+  const second = mfHomeRetap(); window.mfhRefresh = old;
+  dock.classList.remove("active"); document.documentElement.classList.remove("mfh-home-on");
+  return { first, y1, second, refreshed, notHome: mfHomeRetap() };
+});
+check("dock Domů: druhé klepnutí nejdřív vyjede nahoru, pak obnoví řady (a mimo Domů nic nedělá)", retapT.first && retapT.y1 < 5 && retapT.second && retapT.refreshed && retapT.notHome === false, JSON.stringify(retapT));
+
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [{ id: 9001, name: "A", title: "A", poster_path: "/p.jpg", vote_average: 8, original_language: "ja", genre_ids: [16] }] }) }; };
