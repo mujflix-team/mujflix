@@ -432,7 +432,7 @@ html body #mfProfileCreate .pc-heading { display: block; position: relative; }
 html body #mfProfileCreate .pc-eyebrow { display: none !important; }
 html body #mfProfileCreate .pc-title { font-size: clamp(2rem, 5vw, 3.4rem) !important; font-weight: 500 !important; letter-spacing: -0.02em !important; color: #fff !important; line-height: 1.1; }
 html body #mfProfileCreate .pc-subtitle { color: var(--c-text-4) !important; font-size: 1.15rem !important; margin: 10px 0 8px !important; padding-bottom: 22px; border-bottom: 1px solid var(--c-line); }
-html body #mfProfileCreate .pc-close { position: fixed; top: 14px; right: var(--nf-pad); background: transparent !important; border: 0 !important; color: var(--c-text-3) !important; font-size: 2rem !important; width: 44px; height: 44px; }
+html body #mfProfileCreate .pc-close { position: fixed; top: 14px; right: var(--nf-pad); background: transparent !important; border: 0 !important; color: var(--c-text-3) !important; width: 44px; height: 44px; z-index: 21; /* křížek kreslí ::before/::after, text × se nesmí zobrazit podruhé */ }
 html body #mfProfileCreate .pc-close:hover { color: #fff !important; }
 html body #mfProfileCreate .pc-label { color: var(--c-text-3) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.95rem !important; font-weight: 600 !important; margin-top: 26px !important; }
 html body #mfProfileCreate .pc-label-note { color: var(--c-text-4) !important; font-weight: 400; text-transform: none; }

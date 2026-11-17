@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.94
+### Opraveno
+- **Nový profil (telefon):** logo je přes celou šířku s plynulým přechodem, takže se text pod ním už neusekne uprostřed; zavírací křížek je jen jeden (text „×“ se zobrazoval navíc k nakreslenému); spodní lišta s tlačítky má stejný odstín jako pozadí (dřív namodralá).
+
 ## 3.21.93
 ### Opraveno
 - **Filtry v Objevování na telefonu:** rozbalovací seznamy (Řadit, Rok, Hodnocení) byly prázdné (skrytý popisek skryl i text hodnoty); teď je vidět malý popisek nad hodnotou a hodnota se nezalamuje.

@@ -2057,7 +2057,7 @@ canvas#particles {
   .pc-box { padding: 24px 20px; border-radius: var(--r-sheet); }
   .pc-avatar-grid { grid-template-columns: repeat(4, 1fr); }
   .pc-emoji-btn { font-size: 1.2rem; }
-  .pc-btn-row { position: sticky; bottom: -24px; margin: 0 -20px -24px; padding: 14px 20px; background: rgba(12,14,21,.96); }
+  .pc-btn-row { position: sticky; bottom: -24px; margin: 0 -20px -24px; padding: 14px 20px; background: var(--c-bg); border-top: 1px solid var(--c-line); }
 }
 #mfProfileBadge {
 

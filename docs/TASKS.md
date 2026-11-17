@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.94 – okno nového profilu: logo, jeden křížek, odstín lišty (claude/profil-okno)
 - 3.21.93 – oprava filtrů a karet epizod na telefonu (claude/mobil-opravy)
 - 3.21.92 – nová verze i v Cinema módu, bez automatického okna hodnocení (claude/cinema-update)
 - 3.21.91 – designové tokeny barev (claude/barvy)

@@ -1571,6 +1571,11 @@ const rateT = await page.evaluate(() => {
 });
 check("kino: hvězdička označí epizodu a otevře hodnocení", rateT.exists && rateT.open && rateT.watched, JSON.stringify(rateT));
 
+const pcCloseT = await page.evaluate(() => {
+  const c = document.querySelector("#mfProfileCreate .pc-close"), l = document.querySelector("#mfProfileCreate .pc-logo");
+  return { fs: c ? getComputedStyle(c).fontSize : null, logoL: l ? getComputedStyle(l).left : null, logoR: l ? getComputedStyle(l).right : null, pos: l ? getComputedStyle(l).position : null };
+});
+check("nový profil: křížek je jen jeden (text × skrytý) a logo má přes celou šířku čisté pozadí", pcCloseT.fs === "0px" && pcCloseT.pos === "fixed" && pcCloseT.logoL === "0px" && pcCloseT.logoR === "0px", JSON.stringify(pcCloseT));
 await page.setViewportSize({ width: 390, height: 800 });
 const portraitT = await page.evaluate(async () => {
   const m = document.getElementById("seriesModal"), g = document.getElementById("episodesGrid");
