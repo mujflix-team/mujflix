@@ -6,7 +6,7 @@
   --dv-line: rgba(255, 255, 255, 0.09);
   --dv-text: #f4f4f7;
   --dv-dim: rgba(244, 244, 247, 0.62);
-  --dv-accent: var(--accent, #0a84ff);
+  --dv-accent: var(--accent, var(--c-accent));
   --dv-pad: clamp(14px, 3vw, 44px);
   position: fixed;
   inset: 0;
@@ -150,7 +150,7 @@
 #universeOverlay .dv-btn-primary:hover { background: rgba(255, 255, 255, 0.85); }
 #universeOverlay .dv-btn-ghost { background: rgba(109, 109, 118, 0.55); color: #fff; }
 #universeOverlay .dv-btn-ghost:hover { background: rgba(109, 109, 118, 0.8); }
-#universeOverlay .dv-btn-ghost.on svg { fill: #ff453a; stroke: #ff453a; }
+#universeOverlay .dv-btn-ghost.on svg { fill: var(--c-danger); stroke: var(--c-danger); }
 
 /* řady */
 #universeOverlay .dv-row { margin: 22px 0 8px; }
@@ -218,7 +218,7 @@
   background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity 0.15s, transform 0.1s, background 0.15s;
 }
 #universeOverlay .dv-fav.on { opacity: 1; }
-#universeOverlay .dv-fav.on svg { fill: #ff453a; stroke: #ff453a; }
+#universeOverlay .dv-fav.on svg { fill: var(--c-danger); stroke: var(--c-danger); }
 #universeOverlay .dv-card:hover .dv-fav, #universeOverlay .dv-card:focus-within .dv-fav { opacity: 1; }
 #universeOverlay .dv-fav:hover { background: rgba(0, 0, 0, 0.85); transform: scale(1.1); }
 @media (hover: none) { #universeOverlay .dv-fav { opacity: 1; } }

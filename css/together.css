@@ -9,12 +9,12 @@ html.mft-lock, html.mft-lock body { overflow: hidden; }
 #mfTogether .mft-age { min-height: 1.2em; margin: 10px 0 0; color: var(--c-text-3); font-size: 13px; }
 #mfTogether .mft-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 #mfTogether .mft-chip { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 14px 4px 4px; border: 2px solid transparent; border-radius: var(--r-pill); background: var(--c-surface-2); color: #fff; font: inherit; cursor: pointer; }
-#mfTogether .mft-chip[aria-pressed="true"] { border-color: var(--nf-accent, #0a84ff); background: #1f2a3a; }
+#mfTogether .mft-chip[aria-pressed="true"] { border-color: var(--nf-accent, var(--c-accent)); background: #1f2a3a; }
 #mfTogether .mft-av { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; overflow: hidden; border-radius: 50%; background: var(--c-line-hi); font-size: 20px; }
 #mfTogether .mft-av img { width: 100%; height: 100%; object-fit: cover; }
 #mfTogether .mft-btn { min-height: 44px; padding: 0 18px; border: 0; border-radius: var(--r-panel); background: var(--c-line-hi); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
 #mfTogether .mft-btn:disabled { opacity: 0.4; cursor: default; }
-#mfTogether .mft-primary { background: var(--nf-accent, #0a84ff); }
+#mfTogether .mft-primary { background: var(--nf-accent, var(--c-accent)); }
 #mfTogether .mft-go { width: 100%; margin-top: 8px; }
 #mfTogether .mft-res { margin-top: 16px; }
 #mfTogether .mft-pick { display: flex; gap: 14px; }

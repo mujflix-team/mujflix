@@ -4,7 +4,7 @@
 :root {
   --nf-bg: var(--c-bg);
   --nf-pad: clamp(16px, 4vw, 56px);
-  --nf-accent: var(--accent, #0a84ff);
+  --nf-accent: var(--accent, var(--c-accent));
   --nf-text: #fff;
   --nf-dim: var(--c-text-3);
   --nf-bar-h: 68px;
@@ -44,7 +44,7 @@ html.mfh-home-on #mfHeader { display: none !important; }
 #nfTop .nf-icon-btn:active { transform: scale(0.92); }
 #nfTop .nf-avatar {
   width: 34px; height: 34px; margin-left: 8px; border: 0; border-radius: var(--r-media); cursor: pointer; padding: 0;
-  background: var(--nf-avatar, #0a84ff); font-size: 1.15rem; line-height: 1;
+  background: var(--nf-avatar, var(--c-accent)); font-size: 1.15rem; line-height: 1;
   display: inline-flex; align-items: center; justify-content: center;
   box-shadow: 0 0 0 2px transparent; transition: box-shadow 0.15s;
 }
@@ -148,7 +148,7 @@ html body.discover-open #mfDock { display: none !important; }
 .nf-btn-primary:hover { background: rgba(255, 255, 255, 0.78); }
 .nf-btn-ghost { background: rgba(109, 109, 110, 0.7); color: #fff; }
 .nf-btn-ghost:hover { background: rgba(109, 109, 110, 0.45); }
-.nf-btn-ghost.on svg { fill: #ff453a; stroke: #ff453a; }
+.nf-btn-ghost.on svg { fill: var(--c-danger); stroke: var(--c-danger); }
 
 /* řady */
 .nf-rows { position: relative; z-index: 2; margin-top: -36px; padding-bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
@@ -241,7 +241,7 @@ html body #mfProfileGate { background: var(--nf-bg) !important; }
 #mfProfileGate .pg-profiles { gap: clamp(14px, 2.4vw, 32px) !important; }
 #mfProfileGate .pg-avatar {
   width: clamp(84px, 10vw, 150px) !important; height: clamp(84px, 10vw, 150px) !important; border-radius: var(--r-media) !important;
-  background: var(--pg-color, #0a84ff) !important; border: 3px solid transparent !important; box-shadow: none !important;
+  background: var(--pg-color, var(--c-accent)) !important; border: 3px solid transparent !important; box-shadow: none !important;
   font-size: clamp(2.4rem, 4.2vw, 4.2rem) !important; transition: border-color 0.15s ease;
 }
 #mfProfileGate .pg-profile-item:hover .pg-avatar { border-color: #fff !important; transform: none !important; }
@@ -784,7 +784,7 @@ html body #mfProfileBadge { display: none !important; }
 
 /* PIN: zbývající pokusy / zámek */
 html body #mfPinModal .pm-msg { min-height: 1.4em; margin: -8px 0 12px; font-size: 0.95rem; color: var(--c-text-3); text-align: center; }
-html body #mfPinModal .pm-msg.err { color: #ff6b6b; }
+html body #mfPinModal .pm-msg.err { color: var(--c-danger); }
 html body #mfPinModal .pm-msg.lock { color: #ffb84d; font-weight: 600; }
 html body #mfPinModal .pm-numpad.locked { opacity: 0.35; pointer-events: none; }
 
@@ -807,7 +807,7 @@ html body #mfProfileGate .pg-remove-btn {
 html body #mfProfileGate .pg-remove-btn:hover { background: #ff2a35 !important; transform: scale(1.08); }
 @media (max-width: 640px) { html body #mfProfileGate .pg-remove-btn { width: 44px !important; height: 44px !important; top: -16px !important; right: -16px !important; } }
 /* Smazat profil v úpravě */
-html body #mfProfileCreate .pc-btn-delete { background: transparent !important; border: 1px solid #5a1a1f !important; color: #ff6b6b !important; border-radius: var(--r-ctl) !important; padding: 0 22px; height: 46px; font-size: 1rem; cursor: pointer; margin-right: auto; }
+html body #mfProfileCreate .pc-btn-delete { background: transparent !important; border: 1px solid #5a1a1f !important; color: var(--c-danger) !important; border-radius: var(--r-ctl) !important; padding: 0 22px; height: 46px; font-size: 1rem; cursor: pointer; margin-right: auto; }
 html body #mfProfileCreate .pc-btn-delete:hover { background: #3a1014 !important; border-color: #e50914 !important; }
 /* Menu profilu vpravo nahoře */
 #nfProfileMenu {
@@ -818,7 +818,7 @@ html body #mfProfileCreate .pc-btn-delete:hover { background: #3a1014 !important
 @keyframes nfPmIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 #nfProfileMenu .nf-pm-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 16px; background: none; border: 0; color: var(--c-text-2); font: inherit; font-size: 0.95rem; text-align: left; cursor: pointer; }
 #nfProfileMenu .nf-pm-item:hover { text-decoration: underline; color: #fff; }
-#nfProfileMenu .nf-pm-av { width: 32px; height: 32px; border-radius: var(--r-ctl); background: var(--c, #0a84ff); display: grid; place-items: center; overflow: hidden; font-size: 1.2rem; flex: none; }
+#nfProfileMenu .nf-pm-av { width: 32px; height: 32px; border-radius: var(--r-ctl); background: var(--c, var(--c-accent)); display: grid; place-items: center; overflow: hidden; font-size: 1.2rem; flex: none; }
 #nfProfileMenu .nf-pm-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
 #nfProfileMenu .nf-pm-act svg { flex: none; width: 24px; }
 #nfProfileMenu .nf-pm-sep { height: 1px; background: var(--c-line); margin: 6px 0; }
@@ -851,7 +851,7 @@ html body #legalProvidersPanel a span { font: 600 0.88rem/1 var(--nf-font, sans-
 html body #mfProfileWelcome .pw-actions.pw-actions-col { flex-direction: column !important; align-items: stretch; border-top: 0; margin-top: 24px !important; padding-top: 0; }
 html body #mfProfileWelcome .pw-actions.pw-actions-col button { width: 100%; }
 html body #mfProfileWelcome .pw-note { color: var(--c-text-4); font-size: 0.95rem; margin-top: 18px; }
-html body #mfProfileWelcome .pw-linkbtn { background: none; border: 0; padding: 0; color: var(--nf-accent, #0a84ff); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
+html body #mfProfileWelcome .pw-linkbtn { background: none; border: 0; padding: 0; color: var(--nf-accent, var(--c-accent)); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
 html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfSyncModal { display: none; position: fixed; inset: 0; z-index: 1000010; background: rgba(0, 0, 0, 0.82); align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
 #mfSyncModal.show { display: flex; }
@@ -860,7 +860,7 @@ html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfSyncModal .sy-x:hover { color: #fff; }
 #mfSyncModal .sy-back { position: absolute; top: 12px; left: 14px; background: none; border: 0; color: var(--c-text-3); font: 600 0.95rem var(--nf-font, sans-serif); cursor: pointer; padding: 6px; }
 #mfSyncModal .sy-back:hover { color: #fff; }
-#mfSyncModal .sy-ico { color: var(--nf-accent, #0a84ff); margin: 0 auto 10px; display: grid; place-items: center; }
+#mfSyncModal .sy-ico { color: var(--nf-accent, var(--c-accent)); margin: 0 auto 10px; display: grid; place-items: center; }
 #mfSyncModal .sy-ico.sy-ok { color: #46d369; }
 #mfSyncModal .sy-title { font-size: 1.6rem; font-weight: 700; margin: 6px 0 10px; letter-spacing: -0.01em; }
 #mfSyncModal .sy-text { color: var(--c-text-3); font-size: 1rem; line-height: 1.5; margin: 0 0 20px; }
@@ -878,7 +878,7 @@ html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfSyncModal .sy-status { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto 16px; padding: 8px 14px; width: fit-content; max-width: 100%; background: #232323; border-radius: var(--r-modal); color: var(--c-text-2); font-size: 0.92rem; font-weight: 600; }
 #mfSyncModal .sy-status i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-text-4); }
 #mfSyncModal .sy-st-ok i { background: #46d369; }
-#mfSyncModal .sy-st-wait i { background: var(--nf-accent, #0a84ff); }
+#mfSyncModal .sy-st-wait i { background: var(--nf-accent, var(--c-accent)); }
 #mfSyncModal .sy-st-warn i { background: #ffb340; }
 #mfSyncModal .sy-qr.sy-qr-info { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: #232323; color: var(--c-text-3); font-size: 0.85rem; line-height: 1.3; }
 #mfSyncModal .sy-qr.sy-qr-info .sy-btn { width: auto; height: auto; margin: 0; padding: 6px 12px; font-size: 0.85rem; }
@@ -894,7 +894,7 @@ html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfSyncModal .sy-primary:disabled { opacity: 0.6; cursor: default; }
 #mfSyncModal .sy-ghost { color: var(--c-text-3); }
 #mfSyncModal .sy-link { border: 0; color: var(--c-text-4); font-weight: 500; font-size: 0.95rem; height: auto; padding: 10px; margin-top: 14px; }
-#mfSyncModal .sy-link:hover { color: #ff6b6b; }
+#mfSyncModal .sy-link:hover { color: var(--c-danger); }
 @media (max-height: 640px) { #mfSyncModal .sy-qr { width: 120px; height: 120px; } #mfSyncModal .sy-ico svg { width: 40px; height: 40px; } }
 #mfSyncBanner { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000005; display: flex; align-items: center; gap: 14px; padding: 11px 14px 11px 18px; background: var(--c-surface-2); border: 1px solid #444; border-radius: var(--r-media); color: #fff; font: 600 0.95rem var(--nf-font, sans-serif); box-shadow: 0 10px 34px rgba(0, 0, 0, 0.7); max-width: calc(100vw - 24px); }
 #mfSyncBanner button { background: #fff; color: #000; border: 0; border-radius: var(--r-ctl); padding: 8px 14px; font: 700 0.9rem var(--nf-font, sans-serif); cursor: pointer; white-space: nowrap; }
@@ -922,7 +922,7 @@ html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfPrefsModal .pf-tag:hover { border-color: #fff; color: #fff; }
 #mfPrefsModal .pf-tag.pf-on { background: #fff; border-color: #fff; color: #000; font-weight: 700; }
 #mfPrefsModal .pf-msg { min-height: 1.3em; margin: 12px 0 2px; font-size: 0.92rem; color: var(--c-text-3); }
-#mfPrefsModal .pf-msg.pf-err { color: #ff6b6b; }
+#mfPrefsModal .pf-msg.pf-err { color: var(--c-danger); }
 #mfPrefsModal .pf-save, #mfPrefsModal .pf-cancel { display: block; width: 100%; height: 46px; margin-top: 10px; border-radius: var(--r-ctl); font: 700 1.05rem var(--nf-font, sans-serif); cursor: pointer; }
 #mfPrefsModal .pf-save { background: #fff; color: #000; border: 1px solid #fff; }
 #mfPrefsModal .pf-cancel { background: none; color: #fff; border: 1px solid var(--c-text-4); }
@@ -1421,7 +1421,7 @@ html body #seriesModal .modal-hero-left { max-width: none; }
 
 /* Pokračovat ve sledování: ukazatel postupu na plakátu */
 .nf-cprog { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255, 255, 255, 0.28); z-index: 2; }
-.nf-cprog i { display: block; height: 100%; background: var(--nf-accent, #0a84ff); }
+.nf-cprog i { display: block; height: 100%; background: var(--nf-accent, var(--c-accent)); }
 /* Dokoukal jsem: jen ikona (název je ve vodítku a pro čtečky) */
 .nf-btn-icon { width: 48px; padding: 0; flex: none; }
 /* Telefon: nižší banner, aby po otevření byla vidět i první řada */
@@ -1457,7 +1457,7 @@ html body #seriesModal .modal-hero-left { max-width: none; }
 
 /* Karta v řadě Pokračovat má stejný popisek jako ostatní: jeden řádek, bez zalamování */
 .nf-card-ep { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.nf-new { position: absolute; left: 6px; top: 6px; z-index: 2; padding: 2px 7px; border-radius: var(--r-ctl); font-size: 0.66rem; font-weight: 700; letter-spacing: .01em; color: #fff; background: var(--nf-accent, #0a84ff); }
+.nf-new { position: absolute; left: 6px; top: 6px; z-index: 2; padding: 2px 7px; border-radius: var(--r-ctl); font-size: 0.66rem; font-weight: 700; letter-spacing: .01em; color: #fff; background: var(--nf-accent, var(--c-accent)); }
 
 /* Odkaz na Soukromí a podmínky na obrazovce „Kdo se dívá?“ */
 #mfProfileGate .pg-legal { position: fixed; left: 16px; bottom: 12px; font-size: 12px; color: rgba(255,255,255,0.62); text-decoration: none; letter-spacing: 0.02em; }
@@ -1467,7 +1467,7 @@ html body #seriesModal .modal-hero-left { max-width: none; }
 /* Srdíčko „Do oblíbených“ na kartách úvodní stránky (stejné jako v Procházení) */
 .nf-fav { position: absolute; z-index: 3; top: 6px; right: 6px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #fff; background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity 0.15s, background 0.15s; }
 .nf-fav.on { opacity: 1; }
-.nf-fav.on svg { fill: #ff453a; stroke: #ff453a; }
+.nf-fav.on svg { fill: var(--c-danger); stroke: var(--c-danger); }
 .nf-card:hover .nf-fav, .nf-card:focus-within .nf-fav { opacity: 1; }
 .nf-fav:hover { background: rgba(0, 0, 0, 0.85); }
 @media (hover: none) { .nf-fav { opacity: 1; width: 28px; height: 28px; } .nf-fav svg { width: 15px; height: 15px; } }
@@ -1671,7 +1671,7 @@ html body #seriesModal .sd-actor-grid { display: grid; grid-template-columns: re
 
 /* Oblíbené: postup seriálu, popisek, řazení */
 html body #watchlistOverlay .wl-card-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255, 255, 255, 0.3); z-index: 2; }
-html body #watchlistOverlay .wl-card-prog i { display: block; height: 100%; background: var(--accent, #0a84ff); }
+html body #watchlistOverlay .wl-card-prog i { display: block; height: 100%; background: var(--accent, var(--c-accent)); }
 html body #watchlistOverlay .wl-card-sub { padding: 2px 2px 0; font-size: 0.74rem; color: rgba(255, 255, 255, 0.6); line-height: 1.3; }
 html body #watchlistOverlay .wl-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
 html body #watchlistOverlay .wl-tabs { flex-wrap: wrap; }
@@ -1769,7 +1769,7 @@ html body #seriesModal #episodesGrid .sd-season-head:first-child { margin-top: 0
 /* Bez internetu: celoobrazovková hláška přes vše (i přes výběr profilu) */
 #mfOfflineScreen { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; padding: 24px 16px; background: var(--c-bg); color: var(--c-text-2); text-align: center; }
 #mfOfflineScreen .mf-off-brand { margin: 0 0 28px; font-weight: 800; font-size: 34px; letter-spacing: -0.02em; color: #fff; }
-#mfOfflineScreen .mf-off-brand i { color: #0a84ff; font-style: normal; }
+#mfOfflineScreen .mf-off-brand i { color: var(--c-accent); font-style: normal; }
 #mfOfflineScreen h1 { margin: 0 0 8px; font-size: 1.5rem; font-weight: 600; color: #fff; }
 #mfOfflineScreen p { margin: 0 0 24px; color: #9a9a9a; max-width: 420px; line-height: 1.6; }
 #mfOfflineScreen .mf-off-btn { height: 44px; padding: 0 28px; border: 0; border-radius: var(--r-ctl); background: #fff; color: var(--c-bg); font: inherit; font-weight: 700; cursor: pointer; }
@@ -1855,7 +1855,7 @@ html body .nf-hero > .nf-hero-ghost { position: absolute; inset: 0; z-index: 6; 
 html body #mfStandaloneCinema .mf-cin-lang { display: flex; align-items: center; gap: 4px; }
 html body #mfStandaloneCinema .mf-cin-lang-btn { opacity: 0.55; }
 html body #mfStandaloneCinema .mf-cin-lang-btn svg { display: block; border-radius: var(--r-xs); }
-html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: rgba(10, 132, 255, 0.28); }
+html body #mfStandaloneCinema .mf-cin-lang-btn.on { opacity: 1; background: var(--c-accent-a2); }
 
 /* Výběr profilu na telefonu: číslo verze se neukazuje */
 @media (hover: none), (max-width: 520px) { html body #mfProfileGate .pg-version { display: none; } }
@@ -1942,7 +1942,7 @@ html body .nf-btn-ghost.on svg { animation: mfHeartPop .3s ease-out; }
 #mfProfileGate.pg-empty .pg-sync-btn svg { display: none; }
 #mfProfileGate.pg-empty .pg-sync-btn u { color: #fff; text-underline-offset: 3px; }
 
-#mfSettingsModal .pf-row.pf-danger small { color: #ff453a; }
+#mfSettingsModal .pf-row.pf-danger small { color: var(--c-danger); }
 
 
 /* Kino na telefonu: tlačítko Sdílet se nezobrazuje (zbytečně zabírá místo v liště přehrávače) */
@@ -1958,7 +1958,7 @@ html body #mfCardSheet .cs-box { position: relative; width: 100%; padding: 18px 
 html body #mfCardSheet .cs-title { margin: 0; font-weight: var(--fw-bold, 700); font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 html body #mfCardSheet .cs-sub { margin: 2px 0 12px; font-size: 0.85rem; opacity: 0.6; }
 html body #mfCardSheet .cs-btn { display: block; width: 100%; min-height: 48px; margin-top: 8px; padding: 0 16px; border: 0; border-radius: var(--r-modal); background: rgba(255, 255, 255, 0.08); color: #fff; font: inherit; font-size: 1rem; text-align: left; }
-html body #mfCardSheet .cs-btn:first-of-type { background: #0a84ff; }
+html body #mfCardSheet .cs-btn:first-of-type { background: var(--c-accent); }
 html body #mfCardSheet .cs-cancel { text-align: center; background: transparent; opacity: 0.7; }
 html body .nf-card, html body .dv-card, html body .wl-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 html body .nf-card img, html body .dv-card img, html body .wl-card img { pointer-events: none; -webkit-user-drag: none; }

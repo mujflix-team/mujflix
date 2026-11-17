@@ -21,8 +21,8 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 .pc-pin-digit:focus {
-  border-color: rgba(10, 132, 255, 0.65) !important;
-  box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.18), 0 4px 18px rgba(10, 132, 255, 0.3) !important;
+  border-color: var(--c-accent-a3) !important;
+  box-shadow: 0 0 0 4px var(--c-accent-a1), 0 4px 18px var(--c-accent-a2) !important;
   transform: translateY(-2px) scale(1.04) !important;
   outline: none !important;
 }
@@ -60,8 +60,8 @@
   height: 92px !important;
   border-radius: 50% !important;
   background:
-    linear-gradient(160deg, color-mix(in srgb, var(--pg-color, #0a84ff) 28%, #16161d), #101014) !important;
-  border: 2px solid color-mix(in srgb, var(--pg-color, #0a84ff) 55%, transparent) !important;
+    linear-gradient(160deg, color-mix(in srgb, var(--pg-color, var(--c-accent)) 28%, #16161d), #101014) !important;
+  border: 2px solid color-mix(in srgb, var(--pg-color, var(--c-accent)) 55%, transparent) !important;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.04) inset,
     0 10px 30px rgba(0, 0, 0, 0.5) !important;
@@ -83,7 +83,7 @@
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.06) inset,
     0 14px 36px rgba(0, 0, 0, 0.55),
-    0 0 22px color-mix(in srgb, var(--pg-color, #0a84ff) 45%, transparent) !important;
+    0 0 22px color-mix(in srgb, var(--pg-color, var(--c-accent)) 45%, transparent) !important;
 }
 .pg-name {
   font-size: 0.85rem !important;
@@ -104,8 +104,8 @@
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
 }
 .pg-profile-item:hover .pg-add-btn {
-  border-color: rgba(10, 132, 255, 0.55) !important;
-  color: rgba(10, 132, 255, 0.85) !important;
+  border-color: var(--c-accent-a3) !important;
+  color: var(--c-accent-a3) !important;
   transform: translateY(-3px) !important;
 }
 .pg-manage-btn {
@@ -124,8 +124,8 @@
   color: rgba(255, 255, 255, 0.75) !important;
 }
 .pg-manage-btn.active {
-  color: var(--accent, #0a84ff) !important;
-  text-decoration-color: color-mix(in srgb, var(--accent, #0a84ff) 50%, transparent) !important;
+  color: var(--accent, var(--c-accent)) !important;
+  text-decoration-color: color-mix(in srgb, var(--accent, var(--c-accent)) 50%, transparent) !important;
 }
 .pg-remove-btn {
   width: 26px !important;
@@ -143,8 +143,8 @@
   align-items: center !important;
   justify-content: center !important;
   font-size: 1.8rem !important;
-  background: linear-gradient(160deg, rgba(10, 132, 255, 0.28), #101014) !important;
-  border: 2px solid rgba(10, 132, 255, 0.45) !important;
+  background: linear-gradient(160deg, var(--c-accent-a2), #101014) !important;
+  border: 2px solid var(--c-accent-a3) !important;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5) !important;
 }
 .pm-num {
@@ -159,34 +159,34 @@
 }
 .pm-num:active {
   transform: scale(0.94) !important;
-  background: rgba(10, 132, 255, 0.18) !important;
+  background: var(--c-accent-a1) !important;
 }
 .pm-dot {
   transition: background 0.15s ease, transform 0.15s ease !important;
 }
 .pm-dot.filled {
-  background: var(--accent, #0a84ff) !important;
+  background: var(--accent, var(--c-accent)) !important;
   transform: scale(1.15) !important;
 }
 .pm-dot.error {
-  background: #ff453a !important;
+  background: var(--c-danger) !important;
 }
 
 #seriesModal .btn-continue {
-  background: linear-gradient(140deg, #0a84ff, #34aadc) !important;
+  background: linear-gradient(140deg, var(--c-accent), #34aadc) !important;
   color: #fff !important;
   border-radius: var(--r-modal) !important;
   padding: 13px 24px !important;
   font-weight: 800 !important;
   letter-spacing: -0.1px !important;
   box-shadow:
-    0 8px 28px rgba(10, 132, 255, 0.45),
+    0 8px 28px var(--c-accent-a3),
     inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   transition: all 0.25s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
 }
 #seriesModal .btn-continue:hover {
   transform: scale(1.05) translateY(-2px) !important;
-  box-shadow: 0 14px 40px rgba(10, 132, 255, 0.55) !important;
+  box-shadow: 0 14px 40px var(--c-accent-a3) !important;
 }
 
 #seriesModal .panel-btns {
@@ -212,11 +212,11 @@
   transform: translateY(-2px) !important;
 }
 #seriesModal #modalRateBtn {
-  color: rgba(10, 132, 255, 0.8) !important;
+  color: var(--c-accent-a3) !important;
 }
 #seriesModal #modalRateBtn:hover {
-  background: rgba(10, 132, 255, 0.14) !important;
-  border-color: rgba(10, 132, 255, 0.4) !important;
+  background: var(--c-accent-a1) !important;
+  border-color: var(--c-accent-a2) !important;
   color: #fff !important;
 }
 #seriesModal #modalFindBtn {
@@ -234,8 +234,8 @@
 }
 #seriesModal .season-all-btn.active,
 #seriesModal .season-all-btn:hover {
-  background: rgba(10, 132, 255, 0.14) !important;
-  border-color: rgba(10, 132, 255, 0.35) !important;
+  background: var(--c-accent-a1) !important;
+  border-color: var(--c-accent-a2) !important;
   color: #fff !important;
 }
 
@@ -262,7 +262,7 @@
 
 .universe-overlay {
   background:
-    radial-gradient(1100px 500px at 15% -10%, rgba(10,132,255,0.14), transparent 60%),
+    radial-gradient(1100px 500px at 15% -10%, var(--c-accent-a1), transparent 60%),
     radial-gradient(900px 420px at 95% 0%, rgba(191,90,242,0.10), transparent 60%),
     #07070b !important;
 }
@@ -304,7 +304,7 @@
   background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff; font-size: 0.95rem; outline: none; font-family: inherit;
 }
-#watchlistOverlay .wl-search:focus { border-color: rgba(0, 122, 255, 0.6); background: rgba(255, 255, 255, 0.09); }
+#watchlistOverlay .wl-search:focus { border-color: var(--c-accent-a3); background: rgba(255, 255, 255, 0.09); }
 #watchlistOverlay .wl-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 #watchlistOverlay .wl-tab {
   padding: 10px 16px; border-radius: var(--r-pill); cursor: pointer; font-family: inherit;
@@ -312,7 +312,7 @@
   color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; font-weight: 600; transition: all 0.15s;
 }
 #watchlistOverlay .wl-tab:hover { background: rgba(255, 255, 255, 0.11); color: #fff; }
-#watchlistOverlay .wl-tab.active { background: #007aff; border-color: #007aff; color: #fff; }
+#watchlistOverlay .wl-tab.active { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
 #watchlistOverlay .wl-list {
   flex: 1; min-height: 0; overflow-y: auto; padding: 4px 4px 8px; margin: 0 -4px;
   display: grid !important; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -326,7 +326,7 @@
 }
 #watchlistOverlay .wl-card:hover .wl-card-poster,
 #watchlistOverlay .wl-card:focus-visible .wl-card-poster {
-  transform: translateY(-4px) scale(1.02); border-color: rgba(0, 122, 255, 0.7); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  transform: translateY(-4px) scale(1.02); border-color: var(--c-accent-a3); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
 }
 #watchlistOverlay .wl-card-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
 #watchlistOverlay .wl-card-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; opacity: 0.4; }
@@ -340,7 +340,7 @@
   background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff; padding: 0; transition: background 0.15s, transform 0.15s;
 }
-#watchlistOverlay .wl-card-remove:hover { background: #ff453a; transform: scale(1.1); }
+#watchlistOverlay .wl-card-remove:hover { background: var(--c-danger); transform: scale(1.1); }
 #watchlistOverlay .wl-card-play {
   position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
   font-size: 2rem; color: #fff; background: rgba(0, 0, 0, 0.35); opacity: 0; transition: opacity 0.18s; pointer-events: none;
@@ -358,7 +358,7 @@
 #watchlistOverlay .wl-empty-icon { font-size: 3.5rem; }
 #watchlistOverlay .wl-empty-btn {
   margin-top: 6px; padding: 12px 24px; border-radius: var(--r-modal); cursor: pointer; font-size: 0.95rem; font-weight: 700;
-  background: #007aff; border: none; color: #fff; font-family: inherit;
+  background: var(--c-accent); border: none; color: #fff; font-family: inherit;
 }
 #watchlistOverlay .wl-noresult { grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: rgba(255, 255, 255, 0.5); }
 @media (max-width: 640px) {

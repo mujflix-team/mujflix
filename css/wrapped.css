@@ -19,7 +19,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped.open { opacity: 1; }
 #mfWrapped *, #mfWrapped *::before, #mfWrapped *::after { box-sizing: border-box; }
 
-/* Pozadí: plochá tmavá, akcent #0a84ff jen na sloupcích a značce */
+/* Pozadí: plochá tmavá, akcent var(--c-accent) jen na sloupcích a značce */
 #mfWrapped { background: #0a0a0a; } /* jedna plochá barva, každý slide stejně */
 
 /* Horní lišta: postup a křížek */
@@ -39,7 +39,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 /* Písmo */
 #mfWrapped .mfw-eyebrow { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.88; }
 #mfWrapped .mfw-title { font-size: clamp(3.2rem, 13vw, 6.8rem); line-height: 0.95; font-weight: 900; letter-spacing: -0.04em; overflow-wrap: anywhere; }
-#mfWrapped .mfw-mark { padding: 0 0.08em; background: linear-gradient(transparent 62%, #0a84ff 62%); }
+#mfWrapped .mfw-mark { padding: 0 0.08em; background: linear-gradient(transparent 62%, var(--c-accent) 62%); }
 #mfWrapped .mfw-h { font-size: clamp(1.9rem, 6.4vw, 3.2rem); line-height: 1.05; font-weight: 900; letter-spacing: -0.03em; overflow-wrap: anywhere; }
 #mfWrapped .mfw-num { font-size: clamp(6rem, 30vw, 12rem); line-height: 0.85; font-weight: 900; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
 #mfWrapped .mfw-lead { font-size: clamp(1.1rem, 3.6vw, 1.6rem); line-height: 1.25; font-weight: 700; }
@@ -61,7 +61,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-bars li { display: grid; grid-template-columns: minmax(104px, 34%) 1fr auto; align-items: center; gap: 12px; font-size: 0.95rem; }
 #mfWrapped .mfw-bl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 #mfWrapped .mfw-bt { height: 14px; border-radius: var(--r-media); background: rgba(255, 255, 255, 0.12); overflow: hidden; }
-#mfWrapped .mfw-bt i { display: block; height: 100%; width: 0; border-radius: var(--r-media); background: #0a84ff; transition: width 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s; }
+#mfWrapped .mfw-bt i { display: block; height: 100%; width: 0; border-radius: var(--r-media); background: var(--c-accent); transition: width 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s; }
 #mfWrapped .mfw-stage.mfw-in .mfw-bt i { width: var(--w); }
 #mfWrapped .mfw-bars b { font-weight: 900; font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: right; }
 

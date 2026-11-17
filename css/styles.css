@@ -12,7 +12,7 @@
   z-index: 12;
   max-width: min(280px, 48vw);
   padding: 8px 13px;
-  border: 1px solid rgba(10,132,255,.28);
+  border: 1px solid var(--c-accent-a2);
   border-radius: var(--r-modal);
   background: rgba(13,18,29,.88);
   color: rgba(255,255,255,.82);
@@ -91,7 +91,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent, #007aff);
+  outline: 2px solid var(--accent, var(--c-accent));
   outline-offset: 3px;
   padding: 0;
   box-sizing: border-box;
@@ -432,7 +432,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(10, 132, 255, 0.25) 50%,
+    var(--c-accent-a2) 50%,
     transparent
   );
 }
@@ -746,7 +746,7 @@ body {
 }
 .episode-card.kb-focus {
   outline: 1.5px solid
-    color-mix(in srgb, var(--accent, #007aff) 50%, transparent);
+    color-mix(in srgb, var(--accent, var(--c-accent)) 50%, transparent);
   outline-offset: -1.5px;
 }
 .ep-thumb {
@@ -987,9 +987,9 @@ body {
   grid-column: 1/-1;
 }
 .shuffle-highlight {
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, #0e0e16) !important;
+  background: color-mix(in srgb, var(--accent, var(--c-accent)) 5%, #0e0e16) !important;
   box-shadow: inset 0 0 0 1.5px
-    color-mix(in srgb, var(--accent, #007aff) 45%, transparent) !important;
+    color-mix(in srgb, var(--accent, var(--c-accent)) 45%, transparent) !important;
 }
 .confirm-overlay {
   position: fixed;
@@ -1282,7 +1282,7 @@ canvas#particles {
 .genre-editor-box {
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 122, 255, 0.2) transparent;
+  scrollbar-color: var(--c-accent-a1) transparent;
   
   transform: scale(0.9) translateY(20px);
   opacity: 0;
@@ -1319,7 +1319,7 @@ canvas#particles {
 }
 .genre-editor-box {
   background: #0d0d0f;
-  border: 1px solid rgba(0, 122, 255, 0.2);
+  border: 1px solid var(--c-accent-a1);
   border-radius: var(--r-sheet);
   padding: 24px;
   width: min(460px, 92vw);
@@ -1327,7 +1327,7 @@ canvas#particles {
   overflow-y: auto;
   box-shadow:
     0 40px 80px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(0, 122, 255, 0.06);
+    0 0 0 1px var(--c-accent-a1);
 }
 .genre-editor-title {
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
@@ -1364,7 +1364,7 @@ canvas#particles {
 }
 .genre-editor-save:hover {
   transform: scale(1.04);
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
+  box-shadow: 0 4px 16px var(--c-accent-a2);
 }
 .font-option:hover:not(.active) {
   border-color: rgba(255, 255, 255, 0.18);
@@ -1412,9 +1412,9 @@ canvas#particles {
   background: linear-gradient(
     90deg,
     transparent 0,
-    rgba(0, 122, 255, 0.5) 40%,
+    var(--c-accent-a3) 40%,
     rgba(90, 200, 250, 0.8) 50%,
-    rgba(0, 122, 255, 0.5) 60%,
+    var(--c-accent-a3) 60%,
     transparent 100%
   );
   z-index: 3;
@@ -1514,7 +1514,7 @@ canvas#particles {
   top: -9px;
   right: -9px;
 
-  background: #ff453a;
+  background: var(--c-danger);
   color: #fff;
   font-size: 1.15rem;
   line-height: 19px;
@@ -1533,8 +1533,8 @@ canvas#particles {
 }
 .pg-manage-btn.active {
   
-  border-color: rgba(10, 132, 255, .45);
-  background: rgba(10, 132, 255, .14);
+  border-color: var(--c-accent-a3);
+  background: var(--c-accent-a1);
 }
 .pg-avatar {
 
@@ -1595,7 +1595,7 @@ canvas#particles {
   height: 80px;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: var(--pg-color, rgba(0, 122, 255, 0.6));
+  background: var(--pg-color, var(--c-accent-a3));
   filter: blur(24px);
   opacity: 0;
   transition: opacity 0.35s ease;
@@ -1624,15 +1624,15 @@ canvas#particles {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .pg-add-btn:hover {
-  border-color: rgba(0, 122, 255, 0.45);
+  border-color: var(--c-accent-a3);
   border-style: solid;
-  color: rgba(0, 122, 255, 0.85);
-  background: rgba(0, 122, 255, 0.07);
+  color: var(--c-accent-a3);
+  background: var(--c-accent-a1);
   transform: scale(1.05) translateY(-4px);
   box-shadow:
-    0 0 0 0.5px rgba(0, 122, 255, 0.15),
+    0 0 0 0.5px var(--c-accent-a1),
     0 16px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(0, 122, 255, 0.1);
+    inset 0 1px 0 var(--c-accent-a1);
 }
 .pg-manage-btn {
 
@@ -1841,7 +1841,7 @@ canvas#particles {
   text-align: left;
   cursor: pointer;
 }
-.pc-avatar-picker-toggle:hover { border-color: rgba(10,132,255,.55); background: rgba(10,132,255,.08); }
+.pc-avatar-picker-toggle:hover { border-color: var(--c-accent-a3); background: var(--c-accent-a1); }
 .pc-avatar-preview {
   width: 52px;
   height: 52px;
@@ -1881,7 +1881,7 @@ canvas#particles {
   font: inherit;
   font-size: .72rem;
 }
-.pc-avatar-search:focus { border-color: rgba(10,132,255,.55); }
+.pc-avatar-search:focus { border-color: var(--c-accent-a3); }
 .pc-avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; max-height: 310px; overflow-y: auto; }
 .pc-avatar-option {
   min-width: 0;
@@ -1895,7 +1895,7 @@ canvas#particles {
 }
 .pc-avatar-option img { display: block; width: 100%; aspect-ratio: 2/3; object-fit: cover; }
 .pc-avatar-option span { display: block; padding: 5px 4px; overflow: hidden; font-size: .56rem; text-overflow: ellipsis; white-space: nowrap; }
-.pc-avatar-option:hover, .pc-avatar-option.selected { border-color: #0a84ff; color: #fff; }
+.pc-avatar-option:hover, .pc-avatar-option.selected { border-color: var(--c-accent); color: #fff; }
 .pc-avatar-loading { grid-column: 1 / -1; padding: 24px 8px; color: rgba(255,255,255,.38); font-size: .68rem; text-align: center; }
 .pc-character-option span { min-height: 24px; }
 .pc-input {
@@ -1922,7 +1922,7 @@ canvas#particles {
 }
 .pc-emoji-btn.selected {
   border-color: var(--accent);
-  background: rgba(0, 122, 255, 0.1);
+  background: var(--c-accent-a1);
 }
 .pc-color-swatch {
   width: 32px;
@@ -1982,7 +1982,7 @@ canvas#particles {
   box-shadow: 0 28px 90px rgba(0,0,0,.7);
 }
 .pw-kicker {
-  color: #72b8ff;
+  color: var(--c-accent-hi);
   font-size: .58rem;
   font-weight: 800;
   letter-spacing: 2px;
@@ -2003,7 +2003,7 @@ canvas#particles {
   transition: .16s ease;
 }
 .pw-genre:hover { background: rgba(255,255,255,.1); color: #fff; }
-.pw-genre.selected { background: rgba(10,132,255,.2); border-color: rgba(10,132,255,.65); color: #fff; }
+.pw-genre.selected { background: var(--c-accent-a1); border-color: var(--c-accent-a3); color: #fff; }
 .pw-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 26px; }
 .pw-skip, .pw-save {
   padding: 10px 15px;
@@ -2013,7 +2013,7 @@ canvas#particles {
   cursor: pointer;
 }
 .pw-skip { border: 0; background: transparent; color: rgba(255,255,255,.45); }
-.pw-save { border: 0; background: #0a84ff; color: #fff; font-weight: 700; }
+.pw-save { border: 0; background: var(--c-accent); color: #fff; font-weight: 700; }
 .pc-btn-row {
   display: flex;
   gap: 10px;
@@ -2027,7 +2027,7 @@ canvas#particles {
 }
 .pc-btn-save:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 8px 25px var(--c-accent-a2);
 }
 .pc-btn-cancel {
   padding: 12px 20px;
@@ -2257,7 +2257,7 @@ header.mf-header {
   color: rgba(255, 255, 255, 0.95) !important;
 }
 .wl-title span {
-  color: #007aff !important;
+  color: var(--c-accent) !important;
 }
 .ssv-play-btn {
   
@@ -2271,7 +2271,7 @@ header.mf-header {
 }
 .ssv-play-btn:hover {
   
-  box-shadow: 0 6px 28px rgba(0, 122, 255, 0.5) !important;
+  box-shadow: 0 6px 28px var(--c-accent-a3) !important;
   
 }
 
@@ -2291,7 +2291,7 @@ header.mf-header {
   width: 3px !important;
 }
 .next-ep .ep-num {
-  color: #007aff !important;
+  color: var(--c-accent) !important;
 }
 
 .episode-card .ep-meta-row {
@@ -2320,9 +2320,9 @@ header.mf-header {
   display: none !important;
 }
 .ep-play-ring:hover {
-  background: #007aff !important;
-  border-color: #007aff !important;
-  box-shadow: 0 2px 12px rgba(0, 122, 255, 0.4) !important;
+  background: var(--c-accent) !important;
+  border-color: var(--c-accent) !important;
+  box-shadow: 0 2px 12px var(--c-accent-a2) !important;
 }
 .ep-btn-play-hbo {
 
@@ -2363,9 +2363,9 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: rgba(0, 122, 255, 0.55) !important;
+  border-color: var(--c-accent-a3) !important;
   outline: 0 !important;
-  box-shadow: 0 0 0 2.5px rgba(0, 122, 255, 0.2) !important;
+  box-shadow: 0 0 0 2.5px var(--c-accent-a1) !important;
 }
 .confirm-box {
   background: var(--sys-bg1) !important;
@@ -2375,7 +2375,7 @@ textarea:focus {
   max-width: 280px !important;
 }
 .confirm-ok {
-  background: #007aff !important;
+  background: var(--c-accent) !important;
   color: #fff !important;
   border-radius: var(--r-panel) !important;
   font-family: var(--font-sf) !important;
@@ -2391,20 +2391,20 @@ button:active {
 #pwaInstallBtn {
   background: linear-gradient(
     135deg,
-    rgba(0, 122, 255, 0.15),
-    rgba(0, 122, 255, 0.08)
+    var(--c-accent-a1),
+    var(--c-accent-a1)
   ) !important;
-  border: 0.5px solid rgba(0, 122, 255, 0.38) !important;
+  border: 0.5px solid var(--c-accent-a2) !important;
   border-radius: var(--r-modal) !important;
   font-family: var(--font-sf) !important;
 }
 #pwaInstallBtn:hover {
   background: linear-gradient(
     135deg,
-    rgba(0, 122, 255, 0.22),
-    rgba(0, 122, 255, 0.12)
+    var(--c-accent-a1),
+    var(--c-accent-a1)
   ) !important;
-  border-color: rgba(0, 122, 255, 0.55) !important;
+  border-color: var(--c-accent-a3) !important;
 }
 [class*="-divider"],
 [class*="-sep"],
@@ -2752,13 +2752,13 @@ body {
     0 1px 8px rgba(0, 0, 0, 0.8) !important;
 }
 .btn-continue {
-  background: linear-gradient(140deg, #007aff, #0a84ff) !important;
+  background: linear-gradient(140deg, var(--c-accent), var(--c-accent)) !important;
   color: #fff !important;
   border-radius: var(--r-sheet) !important;
   padding: 12px 22px !important;
   font-weight: 700 !important;
   box-shadow:
-    0 8px 28px rgba(0, 122, 255, 0.45),
+    0 8px 28px var(--c-accent-a3),
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
     inset 0 -1px 0 rgba(0, 0, 0, 0.15) !important;
   letter-spacing: -0.1px !important;
@@ -2766,7 +2766,7 @@ body {
 .btn-continue:hover {
   transform: scale(1.05) translateY(-2px) !important;
   box-shadow:
-    0 14px 40px rgba(0, 122, 255, 0.55),
+    0 14px 40px var(--c-accent-a3),
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 .btn-shuffle {
@@ -2833,14 +2833,14 @@ body {
     0 0 0 0.5px rgba(255, 255, 255, 0.1) !important;
 }
 .episode-card.next-ep {
-  background: rgba(0, 122, 255, 0.1) !important;
-  border-color: rgba(0, 122, 255, 0.25) !important;
-  box-shadow: 0 0 0 0.5px rgba(0, 122, 255, 0.2) !important;
+  background: var(--c-accent-a1) !important;
+  border-color: var(--c-accent-a2) !important;
+  box-shadow: 0 0 0 0.5px var(--c-accent-a1) !important;
 }
 .episode-card.next-ep::before {
   border-radius: var(--r-xs) 0 0 var(--r-xs) !important;
-  background: linear-gradient(180deg, #007aff, #0a84ff) !important;
-  box-shadow: 1px 0 8px rgba(0, 122, 255, 0.4) !important;
+  background: linear-gradient(180deg, var(--c-accent), var(--c-accent)) !important;
+  box-shadow: 1px 0 8px var(--c-accent-a2) !important;
 }
 .episode-card.watched {
   opacity: 0.38 !important;
@@ -2890,7 +2890,7 @@ body {
   gap: 8px !important;
 }
 .ep-btn-play-hbo {
-  background: linear-gradient(135deg, #007aff, #0a84ff) !important;
+  background: linear-gradient(135deg, var(--c-accent), var(--c-accent)) !important;
   color: #fff !important;
   border-radius: var(--r-panel) !important;
   font-weight: 700 !important;
@@ -2898,14 +2898,14 @@ body {
   padding: 6px 14px !important;
   border: none !important;
   box-shadow:
-    0 3px 12px rgba(0, 122, 255, 0.4),
+    0 3px 12px var(--c-accent-a2),
     inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
   letter-spacing: -0.1px !important;
 }
 .ep-btn-play-hbo:hover {
-  background: linear-gradient(135deg, #0a84ff, #34aadc) !important;
+  background: linear-gradient(135deg, var(--c-accent), #34aadc) !important;
   transform: scale(1.04) !important;
-  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.55) !important;
+  box-shadow: 0 6px 20px var(--c-accent-a3) !important;
 }
 .ep-btn-mark {
   width: 28px !important;
@@ -2932,9 +2932,9 @@ body {
 }
 .ep-next-tag {
   position: static !important;
-  background: rgba(0, 122, 255, 0.18) !important;
+  background: var(--c-accent-a1) !important;
   color: var(--ios-blue) !important;
-  border: 0.5px solid rgba(0, 122, 255, 0.35) !important;
+  border: 0.5px solid var(--c-accent-a2) !important;
   border-radius: var(--r-media) !important;
   font-size: 0.55rem !important;
   padding: 2px 7px !important;
@@ -2958,19 +2958,19 @@ body {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5) !important;
 }
 .ssv-card.ssv-active {
-  background: rgba(0, 122, 255, 0.13) !important;
-  border-color: rgba(0, 122, 255, 0.38) !important;
+  background: var(--c-accent-a1) !important;
+  border-color: var(--c-accent-a2) !important;
   box-shadow:
-    0 4px 20px rgba(0, 122, 255, 0.22),
+    0 4px 20px var(--c-accent-a1),
     var(--ios-inset) !important;
 }
 .ssv-play-btn {
-  background: rgba(0, 122, 255, 0.85) !important;
+  background: var(--c-accent-a3) !important;
   border: none !important;
-  box-shadow: 0 3px 12px rgba(0, 122, 255, 0.45) !important;
+  box-shadow: 0 3px 12px var(--c-accent-a3) !important;
 }
 .ssv-play-btn:hover {
-  background: #007aff !important;
+  background: var(--c-accent) !important;
   transform: scale(1.1) !important;
 }
 #mf-toast {
@@ -2993,7 +2993,7 @@ body {
   color: rgba(255, 255, 255, 0.95) !important;
 }
 .mf-header-logo span {
-  color: #007aff !important;
+  color: var(--c-accent) !important;
 }
 
 #cinemaBottomBar,
@@ -3048,11 +3048,11 @@ body {
   font-weight: 800 !important;
   letter-spacing: -0.6px !important;
   color: rgba(255, 255, 255, 0.96) !important;
-  text-shadow: 0 1px 18px rgba(10, 132, 255, 0.3) !important;
+  text-shadow: 0 1px 18px var(--c-accent-a2) !important;
 }
 .logo span {
   color: var(--accent) !important;
-  text-shadow: 0 0 20px rgba(10, 132, 255, 0.5) !important;
+  text-shadow: 0 0 20px var(--c-accent-a3) !important;
 }
 .mf-header {
   
@@ -3186,7 +3186,7 @@ body.mf-section-protebe #mfProfileBadge {
   transition: border-color 0.2s;
 }
 .tmdb-av-input:focus {
-  border-color: rgba(0, 122, 255, 0.45);
+  border-color: var(--c-accent-a3);
 }
 .tmdb-av-search-btn {
   padding: 10px 18px;
@@ -3219,12 +3219,12 @@ body.mf-section-protebe #mfProfileBadge {
   transition: all 0.18s;
 }
 .tmdb-av-item:hover {
-  background: rgba(0, 122, 255, 0.1);
-  border-color: rgba(0, 122, 255, 0.3);
+  background: var(--c-accent-a1);
+  border-color: var(--c-accent-a2);
 }
 .tmdb-av-item.selected {
   border-color: var(--accent);
-  background: rgba(0, 122, 255, 0.15);
+  background: var(--c-accent-a1);
 }
 .tmdb-av-img {
   width: 64px;
@@ -3282,9 +3282,9 @@ body.mf-section-protebe #mfProfileBadge {
   width: 100%;
   padding: 10px 14px;
   border-radius: var(--r-panel);
-  background: rgba(0, 122, 255, 0.07);
-  border: 1px solid rgba(0, 122, 255, 0.2);
-  color: rgba(0, 122, 255, 0.8);
+  background: var(--c-accent-a1);
+  border: 1px solid var(--c-accent-a1);
+  color: var(--c-accent-a3);
   font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
@@ -3294,8 +3294,8 @@ body.mf-section-protebe #mfProfileBadge {
   font-family: -apple-system, sans-serif;
 }
 .pc-tmdb-btn:hover {
-  background: rgba(0, 122, 255, 0.13);
-  border-color: rgba(0, 122, 255, 0.35);
+  background: var(--c-accent-a1);
+  border-color: var(--c-accent-a2);
 }
 .pg-gate {
   z-index: 9400 !important;
@@ -3304,16 +3304,16 @@ body.mf-section-protebe #mfProfileBadge {
   z-index: 100001 !important;
 }
 #dockFilmy.active {
-  background: rgba(0, 122, 255, 0.18) !important;
+  background: var(--c-accent-a1) !important;
 }
 #dockFilmy.active svg {
-  stroke: #007aff !important;
+  stroke: var(--c-accent) !important;
 }
 #dockProtebe.active {
-  background: rgba(10, 132, 255, 0.15) !important;
+  background: var(--c-accent-a1) !important;
 }
 #dockProtebe.active svg {
-  stroke: #0a84ff !important;
+  stroke: var(--c-accent) !important;
 }
 #dockHome.active {
   background: rgba(50, 215, 75, 0.15) !important;
@@ -3325,7 +3325,7 @@ body.mf-section-protebe #mfProfileBadge {
   --glass-bg: rgba(28, 28, 36, 0.72);
   --glass-border: rgba(255, 255, 255, 0.13);
   --glass-blur: blur(20px) saturate(1.5);
-  --ios-blue: #0a84ff;
+  --ios-blue: var(--c-accent);
 }
 #mfHeader,
 .mf-header,
@@ -3419,7 +3419,7 @@ button {
 .modal-hero::before {
   background: radial-gradient(
     ellipse 55% 65% at 75% 25%,
-    color-mix(in srgb, var(--accent, #007aff) 10%, transparent) 0,
+    color-mix(in srgb, var(--accent, var(--c-accent)) 10%, transparent) 0,
     transparent 60%
   ) !important;
 }
@@ -3582,7 +3582,7 @@ button:active {
   animation: mf-page-enter 0.26s cubic-bezier(0.34, 1.1, 0.64, 1) both;
 }
 :focus-visible {
-  outline: 2px solid rgba(10, 132, 255, 0.8) !important;
+  outline: 2px solid var(--c-accent-a3) !important;
   outline-offset: 3px !important;
   transition: outline-color 0.15s ease !important;
 }
@@ -3695,8 +3695,8 @@ body:not(.tv-mode):not(.appletv-mode) .episode-grid {
 }
 .season-all-btn:hover,
 .season-all-btn.active {
-  background: rgba(10,132,255,.2) !important;
-  border-color: rgba(10,132,255,.5) !important;
+  background: var(--c-accent-a1) !important;
+  border-color: var(--c-accent-a3) !important;
   color: #fff !important;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card {
@@ -3709,7 +3709,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card {
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card:hover {
   background: rgba(255,255,255,.08) !important;
-  border-color: rgba(10,132,255,.45) !important;
+  border-color: var(--c-accent-a3) !important;
   transform: translateY(-1px) !important;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-body {
@@ -3734,14 +3734,14 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo {
   min-height: 30px;
   padding: 0 11px;
   border-radius: var(--r-panel);
-  background: rgba(10,132,255,.18);
-  border: 1px solid rgba(10,132,255,.38);
+  background: var(--c-accent-a1);
+  border: 1px solid var(--c-accent-a2);
   color: #dceeff;
   font-weight: 700;
   cursor: pointer;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo:hover {
-  background: #0a84ff;
+  background: var(--c-accent);
   color: #fff;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
@@ -3774,7 +3774,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
     transform: none !important;
   }
   body:not(.tv-mode):not(.appletv-mode) .episode-card:hover {
-    border-color: rgba(10,132,255,.55) !important;
+    border-color: var(--c-accent-a3) !important;
     background: rgba(255,255,255,.085) !important;
     transform: translateY(-3px) !important;
     box-shadow: 0 12px 28px rgba(0,0,0,.28) !important;
@@ -4135,8 +4135,8 @@ input:focus, textarea:focus {
   --tv-border:       rgba(255,255,255,0.07);
   --tv-border-hi:    rgba(255,255,255,0.14);
 
-  --tv-blue:         #0a84ff;
-  --tv-blue-dim:     rgba(10,132,255,0.18);
+  --tv-blue:         var(--c-accent);
+  --tv-blue-dim:     var(--c-accent-a1);
 
   --tv-text:         rgba(255,255,255,0.96);
   --tv-text-sub:     rgba(255,255,255,0.60);
@@ -4171,8 +4171,8 @@ html, body {
 
 .bg-glow {
   background:
-    radial-gradient(ellipse 80% 50% at -5% -10%, rgba(10,132,255,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 60% at 105% 105%, rgba(10,132,255,0.03) 0%, transparent 60%) !important;
+    radial-gradient(ellipse 80% 50% at -5% -10%, var(--c-accent-a1) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 105% 105%, var(--c-accent-a1) 0%, transparent 60%) !important;
   animation: none !important;
 }
 body::before, body::after { display: none !important; }
@@ -4249,7 +4249,7 @@ body::before, body::after { display: none !important; }
   font-family: var(--tv-font) !important;
 
 }
-.pg-manage-btn:hover {  border-color: rgba(10,132,255,0.4) !important; background: var(--tv-blue-dim) !important; }
+.pg-manage-btn:hover {  border-color: var(--c-accent-a2) !important; background: var(--tv-blue-dim) !important; }
 
 .universe-overlay, #ratingOverlay, #watchlistOverlay {
   background: rgba(0,0,0,0.78) !important;
@@ -4279,7 +4279,7 @@ body::before, body::after { display: none !important; }
 .pm-box { background: var(--tv-surface) !important; border: 1px solid var(--tv-border-hi) !important; border-radius: var(--r-sheet) !important; box-shadow: 0 40px 100px rgba(0,0,0,0.95) !important; padding: 36px !important; }
 .pm-title { font-family: var(--tv-font) !important; font-size: 24px !important; font-weight: 800 !important; letter-spacing: -0.5px !important; }
 .pm-num { font-family: var(--tv-font) !important; font-size: 24px !important; font-weight: 600 !important;    color: var(--tv-text) !important;  }
-.pm-num:hover {  border-color: rgba(10,132,255,0.4) !important; transform: scale(1.08) !important; }
+.pm-num:hover {  border-color: var(--c-accent-a2) !important; transform: scale(1.08) !important; }
 .pm-dot { width: 12px !important; height: 12px !important; border-radius: 50% !important; border: 2px solid var(--tv-border-hi) !important; background: transparent !important; }
 .pm-dot.filled {  border-color: var(--tv-blue) !important; }
 
@@ -4374,7 +4374,7 @@ body::before, body::after { display: none !important; }
   cursor: pointer !important;
 }
 .rating-btn:hover { transform: scale(1.08) translateY(-3px) !important; }
-.rating-btn.loved.selected, .rating-btn.loved:hover { background: var(--tv-blue-dim) !important; border-color: rgba(10,132,255,0.5) !important; }
+.rating-btn.loved.selected, .rating-btn.loved:hover { background: var(--tv-blue-dim) !important; border-color: var(--c-accent-a3) !important; }
 .rating-btn.liked.selected, .rating-btn.liked:hover { background: rgba(48,209,88,0.1) !important; border-color: rgba(48,209,88,0.4) !important; }
 .rating-btn.ok.selected,    .rating-btn.ok:hover    { background: rgba(255,213,0,0.08) !important; border-color: rgba(255,213,0,0.35) !important; }
 .rating-btn.meh.selected,   .rating-btn.meh:hover   { background: rgba(255,55,95,0.08) !important; border-color: rgba(255,55,95,0.35) !important; }
@@ -4419,7 +4419,7 @@ body::before, body::after { display: none !important; }
   padding: 14px 18px !important;
   transition: border-color 0.18s, box-shadow 0.18s !important;
 }
-.pc-input:focus { border-color: rgba(10,132,255,0.5) !important; outline: none !important; box-shadow: 0 0 0 3px rgba(10,132,255,0.12) !important; }
+.pc-input:focus { border-color: var(--c-accent-a3) !important; outline: none !important; box-shadow: 0 0 0 3px var(--c-accent-a1) !important; }
 .pc-emoji-btn { border-radius: var(--r-modal) !important; background: var(--tv-elevated) !important; border: 1px solid var(--tv-border) !important; font-size: 22px !important; transition: all 0.15s var(--tv-ease-spring) !important; cursor: pointer !important; }
 .pc-btn-save {
   background: var(--tv-blue) !important;
@@ -4427,7 +4427,7 @@ body::before, body::after { display: none !important; }
   font-family: var(--tv-font) !important;
   font-weight: 700 !important;
   font-size: 18px !important;
-  box-shadow: 0 6px 18px rgba(10,132,255,0.4) !important;
+  box-shadow: 0 6px 18px var(--c-accent-a2) !important;
   border: none !important;
   color: #fff !important;
   cursor: pointer !important;
@@ -4459,7 +4459,7 @@ body::before, body::after { display: none !important; }
 }
 #dockMoreSheet button[style*="flex-direction: column"]:hover {
   background: var(--tv-blue-dim) !important;
-  border-color: rgba(10,132,255,0.3) !important;
+  border-color: var(--c-accent-a2) !important;
   transform: scale(1.07) !important;
 }
 #dockMoreSheet div[style*="background: rgba(255, 255, 255, 0.04)"] {
@@ -4502,7 +4502,7 @@ input, textarea, select {
   visibility: visible !important;
   opacity: 1 !important;
 }
-.pg-logo span { color: #0a84ff !important; }
+.pg-logo span { color: var(--c-accent) !important; }
 
 .pg-title {
 
@@ -4888,7 +4888,7 @@ h2.title,
    Dřív zde stálo `!important`, takže inline style z JS (document.documentElement.style.setProperty)
    neměl žádný účinek. Tento blok je poslední v kaskádě a má stejné hodnoty jako dřív, jen už jdou přepsat. */
 :root {
-  --accent: #007aff;
+  --accent: var(--c-accent);
   --accent2: #5ac8fa;
   --bg: #000000;
   --radius: 12px;
