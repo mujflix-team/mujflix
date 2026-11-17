@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.97 – druhé klepnutí na Domů v docku nahoru/obnoví (claude/dock-domu)
 - 3.21.96 – designové tokeny animací (claude/animace)
 - 3.21.95 – rychlejší otevření detailu seriálu (claude/rychle-otevreni)
 - 3.21.94 – okno nového profilu: logo, jeden křížek, odstín lišty (claude/profil-okno)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.97
+### Nově
+- **Druhé klepnutí na „Domů“ v docku** (když už jsi na Domů): nejdřív vyjede nahoru, a když už jsi nahoře, obnoví řady s doporučením (toast „Obnovuji doporučení…“). V oknech a jinde se chová jako dřív.
+
 ## 3.21.96
 ### Změněno
 - **Designový systém – animace:** délky a křivky přechodů v CSS (~330 míst) jsou tokeny `--t-fast/base/slow/xslow` (0,15 / 0,22 / 0,32 / 0,45 s) a `--ease-out/spring/std` místo ~25 různých hodnot a 10 křivek. Rozdíly jsou v řádu setin sekundy. Pravidla v `docs/DESIGN.md`.
