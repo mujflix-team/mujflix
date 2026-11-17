@@ -11,7 +11,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
   color: #fff; color-scheme: dark;
   font-family: var(--nf-font, "Inter Variable", "Helvetica Neue", Helvetica, Arial, sans-serif);
   background: var(--c-bg);
-  opacity: 0; transition: opacity 0.25s ease;
+  opacity: 0; transition: opacity var(--t-base) ease;
   overscroll-behavior: contain;
   outline: none;
 }
@@ -25,7 +25,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 /* Horní lišta: postup a křížek */
 #mfWrapped .mfw-top { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; padding: calc(env(safe-area-inset-top, 0px) + 14px) var(--mfw-pad) 0; }
 #mfWrapped .mfw-prog { flex: 1; display: flex; gap: 4px; }
-#mfWrapped .mfw-prog i { flex: 1; height: 3px; border-radius: var(--r-xs); background: var(--w-4); transition: background 0.2s ease; }
+#mfWrapped .mfw-prog i { flex: 1; height: 3px; border-radius: var(--r-xs); background: var(--w-4); transition: background var(--t-base) ease; }
 #mfWrapped .mfw-prog i.on { background: #fff; }
 #mfWrapped .mfw-x { flex: none; width: var(--mf-x, 44px); height: 44px; display: grid; place-items: center; padding: 0; border: 0; border-radius: var(--r-modal); background: rgba(0, 0, 0, 0.28); color: #fff; cursor: pointer; }
 #mfWrapped .mfw-x:hover { background: rgba(0, 0, 0, 0.5); }
@@ -33,7 +33,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 /* Slide */
 #mfWrapped .mfw-stage { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; padding: 20px var(--mfw-pad); overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; cursor: pointer; }
 #mfWrapped .mfw-slide { margin: auto; width: min(640px, 100%); min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-#mfWrapped .mfw-slide > * { margin: 0; animation: mfwIn 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+#mfWrapped .mfw-slide > * { margin: 0; animation: mfwIn var(--t-xslow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 80ms); }
 @keyframes mfwIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
 /* Písmo */
@@ -61,7 +61,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-bars li { display: grid; grid-template-columns: minmax(104px, 34%) 1fr auto; align-items: center; gap: 12px; font-size: 0.95rem; }
 #mfWrapped .mfw-bl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 #mfWrapped .mfw-bt { height: 14px; border-radius: var(--r-media); background: var(--w-2); overflow: hidden; }
-#mfWrapped .mfw-bt i { display: block; height: 100%; width: 0; border-radius: var(--r-media); background: var(--c-accent); transition: width 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s; }
+#mfWrapped .mfw-bt i { display: block; height: 100%; width: 0; border-radius: var(--r-media); background: var(--c-accent); transition: width 0.9s var(--ease-out) 0.25s; }
 #mfWrapped .mfw-stage.mfw-in .mfw-bt i { width: var(--w); }
 #mfWrapped .mfw-bars b { font-weight: 900; font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: right; }
 

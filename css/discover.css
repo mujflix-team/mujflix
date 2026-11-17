@@ -16,7 +16,7 @@
   background: var(--dv-bg);
   color: var(--dv-text);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--t-base) ease;
   font-family: inherit;
 }
 #universeOverlay.open { display: flex; }
@@ -42,7 +42,7 @@
   flex: 1; min-width: 0; max-width: 640px; display: flex; align-items: center; gap: 10px;
   height: 46px; padding: 0 12px 0 14px; border-radius: var(--r-modal); cursor: text;
   background: var(--dv-surface); border: 1px solid var(--dv-line); color: var(--dv-dim);
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color var(--t-fast), background var(--t-fast);
 }
 #universeOverlay .dv-search:focus-within { border-color: var(--dv-accent); background: var(--dv-surface-2); color: var(--dv-text); }
 #universeOverlay .dv-search input {
@@ -54,7 +54,7 @@
 #universeOverlay .dv-clear, #universeOverlay .dv-close {
   flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
   background: var(--w-2); color: var(--dv-text); font-size: 0.9rem; line-height: 1;
-  display: inline-flex; align-items: center; justify-content: center; transition: background 0.15s; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; transition: background var(--t-fast); padding: 0;
 }
 #universeOverlay .dv-clear[hidden] { display: none; }
 #universeOverlay .dv-clear:hover, #universeOverlay .dv-close:hover { background: var(--w-3); }
@@ -65,7 +65,7 @@
 #universeOverlay .dv-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--dv-surface); border: 1px solid var(--dv-line); border-radius: var(--r-modal); }
 #universeOverlay .dv-seg-btn {
   padding: 8px 18px; border: 0; border-radius: var(--r-panel); background: transparent; color: var(--dv-dim);
-  font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background var(--t-fast), color var(--t-fast);
 }
 #universeOverlay .dv-seg-btn:hover { color: var(--dv-text); }
 #universeOverlay .dv-seg-btn.active { background: var(--dv-accent); color: #fff; }
@@ -84,14 +84,14 @@
 }
 #universeOverlay .dv-toggle {
   height: 38px; padding: 0 14px; border-radius: var(--r-panel); border: 1px solid var(--dv-line); background: var(--dv-surface);
-  color: var(--dv-text); font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s;
+  color: var(--dv-text); font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background var(--t-fast);
 }
 #universeOverlay .dv-toggle:hover { background: var(--dv-surface-2); }
 #universeOverlay .dv-toggle.active { background: #fff; color: #0b0b10; border-color: #fff; }
 #universeOverlay .dv-active { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px var(--dv-pad) 0; }
 #universeOverlay .dv-achip {
   padding: 5px 12px; border-radius: var(--r-pill); border: 1px solid var(--dv-line); background: var(--dv-surface); color: var(--dv-text);
-  font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background var(--t-fast), border-color var(--t-fast);
 }
 #universeOverlay .dv-achip:hover { background: rgba(255, 69, 58, 0.18); border-color: rgba(255, 69, 58, 0.5); }
 #universeOverlay .dv-reset[hidden] { display: none; }
@@ -104,7 +104,7 @@
 #universeOverlay .dv-chip {
   flex: none; padding: 8px 16px; border-radius: var(--r-pill); scroll-snap-align: start; white-space: nowrap;
   background: var(--dv-surface); border: 1px solid var(--dv-line); color: var(--dv-text);
-  font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background var(--t-fast), transform var(--t-fast);
 }
 #universeOverlay .dv-chip:hover:not(:disabled) { background: var(--dv-surface-2); }
 #universeOverlay .dv-chip:active:not(:disabled) { transform: scale(0.97); }
@@ -143,7 +143,7 @@
 #universeOverlay .dv-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 #universeOverlay .dv-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0 22px;
-  border-radius: var(--r-panel); border: 0; cursor: pointer; font-size: 0.98rem; font-weight: 700; transition: transform 0.1s, background 0.15s;
+  border-radius: var(--r-panel); border: 0; cursor: pointer; font-size: 0.98rem; font-weight: 700; transition: transform var(--t-fast), background var(--t-fast);
 }
 #universeOverlay .dv-btn:active { transform: scale(0.97); }
 #universeOverlay .dv-btn-primary { background: #fff; color: #0b0b10; }
@@ -168,7 +168,7 @@
 #universeOverlay .dv-track .dv-card { flex: none; width: clamp(120px, 14vw, 178px); scroll-snap-align: start; }
 #universeOverlay .dv-arrow {
   position: absolute; top: 8px; bottom: 14px; width: 48px; border: 0; cursor: pointer; z-index: 2; color: #fff;
-  display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; padding: 0;
+  display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--t-fast); padding: 0;
 }
 #universeOverlay .dv-arrow-l { left: 0; background: linear-gradient(90deg, rgba(11, 11, 16, 0.92), transparent); }
 #universeOverlay .dv-arrow-r { right: 0; background: linear-gradient(270deg, rgba(11, 11, 16, 0.92), transparent); }
@@ -179,7 +179,7 @@
 #universeOverlay .dv-card { position: relative; min-width: 0; cursor: pointer; outline: none; }
 #universeOverlay .dv-poster {
   position: relative; aspect-ratio: 2 / 3; border-radius: var(--r-panel); overflow: hidden; background: var(--dv-surface);
-  border: 1px solid var(--dv-line); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
+  border: 1px solid var(--dv-line); transition: transform var(--t-base) ease, box-shadow var(--t-base) ease, border-color var(--t-base);
 }
 #universeOverlay .dv-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #universeOverlay .dv-poster-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; opacity: 0.4; }
@@ -190,12 +190,12 @@
    zbělá a zvětší se. Na dotykovém displeji se neukazuje. */
 #universeOverlay .dv-play {
   position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; pointer-events: none;
-  background: rgba(0, 0, 0, 0); opacity: 0; transition: opacity 0.18s ease, background 0.18s ease;
+  background: rgba(0, 0, 0, 0); opacity: 0; transition: opacity var(--t-base) ease, background var(--t-base) ease;
 }
 #universeOverlay .dv-play-btn {
   width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer;
   color: var(--w-5); filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7));
-  transition: color 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition: color var(--t-base) ease, transform var(--t-base) var(--ease-spring);
 }
 #universeOverlay .dv-play-btn svg { display: block; margin-left: 4px; }
 #universeOverlay .dv-card:hover .dv-play, #universeOverlay .dv-card:focus-visible .dv-play { opacity: 1; background: rgba(0, 0, 0, 0.3); }
@@ -215,7 +215,7 @@
 #universeOverlay .dv-fav {
   position: absolute; z-index: 3; top: 6px; right: 6px; width: 32px; height: 32px; border-radius: 50%; border: 0; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; color: #fff; padding: 0;
-  background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity 0.15s, transform 0.1s, background 0.15s;
+  background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity var(--t-fast), transform var(--t-fast), background var(--t-fast);
 }
 #universeOverlay .dv-fav.on { opacity: 1; }
 #universeOverlay .dv-fav.on svg { fill: var(--c-danger); stroke: var(--c-danger); }
