@@ -1586,6 +1586,25 @@ const portraitT = await page.evaluate(async () => {
 });
 await page.setViewportSize({ width: 1280, height: 800 });
 check("epizody na telefonu: obrázek na výšku nezvětší kartu (stejná výška jako krajinný) a tlačítko je na obrazovce", portraitT.h[0] === portraitT.h[1] && portraitT.h[0] < 100 && portraitT.right <= portraitT.w, JSON.stringify(portraitT));
+const noAutoRateT = await page.evaluate(async () => {
+  const ov0 = document.getElementById("epRatingOverlay");
+  if (ov0) { ov0.classList.remove("open"); ov0.style.display = "none"; }
+  toggleWatch("the-simpsons-S1-E3");
+  await new Promise(r => setTimeout(r, 600));
+  const ov = document.getElementById("epRatingOverlay");
+  const out = { open: !!ov && ov.style.display === "flex", watched: !!getWatched()["the-simpsons-S1-E3"] };
+  toggleWatch("the-simpsons-S1-E3");
+  return out;
+});
+check("epizody: označení jako viděno už samo nevyskočí s oknem hodnocení", !noAutoRateT.open && noAutoRateT.watched, JSON.stringify(noAutoRateT));
+
+const updZT = await page.evaluate(() => {
+  const b = document.createElement("div"); b.id = "mfUpdateBar"; document.body.appendChild(b);
+  const z = e => parseInt(getComputedStyle(e).zIndex, 10) || 0;
+  const out = { bar: z(b), cinema: z(document.getElementById("mfStandaloneCinema")) };
+  b.remove(); return out;
+});
+check("aktualizace: hláška „nová verze“ je nad Cinema módem", updZT.bar > updZT.cinema, JSON.stringify(updZT));
 
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
