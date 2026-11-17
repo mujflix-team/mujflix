@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.93
+### Opraveno
+- **Filtry v Objevování na telefonu:** rozbalovací seznamy (Řadit, Rok, Hodnocení) byly prázdné (skrytý popisek skryl i text hodnoty); teď je vidět malý popisek nad hodnotou a hodnota se nezalamuje.
+- **Epizody na telefonu:** obrázek epizody „na výšku“ (plakát místo záběru, např. u seriálů ze zdrojů) už nenatáhne kartu; vždy se ořízne do 16:9 a tlačítko „viděno“ zůstává na obrazovce.
+
 ## 3.21.92
 ### Opraveno
 - **Hláška „Je dostupná nová verze“** se zobrazí i v Cinema módu (dřív byla schovaná pod přehrávačem).
