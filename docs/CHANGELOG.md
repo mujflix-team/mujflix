@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.21.92
+### Opraveno
+- **Hláška „Je dostupná nová verze“** se zobrazí i v Cinema módu (dřív byla schovaná pod přehrávačem).
+
+### Odstraněno
+- Okno „Jak se ti epizoda líbila?“ (hvězdičky) už nevyskakuje samo po označení epizody jako viděné. Hodnotit jde dál ručně hvězdičkou u epizody a v Cinema módu.
+
 ## 3.21.91
 ### Změněno
 - **Designový systém – barvy:** barvy v CSS (~660 míst) jsou tokeny: povrchy `--c-bg/surface/surface-2/line/line-hi`, text `--c-text-2/3/4`, jedna modrá `--c-accent` (+ `-hi` a průhledné `-a1..a3`), `--c-danger` a 6 úrovní průhledné bílé `--w-1..6`. Místo 10 tmavých šedých, 9 šedých textů, 6 modrých a 14 průhledností bílé. Rozdíl na obrazovce je v řádu jednotek z 255. Pravidla v `docs/DESIGN.md`.

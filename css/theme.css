@@ -1182,7 +1182,7 @@ html body .nf-hero-desc.is-open {
 
 /* Hláška o nové verzi a připomenutí zálohy */
 #mfUpdateBar, #mfBackupBar {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 99999;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 1000003; /* nad Cinema módem (1000000) */
   display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 24px); padding: 10px 12px 10px 16px;
   background: var(--c-surface); color: #fff; border: 1px solid var(--w-3); border-radius: var(--r-panel); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   font-size: 0.9rem; animation: nfHeroIn 0.3s ease both;
