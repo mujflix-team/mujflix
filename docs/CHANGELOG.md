@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.91
+### Opraveno
+- **Filtry v Objevování na telefonu:** rozbalovací seznamy (Řadit, Rok, Hodnocení) byly prázdné (skrytý popisek skryl i text hodnoty); teď je vidět malý popisek nad hodnotou a hodnota se nezalamuje.
+- **Epizody na telefonu:** obrázek epizody „na výšku“ (plakát místo záběru, např. u seriálů ze zdrojů) už nenatáhne kartu; vždy se ořízne do 16:9 a tlačítko „viděno“ zůstává na obrazovce.
+
 ## 3.21.90
 ### Změněno
 - **Designový systém – rohy:** všechny zaoblené rohy (CSS, inline styly v JS i index.html, ~270 míst) používají sadu tokenů `--r-xs/ctl/media/panel/modal/sheet/pill` (2/4/6/8/12/16 px/pilulka) místo náhodných čísel (dřív 20 různých hodnot). Pravidla jsou v novém `docs/DESIGN.md`. Drobné vizuální posuny: hodnoty 10 px → 8 px, 14 px → 12 px, 18–24 px → 16 px, "Skrýt už otevřené" v Objevování má 4 px jako ostatní ovládací prvky.

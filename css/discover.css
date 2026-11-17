@@ -275,8 +275,9 @@
   #universeOverlay .dv-seg { width: 100%; }
   #universeOverlay .dv-seg-btn { flex: 1; padding: 8px 6px; }
   #universeOverlay .dv-selects { width: 100%; }
-  #universeOverlay .dv-select { flex: 1; min-width: 0; padding: 0 8px 0 10px; }
-  #universeOverlay .dv-select span { display: none; }
+  /* popisek (Řadit / Rok / Hodnocení) se na telefonu ukáže malý nad hodnotou */
+  #universeOverlay .dv-select { flex: 1; min-width: 0; flex-direction: column; align-items: stretch; justify-content: center; gap: 0; height: auto; min-height: 52px; padding: 6px 8px 4px 10px; }
+  #universeOverlay .dv-select > span { display: block; font-size: 0.68rem; line-height: 1.2; letter-spacing: 0.04em; text-transform: uppercase; }
   #universeOverlay .dv-select select { flex: 1; min-width: 0; max-width: none; }
   #universeOverlay .dv-reset { flex: 1 1 100%; }
   #universeOverlay .dv-toggle { flex: 1 1 100%; }
