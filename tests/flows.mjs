@@ -1570,6 +1570,12 @@ const rateT = await page.evaluate(() => {
 });
 check("kino: hvězdička označí epizodu a otevře hodnocení", rateT.exists && rateT.open && rateT.watched, JSON.stringify(rateT));
 
+const pcCloseT = await page.evaluate(() => {
+  const c = document.querySelector("#mfProfileCreate .pc-close"), l = document.querySelector("#mfProfileCreate .pc-logo");
+  return { fs: c ? getComputedStyle(c).fontSize : null, logoL: l ? getComputedStyle(l).left : null, logoR: l ? getComputedStyle(l).right : null, pos: l ? getComputedStyle(l).position : null };
+});
+check("nový profil: křížek je jen jeden (text × skrytý) a logo má přes celou šířku čisté pozadí", pcCloseT.fs === "0px" && pcCloseT.pos === "fixed" && pcCloseT.logoL === "0px" && pcCloseT.logoR === "0px", JSON.stringify(pcCloseT));
+
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [{ id: 9001, name: "A", title: "A", poster_path: "/p.jpg", vote_average: 8, original_language: "ja", genre_ids: [16] }] }) }; };

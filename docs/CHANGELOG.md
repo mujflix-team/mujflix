@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.94
+### Opraveno
+- **Nový profil (telefon):** logo je přes celou šířku s plynulým přechodem, takže se text pod ním už neusekne uprostřed; zavírací křížek je jen jeden (text „×“ se zobrazoval navíc k nakreslenému); spodní lišta s tlačítky má stejný odstín jako pozadí (dřív namodralá).
+
 ## 3.21.91
 ### Změněno
 - **Designový systém – barvy:** barvy v CSS (~660 míst) jsou tokeny: povrchy `--c-bg/surface/surface-2/line/line-hi`, text `--c-text-2/3/4`, jedna modrá `--c-accent` (+ `-hi` a průhledné `-a1..a3`), `--c-danger` a 6 úrovní průhledné bílé `--w-1..6`. Místo 10 tmavých šedých, 9 šedých textů, 6 modrých a 14 průhledností bílé. Rozdíl na obrazovce je v řádu jednotek z 255. Pravidla v `docs/DESIGN.md`.

@@ -376,12 +376,14 @@ html body #mfProfileCreate .pc-logo {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0 !important;
   z-index: 20 !important;
-  padding: 18px 12px 12px var(--nf-pad, 20px) !important;
-  background: var(--c-bg) !important;
+  padding: 18px 12px 26px var(--nf-pad, 20px) !important;
+  /* přes celou šířku, dole plynule zeslabí – text pod logem se nezačne uprostřed řádku useknutý */
+  background: linear-gradient(var(--c-bg) 68%, transparent) !important;
   pointer-events: none;
 }
-html body #mfProfileCreate .pc-box { position: relative; z-index: 1; }
+html body #mfProfileCreate .pc-box { position: relative; z-index: auto; } /* bez vlastní vrstvy, ať je křížek (z-index 21) nad logem */
 /* Chrome autofill nesmí zbarvit pole do bíla */
 html body #mfProfileCreate input:-webkit-autofill,
 html body #mfProfileCreate input:-webkit-autofill:focus {
