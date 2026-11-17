@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.96
+### Změněno
+- **Designový systém – animace:** délky a křivky přechodů v CSS (~330 míst) jsou tokeny `--t-fast/base/slow/xslow` (0,15 / 0,22 / 0,32 / 0,45 s) a `--ease-out/spring/std` místo ~25 různých hodnot a 10 křivek. Rozdíly jsou v řádu setin sekundy. Pravidla v `docs/DESIGN.md`.
+
 ## 3.21.95
 ### Opraveno
 - **Detail seriálu se otevírá rychleji:** okno se objeví hned po klepnutí (dřív až po dvou snímcích a pak se ~0,5 s pomalu prolínalo, takže byla chvíli vidět stránka pod ním a vypadalo to, že se nic neděje; film se otevíral dřív). Prolnutí je ~0,16 s, nástup obsahu ~0,3 s.

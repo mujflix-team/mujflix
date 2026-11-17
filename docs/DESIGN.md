@@ -37,6 +37,20 @@ Pravidla:
 
 Pravidla: nepsat barvy hexem ani `rgba(255,255,255,…)`; značková červená Netflixu `#e50914` a barva TMDB `#01b4e4` zůstávají jako výjimky. V JS (canvas ve Wrapped, inline styly) zatím zůstávají původní hodnoty.
 
+## Animace – tokeny na začátku `css/styles.css`
+
+| Token | Hodnota | Kam patří |
+|---|---|---|
+| `--t-fast` | 0,15 s | hover, změna barvy, drobné prvky |
+| `--t-base` | 0,22 s | běžné prvky, prolnutí |
+| `--t-slow` | 0,32 s | panely, obsah oken |
+| `--t-xslow` | 0,45 s | velké plochy (banner, stránka) |
+| `--ease-out` | cubic-bezier(.2,.7,.2,1) | vstup a pohyb (na konci zpomalí) |
+| `--ease-spring` | cubic-bezier(.34,1.3,.64,1) | „odskok“ (tlačítka, karty, okna) |
+| `--ease-std` | cubic-bezier(.4,0,.2,1) | pohyb tam i zpět |
+
+Pravidla: nepsat `0.3s` ani vlastní `cubic-bezier`; nekonečné smyčky (spinner, pozadí) a zpoždění zůstávají v sekundách. JS časovače, které čekají na konec přechodu (`setTimeout(... 280)`), musí být ≥ délce přechodu. Ambientní animace (>0,6 s) a `prefers-reduced-motion` se nemění. Inline styly v JS zatím zůstávají v původních hodnotách.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.
