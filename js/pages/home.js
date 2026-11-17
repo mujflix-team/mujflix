@@ -1659,7 +1659,7 @@
                 msg.id = 'mfhCinemaEmptyMsg';
                 msg.style.cssText =
                   'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);' +
-                  'background:rgba(20,20,30,0.95);padding:24px 32px;border-radius:8px;' +
+                  'background:rgba(20,20,30,0.95);padding:24px 32px;border-radius:var(--r-panel);' +
                   'color:#fff;text-align:center;' +
                   'z-index:999999;border:1px solid rgba(255,255,255,0.1);max-width:400px;';
                 msg.innerHTML =
@@ -1668,7 +1668,7 @@
                   '<div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-bottom:16px;">' +
                   'Zkus jiný zdroj nebo zavři přehrávač.</div>' +
                   '<button type="button" id="mfhCinemaEmptyClose" ' +
-                  'style="min-height:44px;padding:0 24px;background:#fff;border:none;border-radius:4px;' +
+                  'style="min-height:44px;padding:0 24px;background:#fff;border:none;border-radius:var(--r-ctl);' +
                   'color:#000;font-weight:700;cursor:pointer;">Zavřít</button>';
                 document.body.appendChild(msg);
                 var btn = document.getElementById('mfhCinemaEmptyClose');

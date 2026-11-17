@@ -32,15 +32,15 @@
   border-bottom: 1px solid var(--dv-line);
   z-index: 3;
 }
-#universeOverlay .dv-filter-btn { display: none; position: relative; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 0; border-radius: 4px; background: var(--dv-surface-2); color: #fff; font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; flex: none; }
-#universeOverlay .dv-filter-dot { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 8px; background: var(--dv-accent); color: #fff; font-size: 10px; font-weight: 800; line-height: 16px; text-align: center; }
+#universeOverlay .dv-filter-btn { display: none; position: relative; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 0; border-radius: var(--r-ctl); background: var(--dv-surface-2); color: #fff; font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; flex: none; }
+#universeOverlay .dv-filter-dot { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: var(--r-panel); background: var(--dv-accent); color: #fff; font-size: 10px; font-weight: 800; line-height: 16px; text-align: center; }
 #universeOverlay .dv-filter-dot[hidden] { display: none; }
 #universeOverlay .dv-bar { display: flex; align-items: center; gap: 14px; }
 #universeOverlay .dv-brand { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; flex: none; }
 #universeOverlay .dv-brand span { color: var(--dv-accent); }
 #universeOverlay .dv-search {
   flex: 1; min-width: 0; max-width: 640px; display: flex; align-items: center; gap: 10px;
-  height: 46px; padding: 0 12px 0 14px; border-radius: 12px; cursor: text;
+  height: 46px; padding: 0 12px 0 14px; border-radius: var(--r-modal); cursor: text;
   background: var(--dv-surface); border: 1px solid var(--dv-line); color: var(--dv-dim);
   transition: border-color 0.15s, background 0.15s;
 }
@@ -62,16 +62,16 @@
 
 /* filtry */
 #universeOverlay .dv-filters { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
-#universeOverlay .dv-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--dv-surface); border: 1px solid var(--dv-line); border-radius: 12px; }
+#universeOverlay .dv-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--dv-surface); border: 1px solid var(--dv-line); border-radius: var(--r-modal); }
 #universeOverlay .dv-seg-btn {
-  padding: 8px 18px; border: 0; border-radius: 9px; background: transparent; color: var(--dv-dim);
+  padding: 8px 18px; border: 0; border-radius: var(--r-panel); background: transparent; color: var(--dv-dim);
   font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s;
 }
 #universeOverlay .dv-seg-btn:hover { color: var(--dv-text); }
 #universeOverlay .dv-seg-btn.active { background: var(--dv-accent); color: #fff; }
 #universeOverlay .dv-selects { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 #universeOverlay .dv-select {
-  display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px 0 12px; border-radius: 10px;
+  display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px 0 12px; border-radius: var(--r-panel);
   background: var(--dv-surface); border: 1px solid var(--dv-line); font-size: 0.8rem; color: var(--dv-dim);
 }
 #universeOverlay .dv-select select {
@@ -79,18 +79,18 @@
 }
 #universeOverlay .dv-select select option { background: #1f1f1f; color: #fff; }
 #universeOverlay .dv-reset {
-  height: 38px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(255, 69, 58, 0.5);
+  height: 38px; padding: 0 14px; border-radius: var(--r-panel); border: 1px solid rgba(255, 69, 58, 0.5);
   background: rgba(255, 69, 58, 0.12); color: #ff6961; font-size: 0.85rem; font-weight: 600; cursor: pointer;
 }
 #universeOverlay .dv-toggle {
-  height: 38px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--dv-line); background: var(--dv-surface);
+  height: 38px; padding: 0 14px; border-radius: var(--r-panel); border: 1px solid var(--dv-line); background: var(--dv-surface);
   color: var(--dv-text); font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s;
 }
 #universeOverlay .dv-toggle:hover { background: var(--dv-surface-2); }
 #universeOverlay .dv-toggle.active { background: #fff; color: #0b0b10; border-color: #fff; }
 #universeOverlay .dv-active { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px var(--dv-pad) 0; }
 #universeOverlay .dv-achip {
-  padding: 5px 12px; border-radius: 999px; border: 1px solid var(--dv-line); background: var(--dv-surface); color: var(--dv-text);
+  padding: 5px 12px; border-radius: var(--r-pill); border: 1px solid var(--dv-line); background: var(--dv-surface); color: var(--dv-text);
   font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s, border-color 0.15s;
 }
 #universeOverlay .dv-achip:hover { background: rgba(255, 69, 58, 0.18); border-color: rgba(255, 69, 58, 0.5); }
@@ -102,7 +102,7 @@
 }
 #universeOverlay .dv-chips::-webkit-scrollbar { display: none; }
 #universeOverlay .dv-chip {
-  flex: none; padding: 8px 16px; border-radius: 999px; scroll-snap-align: start; white-space: nowrap;
+  flex: none; padding: 8px 16px; border-radius: var(--r-pill); scroll-snap-align: start; white-space: nowrap;
   background: var(--dv-surface); border: 1px solid var(--dv-line); color: var(--dv-text);
   font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s;
 }
@@ -131,7 +131,7 @@
 }
 #universeOverlay .dv-hero-body { position: relative; padding: 0 var(--dv-pad) 28px; max-width: 760px; }
 #universeOverlay .dv-hero-badge {
-  display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;
+  display: inline-block; padding: 4px 10px; border-radius: var(--r-media); font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.4px; text-transform: uppercase; background: var(--dv-accent); color: #fff; margin-bottom: 10px;
 }
 #universeOverlay .dv-hero-title { margin: 0 0 8px; font-size: clamp(1.7rem, 4.6vw, 3.2rem); font-weight: 800; line-height: 1.05; letter-spacing: -1px; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6); }
@@ -143,7 +143,7 @@
 #universeOverlay .dv-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 #universeOverlay .dv-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0 22px;
-  border-radius: 10px; border: 0; cursor: pointer; font-size: 0.98rem; font-weight: 700; transition: transform 0.1s, background 0.15s;
+  border-radius: var(--r-panel); border: 0; cursor: pointer; font-size: 0.98rem; font-weight: 700; transition: transform 0.1s, background 0.15s;
 }
 #universeOverlay .dv-btn:active { transform: scale(0.97); }
 #universeOverlay .dv-btn-primary { background: #fff; color: #0b0b10; }
@@ -178,7 +178,7 @@
 /* karta */
 #universeOverlay .dv-card { position: relative; min-width: 0; cursor: pointer; outline: none; }
 #universeOverlay .dv-poster {
-  position: relative; aspect-ratio: 2 / 3; border-radius: 10px; overflow: hidden; background: var(--dv-surface);
+  position: relative; aspect-ratio: 2 / 3; border-radius: var(--r-panel); overflow: hidden; background: var(--dv-surface);
   border: 1px solid var(--dv-line); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
 }
 #universeOverlay .dv-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -207,7 +207,7 @@
   #universeOverlay .dv-play-btn:hover, #universeOverlay .dv-play-btn:active { transform: none; }
 }
 #universeOverlay .dv-rate, #universeOverlay .dv-type {
-  position: absolute; z-index: 2; padding: 3px 7px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+  position: absolute; z-index: 2; padding: 3px 7px; border-radius: var(--r-media); font-size: 0.7rem; font-weight: 700;
   background: rgba(0, 0, 0, 0.68); color: #fff;
 }
 #universeOverlay .dv-rate { left: 6px; bottom: 6px; color: #ffd60a; }
@@ -240,7 +240,7 @@
 /* historie hledání */
 #universeOverlay .dv-history { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 16px var(--dv-pad) 0; }
 #universeOverlay .dv-history-label { font-size: 0.8rem; color: var(--dv-dim); margin-right: 4px; }
-#universeOverlay .dv-hchip { padding: 6px 12px; border-radius: 999px; background: var(--dv-surface); border: 1px solid var(--dv-line); color: var(--dv-text); font-size: 0.85rem; cursor: pointer; }
+#universeOverlay .dv-hchip { padding: 6px 12px; border-radius: var(--r-pill); background: var(--dv-surface); border: 1px solid var(--dv-line); color: var(--dv-text); font-size: 0.85rem; cursor: pointer; }
 #universeOverlay .dv-hchip:hover { background: var(--dv-surface-2); }
 #universeOverlay .dv-hclear { background: transparent; border: 0; color: var(--dv-dim); font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
 
@@ -252,7 +252,7 @@
 
 /* načítání */
 #universeOverlay .dv-skel { background: var(--dv-surface-2); }
-#universeOverlay .dv-skel-line { height: 12px; width: 70%; margin-top: 10px; border-radius: 6px; background: var(--dv-surface); }
+#universeOverlay .dv-skel-line { height: 12px; width: 70%; margin-top: 10px; border-radius: var(--r-media); background: var(--dv-surface); }
 @media (prefers-reduced-motion: reduce) {
   #universeOverlay, #universeOverlay * { animation: none !important; transition: none !important; }
 }

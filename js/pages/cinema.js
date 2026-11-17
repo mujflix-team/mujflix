@@ -1216,7 +1216,7 @@
     panel.style.cssText = `
       background: rgba(10,10,16,0.92);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
+      border-radius: var(--r-sheet);
       padding: 12px 14px;
       display: none;
       flex-direction: column;
@@ -1259,7 +1259,7 @@
       padding: 7px 12px 7px 9px;
       background: rgba(10,10,16,0.88);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 50px;
+      border-radius: var(--r-pill);
       cursor: pointer;
       pointer-events: auto;
       transition: all 0.2s ease;
@@ -1330,7 +1330,7 @@
           const im = document.createElement('img');
           im.src = 'https://image.tmdb.org/t/p/w92' + p.logo_path;
           im.alt = '';
-          im.style.cssText = 'width:24px;height:24px;border-radius:6px;object-fit:cover;border:1px solid rgba(0,0,0,0.5);' + (i ? 'margin-left:-8px;' : '');
+          im.style.cssText = 'width:24px;height:24px;border-radius:var(--r-media);object-fit:cover;border:1px solid rgba(0,0,0,0.5);' + (i ? 'margin-left:-8px;' : '');
           im.onerror = () => { im.style.display = 'none'; };
           stack.appendChild(im);
         });
@@ -1397,7 +1397,7 @@
             const logo = document.createElement('img');
             logo.src = logoUrl;
             logo.alt = providerName;
-            logo.style.cssText = `width:40px;height:40px;object-fit:cover;border-radius:9px;display:block;`;
+            logo.style.cssText = `width:40px;height:40px;object-fit:cover;border-radius:var(--r-panel);display:block;`;
             logo.onerror = () => { logo.style.display = 'none'; btn.style.padding = '6px 10px'; name.style.display = ''; };
             btn.appendChild(logo);
           }

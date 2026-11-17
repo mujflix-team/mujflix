@@ -1,3 +1,8 @@
+/* ═════════ Design tokeny: ROHY (jediný zdroj, pravidla viz docs/DESIGN.md) ═════════
+   xs 2 = drobnosti (lišty, posuvníky) · ctl 4 = ovládací prvky (tlačítka, vstupy, selecty)
+   media 6 = postery, náhledy, karty · panel 8 = malé panely, rozbalovací seznamy, trailer
+   modal 12 = okna a velké panely · sheet 16 = spodní listy a největší plochy · pill = chipy, štítky */
+:root { --r-xs: 2px; --r-ctl: 4px; --r-media: 6px; --r-panel: 8px; --r-modal: 12px; --r-sheet: 16px; --r-pill: 999px; }
 
 
 #mfWelcomeNote {
@@ -8,7 +13,7 @@
   max-width: min(280px, 48vw);
   padding: 8px 13px;
   border: 1px solid rgba(10,132,255,.28);
-  border-radius: 12px;
+  border-radius: var(--r-modal);
   background: rgba(13,18,29,.88);
   color: rgba(255,255,255,.82);
   box-shadow: 0 8px 28px rgba(0,0,0,.35);
@@ -142,13 +147,13 @@ body {
   width: 110px;
   height: 2px;
   background: rgba(255, 255, 255, 0.06);
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   overflow: hidden;
 }
 .logo-progress-fill {
   height: 100%;
   
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   
   transition: width 0.7s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
@@ -281,7 +286,7 @@ body {
   font-size: 0.55rem;
   color: var(--muted);
 
-  border-radius: 50px;
+  border-radius: var(--r-pill);
   padding: 6px 18px;
   opacity: 0;
   animation: fadeInHint 1s 2.5s forwards;
@@ -295,7 +300,7 @@ body {
 .key-hint kbd {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  border-radius: var(--r-ctl);
   padding: 1px 5px;
   font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
   font-size: 0.52rem;
@@ -482,14 +487,14 @@ body {
   flex: 1;
   height: 2px;
   background: rgba(255, 255, 255, 0.06);
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   overflow: hidden;
   max-width: 200px;
 }
 .panel-progress-fill {
   height: 100%;
   
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   transition: width 0.6s ease;
 }
 .panel-progress-text {
@@ -595,7 +600,7 @@ body {
 }
 .modal-body::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  border-radius: var(--r-xs);
 }
 .season-all-btn {
 
@@ -1054,7 +1059,7 @@ body {
   flex: 1;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   color: var(--muted);
   font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
   font-size: 0.8rem;
@@ -1315,7 +1320,7 @@ canvas#particles {
 .genre-editor-box {
   background: #0d0d0f;
   border: 1px solid rgba(0, 122, 255, 0.2);
-  border-radius: 16px;
+  border-radius: var(--r-sheet);
   padding: 24px;
   width: min(460px, 92vw);
   max-height: 80vh;
@@ -1337,7 +1342,7 @@ canvas#particles {
   accent-color: var(--accent);
   cursor: pointer;
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--r-xs);
 }
 .genre-editor-actions {
   display: flex;
@@ -1349,7 +1354,7 @@ canvas#particles {
   background: var(--accent);
   color: #000;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-panel);
   padding: 11px 22px;
   font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
   font-size: 0.8rem;
@@ -1577,7 +1582,7 @@ canvas#particles {
     rgba(255, 255, 255, 0.07) 0,
     transparent 100%
   );
-  border-radius: 28px 28px 0 0;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   pointer-events: none;
   z-index: 1;
 }
@@ -1666,7 +1671,7 @@ canvas#particles {
   width: 80px;
   height: 80px;
   background: #1a1a1e;
-  border-radius: 12px;
+  border-radius: var(--r-modal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1830,7 +1835,7 @@ canvas#particles {
   padding: 9px;
   margin-bottom: 10px;
   border: 1px solid rgba(255,255,255,.1);
-  border-radius: 14px;
+  border-radius: var(--r-modal);
   background: rgba(255,255,255,.045);
   color: #fff;
   text-align: left;
@@ -1844,7 +1849,7 @@ canvas#particles {
   place-items: center;
   flex: 0 0 auto;
   overflow: hidden;
-  border-radius: 13px;
+  border-radius: var(--r-modal);
   background: rgba(255,255,255,.08);
   font-size: 1.8rem;
 }
@@ -1860,7 +1865,7 @@ canvas#particles {
   margin-bottom: 22px;
   padding: 10px;
   border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
+  border-radius: var(--r-sheet);
   background: rgba(0,0,0,.16);
 }
 .pc-avatar-search {
@@ -1869,7 +1874,7 @@ canvas#particles {
   margin-bottom: 10px;
   padding: 10px 12px;
   border: 1px solid rgba(255,255,255,.1);
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   outline: 0;
   background: rgba(255,255,255,.045);
   color: #fff;
@@ -1883,7 +1888,7 @@ canvas#particles {
   padding: 0;
   overflow: hidden;
   border: 2px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   background: rgba(255,255,255,.04);
   color: rgba(255,255,255,.55);
   cursor: pointer;
@@ -1972,7 +1977,7 @@ canvas#particles {
   width: min(440px, 94vw);
   padding: 30px;
   border: 1px solid rgba(255,255,255,.11);
-  border-radius: 24px;
+  border-radius: var(--r-sheet);
   background: linear-gradient(145deg, rgba(25,31,45,.98), rgba(12,15,24,.98));
   box-shadow: 0 28px 90px rgba(0,0,0,.7);
 }
@@ -1989,7 +1994,7 @@ canvas#particles {
 .pw-genre {
   padding: 9px 12px;
   border: 1px solid rgba(255,255,255,.1);
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   background: rgba(255,255,255,.05);
   color: rgba(255,255,255,.7);
   font: inherit;
@@ -2002,7 +2007,7 @@ canvas#particles {
 .pw-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 26px; }
 .pw-skip, .pw-save {
   padding: 10px 15px;
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   font: inherit;
   font-size: .72rem;
   cursor: pointer;
@@ -2036,7 +2041,7 @@ canvas#particles {
   color: rgba(255, 255, 255, 0.8);
 }
 @media (max-width: 480px) {
-  .pc-box { padding: 24px 20px; border-radius: 20px; }
+  .pc-box { padding: 24px 20px; border-radius: var(--r-sheet); }
   .pc-avatar-grid { grid-template-columns: repeat(4, 1fr); }
   .pc-emoji-btn { font-size: 1.2rem; }
   .pc-btn-row { position: sticky; bottom: -24px; margin: 0 -20px -24px; padding: 14px 20px; background: rgba(12,14,21,.96); }
@@ -2057,7 +2062,7 @@ canvas#particles {
 .mpb-avatar {
   width: 26px;
   height: 26px;
-  border-radius: 8px;
+  border-radius: var(--r-panel);
   background: rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
@@ -2091,7 +2096,7 @@ canvas#particles {
   width: 34px;
   height: 34px;
   flex: 0 0 34px;
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   overflow: hidden;
   font-size: 1.08rem;
 }
@@ -2115,7 +2120,7 @@ canvas#particles {
     min-height: 46px;
     right: 10px;
     padding: 5px 6px;
-    border-radius: 13px;
+    border-radius: var(--r-modal);
   }
   #mfProfileBadge .mpb-avatar {
     width: 30px;
@@ -2235,7 +2240,7 @@ header.mf-header {
   backdrop-filter: blur(80px) saturate(2.5) !important;
   -webkit-backdrop-filter: blur(80px) saturate(2.5) !important;
   border: 1px solid rgba(255, 255, 255, 0.13) !important;
-  border-radius: 24px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.12),
     inset 0 -1px 0 rgba(0, 0, 0, 0.18),
@@ -2257,7 +2262,7 @@ header.mf-header {
 .ssv-play-btn {
   
   color: #fff !important;
-  border-radius: 14px !important;
+  border-radius: var(--r-modal) !important;
   font-family: var(--font-sf) !important;
   font-weight: 600 !important;
   font-size: 0.92rem !important;
@@ -2336,7 +2341,7 @@ header.mf-header {
 input[type="search"] {
   background: rgba(118, 118, 128, 0.24) !important;
   border: none !important;
-  border-radius: 12px !important;
+  border-radius: var(--r-modal) !important;
   font-family: var(--font-sf) !important;
   color: rgba(255, 255, 255, 0.92) !important;
   padding: 8px 14px !important;
@@ -2352,7 +2357,7 @@ textarea {
   font-family: var(--font-sf) !important;
   background: rgba(118, 118, 128, 0.24) !important;
   border: 0.5px solid rgba(84, 84, 88, 0.4) !important;
-  border-radius: 12px !important;
+  border-radius: var(--r-modal) !important;
   color: rgba(255, 255, 255, 0.92) !important;
 }
 input:focus,
@@ -2365,14 +2370,14 @@ textarea:focus {
 .confirm-box {
   background: var(--sys-bg1) !important;
   border: 0.5px solid rgba(84, 84, 88, 0.4) !important;
-  border-radius: 14px !important;
+  border-radius: var(--r-modal) !important;
   box-shadow: 0 16px 60px rgba(0, 0, 0, 0.75) !important;
   max-width: 280px !important;
 }
 .confirm-ok {
   background: #007aff !important;
   color: #fff !important;
-  border-radius: 11px !important;
+  border-radius: var(--r-panel) !important;
   font-family: var(--font-sf) !important;
   font-weight: 600 !important;
 }
@@ -2390,7 +2395,7 @@ button:active {
     rgba(0, 122, 255, 0.08)
   ) !important;
   border: 0.5px solid rgba(0, 122, 255, 0.38) !important;
-  border-radius: 14px !important;
+  border-radius: var(--r-modal) !important;
   font-family: var(--font-sf) !important;
 }
 #pwaInstallBtn:hover {
@@ -2548,7 +2553,7 @@ body {
 }
 #epRatingSheet {
   background: #1c1c1e;
-  border-radius: 20px 20px 0 0;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   padding: 12px 24px 36px;
   width: 100%;
   max-width: 480px;
@@ -2563,7 +2568,7 @@ body {
   width: 40px;
   height: 4px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   margin: 0 auto 18px;
 }
 .er-series-name {
@@ -2633,7 +2638,7 @@ body {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.5);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   padding: 10px 20px;
   font-size: 0.85rem;
   cursor: pointer;
@@ -2646,7 +2651,7 @@ body {
   background: rgba(255, 159, 10, 0.15);
   color: rgba(255, 159, 10, 0.4);
   border: 1px solid rgba(255, 159, 10, 0.2);
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   padding: 10px 24px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -2669,7 +2674,7 @@ body {
   color: rgba(255, 159, 10, 0.9);
   background: rgba(255, 159, 10, 0.12);
   border: 1px solid rgba(255, 159, 10, 0.2);
-  border-radius: 5px;
+  border-radius: var(--r-ctl);
   padding: 1px 6px;
   cursor: pointer;
   margin-left: 6px;
@@ -2749,7 +2754,7 @@ body {
 .btn-continue {
   background: linear-gradient(140deg, #007aff, #0a84ff) !important;
   color: #fff !important;
-  border-radius: 16px !important;
+  border-radius: var(--r-sheet) !important;
   padding: 12px 22px !important;
   font-weight: 700 !important;
   box-shadow:
@@ -2767,7 +2772,7 @@ body {
 .btn-shuffle {
   background: rgba(255, 255, 255, 0.07) !important;
   border: 0.5px solid rgba(255, 255, 255, 0.14) !important;
-  border-radius: 16px !important;
+  border-radius: var(--r-sheet) !important;
   backdrop-filter: blur(20px) !important;
   padding: 12px 16px !important;
   font-weight: 600 !important;
@@ -2797,7 +2802,7 @@ body {
 .season-all-btn {
   
   border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 9px !important;
+  border-radius: var(--r-panel) !important;
 
 }
 .episode-grid {
@@ -2833,7 +2838,7 @@ body {
   box-shadow: 0 0 0 0.5px rgba(0, 122, 255, 0.2) !important;
 }
 .episode-card.next-ep::before {
-  border-radius: 3px 0 0 3px !important;
+  border-radius: var(--r-xs) 0 0 var(--r-xs) !important;
   background: linear-gradient(180deg, #007aff, #0a84ff) !important;
   box-shadow: 1px 0 8px rgba(0, 122, 255, 0.4) !important;
 }
@@ -2887,7 +2892,7 @@ body {
 .ep-btn-play-hbo {
   background: linear-gradient(135deg, #007aff, #0a84ff) !important;
   color: #fff !important;
-  border-radius: 10px !important;
+  border-radius: var(--r-panel) !important;
   font-weight: 700 !important;
   font-size: 0.7rem !important;
   padding: 6px 14px !important;
@@ -2930,7 +2935,7 @@ body {
   background: rgba(0, 122, 255, 0.18) !important;
   color: var(--ios-blue) !important;
   border: 0.5px solid rgba(0, 122, 255, 0.35) !important;
-  border-radius: 6px !important;
+  border-radius: var(--r-media) !important;
   font-size: 0.55rem !important;
   padding: 2px 7px !important;
   font-weight: 700 !important;
@@ -2941,7 +2946,7 @@ body {
   background: rgba(24, 24, 36, 0.72) !important;
   backdrop-filter: blur(20px) !important;
   border: 0.5px solid rgba(255, 255, 255, 0.09) !important;
-  border-radius: 16px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow:
     0 2px 12px rgba(0, 0, 0, 0.35),
     var(--ios-inset) !important;
@@ -3075,7 +3080,7 @@ body {
   background: rgba(14, 18, 32, 0.95) !important;
   border: 1px solid var(--plexi-border) !important;
   border-top-color: rgba(255, 255, 255, 0.18) !important;
-  border-radius: 16px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     var(--shadow-lg) !important;
@@ -3149,7 +3154,7 @@ body.mf-section-protebe #mfProfileBadge {
 .tmdb-av-box {
   background: rgba(14, 14, 22, 0.99);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 22px;
+  border-radius: var(--r-sheet);
   padding: 28px 24px;
   width: min(500px, 95vw);
   max-height: 80vh;
@@ -3172,7 +3177,7 @@ body.mf-section-protebe #mfProfileBadge {
   flex: 1;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 11px;
+  border-radius: var(--r-panel);
   padding: 10px 14px;
   color: #fff;
   font-size: 0.85rem;
@@ -3185,7 +3190,7 @@ body.mf-section-protebe #mfProfileBadge {
 }
 .tmdb-av-search-btn {
   padding: 10px 18px;
-  border-radius: 11px;
+  border-radius: var(--r-panel);
   background: var(--accent);
   border: none;
   color: #000;
@@ -3208,7 +3213,7 @@ body.mf-section-protebe #mfProfileBadge {
   align-items: center;
   gap: 5px;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--r-modal);
   padding: 8px 4px;
   border: 2px solid transparent;
   transition: all 0.18s;
@@ -3245,7 +3250,7 @@ body.mf-section-protebe #mfProfileBadge {
 }
 .tmdb-av-cancel {
   padding: 9px 18px;
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
@@ -3254,7 +3259,7 @@ body.mf-section-protebe #mfProfileBadge {
 }
 .tmdb-av-confirm {
   padding: 9px 18px;
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   background: var(--accent);
   border: none;
   color: #000;
@@ -3276,7 +3281,7 @@ body.mf-section-protebe #mfProfileBadge {
 .pc-tmdb-btn {
   width: 100%;
   padding: 10px 14px;
-  border-radius: 11px;
+  border-radius: var(--r-panel);
   background: rgba(0, 122, 255, 0.07);
   border: 1px solid rgba(0, 122, 255, 0.2);
   color: rgba(0, 122, 255, 0.8);
@@ -3507,7 +3512,7 @@ button {
 #cinemaSourceBar button {
   font-size: 0.75rem !important;
   padding: 8px 16px !important;
-  border-radius: 20px !important;
+  border-radius: var(--r-sheet) !important;
   font-weight: 650 !important;
   font-family: -apple-system, Inter, sans-serif !important;
   letter-spacing: 0.1px !important;
@@ -3524,7 +3529,7 @@ button {
 #cinAIBadge {
   font-size: 0.72rem !important;
   padding: 7px 13px !important;
-  border-radius: 20px !important;
+  border-radius: var(--r-sheet) !important;
   font-weight: 700 !important;
 }
 #cinemaEpSel option,
@@ -3699,7 +3704,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card {
   margin-bottom: 6px !important;
   background: rgba(255,255,255,.045) !important;
   border: 1px solid rgba(255,255,255,.1) !important;
-  border-radius: 14px !important;
+  border-radius: var(--r-modal) !important;
   overflow: hidden !important;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card:hover {
@@ -3728,7 +3733,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-actions {
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo {
   min-height: 30px;
   padding: 0 11px;
-  border-radius: 8px;
+  border-radius: var(--r-panel);
   background: rgba(10,132,255,.18);
   border: 1px solid rgba(10,132,255,.38);
   color: #dceeff;
@@ -3742,7 +3747,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo:hover {
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: var(--r-panel);
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.13);
 }
@@ -3762,7 +3767,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
     min-height: 0 !important;
     height: 100% !important;
     margin: 0 !important;
-    border-radius: 16px !important;
+    border-radius: var(--r-sheet) !important;
     background: rgba(255,255,255,.055) !important;
     border: 1px solid rgba(255,255,255,.11) !important;
     overflow: hidden !important;
@@ -3828,7 +3833,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
     min-height: 32px !important;
     justify-content: center !important;
     padding: 0 9px !important;
-    border-radius: 9px !important;
+    border-radius: var(--r-panel) !important;
     font-size: .7rem !important;
   }
   body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
@@ -4089,7 +4094,7 @@ button, .btn, [role="button"] {
 }
 button:active, .btn:active { transform: scale(0.93) !important; transition-duration: 48ms !important; }
 input, textarea, select {
-   border-radius: 12px !important;
+   border-radius: var(--r-modal) !important;
   transition: border-color 0.17s ease, box-shadow 0.17s ease !important;
 }
 input:focus, textarea:focus {
@@ -4102,7 +4107,7 @@ input:focus, textarea:focus {
   font-family: var(--font-ui) !important; font-weight: 500 !important;
   background: rgba(16,16,28,0.97) !important;
   border: 1px solid rgba(255,255,255,0.075) !important;
-  border-radius: 16px !important; box-shadow: var(--shadow-lg) !important;
+  border-radius: var(--r-sheet) !important; box-shadow: var(--shadow-lg) !important;
   backdrop-filter: blur(22px) !important;
 }
 
@@ -4199,7 +4204,7 @@ body::before, body::after { display: none !important; }
 .mf-header-btn {
   width: 44px !important;
   height: 44px !important;
-  border-radius: 12px !important;
+  border-radius: var(--r-modal) !important;
   color: var(--tv-text-sub) !important;
   background: transparent !important;
   border: none !important;
@@ -4218,7 +4223,7 @@ body::before, body::after { display: none !important; }
 #hdrStreakPill {
   background: rgba(255,159,10,0.1) !important;
   border: 1px solid rgba(255,159,10,0.22) !important;
-  border-radius: 22px !important;
+  border-radius: var(--r-sheet) !important;
   padding: 6px 14px !important;
   gap: 6px !important;
 }
@@ -4258,7 +4263,7 @@ body::before, body::after { display: none !important; }
   font-weight: 600 !important;
   background: rgba(20,20,30,0.96) !important;
   border: 1px solid var(--tv-border-hi) !important;
-  border-radius: 16px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow: 0 8px 40px rgba(0,0,0,0.7) !important;
   backdrop-filter: blur(20px) !important;
   padding: 16px 28px !important;
@@ -4271,7 +4276,7 @@ body::before, body::after { display: none !important; }
   text-align: center !important;
 }
 
-.pm-box { background: var(--tv-surface) !important; border: 1px solid var(--tv-border-hi) !important; border-radius: 24px !important; box-shadow: 0 40px 100px rgba(0,0,0,0.95) !important; padding: 36px !important; }
+.pm-box { background: var(--tv-surface) !important; border: 1px solid var(--tv-border-hi) !important; border-radius: var(--r-sheet) !important; box-shadow: 0 40px 100px rgba(0,0,0,0.95) !important; padding: 36px !important; }
 .pm-title { font-family: var(--tv-font) !important; font-size: 24px !important; font-weight: 800 !important; letter-spacing: -0.5px !important; }
 .pm-num { font-family: var(--tv-font) !important; font-size: 24px !important; font-weight: 600 !important;    color: var(--tv-text) !important;  }
 .pm-num:hover {  border-color: rgba(10,132,255,0.4) !important; transform: scale(1.08) !important; }
@@ -4297,7 +4302,7 @@ body::before, body::after { display: none !important; }
     --tv-header-h: 110px;  }
   html, body { font-size: 28px !important; }
   .mf-header-logo { font-size: 40px !important; }
-  .pg-avatar { width: 180px !important; height: 180px !important; font-size: 80px !important; border-radius: 36px !important; }
+  .pg-avatar { width: 180px !important; height: 180px !important; font-size: 80px !important; border-radius: var(--r-pill) !important; }
   .pg-logo { font-size: 56px !important; }
 }
 
@@ -4320,7 +4325,7 @@ body::before, body::after { display: none !important; }
   font-weight: 700 !important;
   background: rgba(255,213,0,0.1) !important;
   border: 1px solid rgba(255,213,0,0.25) !important;
-  border-radius: 8px !important;
+  border-radius: var(--r-panel) !important;
   color: rgba(255,213,0,0.9) !important;
   padding: 3px 10px !important;
 }
@@ -4328,7 +4333,7 @@ body::before, body::after { display: none !important; }
   font-family: var(--tv-font) !important;
   font-weight: 700 !important;
   font-size: 16px !important;
-  border-radius: 12px !important;
+  border-radius: var(--r-modal) !important;
   padding: 12px 22px !important;
   transition: all 0.2s var(--tv-ease) !important;
   cursor: pointer !important;
@@ -4338,7 +4343,7 @@ body::before, body::after { display: none !important; }
 .watchlist-box {
   background: var(--tv-surface) !important;
   border: 1px solid var(--tv-border-hi) !important;
-  border-radius: 22px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow: 0 40px 120px rgba(0,0,0,0.95) !important;
   animation: tv-rise 0.3s var(--tv-ease) both !important;
 }
@@ -4351,7 +4356,7 @@ body::before, body::after { display: none !important; }
 .rating-box {
   background: var(--tv-surface) !important;
   border: 1px solid var(--tv-border-hi) !important;
-  border-radius: 22px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow: 0 40px 120px rgba(0,0,0,0.95) !important;
   padding: 32px !important;
 }
@@ -4359,7 +4364,7 @@ body::before, body::after { display: none !important; }
 .rating-subtitle { font-family: var(--tv-font) !important; font-size: 16px !important; color: var(--tv-text-sub) !important; }
 .rating-label { font-family: var(--tv-font) !important; font-weight: 800 !important; letter-spacing: 1.5px !important; font-size: 12px !important; color: var(--tv-text-muted) !important; }
 .rating-btn {
-  border-radius: 16px !important;
+  border-radius: var(--r-sheet) !important;
   border: 2px solid var(--tv-border-hi) !important;
   background: var(--tv-elevated) !important;
   font-family: var(--tv-font) !important;
@@ -4374,12 +4379,12 @@ body::before, body::after { display: none !important; }
 .rating-btn.ok.selected,    .rating-btn.ok:hover    { background: rgba(255,213,0,0.08) !important; border-color: rgba(255,213,0,0.35) !important; }
 .rating-btn.meh.selected,   .rating-btn.meh:hover   { background: rgba(255,55,95,0.08) !important; border-color: rgba(255,55,95,0.35) !important; }
 .rating-skip { font-family: var(--tv-font) !important; font-size: 16px !important; color: var(--tv-text-muted) !important; transition: color 0.15s !important; cursor: pointer !important; }
-.rating-movie-thumb { border-radius: 12px !important; }
+.rating-movie-thumb { border-radius: var(--r-modal) !important; }
 
 .streak-widget {
   background: rgba(12,12,20,0.9) !important;
   border: 1px solid rgba(255,159,10,0.2) !important;
-  border-radius: 18px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
   backdrop-filter: blur(20px) !important;
   padding: 20px !important;
@@ -4390,7 +4395,7 @@ body::before, body::after { display: none !important; }
 #continueWidget {
   background: var(--tv-surface) !important;
   border: 1px solid var(--tv-border-hi) !important;
-  border-radius: 18px !important;
+  border-radius: var(--r-sheet) !important;
   padding: 20px !important;
   box-shadow: none !important;
 }
@@ -4398,7 +4403,7 @@ body::before, body::after { display: none !important; }
 .pc-box {
   background: var(--tv-surface) !important;
   border: 1px solid var(--tv-border-hi) !important;
-  border-radius: 24px !important;
+  border-radius: var(--r-sheet) !important;
   box-shadow: 0 40px 100px rgba(0,0,0,0.95) !important;
   padding: 36px !important;
 }
@@ -4409,16 +4414,16 @@ body::before, body::after { display: none !important; }
   font-size: 18px !important;
   background: var(--tv-elevated) !important;
   border: 1px solid var(--tv-border-hi) !important;
-  border-radius: 12px !important;
+  border-radius: var(--r-modal) !important;
   color: var(--tv-text) !important;
   padding: 14px 18px !important;
   transition: border-color 0.18s, box-shadow 0.18s !important;
 }
 .pc-input:focus { border-color: rgba(10,132,255,0.5) !important; outline: none !important; box-shadow: 0 0 0 3px rgba(10,132,255,0.12) !important; }
-.pc-emoji-btn { border-radius: 12px !important; background: var(--tv-elevated) !important; border: 1px solid var(--tv-border) !important; font-size: 22px !important; transition: all 0.15s var(--tv-ease-spring) !important; cursor: pointer !important; }
+.pc-emoji-btn { border-radius: var(--r-modal) !important; background: var(--tv-elevated) !important; border: 1px solid var(--tv-border) !important; font-size: 22px !important; transition: all 0.15s var(--tv-ease-spring) !important; cursor: pointer !important; }
 .pc-btn-save {
   background: var(--tv-blue) !important;
-  border-radius: 14px !important;
+  border-radius: var(--r-modal) !important;
   font-family: var(--tv-font) !important;
   font-weight: 700 !important;
   font-size: 18px !important;
@@ -4427,7 +4432,7 @@ body::before, body::after { display: none !important; }
   color: #fff !important;
   cursor: pointer !important;
 }
-.pc-btn-cancel { border-radius: 14px !important; font-family: var(--tv-font) !important; font-weight: 600 !important; font-size: 16px !important; background: var(--tv-elevated) !important; border: 1px solid var(--tv-border-hi) !important; color: var(--tv-text-sub) !important; }
+.pc-btn-cancel { border-radius: var(--r-modal) !important; font-family: var(--tv-font) !important; font-weight: 600 !important; font-size: 16px !important; background: var(--tv-elevated) !important; border: 1px solid var(--tv-border-hi) !important; color: var(--tv-text-sub) !important; }
 .pc-pin-digit {
   font-family: var(--tv-font) !important;
 
@@ -4438,17 +4443,17 @@ body::before, body::after { display: none !important; }
   backdrop-filter: blur(56px) saturate(1.8) !important;
   -webkit-backdrop-filter: blur(56px) saturate(1.8) !important;
   border-top: 1px solid var(--tv-border-hi) !important;
-  border-radius: 28px 28px 0 0 !important;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0 !important;
   box-shadow: 0 -24px 80px rgba(0,0,0,0.9) !important;
 }
 #dockMoreSheet > div:first-child > div {
   background: rgba(255,255,255,0.2) !important;
-  border-radius: 3px !important;
+  border-radius: var(--r-xs) !important;
 }
 #dockMoreSheet button[style*="flex-direction: column"] {
   background: var(--tv-elevated) !important;
   border: 1px solid var(--tv-border) !important;
-  border-radius: 18px !important;
+  border-radius: var(--r-sheet) !important;
   transition: background 0.18s, border-color 0.18s, transform 0.18s var(--tv-ease-spring) !important;
   cursor: pointer !important;
 }
@@ -4460,7 +4465,7 @@ body::before, body::after { display: none !important; }
 #dockMoreSheet div[style*="background: rgba(255, 255, 255, 0.04)"] {
   background: var(--tv-elevated) !important;
   border: 1px solid var(--tv-border) !important;
-  border-radius: 18px !important;
+  border-radius: var(--r-sheet) !important;
 }
 
 button {
@@ -4541,7 +4546,7 @@ input, textarea, select {
 
 .pg-manage-btn {
 
-  border-radius: 12px !important;
+  border-radius: var(--r-modal) !important;
   
   margin-top: 8px !important;
   cursor: pointer !important;
@@ -4591,7 +4596,7 @@ body {
   scrollbar-color: var(--jg-border-d) transparent !important;
 }
 ::-webkit-scrollbar { width: 3px !important; height: 3px !important; }
-::-webkit-scrollbar-thumb { background: var(--jg-border-d) !important; border-radius: 3px !important; }
+::-webkit-scrollbar-thumb { background: var(--jg-border-d) !important; border-radius: var(--r-xs) !important; }
 ::-webkit-scrollbar-track { background: transparent !important; }
 
 ::selection { background: var(--jg-active-a) !important; }
@@ -4861,7 +4866,7 @@ textarea:focus {
 #modalBody::-webkit-scrollbar-thumb,
 .modal-body::-webkit-scrollbar-thumb {
   background: var(--jg-border-d) !important;
-  border-radius: 3px !important;
+  border-radius: var(--r-xs) !important;
 }
 
 h2.title,
