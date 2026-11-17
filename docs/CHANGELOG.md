@@ -1,9 +1,13 @@
 # Changelog
 
-## 3.21.91
+## 3.21.93
 ### Opraveno
 - **Filtry v Objevování na telefonu:** rozbalovací seznamy (Řadit, Rok, Hodnocení) byly prázdné (skrytý popisek skryl i text hodnoty); teď je vidět malý popisek nad hodnotou a hodnota se nezalamuje.
 - **Epizody na telefonu:** obrázek epizody „na výšku“ (plakát místo záběru, např. u seriálů ze zdrojů) už nenatáhne kartu; vždy se ořízne do 16:9 a tlačítko „viděno“ zůstává na obrazovce.
+
+## 3.21.91
+### Změněno
+- **Designový systém – barvy:** barvy v CSS (~660 míst) jsou tokeny: povrchy `--c-bg/surface/surface-2/line/line-hi`, text `--c-text-2/3/4`, jedna modrá `--c-accent` (+ `-hi` a průhledné `-a1..a3`), `--c-danger` a 6 úrovní průhledné bílé `--w-1..6`. Místo 10 tmavých šedých, 9 šedých textů, 6 modrých a 14 průhledností bílé. Rozdíl na obrazovce je v řádu jednotek z 255. Pravidla v `docs/DESIGN.md`.
 
 ## 3.21.90
 ### Změněno

@@ -20,6 +20,23 @@ Pravidla:
 3. `0` jen tam, kde je plocha schválně přilepená k okraji; kolečko je `50%`.
 4. Prvky na stejné úrovni (např. tlačítko a select vedle sebe) mají vždy stejný token.
 
+## Barvy – tokeny na začátku `css/styles.css`
+
+| Token | Hodnota | Kam patří |
+|---|---|---|
+| `--c-bg` | #141414 | pozadí stránky |
+| `--c-surface` | #1f1f1f | karty, panely, okna |
+| `--c-surface-2` | #2a2a2a | zvýšené plochy, hover |
+| `--c-line` / `--c-line-hi` | #333 / #3a3a3a | okraje a dělítka |
+| `--c-text-2/3/4` | #d2d2d2 / #b3b3b3 / #808080 | hlavní popisy / vedlejší / nejslabší (čisté bílé je `#fff`) |
+| `--c-accent` | #0a84ff | jediná hlavní modrá (aktivní stavy, odkazy, zvýraznění) |
+| `--c-accent-hi` | #72b8ff | světlejší modrá pro text na tmavém |
+| `--c-accent-a1/a2/a3` | modrá 15 / 30 / 55 % | výplně, záře, okraje |
+| `--c-danger` | #ff453a | chyba, smazání |
+| `--w-1…6` | bílá 6 / 10 / 18 / 35 / 60 / 85 % | jemné výplně (1), okraje (2), hover (3), text slabý/sekundární/téměř plný (4–6) |
+
+Pravidla: nepsat barvy hexem ani `rgba(255,255,255,…)`; značková červená Netflixu `#e50914` a barva TMDB `#01b4e4` zůstávají jako výjimky. V JS (canvas ve Wrapped, inline styly) zatím zůstávají původní hodnoty.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.
