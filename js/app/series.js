@@ -767,15 +767,8 @@ function _sdCompact(modal, on) {
 function toggleWatch(e) {
   const t = getWatched(),
     n = !!t[e];
-  if (n ? delete t[e] : t[e] = !0, saveWatched(t), n || persistSeriesRecord(e.replace(/-S\d+-E\d+$/, "")), renderEpisodes(), renderSeasons(), updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateLogoProgress(), !n && "function" == typeof openEpRating) {
-    const t = e.split("-"),
-      n = t.slice(0, t.length - 2).join("-"),
-      o = (void 0 !== db && db[n] ? db[n] : {}).name || n,
-      i = parseInt((t[t.length - 2] || "S1").replace("S", "")) || 1,
-      a = parseInt((t[t.length - 1] || "E1").replace("E", "")) || 1,
-      s = "function" == typeof getEpRating ? getEpRating(e) : 0;
-    setTimeout(() => openEpRating(e, o, "S" + i + " · E" + a, s), 350)
-  }
+  // Po označení jako „viděno“ už se nevyskakuje okno s hodnocením epizody (hodnotit jde ručně přes hvězdičku u epizody)
+  n ? delete t[e] : t[e] = !0, saveWatched(t), n || persistSeriesRecord(e.replace(/-S\d+-E\d+$/, "")), renderEpisodes(), renderSeasons(), updatePanelProgress(), updateTileProgress(activeSeries), updateContinueBadge(activeSeries), updateLogoProgress()
 }
 
 function shuffleEpisode() {

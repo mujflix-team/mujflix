@@ -432,7 +432,7 @@ html body #mfProfileCreate .pc-heading { display: block; position: relative; }
 html body #mfProfileCreate .pc-eyebrow { display: none !important; }
 html body #mfProfileCreate .pc-title { font-size: clamp(2rem, 5vw, 3.4rem) !important; font-weight: 500 !important; letter-spacing: -0.02em !important; color: #fff !important; line-height: 1.1; }
 html body #mfProfileCreate .pc-subtitle { color: var(--c-text-4) !important; font-size: 1.15rem !important; margin: 10px 0 8px !important; padding-bottom: 22px; border-bottom: 1px solid var(--c-line); }
-html body #mfProfileCreate .pc-close { position: fixed; top: 14px; right: var(--nf-pad); background: transparent !important; border: 0 !important; color: var(--c-text-3) !important; font-size: 2rem !important; width: 44px; height: 44px; }
+html body #mfProfileCreate .pc-close { position: fixed; top: 14px; right: var(--nf-pad); background: transparent !important; border: 0 !important; color: var(--c-text-3) !important; width: 44px; height: 44px; z-index: 21; /* křížek kreslí ::before/::after, text × se nesmí zobrazit podruhé */ }
 html body #mfProfileCreate .pc-close:hover { color: #fff !important; }
 html body #mfProfileCreate .pc-label { color: var(--c-text-3) !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 0.95rem !important; font-weight: 600 !important; margin-top: 26px !important; }
 html body #mfProfileCreate .pc-label-note { color: var(--c-text-4) !important; font-weight: 400; text-transform: none; }
@@ -1182,7 +1182,7 @@ html body .nf-hero-desc.is-open {
 
 /* Hláška o nové verzi a připomenutí zálohy */
 #mfUpdateBar, #mfBackupBar {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 99999;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 1000003; /* nad Cinema módem (1000000) */
   display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 24px); padding: 10px 12px 10px 16px;
   background: var(--c-surface); color: #fff; border: 1px solid var(--w-3); border-radius: var(--r-panel); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   font-size: 0.9rem; animation: nfHeroIn 0.3s ease both;
@@ -1622,6 +1622,10 @@ html body #seriesModal #episodesGrid .ep-meta-row > * { margin: 0 !important; }
 html body #seriesModal #episodesGrid .ep-thumb { border-radius: var(--r-modal) !important; }
 html body #seriesModal #episodesGrid .ep-desc, html body #seriesModal #episodesGrid .ep-meta-row, html body #seriesModal #episodesGrid .ep-meta-row .ep-num, html body #seriesModal #episodesGrid .ep-meta-row .ep-runtime, html body #seriesModal #episodesGrid .ep-meta-row .ep-rating { color: var(--w-5) !important; }
 @media (max-width: 700px) { html body #seriesModal #episodesGrid .ep-thumb { border-radius: var(--r-panel) !important; } }
+/* Obrázek epizody nikdy neurčuje výšku karty: i obrázek „na výšku“ (plakát místo záběru, třeba u seriálů ze zdrojů) se ořízne do 16:9 */
+html body #seriesModal #episodesGrid .ep-thumb { position: relative; overflow: hidden; aspect-ratio: 16 / 9; align-self: flex-start; }
+html body #seriesModal #episodesGrid .ep-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+@media (max-width: 700px) { html body #seriesModal #episodesGrid .ep-thumb { height: 70px !important; min-height: 70px !important; } html body #seriesModal #episodesGrid .episode-card { align-items: center; } html body #seriesModal #episodesGrid .ep-thumb { align-self: center; } }
 /* Podobné: stejné odsazení jako záložky, nadpis netřeba (je v záložce) */
 html body #seriesModal .sd-similar { padding: 8px clamp(16px, 3vw, 40px) 96px; }
 html body #seriesModal .sd-sim-title { display: none; }
@@ -1685,6 +1689,8 @@ html body .mf-dd { position: relative; display: inline-block; }
 html body .mf-dd-btn { height: 40px; padding: 0 12px 0 14px; display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; border: 0; border-radius: var(--r-panel); background: rgba(109, 109, 110, 0.35); color: #fff; font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
 html body .mf-dd-btn:hover, html body .mf-dd.open .mf-dd-btn { background: rgba(109, 109, 110, 0.6); }
 html body .mf-dd-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body .mf-dd-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body .mf-dd-btn { min-width: 0; }
 html body .mf-dd-chev { flex: none; transition: transform 0.18s; }
 html body .mf-dd.open .mf-dd-chev { transform: rotate(180deg); }
 html body .mf-dd-list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; min-width: 100%; width: max-content; max-width: min(320px, 90vw); margin: 0; padding: 6px; list-style: none; background: #1c1c1c; border: 1px solid var(--w-3); border-radius: var(--r-modal); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); outline: 0; animation: mfddIn 0.14s ease-out; }

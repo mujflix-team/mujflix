@@ -4,6 +4,22 @@
 ### Opraveno
 - **Detail seriálu se otevírá rychleji:** okno se objeví hned po klepnutí (dřív až po dvou snímcích a pak se ~0,5 s pomalu prolínalo, takže byla chvíli vidět stránka pod ním a vypadalo to, že se nic neděje; film se otevíral dřív). Prolnutí je ~0,16 s, nástup obsahu ~0,3 s.
 
+## 3.21.94
+### Opraveno
+- **Nový profil (telefon):** logo je přes celou šířku s plynulým přechodem, takže se text pod ním už neusekne uprostřed; zavírací křížek je jen jeden (text „×“ se zobrazoval navíc k nakreslenému); spodní lišta s tlačítky má stejný odstín jako pozadí (dřív namodralá).
+
+## 3.21.93
+### Opraveno
+- **Filtry v Objevování na telefonu:** rozbalovací seznamy (Řadit, Rok, Hodnocení) byly prázdné (skrytý popisek skryl i text hodnoty); teď je vidět malý popisek nad hodnotou a hodnota se nezalamuje.
+- **Epizody na telefonu:** obrázek epizody „na výšku“ (plakát místo záběru, např. u seriálů ze zdrojů) už nenatáhne kartu; vždy se ořízne do 16:9 a tlačítko „viděno“ zůstává na obrazovce.
+
+## 3.21.92
+### Opraveno
+- **Hláška „Je dostupná nová verze“** se zobrazí i v Cinema módu (dřív byla schovaná pod přehrávačem).
+
+### Odstraněno
+- Okno „Jak se ti epizoda líbila?“ (hvězdičky) už nevyskakuje samo po označení epizody jako viděné. Hodnotit jde dál ručně hvězdičkou u epizody a v Cinema módu.
+
 ## 3.21.91
 ### Změněno
 - **Designový systém – barvy:** barvy v CSS (~660 míst) jsou tokeny: povrchy `--c-bg/surface/surface-2/line/line-hi`, text `--c-text-2/3/4`, jedna modrá `--c-accent` (+ `-hi` a průhledné `-a1..a3`), `--c-danger` a 6 úrovní průhledné bílé `--w-1..6`. Místo 10 tmavých šedých, 9 šedých textů, 6 modrých a 14 průhledností bílé. Rozdíl na obrazovce je v řádu jednotek z 255. Pravidla v `docs/DESIGN.md`.
