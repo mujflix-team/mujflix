@@ -1347,8 +1347,9 @@ check("detail: řada herců má šipky (vpravo viditelná, vlevo ne) a bez posuv
 const setHash = await page.evaluate(async () => {
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const out = { oldGone: typeof window.MFSettings === "undefined" && typeof window.openSettings === "undefined" };
-  location.hash = "#settings"; await wait(300);
-  const m = document.getElementById("mfSettingsModal");
+  location.hash = "#settings";
+  let m = null;
+  for (let i = 0; i < 30; i++) { await wait(100); m = document.getElementById("mfSettingsModal"); if (m && getComputedStyle(m).display !== "none") break; } // na pomalém CI trvá otevření déle než 300 ms
   out.opened = !!m && getComputedStyle(m).display !== "none";
   out.noKeyInputs = !document.getElementById("mfSetTmdb") && !document.getElementById("mfSetAnthro");
   if (window.MFProfileSettings) MFProfileSettings.close();
@@ -1575,6 +1576,40 @@ const pcCloseT = await page.evaluate(() => {
   return { fs: c ? getComputedStyle(c).fontSize : null, logoL: l ? getComputedStyle(l).left : null, logoR: l ? getComputedStyle(l).right : null, pos: l ? getComputedStyle(l).position : null };
 });
 check("nový profil: křížek je jen jeden (text × skrytý) a logo má přes celou šířku čisté pozadí", pcCloseT.fs === "0px" && pcCloseT.pos === "fixed" && pcCloseT.logoL === "0px" && pcCloseT.logoR === "0px", JSON.stringify(pcCloseT));
+await page.setViewportSize({ width: 390, height: 800 });
+const portraitT = await page.evaluate(async () => {
+  const m = document.getElementById("seriesModal"), g = document.getElementById("episodesGrid");
+  const old = { cls: m.className, st: m.style.cssText, html: g.innerHTML, gc: g.className };
+  m.classList.add("open"); m.style.cssText = "display:block;position:fixed;inset:0;overflow:auto"; g.className = "episode-grid";
+  const svg = w => "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${w[0]}' height='${w[1]}'><rect width='100%' height='100%' fill='#c60'/></svg>`);
+  g.innerHTML = [[600, 900], [1280, 720]].map((w, i) => `<div class="episode-card"><div class="ep-thumb"><img src="${svg(w)}"></div><div class="ep-body"><div class="ep-title">${i + 1}. epizoda</div></div><div class="ep-actions"><button class="ep-btn-mark">○</button></div></div>`).join("");
+  await new Promise(r => setTimeout(r, 400));
+  const h = [...g.querySelectorAll(".ep-thumb")].map(t => Math.round(t.getBoundingClientRect().height));
+  const right = Math.max(...[...g.querySelectorAll(".ep-btn-mark")].map(b => b.getBoundingClientRect().right));
+  m.className = old.cls; m.style.cssText = old.st; g.innerHTML = old.html; g.className = old.gc;
+  return { h, right, w: innerWidth };
+});
+await page.setViewportSize({ width: 1280, height: 800 });
+check("epizody na telefonu: obrázek na výšku nezvětší kartu (stejná výška jako krajinný) a tlačítko je na obrazovce", portraitT.h[0] === portraitT.h[1] && portraitT.h[0] < 100 && portraitT.right <= portraitT.w, JSON.stringify(portraitT));
+const noAutoRateT = await page.evaluate(async () => {
+  const ov0 = document.getElementById("epRatingOverlay");
+  if (ov0) { ov0.classList.remove("open"); ov0.style.display = "none"; }
+  toggleWatch("the-simpsons-S1-E3");
+  await new Promise(r => setTimeout(r, 600));
+  const ov = document.getElementById("epRatingOverlay");
+  const out = { open: !!ov && ov.style.display === "flex", watched: !!getWatched()["the-simpsons-S1-E3"] };
+  toggleWatch("the-simpsons-S1-E3");
+  return out;
+});
+check("epizody: označení jako viděno už samo nevyskočí s oknem hodnocení", !noAutoRateT.open && noAutoRateT.watched, JSON.stringify(noAutoRateT));
+
+const updZT = await page.evaluate(() => {
+  const b = document.createElement("div"); b.id = "mfUpdateBar"; document.body.appendChild(b);
+  const z = e => parseInt(getComputedStyle(e).zIndex, 10) || 0;
+  const out = { bar: z(b), cinema: z(document.getElementById("mfStandaloneCinema")) };
+  b.remove(); return out;
+});
+check("aktualizace: hláška „nová verze“ je nad Cinema módem", updZT.bar > updZT.cinema, JSON.stringify(updZT));
 
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
