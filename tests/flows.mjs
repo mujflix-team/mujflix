@@ -1570,6 +1570,12 @@ const rateT = await page.evaluate(() => {
 });
 check("kino: hvězdička označí epizodu a otevře hodnocení", rateT.exists && rateT.open && rateT.watched, JSON.stringify(rateT));
 
+const fastOpenT = await page.evaluate(() => {
+  const m = document.getElementById("seriesModal");
+  return { ov: parseFloat(getComputedStyle(m).transitionDuration), ct: parseFloat(getComputedStyle(m.querySelector(".modal-content")).transitionDuration) };
+});
+check("detail seriálu: rychlý nástup (prolnutí do 0,2 s), ne pomalé prolínání přes stránku", fastOpenT.ov <= 0.2 && fastOpenT.ct <= 0.3, JSON.stringify(fastOpenT));
+
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [{ id: 9001, name: "A", title: "A", poster_path: "/p.jpg", vote_average: 8, original_language: "ja", genre_ids: [16] }] }) }; };

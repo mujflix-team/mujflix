@@ -1294,6 +1294,9 @@ html body nav.nf-quick { background: var(--c-bg) !important; border: 0 !importan
 @keyframes mfFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .nf-row, .nf-quick { animation: mfFadeUp .35s ease both; }
 #universeOverlay, #seriesModal, .modal-overlay { transition-timing-function: cubic-bezier(.2,.7,.2,1); }
+/* Detail seriálu: rychlý nástup (dřív ~0,5 s prolínání – po klepnutí to vypadalo, že se nic neděje) */
+html body #seriesModal { transition-duration: 0.16s !important; }
+html body #seriesModal .modal-content { transition: transform 0.26s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.16s ease !important; }
 @media (prefers-reduced-motion: reduce) {
   .nf-row, .nf-quick, .nf-hero-empty::before { animation: none !important; }
 }

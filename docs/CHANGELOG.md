@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.95
+### Opraveno
+- **Detail seriálu se otevírá rychleji:** okno se objeví hned po klepnutí (dřív až po dvou snímcích a pak se ~0,5 s pomalu prolínalo, takže byla chvíli vidět stránka pod ním a vypadalo to, že se nic neděje; film se otevíral dřív). Prolnutí je ~0,16 s, nástup obsahu ~0,3 s.
+
 ## 3.21.91
 ### Změněno
 - **Designový systém – barvy:** barvy v CSS (~660 míst) jsou tokeny: povrchy `--c-bg/surface/surface-2/line/line-hi`, text `--c-text-2/3/4`, jedna modrá `--c-accent` (+ `-hi` a průhledné `-a1..a3`), `--c-danger` a 6 úrovní průhledné bílé `--w-1..6`. Místo 10 tmavých šedých, 9 šedých textů, 6 modrých a 14 průhledností bílé. Rozdíl na obrazovce je v řádu jednotek z 255. Pravidla v `docs/DESIGN.md`.
