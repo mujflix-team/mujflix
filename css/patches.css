@@ -394,5 +394,5 @@ html body #mfProfileCreate input:-webkit-autofill:focus {
 .pw-tip-ico { flex: 0 0 auto; width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.25rem; border-radius: var(--r-panel); background: rgba(255,255,255,.07); }
 .pw-adwarn { padding: 14px 16px; border-radius: var(--r-panel); border: 1px solid rgba(255,190,60,.45); background: rgba(255,190,60,.08); }
 .pw-adwarn strong { color: #ffc857; }
-.pw-adwarn p { margin: 6px 0 0; color: #d2d2d2; font-size: .92rem; line-height: 1.45; }
+.pw-adwarn p { margin: 6px 0 0; color: var(--c-text-2); font-size: .92rem; line-height: 1.45; }
 .pw-adwarn a { color: #fff; font-weight: 700; text-decoration: underline; }

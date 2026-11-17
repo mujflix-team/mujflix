@@ -93,7 +93,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-btn { min-height: 44px; padding: 0 18px; border: 0; border-radius: var(--r-modal); background: rgba(255, 255, 255, 0.2); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 #mfWrapped .mfw-btn:hover { background: rgba(255, 255, 255, 0.3); }
 #mfWrapped .mfw-btn-main { background: #fff; color: var(--c-bg); }
-#mfWrapped .mfw-btn-main:hover { background: #e6e6e6; }
+#mfWrapped .mfw-btn-main:hover { background: var(--c-text-2); }
 #mfWrapped .mfw-btn[hidden] { display: none; }
 #mfWrapped .mfw-btn:disabled { opacity: 0.35; pointer-events: none; }
 #mfWrapped .mfw-nav { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: 10px; padding: 8px var(--mfw-pad) calc(env(safe-area-inset-bottom, 0px) + 18px); }
