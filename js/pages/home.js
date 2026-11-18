@@ -229,7 +229,7 @@
       var _nfRun = 0;
       var _nfSig = '';
       var _nfCache = {};
-      var _nfBump = 0; /* ručně vyžádané obnovení (stažení dolů / druhé klepnutí na Domů): každé dá jiný výběr titulů */
+      var _nfBump = 1 + Math.floor(Math.random() * 997); /* výběr titulů: při každém načtení aplikace jiný a každé ruční obnovení (stažení dolů / druhé klepnutí na Domů) ho změní dál */
 
       function nfJson(path) {
         var ck = path + '|' + (window.MFAge ? window.MFAge.limit() : 0) + '|' + (mfhOnlyAnime() ? 1 : 0);
@@ -1243,11 +1243,11 @@
         });
         nfJson(oa ? '/discover/tv?sort_by=vote_average.desc&vote_count.gte=300' + AQ + nfPg() : '/tv/top_rated' + nfPg()).then(function (d) {
           if (myRun !== _nfRun) return;
-          nfFillRow('mfhTopTv', fresh(nfItems(d, 'tv')).slice(0, 20));
+          nfFillRow('mfhTopTv', mfhSeededShuffle(fresh(nfItems(d, 'tv')), _nfBump).slice(0, 20));
         });
         nfJson(oa ? '/discover/movie?sort_by=vote_average.desc&vote_count.gte=300' + AQ + nfPg() : '/movie/top_rated' + nfPg()).then(function (d) {
           if (myRun !== _nfRun) return;
-          nfFillRow('mfhTopMovie', fresh(nfItems(d, 'movie')).slice(0, 20));
+          nfFillRow('mfhTopMovie', mfhSeededShuffle(fresh(nfItems(d, 'movie')), _nfBump + 1).slice(0, 20));
         });
       }
 
