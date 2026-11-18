@@ -183,7 +183,7 @@ html body.discover-open #mfDock { display: none !important; }
 .nf-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .nf-card:hover { z-index: 4; }
 .nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(var(--fx-hover-md)); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
-.nf-card:focus-visible .nf-poster { outline: 2px solid #fff; outline-offset: 2px; }
+.nf-card:focus-visible .nf-poster { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 .nf-card-info { padding: 8px 2px 0; }
 .nf-card-title {
   margin: 0; font-size: var(--fs-sm); font-weight: 600; line-height: 1.25; color: var(--c-text-2);
@@ -278,7 +278,7 @@ html body #seriesModal #modalFindBtn { color: #fff !important; }
 html body #seriesModal .close-btn { background: var(--c-surface) !important; border: 0 !important; box-shadow: none !important; color: #fff !important; }
 html body #seriesModal .ssv-card { border: 0 !important; border-radius: var(--r-media) !important; box-shadow: none !important; background: var(--c-surface-2) !important; transition: transform var(--t-base) ease !important; }
 html body #seriesModal .ssv-card:hover { transform: scale(var(--fx-hover-md)) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important; }
-html body #seriesModal .ssv-card.ssv-active { outline: 2px solid #fff; outline-offset: 0; box-shadow: none !important; }
+html body #seriesModal .ssv-card.ssv-active { outline: var(--focus-ring); outline-offset: 0; box-shadow: none !important; }
 html body #seriesModal .season-all-btn{
   background: rgba(109, 109, 110, 0.4) !important; border: 0 !important; border-radius: var(--r-ctl) !important; color: #fff !important; box-shadow: none !important;
 }
@@ -441,7 +441,7 @@ html body #mfProfileCreate .pc-input, html body #mfProfileCreate .pc-avatar-sear
   background: var(--c-text-4) !important; border: 1px solid transparent !important; border-radius: var(--r-ctl) !important; box-shadow: none !important; color: #fff !important; font-size: var(--fs-base) !important; height: var(--h-xl); padding: 0 14px !important;
 }
 html body #mfProfileCreate .pc-input::placeholder, html body #mfProfileCreate .pc-avatar-search::placeholder { color: #d0d0d0; }
-html body #mfProfileCreate .pc-input:focus, html body #mfProfileCreate .pc-avatar-search:focus { outline: 2px solid #fff !important; outline-offset: 0; border-color: transparent !important; }
+html body #mfProfileCreate .pc-input:focus, html body #mfProfileCreate .pc-avatar-search:focus { outline: var(--focus-ring) !important; outline-offset: 0; border-color: transparent !important; }
 html body #mfProfileCreate .pc-avatar-picker-toggle { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; gap: var(--sp-4) !important; }
 html body #mfProfileCreate .pc-avatar-preview { width: 104px !important; height: 104px !important; border-radius: var(--r-ctl) !important; background: var(--c-line) !important; font-size: 3rem !important; overflow: hidden; display: grid; place-items: center; box-shadow: none !important; }
 html body #mfProfileCreate .pc-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
@@ -454,7 +454,7 @@ html body #mfProfileCreate .pc-avatar-option:hover { color: #fff !important; }
 html body #mfProfileCreate .pc-avatar-option.selected { border-color: #fff !important; color: #fff !important; }
 html body #mfProfileCreate .pc-pin-row { justify-content: flex-start !important; gap: var(--sp-3) !important; }
 html body #mfProfileCreate .pc-pin-digit { background: var(--c-text-4) !important; border: 1px solid transparent !important; border-radius: var(--r-ctl) !important; box-shadow: none !important; color: #fff !important; width: 52px !important; height: 52px !important; }
-html body #mfProfileCreate .pc-pin-digit:focus { outline: 2px solid #fff !important; }
+html body #mfProfileCreate .pc-pin-digit:focus { outline: var(--focus-ring) !important; }
 html body #mfProfileCreate .pc-btn-row { display: flex !important; flex-direction: row-reverse; justify-content: flex-end; gap: var(--sp-4) !important; margin-top: 34px !important; padding-top: 22px; border-top: 1px solid var(--c-line); }
 html body #mfProfileCreate .pc-btn-save { flex: 0 0 auto !important; background: #fff !important; color: #000 !important; border: 0 !important; border-radius: var(--r-ctl) !important; box-shadow: none !important; font-weight: 700 !important; font-size: var(--fs-base) !important; padding: 0 28px !important; height: var(--h-xl); letter-spacing: 0.02em; }
 html body #mfProfileCreate .pc-btn-save:hover { background: #d9d9d9 !important; color: var(--c-bg) !important; }
@@ -584,7 +584,7 @@ html body #mfProfileCreate .pc-edit-row { display: flex; gap: var(--sp-5); align
 html body #mfProfileCreate .pc-fields { flex: 1; min-width: 0; }
 html body #mfProfileCreate .pc-fields .pc-label:first-child { margin-top: 0 !important; }
 html body #mfProfileCreate .pc-avatar-picker-toggle { position: relative; flex: none; margin-top: 4px; cursor: pointer; }
-html body #mfProfileCreate .pc-avatar-picker-toggle:hover .pc-avatar-preview { outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-avatar-picker-toggle:hover .pc-avatar-preview { outline: var(--focus-ring); }
 html body #mfProfileCreate .pc-avatar-edit {
   position: absolute; right: -8px; bottom: -8px; width: 34px; height: 34px; border-radius: 50%; background: var(--c-bg); border: 2px solid #fff;
   color: #fff; display: grid; place-items: center; font-size: var(--fs-md);
@@ -601,7 +601,7 @@ html body #mfProfileCreate .pc-avatar-grid { display: grid !important; grid-temp
 html body #mfProfileCreate .pc-avatar-option { padding: 0 !important; display: flex; flex-direction: column; gap: var(--sp-2); text-align: left; font-size: var(--fs-sm); cursor: pointer; }
 html body #mfProfileCreate .pc-avatar-option img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; }
 html body #mfProfileCreate .pc-avatar-option.pc-character-option img { aspect-ratio: 1; }
-html body #mfProfileCreate .pc-avatar-option:hover img, html body #mfProfileCreate .pc-avatar-option:focus-visible img { outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-avatar-option:hover img, html body #mfProfileCreate .pc-avatar-option:focus-visible img { outline: var(--focus-ring); }
 @media (max-width: 640px) {
   html body #mfProfileCreate .pc-edit-row { flex-direction: column; gap: var(--sp-5); }
   html body #mfProfileCreate .pc-avatar-grid { grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
@@ -651,7 +651,7 @@ html body #seriesModal #ssvGrid .ssv-card {
 html body #seriesModal #ssvGrid .ssv-card::after { display: none !important; content: none !important; }
 html body #seriesModal #ssvGrid .ssv-card img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important; filter: none !important; transform: none !important; }
 html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(var(--fx-hover-sm)) !important; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important; z-index: 2; }
-html body #seriesModal #ssvGrid .ssv-card.ssv-active { outline: 2px solid #fff !important; outline-offset: -2px; }
+html body #seriesModal #ssvGrid .ssv-card.ssv-active { outline: var(--focus-ring) !important; outline-offset: -2px; }
 html body #seriesModal #ssvGrid .ssv-num { color: #fff !important; font-size: var(--fs-base) !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; }
 html body #seriesModal #ssvGrid .ssv-name { display: none !important; }
 html body #seriesModal #ssvGrid .ssv-play-btn {
@@ -751,7 +751,7 @@ html body #mfProfileCreate .pc-av-strip { display: flex; gap: var(--sp-3); overf
 html body #mfProfileCreate .pc-av-strip::-webkit-scrollbar { display: none; }
 html body #mfProfileCreate .pc-av-strip .pc-avatar-option { flex: none; width: clamp(84px, 9vw, 120px); scroll-snap-align: start; border-radius: var(--r-ctl) !important; overflow: hidden; }
 html body #mfProfileCreate .pc-av-strip .pc-avatar-option img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-ctl) !important; transition: transform var(--t-fast); }
-html body #mfProfileCreate .pc-av-strip .pc-avatar-option:hover img, html body #mfProfileCreate .pc-av-strip .pc-avatar-option:focus-visible img { transform: scale(var(--fx-hover-md)); outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-av-strip .pc-avatar-option:hover img, html body #mfProfileCreate .pc-av-strip .pc-avatar-option:focus-visible img { transform: scale(var(--fx-hover-md)); outline: var(--focus-ring); }
 html body #mfProfileCreate .pc-av-strip .pc-avatar-option { display: flex; flex-direction: column; gap: var(--sp-2); overflow: visible; }
 html body #mfProfileCreate .pc-av-cap { display: block; font-size: var(--fs-xs); color: var(--c-text-3); text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 
@@ -927,7 +927,7 @@ html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
 #mfPrefsModal .pf-save { background: #fff; color: #000; border: 1px solid #fff; }
 #mfPrefsModal .pf-cancel { background: none; color: #fff; border: 1px solid var(--c-text-4); }
 #mfPrefsModal .pf-cancel:hover { border-color: #fff; }
-#mfPrefsModal button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+#mfPrefsModal button:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 #mfSettingsModal .pf-rows { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: 4px; }
 #mfSettingsModal .pf-row { display: flex; align-items: center; gap: var(--sp-4); width: 100%; text-align: left; background: var(--c-surface-2); border: 1px solid transparent; border-radius: var(--r-ctl); color: #fff; font: inherit; padding: 14px 16px; cursor: pointer; }
 #mfSettingsModal .pf-row:hover, #mfSettingsModal .pf-row:focus-visible { background: var(--c-line-hi); border-color: #fff; outline: 0; }
@@ -986,7 +986,7 @@ html body #watchlistOverlay .wl-card { gap: 0; }
 html body #watchlistOverlay .wl-card-poster { border-radius: var(--r-media); border: 0; background: linear-gradient(160deg, var(--c-surface), #131313); transition: transform var(--t-base) ease, box-shadow var(--t-base) ease; }
 html body #watchlistOverlay .wl-card:hover { z-index: 4; position: relative; }
 html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(var(--fx-hover-md)); border: 0; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
-html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { outline: 2px solid #fff; outline-offset: 2px; }
+html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 html body #watchlistOverlay .wl-card-name { margin: 0; padding: 8px 2px 0; font-size: var(--fs-sm); font-weight: 600; line-height: 1.25; color: var(--c-text-2); }
 html body #watchlistOverlay .wl-card-badge { border-radius: var(--r-xs); background: rgba(0, 0, 0, 0.7); backdrop-filter: none; font-size: var(--fs-xs); padding: 3px 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 html body #watchlistOverlay .wl-card-remove { width: 28px; height: 28px; border-radius: 50%; background: rgba(20, 20, 20, 0.8); backdrop-filter: none; border: 1px solid var(--w-4); }
@@ -1116,7 +1116,7 @@ html body .nf-arrow { top: 32px; bottom: 48px; }
 
 /* Popis: značka „Více ▾“ jen u useknutého textu. Rozbalený popis roste nahoru (obsah banneru je u spodku), má max-height a posuv, tlačítka zůstávají na místě */
 html body .nf-hero-desc.is-expandable, html body #seriesModal .sd-overview.is-expandable { cursor: pointer; margin-bottom: 4px; }
-html body .nf-hero-desc.is-expandable:focus-visible, html body #seriesModal .sd-overview.is-expandable:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: var(--r-ctl); }
+html body .nf-hero-desc.is-expandable:focus-visible, html body #seriesModal .sd-overview.is-expandable:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); border-radius: var(--r-ctl); }
 html body .nf-hero-body { display: flex; flex-direction: column; justify-content: flex-end; }
 html body .nf-hero-body > * { flex-shrink: 0; }
 html body .nf-hero-body > .nf-hero-desc.is-open { flex-shrink: 1; min-height: 4.4em; }
@@ -1450,7 +1450,7 @@ html body #seriesModal .modal-hero-left { max-width: none; }
 
 /* ===== v3.6: přehlednost ===== */
 /* viditelný focus při ovládání klávesnicí */
-:is(button, a, [role="button"], input, select, [tabindex]):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+:is(button, a, [role="button"], input, select, [tabindex]):focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 /* dostatečně velké klikací plochy na dotykových zařízeních */
 @media (hover: none) and (pointer: coarse) {
   .dock-btn, .nf-btn, .wl-empty-btn, .close-btn, #mfStandaloneCinemaClose { min-height: var(--h-lg); min-width: 44px; }
@@ -1510,7 +1510,7 @@ html body #seriesModal .sd-season { flex: 0 0 auto; min-width: 48px; height: 42p
 html body #seriesModal .sd-season:hover { background: rgba(109, 109, 110, 0.6); color: #fff; }
 html body #seriesModal .sd-season.done::after { content: "✓"; margin-left: 5px; font-size: var(--fs-xs); opacity: 0.65; }
 html body #seriesModal .sd-season.active { background: #fff; color: var(--c-bg); }
-html body #seriesModal .sd-tab:focus-visible, html body #seriesModal .sd-season:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body #seriesModal .sd-tab:focus-visible, html body #seriesModal .sd-season:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 
 /* Popis seriálu (záložka) */
 html body #seriesModal .sd-info { padding: 8px clamp(16px, 3vw, 40px) 96px; max-width: 760px; }
@@ -1546,7 +1546,7 @@ html body #seriesModal #episodesGrid .ep-seen-dot,
 html body #seriesModal #episodesGrid .episode-card.watched .ep-seen-dot{ display: none !important; }
 html body #seriesModal #episodesGrid .ep-hover-play { border-radius: var(--r-panel); }
 /* Další epizoda: tenký bílý rámeček kolem obrázku, nic víc */
-html body #seriesModal #episodesGrid .episode-card.next-ep .ep-thumb { outline: 2px solid #fff; outline-offset: -2px; }
+html body #seriesModal #episodesGrid .episode-card.next-ep .ep-thumb { outline: var(--focus-ring); outline-offset: -2px; }
 /* Odškrtnutí vpravo nahoře na obrázku */
 html body #seriesModal #episodesGrid .ep-actions { position: absolute; top: 8px; right: 8px; margin: 0; z-index: 3; transform: none; }
 html body #seriesModal #episodesGrid .ep-btn-mark { width: 32px; height: var(--h-sm); border-radius: 50% !important; border: 0 !important; background: rgba(0, 0, 0, 0.6) !important; color: #fff !important; font-size: var(--fs-md); opacity: 0.85; transition: opacity var(--t-fast), background var(--t-fast); }
@@ -1647,7 +1647,7 @@ html body #seriesModal .sd-trailer-btn img { width: 100%; height: 100%; object-f
 html body #seriesModal .sd-trailer-btn:hover img { opacity: 1; }
 html body #seriesModal .sd-trailer-play { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; }
 html body #seriesModal .sd-trailer-play svg { width: 18px; height: 22px; fill: #fff; margin-left: 4px; }
-html body #seriesModal .sd-trailer-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body #seriesModal .sd-trailer-btn:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 html body #seriesModal .sd-castrow { display: flex; gap: var(--sp-4); overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
 html body #seriesModal .sd-castrow::-webkit-scrollbar { display: none; }
 html body #seriesModal .sd-actor { flex: 0 0 104px; min-width: 0; }
@@ -1664,8 +1664,8 @@ html body #seriesModal .sd-actor-role { margin-top: 2px; font-size: var(--fs-sm)
 
 /* Herec: klepnutí otevře filmografii v záložce Popis */
 html body #seriesModal button.sd-actor { appearance: none; background: transparent; border: 0; padding: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
-html body #seriesModal button.sd-actor:hover .sd-actor-photo { outline: 2px solid #fff; outline-offset: -2px; }
-html body #seriesModal button.sd-actor:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: var(--r-modal); }
+html body #seriesModal button.sd-actor:hover .sd-actor-photo { outline: var(--focus-ring); outline-offset: -2px; }
+html body #seriesModal button.sd-actor:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); border-radius: var(--r-modal); }
 html body #seriesModal .sd-actor-view { padding: 8px clamp(16px, 3vw, 40px) 96px; }
 html body #seriesModal .sd-actor-view[hidden] { display: none; }
 html body #seriesModal .sd-actor-back { appearance: none; border: 0; background: transparent; color: var(--w-5); font: inherit; font-size: var(--fs-md); font-weight: 600; padding: 8px 0; min-height: 40px; cursor: pointer; }
@@ -1688,7 +1688,7 @@ html body #watchlistOverlay .wl-sort select { height: var(--h-md); padding: 0 12
 html body .mf-dd { position: relative; display: inline-block; }
 html body .mf-dd-btn { height: var(--h-md); padding: 0 12px 0 14px; display: inline-flex; align-items: center; justify-content: space-between; gap: var(--sp-3); border: 0; border-radius: var(--r-panel); background: rgba(109, 109, 110, 0.35); color: #fff; font: inherit; font-size: var(--fs-md); font-weight: 600; cursor: pointer; transition: background var(--t-fast); }
 html body .mf-dd-btn:hover, html body .mf-dd.open .mf-dd-btn { background: rgba(109, 109, 110, 0.6); }
-html body .mf-dd-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+html body .mf-dd-btn:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 html body .mf-dd-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 html body .mf-dd-btn { min-width: 0; }
 html body .mf-dd-chev { flex: none; transition: transform var(--t-base); }
