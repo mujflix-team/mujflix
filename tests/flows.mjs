@@ -1637,6 +1637,8 @@ const fontT = await page.evaluate(() => {
   return { fams: [...new Set(sel.map(fam))], tok: getComputedStyle(document.documentElement).getPropertyValue("--fs-md").trim() };
 });
 check("písmo: všude jedna rodina (Inter Variable) a existují tokeny velikostí", fontT.fams.length === 1 && /Inter Variable/.test(fontT.fams[0]) && fontT.tok === "0.92rem", JSON.stringify(fontT));
+const a11yT = await page.evaluate(() => ({ s: document.getElementById("cinemaSeasonSel").getAttribute("aria-label"), e: document.getElementById("cinemaEpSel").getAttribute("aria-label"), b: document.getElementById("hdrSearchBar").getAttribute("role"), t: document.getElementById("hdrSearchBar").tabIndex, g: document.getElementById("mfProfileGate").getAttribute("role"), h1: !!document.querySelector("h1.mf-sr-only") }));
+check("přístupnost: popisky výběrů v Cinema, klávesnicová lišta hledání, dialog profilu a nadpis", a11yT.s === "Řada" && a11yT.e === "Epizoda" && a11yT.b === "button" && a11yT.t === 0 && a11yT.g === "dialog" && a11yT.h1 === true, JSON.stringify(a11yT));
 await page.evaluate(() => { const b = document.createElement("button"); b.id = "focProbe"; b.textContent = "x"; document.body.appendChild(b); });
 await page.keyboard.press("Shift");
 await page.evaluate(() => document.getElementById("focProbe").focus());

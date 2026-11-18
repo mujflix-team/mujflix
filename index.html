@@ -49,7 +49,7 @@
 
     <link rel="manifest" href="manifest.webmanifest?v=3" />
 
-    <link rel="stylesheet" href="css/styles.css?v=21" />
+    <link rel="stylesheet" href="css/styles.css?v=22" />
     <link rel="stylesheet" href="css/patches.css" />
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=14" media="print" onload="this.media='all'" />
@@ -89,8 +89,9 @@
 
   <body>
     <div id="mfSplash" aria-hidden="true"><b>Můj<i>Flix</i></b></div>
+    <h1 class="mf-sr-only">MůjFlix</h1>
     
-    <div id="mfProfileGate" style="display:flex;">
+    <div id="mfProfileGate" role="dialog" aria-modal="true" aria-label="Výběr profilu" style="display:flex;">
       <script>
         /* Bez probliknutí: výběr profilu se hned skryje, když ho gate.js stejně přeskočí (viz js/profiles/gate.js) */
         try {
@@ -325,7 +326,7 @@
         >
       </div>
 
-      <div id="hdrSearchBar" onclick="openUniverse()" style="
+      <div id="hdrSearchBar" role="button" tabindex="0" aria-label="Hledat filmy a seriály" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUniverse();}" onclick="openUniverse()" style="
         flex: 1;
         max-width: 340px;
         margin: 0 12px;
@@ -1333,6 +1334,7 @@
         >
           <select
             id="cinemaSeasonSel"
+            aria-label="Řada"
             style="
               background: rgba(20, 20, 30, 0.85);
               border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -1362,6 +1364,7 @@
           >
           <select
             id="cinemaEpSel"
+            aria-label="Epizoda"
             style="
               background: rgba(20, 20, 30, 0.85);
               border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -1794,7 +1797,7 @@
     </script>
 
 <script src="js/app/card-menu.js?v=3" defer></script>
-<script src="js/pages/cinema.js?v=21" defer></script>
+<script src="js/pages/cinema.js?v=22" defer></script>
     <script src="js/app/wrapped.js?v=4" defer></script>
     <script src="js/app/together.js?v=1" defer></script>
     <script src="js/pages/home.js?v=39" defer></script>
