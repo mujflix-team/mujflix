@@ -974,6 +974,7 @@
         return a;
       }
       window.mfhProfileSeed = mfhProfileSeed; window.mfhSeededShuffle = mfhSeededShuffle; // pro testy
+      window.mfhTopGenreIdsWithProfile = function () { return mfhTopGenreIdsWithProfile(); }; // Objevování: výchozí nabídka podle profilu
 
       function mfhTopGenreIdsWithProfile() {
         var ids = mfhTopGenreIds();

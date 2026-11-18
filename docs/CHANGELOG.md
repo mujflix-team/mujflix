@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.113
+### Změněno
+- **Stažení dolů na Domů je těžší a vibruje:** prst musí ujet zhruba 2× víc než dřív (práh a odpor), v okamžiku, kdy se „nabije“, zavibruje (a ještě jednou při puštění). Vibrace funguje na Androidu, iPhone ji pro weby nepodporuje.
+- **Objevování se mění:** výchozí řady (Pro tebe, žánry, nejlépe hodnocené filmy a seriály, trendy, novinky) a výchozí mřížka berou při každém načtení jinou stránku z TMDB a míchají pořadí, takže tam nejsou pořád stejné tituly na stejných místech. „Pro tebe“ a liché stránky mřížky jdou podle oblíbených žánrů profilu. Při nastaveném filtru se vše chová jako dřív.
+
 ## 3.21.112
 ### Změněno
 - **Nové loading animace:** nahoře se při pomalejším načítání dat ukáže tenký modrý běžící pruh (až po 250 ms, aby neblikal) a v Cinema režimu nahradil kroužek při načítání přehrávače. Skeleton karet a banneru je sjednocený (pulz, 1,3 s, dřív 1,4 a 1,8 s). Odstraněny nepoužité animace `nfSpin` a `cinSpin`.
