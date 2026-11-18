@@ -210,6 +210,17 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
   await page.waitForTimeout(1200);
   const reset = await page.evaluate(() => ({ active: document.querySelectorAll("#dvBody .dv-achip").length, pressed: document.querySelectorAll("#dvGenres .dv-chip.active").length, rating: document.getElementById("dvRating").value, seen: document.getElementById("dvHideSeen").getAttribute("aria-pressed") }));
   check("Filtry: Zrušit filtry vrátí vše (žánry, hodnocení i skrývání)", reset.active === 0 && reset.pressed === 0 && reset.rating === "" && reset.seen === "false", JSON.stringify(reset));
+  await page.click('#dvProviders [data-provider="8"]');
+  await page.click('#dvProviders [data-provider="1899"]');
+  const pick = async (n, text) => { await page.locator("#universeOverlay .dv-select .mf-dd-btn").nth(n).click(); await page.locator("#universeOverlay .mf-dd.open .mf-dd-opt", { hasText: text }).click(); };
+  await pick(1, "2010–2019"); await pick(3, "Do 90 min"); await pick(4, "Česky");
+  await page.waitForTimeout(2000);
+  const nu = urls.slice(-2).join(" ");
+  check("Filtry: služby (Netflix | Max, region CZ), dekáda, délka a jazyk se pošlou TMDB a jdou kombinovat", /with_watch_providers=8%7C1899/.test(nu) && /watch_region=CZ/.test(nu) && /primary_release_date\.gte=2010-01-01/.test(nu) && /primary_release_date\.lte=2019-12-31/.test(nu) && /with_runtime\.lte=90/.test(nu) && /with_original_language=cs/.test(nu), nu.slice(0, 400));
+  const nchips = await page.evaluate(() => [...document.querySelectorAll("#dvBody .dv-achip")].map(b => b.textContent).join("|"));
+  check("Filtry: nové filtry jsou v přehledu aktivních štítků", /Netflix ×/.test(nchips) && /Max ×/.test(nchips) && /2010–2019 ×/.test(nchips) && /Do 90 min ×/.test(nchips) && /Česky ×/.test(nchips), nchips);
+  await page.evaluate(() => document.getElementById("dvReset").click());
+  await page.waitForTimeout(800);
   await page.locator("#universeOverlay .dv-select .mf-dd-btn").nth(2).click();
   await page.locator("#universeOverlay .mf-dd.open .mf-dd-opt", { hasText: "8+" }).click();
   await page.waitForTimeout(1200);
