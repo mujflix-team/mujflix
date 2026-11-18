@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.105
+### Nově
+- **Objevování – další filtry:** streamovací služba (Netflix, Max, Disney+, Prime Video, Apple TV+, SkyShowtime; v ČR, jde vybrat víc najednou), dekáda místo jednoho roku, délka (do 90 / 90–120 / přes 120 min) a původní jazyk. Všechny jdou kombinovat se žánry, hodnocením i řazením a každý se dá odebrat štítkem nad mřížkou. Při hledání textu se uplatní dekáda a jazyk; služba a délka jen při procházení.
+
 ## 3.21.104
 ### Změněno
 - **Designový systém – kroužek při ovládání klávesnicí:** jedno pravidlo `--focus-ring` / `--focus-gap` (bílý kroužek 2 px, odstup 2 px). Dřív globální modré pravidlo s `!important` přebíjelo bílé kroužky u jednotlivých prvků, takže vzhled byl nahodilý. Pravidla v `docs/DESIGN.md`.
