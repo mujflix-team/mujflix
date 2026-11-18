@@ -1658,6 +1658,19 @@ const pullT = await page.evaluate(async () => {
   return { short, long };
 });
 check("stažení dolů na Domů: krátké tažení nic, dlouhé obnoví doporučení", pullT.short === 0 && pullT.long === 1, JSON.stringify(pullT));
+const ldRoute = /^(?!http:\/\/localhost)/;
+await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
+await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });
+await page.waitForTimeout(100);
+const barEarly = await page.evaluate(() => !!document.querySelector("#mfLoadBar.on"));
+await page.waitForTimeout(450);
+const barMid = await page.evaluate(() => !!document.querySelector("#mfLoadBar.on"));
+await page.evaluate(() => window.__ldP); await page.waitForTimeout(150);
+const barEnd = await page.evaluate(() => !!document.querySelector("#mfLoadBar.on"));
+await page.unroute(ldRoute);
+check("načítání: modrý pruh nahoře se ukáže až u pomalé odpovědi (po 250 ms) a po jejím dokončení zmizí", !barEarly && barMid && !barEnd, JSON.stringify({ barEarly, barMid, barEnd }));
+const sdurT = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--sk-dur").trim());
+check("načítání: token --sk-dur (1.3s) existuje", sdurT === "1.3s", sdurT);
 const newPicksT = await page.evaluate(async () => {
   const origFetch = window.fetch, urls = []; localStorage.setItem("mf_tmdb_key", "K");
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [] }) }; };

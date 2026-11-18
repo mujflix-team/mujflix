@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.112
+### Změněno
+- **Nové loading animace:** nahoře se při pomalejším načítání dat ukáže tenký modrý běžící pruh (až po 250 ms, aby neblikal) a v Cinema režimu nahradil kroužek při načítání přehrávače. Skeleton karet a banneru je sjednocený (pulz, 1,3 s, dřív 1,4 a 1,8 s). Odstraněny nepoužité animace `nfSpin` a `cinSpin`.
+
 ## 3.21.111
 ### Opraveno
 - **Objevování na telefonu:** rozbalovače filtrů (Řadit, Rok, Hodnocení, Délka, Jazyk) jsou ve dvou sloupcích, takže je vidět celá vybraná hodnota (dřív se při pěti vedle sebe zkrátila na „P.“, „K.“, „L.“). „Skrýt už otevřené“ a „Zrušit filtry“ jsou přes celou šířku.

@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.112 – nové loading animace: modrý pruh + sjednocený skeleton (claude/loading)
 - 3.21.111 – Objevování na telefonu: filtry ve dvou sloupcích (claude/discover-mobil)
 - 3.21.110 – úklid nepoužívaného CSS (claude/uklid-css)
 - 3.21.109 – drobné opravy přístupnosti (claude/pristupnost)

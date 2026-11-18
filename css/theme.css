@@ -395,11 +395,15 @@ html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchli
 }
 .mf-cinema-skeleton[aria-hidden="true"] { opacity: 0; visibility: hidden; }
 .mf-cinema-skeleton-mark {
-  width: 56px; height: 56px; border-radius: 50%; border: 4px solid var(--c-surface-2); border-top-color: var(--nf-accent); font-size: 0;
-  animation: nfSpin 0.9s linear infinite;
+  position: relative; overflow: hidden; width: min(220px, 60vw); height: var(--ld-bar-h); border-radius: var(--ld-bar-h); background: var(--w-2); font-size: 0;
 }
+.mf-cinema-skeleton-mark::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; border-radius: var(--ld-bar-h); background: var(--c-accent);
+  animation: mfLdBar var(--sk-dur) var(--ease-std) infinite;
+}
+@keyframes mfLdBar { to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .mf-cinema-skeleton-mark::after { animation: none; left: 0; width: 100%; opacity: .6; } }
 .mf-cinema-skeleton-line { display: none; }
-@keyframes nfSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .mf-cinema-skeleton-mark { animation: none; } }
 
 @media (max-width: 700px) {
@@ -1237,7 +1241,7 @@ html body nav.nf-quick { background: var(--c-bg) !important; border: 0 !importan
 .nf-hero-empty::before {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(100deg, transparent 30%, var(--w-1) 50%, transparent 70%);
-  transform: translateX(-100%); animation: nfShimmerX 1.8s ease-in-out infinite;
+  transform: translateX(-100%); animation: nfShimmerX var(--sk-dur) ease-in-out infinite;
 }
 @keyframes nfShimmerX { to { transform: translateX(100%); } }
 .nf-hero-empty::after {
@@ -1777,7 +1781,7 @@ html body #seriesModal.sd-morph .modal-hero-content { animation: sdMorphIn var(-
 /* Statická barva; v okně seriálu (omezený počet prvků) jemné pulzování přes opacity – běží mimo hlavní vlákno, žádné přepočty stylů */
 @keyframes mfImgPulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
 html.mf-imgfx .ep-thumb, html.mf-imgfx .sd-sim-poster, html.mf-imgfx .sd-actor-photo, html.mf-imgfx #universeOverlay .dv-poster { background: var(--c-surface); }
-html.mf-imgfx #seriesModal .ep-thumb:not(:has(img.is-loaded)), html.mf-imgfx #seriesModal .sd-sim-poster:not(:has(img.is-loaded)), html.mf-imgfx #seriesModal .sd-actor-photo:not(:has(img.is-loaded)) { animation: mfImgPulse 1.4s ease-in-out infinite; }
+html.mf-imgfx #seriesModal .ep-thumb:not(:has(img.is-loaded)), html.mf-imgfx #seriesModal .sd-sim-poster:not(:has(img.is-loaded)), html.mf-imgfx #seriesModal .sd-actor-photo:not(:has(img.is-loaded)) { animation: mfImgPulse var(--sk-dur) ease-in-out infinite; }
 html.mf-imgfx .ep-thumb:has(img.is-loaded), html.mf-imgfx .sd-sim-poster:has(img.is-loaded), html.mf-imgfx .sd-actor-photo:has(img.is-loaded), html.mf-imgfx #universeOverlay .dv-poster:has(img.is-loaded) { animation: none; background: var(--c-surface); }
 html.mf-imgfx .ep-thumb img, html.mf-imgfx .sd-sim-poster img, html.mf-imgfx .sd-actor-photo img, html.mf-imgfx #universeOverlay .dv-poster img { transition: opacity var(--t-xslow) ease calc(var(--i, 0) * 45ms), transform var(--t-xslow) ease calc(var(--i, 0) * 45ms); }
 html.mf-imgfx .ep-thumb img:not(.is-loaded), html.mf-imgfx .sd-sim-poster img:not(.is-loaded), html.mf-imgfx .sd-actor-photo img:not(.is-loaded), html.mf-imgfx #universeOverlay .dv-poster img:not(.is-loaded) { opacity: 0; transform: scale(1.04); animation: nfImgSafety 0s 4s forwards; }
@@ -1786,8 +1790,8 @@ html body #seriesModal .sd-sim-poster img { width: 100%; height: 100%; aspect-ra
 @media (prefers-reduced-motion: reduce) { html.mf-imgfx .ep-thumb, html.mf-imgfx .sd-sim-poster, html.mf-imgfx .sd-actor-photo, html.mf-imgfx #universeOverlay .dv-poster { animation: none; } html.mf-imgfx .ep-thumb img, html.mf-imgfx .sd-sim-poster img, html.mf-imgfx .sd-actor-photo img, html.mf-imgfx #universeOverlay .dv-poster img { transition: none; } }
 
 /* Placeholdery řad na úvodní stránce, dokud nepřijdou data z TMDB (jen opacity, mimo hlavní vlákno) */
-.nf-card-sk .nf-poster { animation: mfImgPulse 1.4s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .nf-card-sk .nf-poster { animation: none; } }
+.nf-card-sk .nf-poster { animation: mfImgPulse var(--sk-dur) ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .nf-card-sk .nf-poster, .nf-hero-empty::before { animation: none; } }
 
 /* Herec bez fotky: anonymní silueta */
 html body #seriesModal .sd-actor-photo.sd-actor-nophoto { background: linear-gradient(160deg, #2c2c2c, #1c1c1c); animation: none; align-items: flex-end; justify-content: center; }
@@ -1811,7 +1815,7 @@ html::-webkit-scrollbar { display: none !important; width: 0 !important; }
 
 /* Epizody, které se ještě načítají: shimmer místo dočasného plakátu a názvu „Epizoda N“ */
 html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-thumb img { opacity: 0 !important; }
-html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-thumb { background: var(--c-surface); animation: mfImgPulse 1.4s ease-in-out infinite; }
+html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-thumb { background: var(--c-surface); animation: mfImgPulse var(--sk-dur) ease-in-out infinite; }
 html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-title { color: transparent !important; background: var(--w-2); border-radius: var(--r-media); width: 62%; height: 1.05em; align-self: flex-start; }
 html body #seriesModal #episodesGrid .episode-card.ep-loading .ep-btn-mark { opacity: 0.4; }
 
@@ -1986,3 +1990,9 @@ html body #seriesModal .sd-trailer-btn:hover .sd-trailer-play svg, html body #se
 .nf-trailer:fullscreen { --nf-tr-bar: 64px; }
 .nf-trailer.playing:fullscreen { width: 100vw; height: 100vh; }
 .nf-trailer:fullscreen .nf-tr-ctl { bottom: 12px; right: 22px; }
+
+/* Globální běžící pruh načítání (js/shell/progress.js) */
+#mfLoadBar { position: fixed; top: 0; left: 0; right: 0; height: var(--ld-bar-h); z-index: 2147482000; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity var(--t-base) var(--ease-std); }
+#mfLoadBar.on { opacity: 1; }
+#mfLoadBar i { position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; background: var(--c-accent); border-radius: var(--ld-bar-h); animation: mfLdBar var(--sk-dur) var(--ease-std) infinite; }
+@media (prefers-reduced-motion: reduce) { #mfLoadBar i { animation: none; left: 0; width: 100%; opacity: .6; } }

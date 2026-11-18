@@ -89,6 +89,11 @@ Nový efekt = jen tyto tokeny.
 ## Kroužek při ovládání klávesnicí
 Jedno pravidlo: `--focus-ring` (2px bílá čára) a odstup `--focus-gap` (2px). Platí globálně pro `:focus-visible`; konkrétní prvky ho jen používají (`outline: var(--focus-ring)`), nevymýšlí vlastní barvy ani tloušťky. Textová pole zvýrazňují při zaměření okraj.
 
+## Načítání
+- **Běžící modrý pruh** (`--ld-bar-h` 3px, barva `--c-accent`): globálně nahoře při pomalejším načítání dat (`js/shell/progress.js`, ukáže se po 250 ms) a v Cinema režimu při načítání přehrávače. Žádná kolečka.
+- **Skeleton:** jemný pulz (`--sk-dur` 1.3s) na dlaždicích; lesk jen na velkém úvodním banneru. Plakáty v Objevování zůstávají statické (výkon na telefonu).
+- Animace načítání se vždy vypínají u `prefers-reduced-motion`.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.
