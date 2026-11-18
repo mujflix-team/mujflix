@@ -1637,6 +1637,17 @@ const fontT = await page.evaluate(() => {
   return { fams: [...new Set(sel.map(fam))], tok: getComputedStyle(document.documentElement).getPropertyValue("--fs-md").trim() };
 });
 check("písmo: všude jedna rodina (Inter Variable) a existují tokeny velikostí", fontT.fams.length === 1 && /Inter Variable/.test(fontT.fams[0]) && fontT.tok === "0.92rem", JSON.stringify(fontT));
+const pullT = await page.evaluate(async () => {
+  window.ontouchstart = null; document.documentElement.classList.add("mfh-home-on"); window.scrollTo(0, 0);
+  let n = 0; window.mfhRefresh = () => { n++; };
+  await new Promise(r => { const sc = document.createElement("script"); sc.src = "js/shell/pull.js"; sc.onload = r; document.body.appendChild(sc); });
+  const fire = (t, y) => { const e = new Event(t, { bubbles: true }); e.touches = t === "touchend" ? [] : [{ clientY: y }]; document.dispatchEvent(e); };
+  fire("touchstart", 100); fire("touchmove", 150); fire("touchend", 150); const short = n;
+  fire("touchstart", 100); fire("touchmove", 300); fire("touchend", 300); const long = n;
+  document.documentElement.classList.remove("mfh-home-on");
+  return { short, long };
+});
+check("stažení dolů na Domů: krátké tažení nic, dlouhé obnoví doporučení", pullT.short === 0 && pullT.long === 1, JSON.stringify(pullT));
 
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];

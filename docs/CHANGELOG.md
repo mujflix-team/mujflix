@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.21.101
+### Nově
+- **Stažení dolů na Domů (telefon):** když jsi úplně nahoře a přetáhneš prstem dolů, objeví se kolečko a po puštění se obnoví doporučení (jako na Instagramu).
+
+### Opraveno
+- Návrat do PWA z paměti prohlížeče (gesto zpět) už nenechá prázdnou šedou obrazovku, stránka se v takovém případě načte znovu.
+
 ## 3.21.98
 ### Změněno
 - **Designový systém – písmo:** všude jedna rodina Inter Variable (dřív 5 různých definic, z toho Sora a „Inter“ ani nebyly načtené, takže se text lišil podle zařízení) a běžné velikosti písma (~360 míst) jsou tokeny `--fs-xs…4xl`; nestandardní tloušťky (100–300, 425, 650, 750) srovnány. Rozdíly velikostí jsou do ~0,05 rem u běžného textu. Pravidla v `docs/DESIGN.md`.

@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.98 – designové tokeny písma (claude/pismo)
+- 3.21.101 – stažení dolů pro obnovení Domů + oprava šedé obrazovky v PWA (claude/pwa-zpet-pull)
 - 3.21.97 – druhé klepnutí na Domů v docku nahoru/obnoví (claude/dock-domu)
 - 3.21.96 – designové tokeny animací (claude/animace)
 - 3.21.95 – rychlejší otevření detailu seriálu (claude/rychle-otevreni)
