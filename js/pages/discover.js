@@ -36,7 +36,14 @@
     { key: 'newest', label: 'Nejnovější' }
   ];
 
-  function freshState() { return { type: 'all', genres: [], sort: 'popular', year: '', minRating: '', hideSeen: false, query: '' }; }
+  function freshState() { return { type: 'all', genres: [], sort: 'popular', year: '', minRating: '', hideSeen: false, query: '', providers: [], runtime: '', lang: '' }; }
+  /* Streamovací služby (TMDB provider ID, region CZ), délka a původní jazyk */
+  var PROVIDERS = [{ id: 8, name: 'Netflix' }, { id: 1899, name: 'Max' }, { id: 337, name: 'Disney+' }, { id: 119, name: 'Prime Video' }, { id: 350, name: 'Apple TV+' }, { id: 1773, name: 'SkyShowtime' }];
+  var RUNTIMES = [['', 'Libovolná'], ['lt90', 'Do 90 min'], ['90-120', '90–120 min'], ['gt120', 'Přes 120 min']];
+  var LANGS = [['', 'Libovolný'], ['cs', 'Česky'], ['en', 'Anglicky'], ['ja', 'Japonsky'], ['ko', 'Korejsky'], ['fr', 'Francouzsky'], ['de', 'Německy'], ['es', 'Španělsky']];
+  var DECADES = [['2020-2029', '2020–2029'], ['2010-2019', '2010–2019'], ['2000-2009', '2000–2009'], ['1990-1999', '1990–1999'], ['1980-1989', '1980–1989'], ['1970-1979', '1970–1979']];
+  function labelOf(list, v) { var r = list.filter(function (x) { return x[0] === v; })[0]; return r ? r[1] : v; }
+  function yearRange(v) { var m = /^(\d{4})-(\d{4})$/.exec(v || ''); return m ? [m[1], m[2]] : null; }
   var state = freshState();
   var run = 0;
   var searchTimer = null;
@@ -112,6 +119,7 @@
       title: r.title || r.name || r.original_title || r.original_name || '',
       orig: r.original_title || r.original_name || '',
       year: date.slice(0, 4),
+      lang: r.original_language || '',
       date: date,
       rating: Number(r.vote_average) || 0,
       pop: Number(r.popularity) || 0,
@@ -455,7 +463,14 @@
       var extra = o.genres ? String(o.genres).split('|')[0].split(',').filter(function (x) { return x !== '16'; }).join(',') : '';
       q.push('with_genres=' + encodeURIComponent(extra ? '16,' + extra : '16'), 'with_original_language=ja');
     } else if (o.genres) q.push('with_genres=' + encodeURIComponent(o.genres));
-    if (o.year) q.push((type === 'movie' ? 'primary_release_year=' : 'first_air_date_year=') + o.year);
+    var yr = yearRange(o.year), df = type === 'movie' ? 'primary_release_date' : 'first_air_date';
+    if (yr) q.push(df + '.gte=' + yr[0] + '-01-01', df + '.lte=' + yr[1] + '-12-31');
+    else if (o.year) q.push((type === 'movie' ? 'primary_release_year=' : 'first_air_date_year=') + o.year);
+    if (o.providers && o.providers.length) q.push('with_watch_providers=' + o.providers.join('%7C'), 'watch_region=CZ');
+    if (o.runtime === 'lt90') q.push('with_runtime.lte=90');
+    else if (o.runtime === '90-120') q.push('with_runtime.gte=90', 'with_runtime.lte=120');
+    else if (o.runtime === 'gt120') q.push('with_runtime.gte=120');
+    if (o.lang && !onlyAnime()) q.push('with_original_language=' + encodeURIComponent(o.lang));
     if (o.minRating) q.push('vote_average.gte=' + encodeURIComponent(o.minRating));
     return '/discover/' + type + '?' + q.join('&');
   }
@@ -621,11 +636,16 @@
 
   /* ---------- Mřížka (filtry a hledání) ---------- */
 
+  function provName(id) { var p = PROVIDERS.filter(function (x) { return x.id === Number(id); })[0]; return p ? p.name : String(id); }
+
   function describeFilters() {
     var parts = [];
     if (state.genres.length) parts.push(selGenres().map(function (g) { return g.name; }).join(' + '));
     parts.push(state.type === 'movie' ? 'Filmy' : state.type === 'tv' ? 'Seriály' : 'Filmy a seriály');
-    if (state.year) parts.push(state.year);
+    if (state.year) parts.push(labelOf(DECADES, state.year));
+    if (state.providers.length) parts.push(state.providers.map(function (id) { return provName(id); }).join(' / '));
+    if (state.runtime) parts.push(labelOf(RUNTIMES, state.runtime));
+    if (state.lang) parts.push(labelOf(LANGS, state.lang));
     if (state.minRating) parts.push('★ ' + state.minRating + '+');
     var s = SORTS.filter(function (x) { return x.key === state.sort; })[0];
     if (s && state.sort !== 'popular') parts.push(s.label.toLowerCase());
@@ -682,7 +702,9 @@
 
   function matchesFilters(it) {
     if (state.type !== 'all' && it.type !== state.type) return false;
-    if (state.year && it.year !== state.year) return false;
+    var yr = yearRange(state.year);
+    if (yr ? (it.year < yr[0] || it.year > yr[1]) : (state.year && it.year !== state.year)) return false;
+    if (state.lang && it.lang !== state.lang) return false;
     if (state.minRating && it.rating < Number(state.minRating)) return false;
     var sel = selGenres();
     for (var k = 0; k < sel.length; k++) {
@@ -816,7 +838,7 @@
       if (ids.some(function (x) { return !x; })) return;
       /* Jeden žánr může být „A|B“ (nebo). Při více žánrech TMDB nepustí nebo uvnitř „a“, proto se vezme první ID z každého. */
       var gid = ids.length > 1 ? ids.map(function (x) { return String(x).split('|')[0]; }).join(',') : (ids[0] || '');
-      jobs.push(fetchDiscover(t, page, { sort: state.sort, genres: gid, year: state.year, minRating: state.minRating }));
+      jobs.push(fetchDiscover(t, page, { sort: state.sort, genres: gid, year: state.year, minRating: state.minRating, providers: state.providers, runtime: state.runtime, lang: state.lang }));
     });
     if (!jobs.length) return Promise.resolve({ items: [], pages: 0 });
     return Promise.all(jobs).then(function (r) {
@@ -897,7 +919,7 @@
   /* ---------- Stav a ovládání ---------- */
 
   function activeCount() {
-    return (state.type !== 'all' ? 1 : 0) + state.genres.length + (state.sort !== 'popular' ? 1 : 0) + (state.year ? 1 : 0) + (state.minRating ? 1 : 0) + (state.hideSeen ? 1 : 0);
+    return (state.type !== 'all' ? 1 : 0) + state.genres.length + (state.sort !== 'popular' ? 1 : 0) + (state.year ? 1 : 0) + state.providers.length + (state.runtime ? 1 : 0) + (state.lang ? 1 : 0) + (state.minRating ? 1 : 0) + (state.hideSeen ? 1 : 0);
   }
 
   function filtersActive() { return activeCount() > 0; }
@@ -907,7 +929,10 @@
     var out = [];
     if (state.type !== 'all') out.push([state.type === 'movie' ? 'Filmy' : 'Seriály', function () { state.type = 'all'; }]);
     state.genres.forEach(function (k) { var g = genreByKey(k); if (g) out.push([g.name, function () { state.genres = state.genres.filter(function (x) { return x !== k; }); }]); });
-    if (state.year) out.push([state.year, function () { state.year = ''; }]);
+    if (state.year) out.push([labelOf(DECADES, state.year), function () { state.year = ''; }]);
+    state.providers.forEach(function (id) { out.push([provName(id), function () { state.providers = state.providers.filter(function (x) { return x !== id; }); }]); });
+    if (state.runtime) out.push([labelOf(RUNTIMES, state.runtime), function () { state.runtime = ''; }]);
+    if (state.lang) out.push([labelOf(LANGS, state.lang), function () { state.lang = ''; }]);
     if (state.minRating) out.push(['★ ' + state.minRating + '+', function () { state.minRating = ''; }]);
     if (state.hideSeen) out.push(['Bez už otevřených', function () { state.hideSeen = false; }]);
     var so = SORTS.filter(function (x) { return x.key === state.sort; })[0];
@@ -935,7 +960,14 @@
     els.sort.value = state.sort;
     els.year.value = state.year;
     els.rating.value = state.minRating;
-    [els.sort, els.year, els.rating].forEach(function (s) { window.mfSyncDropdown && window.mfSyncDropdown(s); });
+    els.runtime.value = state.runtime;
+    els.lang.value = state.lang;
+    [].forEach.call(els.providers.children, function (b) {
+      var on = state.providers.indexOf(Number(b.getAttribute('data-provider'))) > -1;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    [els.sort, els.year, els.rating, els.runtime, els.lang].forEach(function (s) { window.mfSyncDropdown && window.mfSyncDropdown(s); });
     els.seen.classList.toggle('active', state.hideSeen);
     els.seen.setAttribute('aria-pressed', state.hideSeen ? 'true' : 'false');
   }
@@ -991,9 +1023,9 @@
     if (!root) return false;
     els = {
       root: root, input: $('dvSearch'), clear: $('dvClear'), close: $('dvClose'), fbtn: $('dvFilterBtn'), reset: $('dvReset'),
-      type: $('dvType'), genres: $('dvGenres'), sort: $('dvSort'), year: $('dvYear'), rating: $('dvRating'), seen: $('dvHideSeen'), body: $('dvBody')
+      type: $('dvType'), genres: $('dvGenres'), sort: $('dvSort'), year: $('dvYear'), rating: $('dvRating'), runtime: $('dvRuntime'), lang: $('dvLang'), providers: $('dvProviders'), seen: $('dvHideSeen'), body: $('dvBody')
     };
-    if (!els.input || !els.body || !els.rating || !els.seen) return false;
+    if (!els.input || !els.body || !els.rating || !els.seen || !els.runtime || !els.lang || !els.providers) return false;
 
     GENRES.forEach(function (g) {
       var b = el('button', 'dv-chip', g.name);
@@ -1010,6 +1042,7 @@
     var any = el('option', null, 'Kterýkoli rok');
     any.value = '';
     els.year.appendChild(any);
+    DECADES.forEach(function (d) { var od = el('option', null, d[1]); od.value = d[0]; els.year.appendChild(od); });
     for (var y = new Date().getFullYear(); y >= 1970; y--) {
       var o2 = el('option', null, String(y));
       o2.value = String(y);
@@ -1021,7 +1054,21 @@
       o3.value = r[0];
       els.rating.appendChild(o3);
     });
-    [els.sort, els.year, els.rating].forEach(function (s) { window.mfEnhanceDropdown && window.mfEnhanceDropdown(s); });
+    [[els.runtime, RUNTIMES], [els.lang, LANGS]].forEach(function (pair) {
+      pair[1].forEach(function (r) { var oo = el('option', null, r[1]); oo.value = r[0]; pair[0].appendChild(oo); });
+    });
+    PROVIDERS.forEach(function (pv) {
+      var pb = el('button', 'dv-chip', pv.name);
+      pb.type = 'button';
+      pb.setAttribute('data-provider', String(pv.id));
+      pb.addEventListener('click', function () {
+        var at = state.providers.indexOf(pv.id);
+        if (at > -1) state.providers.splice(at, 1); else state.providers.push(pv.id);
+        refresh();
+      });
+      els.providers.appendChild(pb);
+    });
+    [els.sort, els.year, els.rating, els.runtime, els.lang].forEach(function (s) { window.mfEnhanceDropdown && window.mfEnhanceDropdown(s); });
 
     [].forEach.call(els.type.children, function (b) {
       b.addEventListener('click', function () { setType(b.getAttribute('data-type')); });
@@ -1029,6 +1076,8 @@
     els.sort.addEventListener('change', function () { state.sort = els.sort.value; refresh(); });
     els.year.addEventListener('change', function () { state.year = els.year.value; refresh(); });
     els.rating.addEventListener('change', function () { state.minRating = els.rating.value; refresh(); });
+    els.runtime.addEventListener('change', function () { state.runtime = els.runtime.value; refresh(); });
+    els.lang.addEventListener('change', function () { state.lang = els.lang.value; refresh(); });
     els.seen.addEventListener('click', function () { state.hideSeen = !state.hideSeen; refresh(); });
     els.input.addEventListener('input', onInput);
     els.input.addEventListener('keydown', function (e) {
