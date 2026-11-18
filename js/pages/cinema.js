@@ -380,7 +380,7 @@
   function ensureModal() {
     if (modal) return;
     modal = document.createElement("div");
-    modal.id = "mfStandaloneCinema";
+    modal.id = "mfStandaloneCinema"; modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true"); modal.setAttribute("aria-labelledby", "mfStandaloneCinemaTitle");
     modal.innerHTML =
       '<div class="mf-standalone-cinema-top">' +
         '<button type="button" id="mfStandaloneCinemaClose" aria-label="Zpět" title="Zpět (Esc)">' +
