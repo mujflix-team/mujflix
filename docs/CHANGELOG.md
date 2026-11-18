@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.106
+### Opraveno
+- **Obnovení doporučení na Domů** (stažení dolů i druhé klepnutí na Domů) teď opravdu změní karty: každé obnovení načte jinou stránku žebříčků, jiný výběr „Vybráno pro tebe“, jiné pořadí „Protože jsi viděl…“ a jiný banner. Dřív se jen vypsal text a stejná data z paměti se vykreslila znovu.
+
 ## 3.21.104
 ### Změněno
 - **Designový systém – kroužek při ovládání klávesnicí:** jedno pravidlo `--focus-ring` / `--focus-gap` (bílý kroužek 2 px, odstup 2 px). Dřív globální modré pravidlo s `!important` přebíjelo bílé kroužky u jednotlivých prvků, takže vzhled byl nahodilý. Pravidla v `docs/DESIGN.md`.
