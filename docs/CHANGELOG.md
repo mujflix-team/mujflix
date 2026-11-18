@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.110
+### Změněno
+- **Úklid CSS:** odstraněno 28 pravidel pro prvky, které v aplikaci už neexistují (např. starý výběr série `ssvGrid`, `modalFindBtn`, `dockPlex`, `cinAIBadge`) a prázdné `@media` bloky. Vzhled beze změny.
+
 ## 3.21.109
 ### Opraveno
 - **Přístupnost (čtečky obrazovky, klávesnice):** výběr řady a epizody v Cinema režimu má popisky, vyhledávací lišta nahoře se dá ovládat klávesnicí (Enter/mezerník) a čtečka ji ohlásí jako tlačítko, výběr profilu a režim Cinema jsou označené jako okna (`role=dialog`) a stránka má skrytý nadpis „MůjFlix“.

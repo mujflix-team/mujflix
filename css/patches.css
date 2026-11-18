@@ -219,14 +219,6 @@
   border-color: var(--c-accent-a2) !important;
   color: #fff !important;
 }
-#seriesModal #modalFindBtn {
-  color: rgba(48, 209, 88, 0.8) !important;
-}
-#seriesModal #modalFindBtn:hover {
-  background: rgba(48, 209, 88, 0.14) !important;
-  border-color: rgba(48, 209, 88, 0.4) !important;
-  color: #fff !important;
-}
 
 #seriesModal .season-all-btn {
   color: var(--w-5) !important;
@@ -277,7 +269,7 @@
 }
 .mf-dock-badge.visible { transform: scale(1); }
 
-#aiApikeyOverlay, [onclick*="openAi"], [onclick*="toggleAiPanel"], #dockPlex, #mfSectionPlex {
+[onclick*="openAi"], [onclick*="toggleAiPanel"], #mfSectionPlex {
   display: none !important;
 }
 
@@ -391,9 +383,6 @@ html body #mfProfileCreate input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px var(--c-surface-2) inset !important;
   caret-color: #fff;
 }
-
-/* ---- Onboarding: krok 2 (tutorial) ---- */
-.pw-tip-ico { flex: 0 0 auto; width: 40px; height: 40px; display: grid; place-items: center; font-size: var(--fs-xl); border-radius: var(--r-panel); background: var(--w-1); }
 .pw-adwarn { padding: 14px 16px; border-radius: var(--r-panel); border: 1px solid rgba(255,190,60,.45); background: rgba(255,190,60,.08); }
 .pw-adwarn strong { color: #ffc857; }
 .pw-adwarn p { margin: 6px 0 0; color: var(--c-text-2); font-size: var(--fs-md); line-height: 1.45; }
