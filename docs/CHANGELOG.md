@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.21.107
+## 3.21.108
 ### Změněno
 - **Doporučení na Domů se mění při každém načtení:** „Vybráno pro tebe“, „Nejlépe hodnocené seriály“ a „Nejlépe hodnocené filmy“ (a pořadí v „Protože jsi viděl…“) berou při každém spuštění aplikace jinou stránku a jiné pořadí, takže tam nejsou pořád stejné tituly na stejných místech. Ruční obnovení je mění dál. „Top 10 tento týden“ zůstává podle žebříčku.
 
