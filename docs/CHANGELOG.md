@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.111
+### Opraveno
+- **Objevování na telefonu:** rozbalovače filtrů (Řadit, Rok, Hodnocení, Délka, Jazyk) jsou ve dvou sloupcích, takže je vidět celá vybraná hodnota (dřív se při pěti vedle sebe zkrátila na „P.“, „K.“, „L.“). „Skrýt už otevřené“ a „Zrušit filtry“ jsou přes celou šířku.
+
 ## 3.21.110
 ### Změněno
 - **Úklid CSS:** odstraněno 28 pravidel pro prvky, které v aplikaci už neexistují (např. starý výběr série `ssvGrid`, `modalFindBtn`, `dockPlex`, `cinAIBadge`) a prázdné `@media` bloky. Vzhled beze změny.
