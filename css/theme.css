@@ -201,9 +201,6 @@ html body.discover-open #mfDock { display: none !important; }
   padding-right: 0.06em;
 }
 
-/* „Zobrazit vše“ */
-.mfh-h2 { margin: 0; font: 700 1.2rem/1.2 -apple-system, "SF Pro Display", "Inter", sans-serif; color: #fff; }
-
 /* telefon */
 @media (max-width: 899px) {
   .nf-hero { height: clamp(420px, 72vh, 640px); }
@@ -274,7 +271,6 @@ html body #seriesModal .btn-continue { background: #fff !important; color: #000 
 html body #seriesModal .btn-continue:hover { background: var(--w-6) !important; }
 html body #seriesModal .btn-shuffle { background: rgba(109, 109, 110, 0.7) !important; color: #fff !important; }
 html body #seriesModal .btn-shuffle:hover { background: rgba(109, 109, 110, 0.45) !important; }
-html body #seriesModal #modalFindBtn { color: #fff !important; }
 html body #seriesModal .close-btn { background: var(--c-surface) !important; border: 0 !important; box-shadow: none !important; color: #fff !important; }
 html body #seriesModal .ssv-card { border: 0 !important; border-radius: var(--r-media) !important; box-shadow: none !important; background: var(--c-surface-2) !important; transition: transform var(--t-base) ease !important; }
 html body #seriesModal .ssv-card:hover { transform: scale(var(--fx-hover-md)) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important; }
@@ -641,25 +637,6 @@ html body #mfPinModal .pm-cancel:hover { color: #fff !important; border-color: #
 html body #mfProfileCreate .pc-avatar-picker-toggle { width: auto !important; max-width: none !important; display: block !important; }
 html body #mfProfileCreate .pc-avatar-picker { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; z-index: 50 !important; box-sizing: border-box; }
 html body #mfProfileCreate .pc-picker-head { padding-top: 84px; }
-
-/* Výběr série – mřížka plakátů v tmavém stylu */
-html body #seriesModal #ssvGrid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: var(--sp-4) !important; padding: 0 var(--nf-pad, 24px) 32px !important; }
-html body #seriesModal #ssvGrid .ssv-card {
-  position: relative; aspect-ratio: 2 / 3; width: auto !important; height: auto !important; min-width: 0 !important; border: 0 !important; border-radius: var(--r-media) !important;
-  background: var(--c-surface-2) !important; box-shadow: none !important; overflow: hidden; cursor: pointer; outline: none; transition: transform var(--t-base) !important;
-}
-html body #seriesModal #ssvGrid .ssv-card::after { display: none !important; content: none !important; }
-html body #seriesModal #ssvGrid .ssv-card img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important; filter: none !important; transform: none !important; }
-html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(var(--fx-hover-sm)) !important; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important; z-index: 2; }
-html body #seriesModal #ssvGrid .ssv-card.ssv-active { outline: var(--focus-ring) !important; outline-offset: -2px; }
-html body #seriesModal #ssvGrid .ssv-num { color: #fff !important; font-size: var(--fs-base) !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; }
-html body #seriesModal #ssvGrid .ssv-name { display: none !important; }
-html body #seriesModal #ssvGrid .ssv-play-btn {
-  width: 52px !important; height: var(--h-xl) !important; padding: 0 !important; border-radius: 50% !important; border: 2px solid #fff !important; background: rgba(0, 0, 0, 0.55) !important;
-  box-shadow: none !important; display: grid !important; place-items: center; font-size: 0 !important; transform: none !important; min-width: 0 !important;
-}
-html body #seriesModal #ssvGrid .ssv-play-btn svg { width: 20px !important; height: 20px !important; fill: #fff !important; margin: 0 0 0 3px !important; }
-@media (max-width: 640px) { html body #seriesModal #ssvGrid { grid-template-columns: repeat(2, 1fr) !important; gap: var(--sp-3) !important; } }
 html body #mfProfileCreate.picker-open .pc-logo, html body #mfProfileCreate.picker-open .pc-close { display: none !important; }
 
 /* Hvězdička v kině a okno hodnocení nad kinem */
@@ -685,12 +662,8 @@ html body *:not(svg):not(svg *):not(code):not(pre):not(#mfFontLock) { font-famil
 
 #seriesModal .ep-hover-play{ pointer-events: none; }
 @media (hover: none), (pointer: coarse) {
-  html body #seriesModal #ssvGrid .ssv-card:hover { transform: none !important; box-shadow: none !important; }
   html body #seriesModal #episodesGrid .episode-card:hover .ep-hover-play{ opacity: 0 !important; }
   html body #seriesModal #episodesGrid .episode-card:hover { background: transparent !important; }
-}
-@media (hover: hover) and (pointer: fine) {
-  html body #seriesModal #ssvGrid .ssv-card:hover { transform: scale(var(--fx-hover-sm)) !important; }
 }
 
 /* Výkon: dlouhé seznamy se vykreslují až při zobrazení, rozmazání pozadí (drahé na GPU) jen na stolním počítači */
@@ -848,8 +821,6 @@ html body #legalProvidersPanel a span { font: 600 0.88rem/1 var(--nf-font, sans-
   color: var(--c-text-4) !important; font: 500 clamp(0.85rem, 1vw, 1rem) var(--nf-font, sans-serif) !important; cursor: pointer;
 }
 #mfProfileGate .pg-sync-btn:hover { color: #fff !important; }
-html body #mfProfileWelcome .pw-actions.pw-actions-col { flex-direction: column !important; align-items: stretch; border-top: 0; margin-top: 24px !important; padding-top: 0; }
-html body #mfProfileWelcome .pw-actions.pw-actions-col button { width: 100%; }
 html body #mfProfileWelcome .pw-note { color: var(--c-text-4); font-size: var(--fs-md); margin-top: 18px; }
 html body #mfProfileWelcome .pw-linkbtn { background: none; border: 0; padding: 0; color: var(--nf-accent, var(--c-accent)); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
 html body #mfProfileWelcome .pw-linkbtn:hover { color: #fff; }
@@ -1079,7 +1050,7 @@ html body #seriesModal.sd-detail .panel-btns > .btn-continue { grid-row: 2; grid
 }
 /* Seznam dílů / Podobné: menší hlavička (název, metadata, tlačítka), ať je vidět co nejvíc dílů */
 html body #seriesModal:not(.sd-detail):not(.nf-compact) .modal-hero { min-height: clamp(190px, 27vh, 260px) !important; }
-html body #seriesModal:not(.sd-detail) .sd-overview, html body #seriesModal:not(.sd-detail) .sd-cast, html body #seriesModal:not(.sd-detail) .sd-links { display: none !important; }
+html body #seriesModal:not(.sd-detail) .sd-overview, html body #seriesModal:not(.sd-detail) .sd-cast{ display: none !important; }
 html body #seriesModal:not(.sd-detail):not(.nf-compact) .modal-hero-left h2 { font-size: clamp(1.6rem, 3.4vw, 2.6rem) !important; }
 
 /* Logo titulu místo textu */
@@ -1386,7 +1357,7 @@ html body.mf-section-protebe #nfTop, html body:has(#watchlistOverlay.visible) #n
 .nf-hero { animation: none; }
 .nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(var(--fx-hover-sm)); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
 html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(var(--fx-hover-sm)); }
-html body #seriesModal .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(var(--fx-hover-sm)) !important; }
+html body #seriesModal .ssv-card:hover{ transform: scale(var(--fx-hover-sm)) !important; }
 .nf-tr-open:hover img { transform: none; }
 html body #mfDock.mf-dock.mf-dock-hidden { transform: none !important; }
 .nf-hero-bg { animation-duration: var(--t-slow); }
@@ -1886,7 +1857,7 @@ html body .nf-hero-eyebrow { font-weight: var(--fw-medium); letter-spacing: 0.14
 html body .nf-hero-meta { font-weight: var(--fw-medium); }
 html body .nf-hero-desc, html body #seriesModal .sd-overview { font-weight: var(--fw-light) !important; }
 html body .nf-btn, html body #seriesModal .dv-btn { font-weight: var(--fw-bold) !important; }
-html body .nf-row-title, html body .mfh-h2 { font-weight: var(--fw-bold) !important; }
+html body .nf-row-title{ font-weight: var(--fw-bold) !important; }
 html body .nf-row-sub { font-weight: var(--fw-light); }
 html body .nf-card-title { font-weight: var(--fw-medium) !important; }
 html body .nf-card-ep { font-weight: var(--fw-regular); }
