@@ -18,7 +18,8 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
-- 3.21.105 – Discover: filtr služby, dekády, délky a jazyka (claude/discover-filtry)
+- 3.21.107 – Discover: filtr služby, dekády, délky a jazyka (claude/discover-filtry)
+- 3.21.106 – obnovení doporučení na Domů mění karty (claude/obnoveni-domu)
 - 3.21.104 – jednotný kroužek při ovládání klávesnicí (claude/focus)
 - 3.21.103 – designové tokeny efektů (claude/efekty)
 - 3.21.102 – animace a barvy v JS na tokeny (claude/js-tokeny)

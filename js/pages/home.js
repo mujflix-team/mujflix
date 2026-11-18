@@ -229,6 +229,7 @@
       var _nfRun = 0;
       var _nfSig = '';
       var _nfCache = {};
+      var _nfBump = 0; /* ručně vyžádané obnovení (stažení dolů / druhé klepnutí na Domů): každé dá jiný výběr titulů */
 
       function nfJson(path) {
         var ck = path + '|' + (window.MFAge ? window.MFAge.limit() : 0) + '|' + (mfhOnlyAnime() ? 1 : 0);
@@ -416,6 +417,10 @@
 
       /* Při startu volá překreslení víc míst za sebou (profil, historie, oblíbené…); sloučí se do jednoho, ať řady neblikají víckrát */
       var _rhT = 0;
+      window.mfhNewPicks = function () {
+        _nfBump++; _nfCache = {}; _heroOpenPick = null; _heroSeed = Math.random(); _nfSig = '';
+        try { renderHomepage(); } catch (e) { void e; }
+      };
       window.mfhRefresh = function () { _nfSig = ''; try { window.renderHomepage(); } catch (e) { void e; } }; /* po změně doporučování se řady obnoví */
       window.renderHomepage = function () {
         clearTimeout(_rhT);
@@ -1031,7 +1036,7 @@
           }
           return Promise.resolve(pop);
         }
-        var seed = mfhProfileSeed(), p1 = 1 + seed % 4; // každý profil začíná na jiné stránce výsledků a pořadí si zamíchá po svém
+        var seed = mfhProfileSeed() + _nfBump * 7, p1 = 1 + seed % 4; // každý profil začíná na jiné stránce výsledků a pořadí si zamíchá po svém
         return Promise.all(['tv', 'movie'].map(function (type, ti) {
           // Filmy a seriály mají v TMDB částečně jiná ID žánrů (např. Akční 28 vs. 10759)
           var ids = genres.length ? (window.mfGenreIdsFor ? window.mfGenreIdsFor(genres, type) : genres) : [];
@@ -1202,7 +1207,9 @@
               var k = it.mediaType + it.tmdbId;
               if (usedBecause[k] || String(it.tmdbId) === sd.id) return false;
               return true;
-            }).slice(0, 16);
+            });
+            if (_nfBump) list = mfhSeededShuffle(list, _nfBump + si);
+            list = list.slice(0, 16);
             if (list.length < 4) list = [];
             list.forEach(function (it) { usedBecause[it.mediaType + it.tmdbId] = 1; });
             nfFillRow('mfhBecause' + si, list);
@@ -1229,15 +1236,16 @@
         });
 
         var AQ = window.MF_ANIME_QUERY || '';
+        function nfPg() { return _nfBump ? (oa ? '&page=' : '?page=') + (1 + _nfBump % 4) : ''; } /* při ručním obnovení se vezme další stránka žebříčku */
         nfJson(oa ? '/discover/tv?sort_by=popularity.desc&vote_count.gte=50' + AQ : '/trending/all/week').then(function (d) {
           if (myRun !== _nfRun) return;
           nfFillRow('mfhTop10', (oa ? nfItems(d, 'tv') : nfItems(d)).slice(0, 10), true);
         });
-        nfJson(oa ? '/discover/tv?sort_by=vote_average.desc&vote_count.gte=300' + AQ : '/tv/top_rated').then(function (d) {
+        nfJson(oa ? '/discover/tv?sort_by=vote_average.desc&vote_count.gte=300' + AQ + nfPg() : '/tv/top_rated' + nfPg()).then(function (d) {
           if (myRun !== _nfRun) return;
           nfFillRow('mfhTopTv', fresh(nfItems(d, 'tv')).slice(0, 20));
         });
-        nfJson(oa ? '/discover/movie?sort_by=vote_average.desc&vote_count.gte=300' + AQ : '/movie/top_rated').then(function (d) {
+        nfJson(oa ? '/discover/movie?sort_by=vote_average.desc&vote_count.gte=300' + AQ + nfPg() : '/movie/top_rated' + nfPg()).then(function (d) {
           if (myRun !== _nfRun) return;
           nfFillRow('mfhTopMovie', fresh(nfItems(d, 'movie')).slice(0, 20));
         });
@@ -1449,7 +1457,7 @@
           var y = window.pageYOffset || document.documentElement.scrollTop || 0;
           if (y > 40) { window.scrollTo({ top: 0, behavior: 'smooth' }); return true; }
           if (typeof showToast === 'function') showToast('Obnovuji doporučení…');
-          window.mfhRefresh && window.mfhRefresh();
+          window.mfhNewPicks && window.mfhNewPicks();
           return true;
         } catch (e) { return false; }
       };

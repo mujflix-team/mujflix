@@ -1624,8 +1624,8 @@ const retapT = await page.evaluate(async () => {
   const first = mfHomeRetap();
   await new Promise(r => setTimeout(r, 900));
   const y1 = window.pageYOffset;
-  window.scrollTo(0, 0); let refreshed = false; const old = window.mfhRefresh; window.mfhRefresh = () => { refreshed = true; };
-  const second = mfHomeRetap(); window.mfhRefresh = old;
+  window.scrollTo(0, 0); let refreshed = false; const old = window.mfhNewPicks; window.mfhNewPicks = () => { refreshed = true; };
+  const second = mfHomeRetap(); window.mfhNewPicks = old;
   dock.classList.remove("active"); document.documentElement.classList.remove("mfh-home-on");
   return { first, y1, second, refreshed, notHome: mfHomeRetap() };
 });
@@ -1647,15 +1647,24 @@ const fxT = await page.evaluate(() => { const r = getComputedStyle(document.docu
 check("efekty: existují tokeny --fx-* a --blur-*", fxT.join() === "1.06,.96,20px", JSON.stringify(fxT));
 const pullT = await page.evaluate(async () => {
   window.ontouchstart = null; document.documentElement.classList.add("mfh-home-on"); window.scrollTo(0, 0);
-  let n = 0; window.mfhRefresh = () => { n++; };
+  let n = 0; const origPicks = window.mfhNewPicks; window.mfhNewPicks = () => { n++; };
   await new Promise(r => { const sc = document.createElement("script"); sc.src = "js/shell/pull.js"; sc.onload = r; document.body.appendChild(sc); });
   const fire = (t, y) => { const e = new Event(t, { bubbles: true }); e.touches = t === "touchend" ? [] : [{ clientY: y }]; document.dispatchEvent(e); };
   fire("touchstart", 100); fire("touchmove", 150); fire("touchend", 150); const short = n;
   fire("touchstart", 100); fire("touchmove", 300); fire("touchend", 300); const long = n;
-  document.documentElement.classList.remove("mfh-home-on");
+  document.documentElement.classList.remove("mfh-home-on"); window.mfhNewPicks = origPicks;
   return { short, long };
 });
 check("stažení dolů na Domů: krátké tažení nic, dlouhé obnoví doporučení", pullT.short === 0 && pullT.long === 1, JSON.stringify(pullT));
+const newPicksT = await page.evaluate(async () => {
+  const origFetch = window.fetch, urls = []; localStorage.setItem("mf_tmdb_key", "K");
+  window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [] }) }; };
+  window.mfhNewPicks(); await new Promise(r => setTimeout(r, 700)); const a = urls.filter(u => /top_rated|vote_average\.desc/.test(u)).join(" ");
+  urls.length = 0; window.mfhNewPicks(); await new Promise(r => setTimeout(r, 700)); const b = urls.filter(u => /top_rated|vote_average\.desc/.test(u)).join(" ");
+  window.fetch = origFetch; localStorage.removeItem("mf_tmdb_key");
+  return { a, b };
+});
+check("obnovení Domů: každé ruční obnovení vezme jinou stránku žebříčků (jiné tituly)", /[?&]page=\d/.test(newPicksT.a) && newPicksT.a !== newPicksT.b, JSON.stringify(newPicksT));
 const hspT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--h-lg").trim(), r.getPropertyValue("--h-xl").trim(), r.getPropertyValue("--sp-2").trim(), r.getPropertyValue("--sp-4").trim()]; });
 check("výšky a mezery: existují tokeny --h-* a --sp-*", hspT.join() === "44px,48px,8px,16px", JSON.stringify(hspT));
 

@@ -50,7 +50,7 @@
         busy = true;
         draw(TH * 0.7, true);
         if (typeof showToast === "function") showToast("Obnovuji doporučení…");
-        try { window.mfhRefresh && window.mfhRefresh(); } catch (e) {}
+        try { (window.mfhNewPicks || window.mfhRefresh || function () {})(); } catch (e) {}
         setTimeout(function () { draw(0, true); busy = false; }, 900);
       } else draw(0, true);
       pull = 0;
