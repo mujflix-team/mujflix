@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.107
+### Nově
+- **Objevování – další filtry:** streamovací služba (Netflix, Max, Disney+, Prime Video, Apple TV+, SkyShowtime; v ČR, jde vybrat víc najednou), dekáda místo jednoho roku, délka (do 90 / 90–120 / přes 120 min) a původní jazyk. Všechny jdou kombinovat se žánry, hodnocením i řazením a každý se dá odebrat štítkem nad mřížkou. Při hledání textu se uplatní dekáda a jazyk; služba a délka jen při procházení.
+
 ## 3.21.106
 ### Opraveno
 - **Obnovení doporučení na Domů** (stažení dolů i druhé klepnutí na Domů) teď opravdu změní karty: každé obnovení načte jinou stránku žebříčků, jiný výběr „Vybráno pro tebe“, jiné pořadí „Protože jsi viděl…“ a jiný banner. Dřív se jen vypsal text a stejná data z paměti se vykreslila znovu.
