@@ -1639,6 +1639,8 @@ const fontT = await page.evaluate(() => {
 check("písmo: všude jedna rodina (Inter Variable) a existují tokeny velikostí", fontT.fams.length === 1 && /Inter Variable/.test(fontT.fams[0]) && fontT.tok === "0.92rem", JSON.stringify(fontT));
 const hspT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--h-lg").trim(), r.getPropertyValue("--h-xl").trim(), r.getPropertyValue("--sp-2").trim(), r.getPropertyValue("--sp-4").trim()]; });
 check("výšky a mezery: existují tokeny --h-* a --sp-*", hspT.join() === "44px,48px,8px,16px", JSON.stringify(hspT));
+const shT = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--sh-2").trim());
+check("stíny: existují tokeny --sh-*", /0 12px 36px/.test(shT), shT);
 
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];

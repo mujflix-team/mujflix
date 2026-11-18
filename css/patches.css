@@ -132,7 +132,7 @@
   height: 26px !important;
   border-radius: 50% !important;
   border: 2px solid #0b0b0f !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: var(--sh-1) !important;
 }
 
 #mfPinModal .pm-avatar {
@@ -145,7 +145,7 @@
   font-size: var(--fs-3xl) !important;
   background: linear-gradient(160deg, var(--c-accent-a2), #101014) !important;
   border: 2px solid var(--c-accent-a3) !important;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: var(--sh-2) !important;
 }
 .pm-num {
   border-radius: var(--r-sheet) !important;
@@ -179,14 +179,13 @@
   padding: 13px 24px !important;
   font-weight: 800 !important;
   letter-spacing: -0.1px !important;
-  box-shadow:
-    0 8px 28px var(--c-accent-a3),
+  box-shadow: var(--sh-glow),
     inset 0 1px 0 var(--w-3) !important;
   transition: all var(--t-base) var(--ease-spring) !important;
 }
 #seriesModal .btn-continue:hover {
   transform: scale(1.05) translateY(-2px) !important;
-  box-shadow: 0 14px 40px var(--c-accent-a3) !important;
+  box-shadow: var(--sh-glow) !important;
 }
 
 #seriesModal .panel-btns {
@@ -291,7 +290,7 @@
   border-radius: var(--r-sheet) !important;
   background: rgba(14, 14, 22, 0.98) !important;
   border: 1px solid var(--w-2) !important;
-  box-shadow: 0 50px 120px rgba(0, 0, 0, 0.9) !important;
+  box-shadow: var(--sh-3) !important;
 }
 #watchlistOverlay .wl-header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
 #watchlistOverlay .wl-title-wrap { display: flex; align-items: baseline; gap: var(--sp-3); min-width: 0; }
@@ -326,7 +325,7 @@
 }
 #watchlistOverlay .wl-card:hover .wl-card-poster,
 #watchlistOverlay .wl-card:focus-visible .wl-card-poster {
-  transform: translateY(-4px) scale(1.02); border-color: var(--c-accent-a3); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  transform: translateY(-4px) scale(1.02); border-color: var(--c-accent-a3); box-shadow: var(--sh-2);
 }
 #watchlistOverlay .wl-card-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
 #watchlistOverlay .wl-card-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: var(--fs-4xl); opacity: 0.4; }

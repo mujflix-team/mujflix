@@ -184,7 +184,7 @@
 #universeOverlay .dv-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #universeOverlay .dv-poster-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: var(--fs-4xl); opacity: 0.4; }
 #universeOverlay .dv-card:hover .dv-poster,
-#universeOverlay .dv-card:focus-visible .dv-poster { transform: scale(1.04); border-color: var(--w-4); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6); }
+#universeOverlay .dv-card:focus-visible .dv-poster { transform: scale(1.04); border-color: var(--w-4); box-shadow: var(--sh-2); }
 #universeOverlay .dv-card:focus-visible .dv-poster { outline: 2px solid var(--dv-accent); outline-offset: 2px; }
 /* symbol přehrání: šedý trojúhelník (jako na náhledu epizody). Ukáže se při najetí na kartu, při najetí přímo na něj (okolí 64 px)
    zbělá a zvětší se. Na dotykovém displeji se neukazuje. */
