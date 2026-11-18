@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.100
+### Změněno
+- **Designový systém – stíny:** 64 různých stínů (jen černé a modré záře) je teď 4 tokeny `--sh-1/2/3` a `--sh-glow`. Pravidla v `docs/DESIGN.md`.
+
 ## 3.21.99
 ### Změněno
 - **Designový systém – výšky a mezery:** výšky ovládacích prvků (~60 míst) jsou teď jen 4 tokeny `--h-sm/md/lg/xl` (32/40/44/48 px) místo 13 různých čísel a mezery `gap` (~200 míst) jedna škála `--sp-1…5` (4/8/12/16/24 px). Rozdíly jsou max. pár pixelů. Pravidla v `docs/DESIGN.md`.

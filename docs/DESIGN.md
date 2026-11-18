@@ -80,6 +80,10 @@ Tloušťky: 400 běžný · 500 střední · 600 polotučný · 700 tučný · 8
 Mezery (`gap`): `--sp-1` 4px · `--sp-2` 8px · `--sp-3` 12px · `--sp-4` 16px · `--sp-5` 24px.
 Nová výška ovládacího prvku nebo `gap` = jen tyto tokeny, žádná „náhodná" čísla.
 
+## Stíny – tokeny na začátku `css/styles.css`
+`--sh-1` malé (tooltipy, malé karty) · `--sh-2` běžné (karty při hoveru, menu, panely) · `--sh-3` velké (modály, okna) · `--sh-glow` modrá záře akcentu (aktivní/hlavní prvky).
+Nový stín = jen tyto tokeny.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.
