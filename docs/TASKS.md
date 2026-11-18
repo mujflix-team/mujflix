@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.108 – doporučení na Domů se mění při každém načtení (claude/nahodna-doporuceni)
 - 3.21.107 – Discover: filtr služby, dekády, délky a jazyka (claude/discover-filtry)
 - 3.21.106 – obnovení doporučení na Domů mění karty (claude/obnoveni-domu)
 - 3.21.104 – jednotný kroužek při ovládání klávesnicí (claude/focus)
