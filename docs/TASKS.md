@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.103 – designové tokeny efektů (claude/efekty)
 - 3.21.102 – animace a barvy v JS na tokeny (claude/js-tokeny)
 - 3.21.98 – designové tokeny písma (claude/pismo)
 - 3.21.101 – stažení dolů pro obnovení Domů + oprava šedé obrazovky v PWA (claude/pwa-zpet-pull)

@@ -80,6 +80,12 @@ Tloušťky: 400 běžný · 500 střední · 600 polotučný · 700 tučný · 8
 Mezery (`gap`): `--sp-1` 4px · `--sp-2` 8px · `--sp-3` 12px · `--sp-4` 16px · `--sp-5` 24px.
 Nová výška ovládacího prvku nebo `gap` = jen tyto tokeny, žádná „náhodná" čísla.
 
+## Efekty – tokeny na začátku `css/styles.css`
+- Hover zvětšení: `--fx-hover-sm` 1.03 (velké karty) · `--fx-hover-md` 1.06 (plakáty, tlačítka) · `--fx-hover-lg` 1.1 (malé ikony) · `--fx-hover-xl` 1.2 (drobné body/hvězdičky). Použití: `transform: scale(var(--fx-hover-md))`.
+- Stisk (`:active`): `--fx-press` .96 (běžné) · `--fx-press-sm` .92 (malé ikony).
+- Rozmazání pozadí (`backdrop-filter`): `--blur-sm` 8px (drobnosti) · `--blur-md` 20px (lišty, menu, okna) · `--blur-lg` 36px (celoobrazovková skla).
+Nový efekt = jen tyto tokeny.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.

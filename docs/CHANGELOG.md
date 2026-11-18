@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.103
+### Změněno
+- **Designový systém – efekty:** zvětšení při najetí (38 míst) je 4 tokeny `--fx-hover-*`, stisk (19 míst) 2 tokeny `--fx-press*` a rozmazání pozadí (87 míst, dřív 15 různých hodnot) 3 tokeny `--blur-sm/md/lg`. Rozdíly jsou nepatrné. Pravidla v `docs/DESIGN.md`.
+
 ## 3.21.102
 ### Změněno
 - **Designový systém – JS:** zbylé animace a barvy zapsané přímo v JS (`fx.js`, `cinema.js`) používají tokeny `--t-*`, `--ease-*`, `--c-accent*` stejně jako CSS. Vzhled beze změny.
