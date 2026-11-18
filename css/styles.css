@@ -22,6 +22,8 @@
 :root { --h-sm: 32px; --h-md: 40px; --h-lg: 44px; --h-xl: 48px; --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; }
 /* ═════════ Design tokeny: EFEKTY (hover/press/rozmazání, pravidla viz docs/DESIGN.md) ═════════ */
 :root { --fx-hover-sm: 1.03; --fx-hover-md: 1.06; --fx-hover-lg: 1.1; --fx-hover-xl: 1.2; --fx-press: .96; --fx-press-sm: .92; --blur-sm: 8px; --blur-md: 20px; --blur-lg: 36px; }
+/* ═════════ Design token: KROUŽEK PŘI OVLÁDÁNÍ KLÁVESNICÍ (pravidla viz docs/DESIGN.md) ═════════ */
+:root { --focus-ring: 2px solid #fff; --focus-gap: 2px; }
 :root {
   --c-bg: #141414; --c-surface: #1f1f1f; --c-surface-2: #2a2a2a; --c-line: #333; --c-line-hi: #3a3a3a;
   --c-text-2: #d2d2d2; --c-text-3: #b3b3b3; --c-text-4: #808080;
@@ -118,8 +120,8 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent, var(--c-accent));
-  outline-offset: 3px;
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-gap);
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -3608,8 +3610,8 @@ button:active {
   animation: mf-page-enter var(--t-base) var(--ease-spring) both;
 }
 :focus-visible {
-  outline: 2px solid var(--c-accent-a3) !important;
-  outline-offset: 3px !important;
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-gap);
   transition: outline-color var(--t-fast) ease !important;
 }
 
