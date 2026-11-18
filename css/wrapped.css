@@ -97,7 +97,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-btn[hidden] { display: none; }
 #mfWrapped .mfw-btn:disabled { opacity: 0.35; pointer-events: none; }
 #mfWrapped .mfw-nav { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: var(--sp-3); padding: 8px var(--mfw-pad) calc(env(safe-area-inset-bottom, 0px) + 18px); }
-#mfWrapped :is(button, select):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+#mfWrapped :is(button, select):focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-gap); }
 
 @media (max-width: 480px) {
   #mfWrapped .mfw-bars li { grid-template-columns: minmax(92px, 36%) 1fr auto; gap: var(--sp-3); }

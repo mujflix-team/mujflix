@@ -1637,6 +1637,12 @@ const fontT = await page.evaluate(() => {
   return { fams: [...new Set(sel.map(fam))], tok: getComputedStyle(document.documentElement).getPropertyValue("--fs-md").trim() };
 });
 check("písmo: všude jedna rodina (Inter Variable) a existují tokeny velikostí", fontT.fams.length === 1 && /Inter Variable/.test(fontT.fams[0]) && fontT.tok === "0.92rem", JSON.stringify(fontT));
+await page.evaluate(() => { const b = document.createElement("button"); b.id = "focProbe"; b.textContent = "x"; document.body.appendChild(b); });
+await page.keyboard.press("Shift");
+await page.evaluate(() => document.getElementById("focProbe").focus());
+await page.waitForTimeout(400);
+const focT = await page.evaluate(() => { const b = document.getElementById("focProbe"); const c = getComputedStyle(b); const r = [c.outlineWidth, c.outlineColor, getComputedStyle(document.documentElement).getPropertyValue("--focus-gap").trim()]; b.remove(); return r; });
+check("kroužek při klávesnici: jednotný bílý 2px (--focus-ring)", focT[0] === "2px" && focT[1] === "rgb(255, 255, 255)" && focT[2] === "2px", JSON.stringify(focT));
 const fxT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--fx-hover-md").trim(), r.getPropertyValue("--fx-press").trim(), r.getPropertyValue("--blur-md").trim()]; });
 check("efekty: existují tokeny --fx-* a --blur-*", fxT.join() === "1.06,.96,20px", JSON.stringify(fxT));
 const pullT = await page.evaluate(async () => {
