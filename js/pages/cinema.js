@@ -1262,7 +1262,7 @@
       border-radius: var(--r-pill);
       cursor: pointer;
       pointer-events: auto;
-      transition: all 0.2s ease;
+      transition: all var(--t-base) var(--ease-std);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
@@ -1345,8 +1345,8 @@
       }
       badge.title = 'Dostupné legálně v regionu ' + regionName;
 
-      badge.style.borderColor = 'rgba(0,122,255,0.3)';
-      const bsvg = badge.querySelector('svg'); if (bsvg) bsvg.style.stroke = '#007aff';
+      badge.style.borderColor = 'var(--c-accent-a2)';
+      const bsvg = badge.querySelector('svg'); if (bsvg) bsvg.style.stroke = 'var(--c-accent)';
 
       panelLabel.textContent = 'Legálně dostupné (' + regionName + ')';
 
@@ -1381,7 +1381,7 @@
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: ${logoUrl ? '12px' : '20px'};
             text-decoration: none;
-            transition: all 0.18s;
+            transition: all var(--t-fast);
             cursor: pointer;
           `;
           btn.onmouseenter = () => {

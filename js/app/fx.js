@@ -15,7 +15,7 @@
       border-radius: var(--r-sheet) !important;
       border: 1px solid rgba(255,255,255,0.07) !important;
       background: rgba(255,255,255,0.04) !important;
-      transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1), border-color 0.2s, box-shadow 0.3s !important;
+      transition: transform var(--t-slow) var(--ease-spring), border-color var(--t-base), box-shadow var(--t-slow) !important;
     }
     /* OPRAVA: na dotyku (mobil/tablet) zůstává :hover "přilepený" po ťuknutí
        a dřív ho scroll náhodou smazal — teď hover funguje jen na zařízeních
@@ -28,7 +28,7 @@
       }
     }
     .ssv-card.ssv-active {
-      border-color: var(--accent,#007aff) !important;
+      border-color: var(--accent,var(--c-accent)) !important;
       box-shadow: 0 0 0 2px rgba(0,122,255,0.3), 0 16px 48px rgba(0,122,255,0.35) !important;
     }
     .ssv-play-btn {
@@ -59,7 +59,7 @@
       clip-path: none !important;
       min-height: 0 !important;
       gap: 0 !important;
-      transition: background 0.18s ease !important;
+      transition: background var(--t-fast) var(--ease-std) !important;
     }
     .episode-card:hover {
       background: rgba(255,255,255,0.04) !important;
@@ -92,7 +92,7 @@
       width: 100% !important; height: 100% !important;
       object-fit: cover !important;
       filter: brightness(0.78) saturate(0.82) !important;
-      transition: transform 0.4s ease, filter 0.3s !important;
+      transition: transform var(--t-xslow) var(--ease-std), filter var(--t-slow) !important;
     }
     .episode-card:hover .ep-thumb img {
       transform: scale(1.06) !important;
@@ -101,7 +101,7 @@
     .ep-hover-play {
       background: rgba(0,0,0,0.28) !important;
       opacity: 0 !important;
-      transition: opacity 0.2s !important;
+      transition: opacity var(--t-base) !important;
     }
     .episode-card:hover .ep-hover-play { opacity: 1 !important; }
     .ep-play-ring {
@@ -146,7 +146,7 @@
       font-size: 0.68rem !important;
       color: rgba(255,255,255,0.38) !important;
       max-height: 0 !important; opacity: 0 !important; margin-top: 0 !important;
-      transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.25s ease !important;
+      transition: max-height var(--t-slow) var(--ease-std), opacity var(--t-base) var(--ease-std), margin-top var(--t-base) var(--ease-std) !important;
       display: -webkit-box !important;
       -webkit-line-clamp: 2 !important;
       -webkit-box-orient: vertical !important;
@@ -160,7 +160,7 @@
     .ep-actions {
       max-height: 0 !important; opacity: 0 !important; margin-top: 0 !important;
       overflow: hidden !important;
-      transition: max-height 0.28s ease, opacity 0.22s ease, margin-top 0.22s ease !important;
+      transition: max-height var(--t-slow) var(--ease-std), opacity var(--t-base) var(--ease-std), margin-top var(--t-base) var(--ease-std) !important;
     }
     @media (hover: hover) and (pointer: fine) {
       .episode-card:hover .ep-actions {
@@ -208,7 +208,7 @@
       pointer-events: none !important;
       transform: translateY(110%) !important;
       visibility: hidden !important;
-      transition: all 0.25s ease !important;
+      transition: all var(--t-base) var(--ease-std) !important;
     }
 
     /* Skrýt profil při otevřeném modalu */
@@ -216,7 +216,7 @@
     body.modal-open .mf-profile-badge {
       opacity: 0 !important;
       pointer-events: none !important;
-      transition: opacity 0.2s ease !important;
+      transition: opacity var(--t-base) var(--ease-std) !important;
     }
 
     /* Profile badge — čtvereček */
