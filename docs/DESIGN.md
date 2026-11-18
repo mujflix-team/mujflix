@@ -86,6 +86,9 @@ Nová výška ovládacího prvku nebo `gap` = jen tyto tokeny, žádná „náho
 - Rozmazání pozadí (`backdrop-filter`): `--blur-sm` 8px (drobnosti) · `--blur-md` 20px (lišty, menu, okna) · `--blur-lg` 36px (celoobrazovková skla).
 Nový efekt = jen tyto tokeny.
 
+## Kroužek při ovládání klávesnicí
+Jedno pravidlo: `--focus-ring` (2px bílá čára) a odstup `--focus-gap` (2px). Platí globálně pro `:focus-visible`; konkrétní prvky ho jen používají (`outline: var(--focus-ring)`), nevymýšlí vlastní barvy ani tloušťky. Textová pole zvýrazňují při zaměření okraj.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.

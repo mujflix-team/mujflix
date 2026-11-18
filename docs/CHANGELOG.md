@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.104
+### Změněno
+- **Designový systém – kroužek při ovládání klávesnicí:** jedno pravidlo `--focus-ring` / `--focus-gap` (bílý kroužek 2 px, odstup 2 px). Dřív globální modré pravidlo s `!important` přebíjelo bílé kroužky u jednotlivých prvků, takže vzhled byl nahodilý. Pravidla v `docs/DESIGN.md`.
+
 ## 3.21.103
 ### Změněno
 - **Designový systém – efekty:** zvětšení při najetí (38 míst) je 4 tokeny `--fx-hover-*`, stisk (19 míst) 2 tokeny `--fx-press*` a rozmazání pozadí (87 míst, dřív 15 různých hodnot) 3 tokeny `--blur-sm/md/lg`. Rozdíly jsou nepatrné. Pravidla v `docs/DESIGN.md`.
