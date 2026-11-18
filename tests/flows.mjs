@@ -1637,6 +1637,8 @@ const fontT = await page.evaluate(() => {
   return { fams: [...new Set(sel.map(fam))], tok: getComputedStyle(document.documentElement).getPropertyValue("--fs-md").trim() };
 });
 check("písmo: všude jedna rodina (Inter Variable) a existují tokeny velikostí", fontT.fams.length === 1 && /Inter Variable/.test(fontT.fams[0]) && fontT.tok === "0.92rem", JSON.stringify(fontT));
+const fxT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--fx-hover-md").trim(), r.getPropertyValue("--fx-press").trim(), r.getPropertyValue("--blur-md").trim()]; });
+check("efekty: existují tokeny --fx-* a --blur-*", fxT.join() === "1.06,.96,20px", JSON.stringify(fxT));
 const pullT = await page.evaluate(async () => {
   window.ontouchstart = null; document.documentElement.classList.add("mfh-home-on"); window.scrollTo(0, 0);
   let n = 0; window.mfhRefresh = () => { n++; };

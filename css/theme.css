@@ -41,7 +41,7 @@ html.mfh-home-on #mfHeader { display: none !important; }
 #nfTop .nf-icon-btn { color: #fff !important; }
 #nfTop .nf-icon-btn svg { stroke: currentColor !important; fill: none !important; }
 #nfTop .nf-icon-btn:hover { background: var(--w-2); }
-#nfTop .nf-icon-btn:active { transform: scale(0.92); }
+#nfTop .nf-icon-btn:active { transform: scale(var(--fx-press-sm)); }
 #nfTop .nf-avatar {
   width: 34px; height: 34px; margin-left: 8px; border: 0; border-radius: var(--r-media); cursor: pointer; padding: 0;
   background: var(--nf-avatar, var(--c-accent)); font-size: var(--fs-lg); line-height: 1;
@@ -143,7 +143,7 @@ html body.discover-open #mfDock { display: none !important; }
   border: 0; border-radius: var(--r-media); cursor: pointer; font-family: inherit; font-size: var(--fs-base); font-weight: 700; line-height: 1;
   transition: background var(--t-fast), transform var(--t-fast);
 }
-.nf-btn:active { transform: scale(0.97); }
+.nf-btn:active { transform: scale(var(--fx-press)); }
 .nf-btn-primary { background: #fff; color: #000; }
 .nf-btn-primary:hover { background: var(--w-6); }
 .nf-btn-ghost { background: rgba(109, 109, 110, 0.7); color: #fff; }
@@ -182,7 +182,7 @@ html body.discover-open #mfDock { display: none !important; }
 }
 .nf-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .nf-card:hover { z-index: 4; }
-.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(1.08); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(var(--fx-hover-md)); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
 .nf-card:focus-visible .nf-poster { outline: 2px solid #fff; outline-offset: 2px; }
 .nf-card-info { padding: 8px 2px 0; }
 .nf-card-title {
@@ -277,7 +277,7 @@ html body #seriesModal .btn-shuffle:hover { background: rgba(109, 109, 110, 0.45
 html body #seriesModal #modalFindBtn { color: #fff !important; }
 html body #seriesModal .close-btn { background: var(--c-surface) !important; border: 0 !important; box-shadow: none !important; color: #fff !important; }
 html body #seriesModal .ssv-card { border: 0 !important; border-radius: var(--r-media) !important; box-shadow: none !important; background: var(--c-surface-2) !important; transition: transform var(--t-base) ease !important; }
-html body #seriesModal .ssv-card:hover { transform: scale(1.05) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important; }
+html body #seriesModal .ssv-card:hover { transform: scale(var(--fx-hover-md)) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important; }
 html body #seriesModal .ssv-card.ssv-active { outline: 2px solid #fff; outline-offset: 0; box-shadow: none !important; }
 html body #seriesModal .season-all-btn{
   background: rgba(109, 109, 110, 0.4) !important; border: 0 !important; border-radius: var(--r-ctl) !important; color: #fff !important; box-shadow: none !important;
@@ -341,7 +341,7 @@ html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchli
   background: none; color: #fff; display: inline-flex; align-items: center; justify-content: center; transition: background var(--t-fast), transform var(--t-fast);
 }
 #mfStandaloneCinemaClose:hover { background: var(--w-3); }
-#mfStandaloneCinemaClose:active { transform: scale(0.92); }
+#mfStandaloneCinemaClose:active { transform: scale(var(--fx-press-sm)); }
 #mfStandaloneCinema .mf-standalone-cinema-top strong {
   font-size: clamp(1rem, 1.4vw, 1.25rem); font-weight: 700; letter-spacing: -0.01em; color: #fff;
   max-width: min(36vw, 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -355,7 +355,7 @@ html body #watchlistOverlay.watchlist-overlay .watchlist-box, html body #watchli
 }
 #mfStandaloneCinema .mf-cin-ep-btn:hover,
 #mfStandaloneCinema .mf-cin-fav-btn:hover{ background: rgba(109, 109, 110, 0.85); }
-#mfStandaloneCinema .mf-cin-ep-btn:active, #mfStandaloneCinema .mf-cin-fav-btn:active { transform: scale(0.97); }
+#mfStandaloneCinema .mf-cin-ep-btn:active, #mfStandaloneCinema .mf-cin-fav-btn:active { transform: scale(var(--fx-press)); }
 #mfStandaloneCinema .mf-cin-ep-pick, #mfStandaloneCinema #mfCinNextEp { background: #fff; color: #000; }
 #mfStandaloneCinema .mf-cin-ep-pick:hover, #mfStandaloneCinema #mfCinNextEp:hover { background: var(--w-6); }
 #mfStandaloneCinema .mf-cin-fav-btn.faved { background: var(--w-3); color: #fff; }
@@ -650,7 +650,7 @@ html body #seriesModal #ssvGrid .ssv-card {
 }
 html body #seriesModal #ssvGrid .ssv-card::after { display: none !important; content: none !important; }
 html body #seriesModal #ssvGrid .ssv-card img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0 !important; filter: none !important; transform: none !important; }
-html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(1.04) !important; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important; z-index: 2; }
+html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(var(--fx-hover-sm)) !important; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important; z-index: 2; }
 html body #seriesModal #ssvGrid .ssv-card.ssv-active { outline: 2px solid #fff !important; outline-offset: -2px; }
 html body #seriesModal #ssvGrid .ssv-num { color: #fff !important; font-size: var(--fs-base) !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; margin: 0 !important; }
 html body #seriesModal #ssvGrid .ssv-name { display: none !important; }
@@ -690,7 +690,7 @@ html body *:not(svg):not(svg *):not(code):not(pre):not(#mfFontLock) { font-famil
   html body #seriesModal #episodesGrid .episode-card:hover { background: transparent !important; }
 }
 @media (hover: hover) and (pointer: fine) {
-  html body #seriesModal #ssvGrid .ssv-card:hover { transform: scale(1.02) !important; }
+  html body #seriesModal #ssvGrid .ssv-card:hover { transform: scale(var(--fx-hover-sm)) !important; }
 }
 
 /* Výkon: dlouhé seznamy se vykreslují až při zobrazení, rozmazání pozadí (drahé na GPU) jen na stolním počítači */
@@ -751,7 +751,7 @@ html body #mfProfileCreate .pc-av-strip { display: flex; gap: var(--sp-3); overf
 html body #mfProfileCreate .pc-av-strip::-webkit-scrollbar { display: none; }
 html body #mfProfileCreate .pc-av-strip .pc-avatar-option { flex: none; width: clamp(84px, 9vw, 120px); scroll-snap-align: start; border-radius: var(--r-ctl) !important; overflow: hidden; }
 html body #mfProfileCreate .pc-av-strip .pc-avatar-option img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-ctl) !important; transition: transform var(--t-fast); }
-html body #mfProfileCreate .pc-av-strip .pc-avatar-option:hover img, html body #mfProfileCreate .pc-av-strip .pc-avatar-option:focus-visible img { transform: scale(1.06); outline: 3px solid #fff; }
+html body #mfProfileCreate .pc-av-strip .pc-avatar-option:hover img, html body #mfProfileCreate .pc-av-strip .pc-avatar-option:focus-visible img { transform: scale(var(--fx-hover-md)); outline: 3px solid #fff; }
 html body #mfProfileCreate .pc-av-strip .pc-avatar-option { display: flex; flex-direction: column; gap: var(--sp-2); overflow: visible; }
 html body #mfProfileCreate .pc-av-cap { display: block; font-size: var(--fs-xs); color: var(--c-text-3); text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 
@@ -804,7 +804,7 @@ html body #mfProfileGate .pg-remove-btn {
   background: #e50914 !important; color: #fff !important; border: 3px solid var(--c-bg) !important; font-size: var(--fs-3xl) !important; line-height: var(--h-sm) !important; padding: 0 !important;
   display: grid; place-items: center; cursor: pointer; z-index: 5; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
 }
-html body #mfProfileGate .pg-remove-btn:hover { background: #ff2a35 !important; transform: scale(1.08); }
+html body #mfProfileGate .pg-remove-btn:hover { background: #ff2a35 !important; transform: scale(var(--fx-hover-md)); }
 @media (max-width: 640px) { html body #mfProfileGate .pg-remove-btn { width: 44px !important; height: var(--h-lg) !important; top: -16px !important; right: -16px !important; } }
 /* Smazat profil v úpravě */
 html body #mfProfileCreate .pc-btn-delete { background: transparent !important; border: 1px solid #5a1a1f !important; color: var(--c-danger) !important; border-radius: var(--r-ctl) !important; padding: 0 22px; height: var(--h-xl); font-size: var(--fs-base); cursor: pointer; margin-right: auto; }
@@ -985,7 +985,7 @@ html body #watchlistOverlay .wl-list { grid-template-columns: repeat(auto-fill, 
 html body #watchlistOverlay .wl-card { gap: 0; }
 html body #watchlistOverlay .wl-card-poster { border-radius: var(--r-media); border: 0; background: linear-gradient(160deg, var(--c-surface), #131313); transition: transform var(--t-base) ease, box-shadow var(--t-base) ease; }
 html body #watchlistOverlay .wl-card:hover { z-index: 4; position: relative; }
-html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(1.08); border: 0; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
+html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(var(--fx-hover-md)); border: 0; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7); }
 html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { outline: 2px solid #fff; outline-offset: 2px; }
 html body #watchlistOverlay .wl-card-name { margin: 0; padding: 8px 2px 0; font-size: var(--fs-sm); font-weight: 600; line-height: 1.25; color: var(--c-text-2); }
 html body #watchlistOverlay .wl-card-badge { border-radius: var(--r-xs); background: rgba(0, 0, 0, 0.7); backdrop-filter: none; font-size: var(--fs-xs); padding: 3px 6px; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -999,8 +999,8 @@ html body #watchlistOverlay .wl-card-play-btn {
   transition: color var(--t-base) ease, transform var(--t-base) var(--ease-spring);
 }
 html body #watchlistOverlay .wl-card-play-btn svg { display: block; margin-left: 4px; }
-html body #watchlistOverlay .wl-card-play-btn:hover { color: #fff; transform: scale(1.2); }
-html body #watchlistOverlay .wl-card-play-btn:active { transform: scale(0.95); }
+html body #watchlistOverlay .wl-card-play-btn:hover { color: #fff; transform: scale(var(--fx-hover-xl)); }
+html body #watchlistOverlay .wl-card-play-btn:active { transform: scale(var(--fx-press)); }
 @media (hover: none) { html body #watchlistOverlay .wl-card-play { display: none; } }
 @media (prefers-reduced-motion: reduce) { html body #watchlistOverlay .wl-card-play-btn { transition: none; } html body #watchlistOverlay .wl-card-play-btn:hover, html body #watchlistOverlay .wl-card-play-btn:active { transform: none; } }
 html body #watchlistOverlay .wl-empty-btn { border-radius: var(--r-ctl); }
@@ -1016,7 +1016,7 @@ html body #watchlistOverlay .wl-empty-btn { border-radius: var(--r-ctl); }
 .nf-trailer.away { opacity: 0; transform: translateY(-8px) scale(0.96); pointer-events: none; }
 .nf-tr-open { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; color: #fff; }
 .nf-tr-open img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; transition: opacity var(--t-base), transform var(--t-slow); }
-.nf-tr-open:hover img { opacity: 1; transform: scale(1.04); }
+.nf-tr-open:hover img { opacity: 1; transform: scale(var(--fx-hover-sm)); }
 .nf-tr-play { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid var(--w-6); display: flex; align-items: center; justify-content: center; }
 .nf-tr-label { position: absolute; left: 8px; bottom: 6px; font-size: var(--fs-xs); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; text-shadow: 0 1px 4px #000; }
 .nf-trailer.playing .nf-tr-open { display: none; }
@@ -1058,7 +1058,7 @@ html body #seriesModal .sd-sim-title { font-size: var(--fs-lg); font-weight: 800
 html body #seriesModal .sd-sim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(110px, 12vw, 170px), 1fr)); gap: 18px 12px; }
 html body #seriesModal .sd-sim-card { padding: 0; border: 0; background: transparent; color: var(--c-text-2); text-align: left; cursor: pointer; font: inherit; }
 html body #seriesModal .sd-sim-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: var(--r-media); display: block; background: var(--c-surface); transition: transform var(--t-base); }
-html body #seriesModal .sd-sim-card:hover img { transform: scale(1.05); }
+html body #seriesModal .sd-sim-card:hover img { transform: scale(var(--fx-hover-md)); }
 html body #seriesModal .sd-sim-card span { display: block; margin-top: 6px; font-size: var(--fs-sm); font-weight: 600; }
 
 /* ===== Detail seriálu na celou obrazovku (jako na TV): vlevo název, popis, tlačítka; díly až po „Další epizody“ ===== */
@@ -1134,7 +1134,7 @@ html body .nf-hero-desc.is-open.is-scrollable, html body #seriesModal .sd-overvi
 @keyframes mfDescOpen { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 html body .nf-hero-desc.is-open {
   padding: 14px 18px; border-radius: var(--r-modal); background: rgba(12, 12, 14, 0.55);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(var(--blur-md)); backdrop-filter: blur(var(--blur-md));
   text-shadow: none; line-height: 1.6; animation: mfDescOpen var(--t-base) ease both;
 }
 @media (min-width: 900px) {
@@ -1147,7 +1147,7 @@ html body .nf-hero-desc.is-open {
     width: min(560px, 40vw); min-height: 0; max-height: max(260px, calc(100% - var(--mf-pb) - 300px));
     padding: 20px 24px; font-size: var(--fs-base); line-height: 1.6; text-shadow: none;
     background: linear-gradient(180deg, rgba(14, 14, 16, 0.62), rgba(14, 14, 16, 0.78));
-    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(var(--blur-md)); backdrop-filter: blur(var(--blur-md));
     border-left: 3px solid var(--w-5); border-radius: var(--r-ctl) var(--r-panel) var(--r-panel) var(--r-ctl);
   }
 }
@@ -1171,8 +1171,8 @@ html body .nf-hero-desc.is-open {
 .nf-play-btn { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; color: var(--w-5); filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)); transition: color var(--t-base) ease, transform var(--t-base) var(--ease-spring); }
 .nf-play-btn svg { display: block; margin-left: 4px; }
 .nf-card:hover .nf-play, .nf-card:focus-visible .nf-play { opacity: 1; background: rgba(0, 0, 0, 0.3); }
-.nf-play-btn:hover { color: #fff; transform: scale(1.2); }
-.nf-play-btn:active { transform: scale(0.95); }
+.nf-play-btn:hover { color: #fff; transform: scale(var(--fx-hover-xl)); }
+.nf-play-btn:active { transform: scale(var(--fx-press)); }
 @media (hover: none) { .nf-play { display: none; } }
 @media (prefers-reduced-motion: reduce) { .nf-play, .nf-play-btn { transition: none; } .nf-play-btn:hover, .nf-play-btn:active { transform: none; } }
 
@@ -1384,9 +1384,9 @@ html body.mf-section-protebe #nfTop, html body:has(#watchlistOverlay.visible) #n
 /* ───────── Klidnější aplikace (v3.3) – nic se nehýbe, dokud o to člověk nestojí ───────── */
 .nf-row, .nf-quick { animation: none !important; }
 .nf-hero { animation: none; }
-.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(1.03); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
-html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(1.03); }
-html body #seriesModal .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(1.02) !important; }
+.nf-card:hover .nf-poster, .nf-card:focus-visible .nf-poster { transform: scale(var(--fx-hover-sm)); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+html body #watchlistOverlay .wl-card:hover .wl-card-poster, html body #watchlistOverlay .wl-card:focus-visible .wl-card-poster { transform: scale(var(--fx-hover-sm)); }
+html body #seriesModal .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:hover, html body #seriesModal #ssvGrid .ssv-card:focus-visible { transform: scale(var(--fx-hover-sm)) !important; }
 .nf-tr-open:hover img { transform: none; }
 html body #mfDock.mf-dock.mf-dock-hidden { transform: none !important; }
 .nf-hero-bg { animation-duration: var(--t-slow); }
@@ -1529,7 +1529,7 @@ html body #seriesModal #episodesGrid .episode-card:hover, html body #seriesModal
 html body #seriesModal #episodesGrid .episode-card::before, html body #seriesModal #episodesGrid .episode-card::after { display: none !important; content: none !important; }
 html body #seriesModal #episodesGrid .ep-thumb { width: 100% !important; max-width: none !important; min-width: 0 !important; height: auto !important; aspect-ratio: 16 / 9; border-radius: var(--r-panel) !important; overflow: hidden; background: var(--c-surface); box-shadow: none; position: relative; }
 html body #seriesModal #episodesGrid .ep-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity var(--t-xslow) ease calc(var(--i, 0) * 45ms), transform var(--t-base) ease, filter var(--t-base); }
-html body #seriesModal #episodesGrid .episode-card:hover .ep-thumb img { transform: scale(1.04); }
+html body #seriesModal #episodesGrid .episode-card:hover .ep-thumb img { transform: scale(var(--fx-hover-sm)); }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb img { filter: grayscale(1) brightness(0.25) !important; }
 /* Zhlédnutá epizoda: náhled je skoro černý (černobílý, ~25 % jasu), ale pořád trochu vidět; při najetí zešedne (~60 % jasu). */
 html body #seriesModal #episodesGrid .episode-card.watched:hover .ep-thumb img { filter: grayscale(1) brightness(0.6) !important; }
@@ -1559,8 +1559,8 @@ html body #seriesModal #episodesGrid .ep-thumb::before { content: none !importan
 html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play { position: absolute !important; inset: auto !important; left: 50% !important; top: 50% !important; width: 64px !important; height: 64px !important; margin: -32px 0 0 -32px !important; display: flex !important; align-items: center; justify-content: center; background: none !important; border-radius: 0 !important; opacity: 1 !important; pointer-events: auto !important; cursor: pointer; z-index: 4; }
 html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring { display: flex !important; width: auto !important; height: auto !important; border: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; transform: none !important; }
 html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play .ep-play-ring svg { display: block; width: 30px !important; height: 36px !important; margin: 0 0 0 4px !important; fill: var(--w-5) !important; filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)); transition: fill var(--t-base) ease, transform var(--t-base) var(--ease-spring) !important; }
-html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play:hover .ep-play-ring svg { fill: #fff !important; transform: scale(1.2); }
-html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play:active .ep-play-ring svg { transform: scale(0.95); }
+html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play:hover .ep-play-ring svg { fill: #fff !important; transform: scale(var(--fx-hover-xl)); }
+html body #seriesModal #episodesGrid .episode-card .ep-thumb .ep-hover-play:active .ep-play-ring svg { transform: scale(var(--fx-press)); }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb .ep-hover-play .ep-play-ring svg { fill: var(--w-4) !important; }
 html body #seriesModal #episodesGrid .episode-card.watched .ep-thumb .ep-hover-play:hover .ep-play-ring svg { fill: #fff !important; }
 @media (max-width: 700px) {
@@ -1910,7 +1910,7 @@ html body .nf-row .nf-card:nth-child(6) { animation-delay: .2s; }
 html body .nf-row .nf-card:nth-child(n+7) { animation-delay: .24s; }
 html body #seriesModal #episodesGrid .episode-card, html body #seriesModal .sd-sim-card { transition: transform var(--t-base) ease, opacity var(--t-base) ease; }
 html body .nf-btn, html body .nf-chip, html body #seriesModal .sd-tab, html body #seriesModal .sd-season { transition: background var(--t-base) ease, color var(--t-base) ease, border-color var(--t-base) ease, transform var(--t-fast) ease; }
-html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #seriesModal .sd-season:active { transform: scale(0.96); }
+html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #seriesModal .sd-season:active { transform: scale(var(--fx-press)); }
 @media (prefers-reduced-motion: reduce) {
   html body .modal-overlay.visible .modal-content, html body .nf-row .nf-card { animation: none !important; }
 }
@@ -1992,8 +1992,8 @@ html body #mfLogoAsk .la-chk input { accent-color: #e50914; margin: 0; }
 .nf-tr-play, html body #seriesModal .sd-trailer-play { width: 64px; height: 64px; margin: -32px 0 0 -32px; border: 0; border-radius: 0; background: none; }
 .nf-tr-play svg, html body #seriesModal .sd-trailer-play svg { display: block; width: 30px; height: 36px; margin: 0 0 0 4px; fill: var(--w-5); filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.7)); transition: fill var(--t-base) ease, transform var(--t-base) var(--ease-spring); }
 .nf-tr-open:hover .nf-tr-play svg, .nf-tr-open:focus-visible .nf-tr-play svg,
-html body #seriesModal .sd-trailer-btn:hover .sd-trailer-play svg, html body #seriesModal .sd-trailer-btn:focus-visible .sd-trailer-play svg { fill: #fff; transform: scale(1.2); }
-.nf-tr-open:active .nf-tr-play svg, html body #seriesModal .sd-trailer-btn:active .sd-trailer-play svg { transform: scale(0.95); }
+html body #seriesModal .sd-trailer-btn:hover .sd-trailer-play svg, html body #seriesModal .sd-trailer-btn:focus-visible .sd-trailer-play svg { fill: #fff; transform: scale(var(--fx-hover-xl)); }
+.nf-tr-open:active .nf-tr-play svg, html body #seriesModal .sd-trailer-btn:active .sd-trailer-play svg { transform: scale(var(--fx-press)); }
 @media (max-width: 700px) {
   .nf-tr-play, html body #seriesModal .sd-trailer-play { width: 52px; height: 52px; margin: -26px 0 0 -26px; }
   .nf-tr-play svg, html body #seriesModal .sd-trailer-play svg { width: 24px; height: 29px; }
