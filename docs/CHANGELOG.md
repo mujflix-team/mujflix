@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.104
+### Opraveno
+- **Obnovení doporučení na Domů** (stažení dolů i druhé klepnutí na Domů) teď opravdu změní karty: každé obnovení načte jinou stránku žebříčků, jiný výběr „Vybráno pro tebe“, jiné pořadí „Protože jsi viděl…“ a jiný banner. Dřív se jen vypsal text a stejná data z paměti se vykreslila znovu.
+
 ## 3.21.103
 ### Změněno
 - **Designový systém – efekty:** zvětšení při najetí (38 míst) je 4 tokeny `--fx-hover-*`, stisk (19 míst) 2 tokeny `--fx-press*` a rozmazání pozadí (87 míst, dřív 15 různých hodnot) 3 tokeny `--blur-sm/md/lg`. Rozdíly jsou nepatrné. Pravidla v `docs/DESIGN.md`.
