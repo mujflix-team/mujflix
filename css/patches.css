@@ -2,7 +2,7 @@
 .pc-pin-row {
   display: flex !important;
   justify-content: center !important;
-  gap: 12px !important;
+  gap: var(--sp-3) !important;
   margin: 4px 0 26px !important;
 }
 .pc-pin-digit {
@@ -50,10 +50,10 @@
   margin-top: 4px !important;
 }
 .pg-profiles {
-  gap: 26px !important;
+  gap: var(--sp-5) !important;
 }
 .pg-profile-item {
-  gap: 10px !important;
+  gap: var(--sp-3) !important;
 }
 .pg-avatar {
   width: 92px !important;
@@ -190,7 +190,7 @@
 }
 
 #seriesModal .panel-btns {
-  gap: 8px !important;
+  gap: var(--sp-2) !important;
 }
 #seriesModal .btn-shuffle {
   background: var(--w-1) !important;
@@ -287,25 +287,25 @@
   height: min(86vh, 900px) !important;
   max-height: 92vh !important;
   padding: 28px 30px 24px !important;
-  gap: 18px !important;
+  gap: var(--sp-4) !important;
   border-radius: var(--r-sheet) !important;
   background: rgba(14, 14, 22, 0.98) !important;
   border: 1px solid var(--w-2) !important;
   box-shadow: 0 50px 120px rgba(0, 0, 0, 0.9) !important;
 }
-#watchlistOverlay .wl-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-#watchlistOverlay .wl-title-wrap { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+#watchlistOverlay .wl-header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+#watchlistOverlay .wl-title-wrap { display: flex; align-items: baseline; gap: var(--sp-3); min-width: 0; }
 #watchlistOverlay .wl-title { font-size: var(--fs-3xl) !important; font-weight: 800 !important; letter-spacing: -0.6px !important; color: #fff !important; }
 #watchlistOverlay .wl-count { font-size: var(--fs-sm); color: var(--w-4); white-space: nowrap; }
 #watchlistOverlay .wl-close { width: 44px !important; height: 44px !important; flex: none; font-size: var(--fs-base) !important; }
-#watchlistOverlay .wl-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+#watchlistOverlay .wl-tools { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
 #watchlistOverlay .wl-search {
   flex: 1 1 220px; min-width: 0; padding: 12px 16px; border-radius: var(--r-modal);
   background: var(--w-1); border: 1px solid var(--w-2);
   color: #fff; font-size: var(--fs-md); outline: none; font-family: inherit;
 }
 #watchlistOverlay .wl-search:focus { border-color: var(--c-accent-a3); background: var(--w-2); }
-#watchlistOverlay .wl-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+#watchlistOverlay .wl-tabs { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
 #watchlistOverlay .wl-tab {
   padding: 10px 16px; border-radius: var(--r-pill); cursor: pointer; font-family: inherit;
   background: var(--w-1); border: 1px solid var(--w-2);
@@ -318,7 +318,7 @@
   display: grid !important; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 20px 16px; align-content: start; -webkit-overflow-scrolling: touch;
 }
-#watchlistOverlay .wl-card { cursor: pointer; outline: none; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+#watchlistOverlay .wl-card { cursor: pointer; outline: none; display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
 #watchlistOverlay .wl-card-poster {
   position: relative; aspect-ratio: 2 / 3; border-radius: var(--r-sheet); overflow: hidden;
   background: linear-gradient(160deg, #262636, #14141e); border: 1px solid var(--w-1);
@@ -353,7 +353,7 @@
 }
 #watchlistOverlay .wl-empty {
   grid-column: 1 / -1; display: none; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; gap: 12px; padding: 60px 20px; font-size: var(--fs-base) !important; line-height: 1.5; color: var(--w-5) !important;
+  text-align: center; gap: var(--sp-3); padding: 60px 20px; font-size: var(--fs-base) !important; line-height: 1.5; color: var(--w-5) !important;
 }
 #watchlistOverlay .wl-empty-icon { font-size: 3.5rem; }
 #watchlistOverlay .wl-empty-btn {

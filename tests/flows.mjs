@@ -1648,6 +1648,8 @@ const pullT = await page.evaluate(async () => {
   return { short, long };
 });
 check("stažení dolů na Domů: krátké tažení nic, dlouhé obnoví doporučení", pullT.short === 0 && pullT.long === 1, JSON.stringify(pullT));
+const hspT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--h-lg").trim(), r.getPropertyValue("--h-xl").trim(), r.getPropertyValue("--sp-2").trim(), r.getPropertyValue("--sp-4").trim()]; });
+check("výšky a mezery: existují tokeny --h-* a --sp-*", hspT.join() === "44px,48px,8px,16px", JSON.stringify(hspT));
 
 const onlyAnimeT = await page.evaluate(async () => {
   const origFetch = window.fetch; const urls = [];
