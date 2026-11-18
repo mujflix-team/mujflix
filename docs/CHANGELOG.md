@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.21.101
+### Nově
+- **Stažení dolů na Domů (telefon):** když jsi úplně nahoře a přetáhneš prstem dolů, objeví se kolečko a po puštění se obnoví doporučení (jako na Instagramu).
+
+### Opraveno
+- Návrat do PWA z paměti prohlížeče (gesto zpět) už nenechá prázdnou šedou obrazovku, stránka se v takovém případě načte znovu.
+
 ## 3.21.99
 ### Změněno
 - **Designový systém – výšky a mezery:** výšky ovládacích prvků (~60 míst) jsou teď jen 4 tokeny `--h-sm/md/lg/xl` (32/40/44/48 px) místo 13 různých čísel a mezery `gap` (~200 míst) jedna škála `--sp-1…5` (4/8/12/16/24 px). Rozdíly jsou max. pár pixelů. Pravidla v `docs/DESIGN.md`.
