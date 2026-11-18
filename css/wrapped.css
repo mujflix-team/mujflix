@@ -23,8 +23,8 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped { background: #0a0a0a; } /* jedna plochá barva, každý slide stejně */
 
 /* Horní lišta: postup a křížek */
-#mfWrapped .mfw-top { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; padding: calc(env(safe-area-inset-top, 0px) + 14px) var(--mfw-pad) 0; }
-#mfWrapped .mfw-prog { flex: 1; display: flex; gap: 4px; }
+#mfWrapped .mfw-top { position: relative; z-index: 2; display: flex; align-items: center; gap: var(--sp-4); padding: calc(env(safe-area-inset-top, 0px) + 14px) var(--mfw-pad) 0; }
+#mfWrapped .mfw-prog { flex: 1; display: flex; gap: var(--sp-1); }
 #mfWrapped .mfw-prog i { flex: 1; height: 3px; border-radius: var(--r-xs); background: var(--w-4); transition: background var(--t-base) ease; }
 #mfWrapped .mfw-prog i.on { background: #fff; }
 #mfWrapped .mfw-x { flex: none; width: var(--mf-x, 44px); height: 44px; display: grid; place-items: center; padding: 0; border: 0; border-radius: var(--r-modal); background: rgba(0, 0, 0, 0.28); color: #fff; cursor: pointer; }
@@ -32,7 +32,7 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 
 /* Slide */
 #mfWrapped .mfw-stage { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; padding: 20px var(--mfw-pad); overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; cursor: pointer; }
-#mfWrapped .mfw-slide { margin: auto; width: min(640px, 100%); min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+#mfWrapped .mfw-slide { margin: auto; width: min(640px, 100%); min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-4); }
 #mfWrapped .mfw-slide > * { margin: 0; animation: mfwIn var(--t-xslow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 80ms); }
 @keyframes mfwIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
@@ -52,13 +52,13 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-poster-ph { display: grid; place-items: center; font-size: 3rem; font-weight: 900; color: var(--w-5); }
 
 /* Seznamy a sloupce */
-#mfWrapped .mfw-list { list-style: none; padding: 0; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
-#mfWrapped .mfw-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: var(--r-modal); background: var(--w-1); }
+#mfWrapped .mfw-list { list-style: none; padding: 0; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
+#mfWrapped .mfw-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: 10px 14px; border-radius: var(--r-modal); background: var(--w-1); }
 #mfWrapped .mfw-list li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #mfWrapped .mfw-list li b { flex: none; font-weight: 900; font-variant-numeric: tabular-nums; }
 #mfWrapped .mfw-barswrap { width: 100%; }
-#mfWrapped .mfw-bars { list-style: none; margin: 4px 0 0; padding: 0; width: 100%; display: grid; gap: 12px; }
-#mfWrapped .mfw-bars li { display: grid; grid-template-columns: minmax(104px, 34%) 1fr auto; align-items: center; gap: 12px; font-size: var(--fs-md); }
+#mfWrapped .mfw-bars { list-style: none; margin: 4px 0 0; padding: 0; width: 100%; display: grid; gap: var(--sp-3); }
+#mfWrapped .mfw-bars li { display: grid; grid-template-columns: minmax(104px, 34%) 1fr auto; align-items: center; gap: var(--sp-3); font-size: var(--fs-md); }
 #mfWrapped .mfw-bl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 #mfWrapped .mfw-bt { height: 14px; border-radius: var(--r-media); background: var(--w-2); overflow: hidden; }
 #mfWrapped .mfw-bt i { display: block; height: 100%; width: 0; border-radius: var(--r-media); background: var(--c-accent); transition: width 0.9s var(--ease-out) 0.25s; }
@@ -66,13 +66,13 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-bars b { font-weight: 900; font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: right; }
 
 /* Čísla */
-#mfWrapped .mfw-stats { width: 100%; display: grid; gap: 12px; }
-#mfWrapped .mfw-stat { display: grid; grid-template-columns: minmax(2.2em, auto) 1fr; align-items: center; gap: 16px; padding: 14px 18px; border-radius: var(--r-modal); background: var(--w-1); }
+#mfWrapped .mfw-stats { width: 100%; display: grid; gap: var(--sp-3); }
+#mfWrapped .mfw-stat { display: grid; grid-template-columns: minmax(2.2em, auto) 1fr; align-items: center; gap: var(--sp-4); padding: 14px 18px; border-radius: var(--r-modal); background: var(--w-1); }
 #mfWrapped .mfw-stat b { font-size: clamp(2.4rem, 9vw, 3.6rem); line-height: 1; font-weight: 900; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 #mfWrapped .mfw-stat span { font-size: var(--fs-base); font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
 
 /* Filmy */
-#mfWrapped .mfw-films { width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+#mfWrapped .mfw-films { width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
 #mfWrapped .mfw-films figure { margin: 0; min-width: 0; }
 #mfWrapped .mfw-films .mfw-poster { width: 100%; }
 #mfWrapped .mfw-films figcaption { margin-top: 6px; font-size: var(--fs-sm); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -85,22 +85,22 @@ html.mfw-lock, html.mfw-lock body { overflow: hidden; }
 #mfWrapped .mfw-card b { display: block; margin-top: 2px; font-size: clamp(1.2rem, 4.2vw, 1.7rem); font-weight: 900; line-height: 1.15; overflow-wrap: anywhere; }
 
 /* Výběr měsíce */
-#mfWrapped .mfw-pick { display: grid; gap: 6px; font-size: var(--fs-sm); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
-#mfWrapped .mfw-select { height: 44px; min-width: 200px; padding: 0 12px; border-radius: var(--r-modal); border: 1px solid var(--w-5); background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-size: var(--fs-base); letter-spacing: 0; text-transform: none; cursor: pointer; }
+#mfWrapped .mfw-pick { display: grid; gap: var(--sp-2); font-size: var(--fs-sm); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
+#mfWrapped .mfw-select { height: var(--h-lg); min-width: 200px; padding: 0 12px; border-radius: var(--r-modal); border: 1px solid var(--w-5); background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-size: var(--fs-base); letter-spacing: 0; text-transform: none; cursor: pointer; }
 
 /* Tlačítka */
-#mfWrapped .mfw-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-#mfWrapped .mfw-btn { min-height: 44px; padding: 0 18px; border: 0; border-radius: var(--r-modal); background: var(--w-3); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+#mfWrapped .mfw-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: 6px; }
+#mfWrapped .mfw-btn { min-height: var(--h-lg); padding: 0 18px; border: 0; border-radius: var(--r-modal); background: var(--w-3); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 #mfWrapped .mfw-btn:hover { background: var(--w-4); }
 #mfWrapped .mfw-btn-main { background: #fff; color: var(--c-bg); }
 #mfWrapped .mfw-btn-main:hover { background: var(--c-text-2); }
 #mfWrapped .mfw-btn[hidden] { display: none; }
 #mfWrapped .mfw-btn:disabled { opacity: 0.35; pointer-events: none; }
-#mfWrapped .mfw-nav { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: 10px; padding: 8px var(--mfw-pad) calc(env(safe-area-inset-bottom, 0px) + 18px); }
+#mfWrapped .mfw-nav { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: var(--sp-3); padding: 8px var(--mfw-pad) calc(env(safe-area-inset-bottom, 0px) + 18px); }
 #mfWrapped :is(button, select):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 @media (max-width: 480px) {
-  #mfWrapped .mfw-bars li { grid-template-columns: minmax(92px, 36%) 1fr auto; gap: 10px; }
+  #mfWrapped .mfw-bars li { grid-template-columns: minmax(92px, 36%) 1fr auto; gap: var(--sp-3); }
   #mfWrapped .mfw-card { padding: 16px; gap: 14px 16px; }
 }
 
