@@ -69,6 +69,17 @@ Jedna rodina `--font` = **Inter Variable** (přibalený ve `/fonts`, takže vypa
 
 Tloušťky: 400 běžný · 500 střední · 600 polotučný · 700 tučný · 800 nadpisy · 900 logo/hero (jiné hodnoty typu 425 nebo 750 se nepoužívají). Hero titulky a `clamp()` velikosti zůstávají vlastní.
 
+## Výšky a mezery – tokeny na začátku `css/styles.css`
+| Token | Hodnota | Použití |
+|---|---|---|
+| `--h-sm` | 32px | kompaktní prvky (štítky, malá tlačítka) |
+| `--h-md` | 40px | běžné ovládací prvky |
+| `--h-lg` | 44px | dotykový cíl, výchozí na telefonu |
+| `--h-xl` | 48px | hlavní tlačítka (Přehrát, Pokračovat) |
+
+Mezery (`gap`): `--sp-1` 4px · `--sp-2` 8px · `--sp-3` 12px · `--sp-4` 16px · `--sp-5` 24px.
+Nová výška ovládacího prvku nebo `gap` = jen tyto tokeny, žádná „náhodná" čísla.
+
 ## Tlačítka
 - **Primární** (jedno na obrazovku): bílé, černý text, `--r-ctl`, výška 48 px (v menších oknech 44–46 px).
 - **Sekundární**: plná šedá `rgba(109,109,110,.7)`, bílý text, `--r-ctl`.

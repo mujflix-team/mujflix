@@ -16,6 +16,10 @@
    jedna rodina (Inter Variable je přibalený v /fonts, na všech zařízeních stejný) · velikosti xs…4xl */
 :root { --font: "Inter Variable", "Helvetica Neue", Helvetica, "Segoe UI", Roboto, Arial, sans-serif;
   --fs-xs: 0.72rem; --fs-sm: 0.82rem; --fs-md: 0.92rem; --fs-base: 1rem; --fs-lg: 1.12rem; --fs-xl: 1.25rem; --fs-2xl: 1.5rem; --fs-3xl: 1.8rem; --fs-4xl: 2.2rem; }
+/* ═════════ Design tokeny: VÝŠKY OVLÁDACÍCH PRVKŮ a MEZERY (pravidla viz docs/DESIGN.md) ═════════
+   výšky: sm 32 = kompaktní (štítky, malá tlačítka) · md 40 = běžné · lg 44 = dotykový cíl (výchozí na telefonu) · xl 48 = hlavní tlačítka
+   mezery (gap): sp-1 4 · sp-2 8 · sp-3 12 · sp-4 16 · sp-5 24 */
+:root { --h-sm: 32px; --h-md: 40px; --h-lg: 44px; --h-xl: 48px; --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; }
 :root {
   --c-bg: #141414; --c-surface: #1f1f1f; --c-surface-2: #2a2a2a; --c-line: #333; --c-line-hi: #3a3a3a;
   --c-text-2: #d2d2d2; --c-text-3: #b3b3b3; --c-text-4: #808080;
@@ -162,7 +166,7 @@ body {
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-2);
 }
 .logo-progress-bar {
   width: 110px;
@@ -193,7 +197,7 @@ body {
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--sp-2);
 
   opacity: 0;
   pointer-events: none;
@@ -245,7 +249,7 @@ body {
   color: var(--w-4);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
 }
 .streak-today-count {
   font-size: var(--fs-xs);
@@ -302,7 +306,7 @@ body {
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
-  gap: 14px;
+  gap: var(--sp-4);
   align-items: center;
   font-size: var(--fs-xs);
   color: var(--muted);
@@ -467,7 +471,7 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 18px;
+  gap: var(--sp-4);
 }
 .modal-hero-left {
   flex: 1;
@@ -483,7 +487,7 @@ body {
 .modal-meta-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-3);
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
@@ -495,14 +499,14 @@ body {
 .tmdb-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
 
   letter-spacing: 0.5px;
 }
 .panel-progress-wrap {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--sp-2);
 }
 .panel-progress-bar {
   flex: 1;
@@ -525,13 +529,13 @@ body {
 }
 .panel-btns {
   display: flex;
-  gap: 10px;
+  gap: var(--sp-3);
   flex-shrink: 0;
 }
 .btn-continue {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-2);
 
   border: none;
 
@@ -552,7 +556,7 @@ body {
 .btn-shuffle {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--sp-2);
 
   border-top-color: var(--w-3);
 
@@ -645,7 +649,7 @@ body {
 .ssv-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
+  gap: var(--sp-3);
 }
 .ssv-card {
   position: relative;
@@ -714,7 +718,7 @@ body {
 .ssv-play-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--sp-2);
 
   padding: 9px 18px;
 
@@ -884,7 +888,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--sp-2);
   font-size: var(--fs-xs);
   font-weight: 800;
   color: var(--w-5);
@@ -894,13 +898,13 @@ body {
   padding: 0 18px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-1);
   min-width: 0;
 }
 .ep-meta-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-2);
 }
 .ep-num {
   font-family: var(--font);
@@ -966,7 +970,7 @@ body {
 }
 .ep-actions {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-2);
   align-items: center;
   max-height: 0;
   opacity: 0;
@@ -983,7 +987,7 @@ body {
 .ep-btn-play-hbo {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-2);
 
   cursor: pointer;
 
@@ -1060,7 +1064,7 @@ body {
 }
 .confirm-btns {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-2);
 }
 .confirm-ok {
   flex: 1;
@@ -1120,7 +1124,7 @@ body {
   
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--sp-5);
   overflow: hidden;
 }
 .watchlist-overlay.visible .watchlist-box {
@@ -1152,7 +1156,7 @@ body {
 .wl-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sp-3);
   overflow-y: auto;
   flex: 1;
   scrollbar-width: thin;
@@ -1224,14 +1228,14 @@ body {
 .rating-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: var(--sp-2);
   margin-bottom: 8px;
 }
 .rating-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: var(--sp-1);
 
 }
 
@@ -1368,7 +1372,7 @@ canvas#particles {
 .genre-editor-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--sp-2);
   margin-top: 22px;
 }
 .genre-editor-save {
@@ -1639,7 +1643,7 @@ canvas#particles {
 
   flex-direction: column;
 
-  gap: 10px;
+  gap: var(--sp-3);
   cursor: pointer;
 
   box-shadow: inset 0 1px 0 var(--w-1);
@@ -1683,7 +1687,7 @@ canvas#particles {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: var(--sp-5);
   min-width: 300px;
 
 }
@@ -1710,7 +1714,7 @@ canvas#particles {
 }
 .pm-dots {
   display: flex;
-  gap: 14px;
+  gap: var(--sp-4);
 }
 
 .pm-dot.error {
@@ -1735,7 +1739,7 @@ canvas#particles {
 .pm-numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: var(--sp-3);
   width: 220px;
 }
 .pm-num {
@@ -1802,7 +1806,7 @@ canvas#particles {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--sp-4);
 }
 .pc-eyebrow {
   color: rgba(114, 184, 255, .78);
@@ -1852,7 +1856,7 @@ canvas#particles {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--sp-3);
   padding: 9px;
   margin-bottom: 10px;
   border: 1px solid var(--w-2);
@@ -1903,7 +1907,7 @@ canvas#particles {
   font-size: var(--fs-xs);
 }
 .pc-avatar-search:focus { border-color: var(--c-accent-a3); }
-.pc-avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; max-height: 310px; overflow-y: auto; }
+.pc-avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-2); max-height: 310px; overflow-y: auto; }
 .pc-avatar-option {
   min-width: 0;
   padding: 0;
@@ -2011,7 +2015,7 @@ canvas#particles {
 }
 .pw-title { margin-top: 8px; color: #fff; font-size: var(--fs-2xl); font-weight: 800; }
 .pw-subtitle { margin: 8px 0 22px; color: var(--w-5); font-size: var(--fs-sm); line-height: 1.5; }
-.pw-genres { display: flex; flex-wrap: wrap; gap: 8px; }
+.pw-genres { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .pw-genre {
   padding: 9px 12px;
   border: 1px solid var(--w-2);
@@ -2025,7 +2029,7 @@ canvas#particles {
 }
 .pw-genre:hover { background: var(--w-2); color: #fff; }
 .pw-genre.selected { background: var(--c-accent-a1); border-color: var(--c-accent-a3); color: #fff; }
-.pw-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 26px; }
+.pw-actions { display: flex; justify-content: flex-end; gap: var(--sp-2); margin-top: 26px; }
 .pw-skip, .pw-save {
   padding: 10px 15px;
   border-radius: var(--r-panel);
@@ -2037,7 +2041,7 @@ canvas#particles {
 .pw-save { border: 0; background: var(--c-accent); color: #fff; font-weight: 700; }
 .pc-btn-row {
   display: flex;
-  gap: 10px;
+  gap: var(--sp-3);
   padding-top: 4px;
 }
 .pc-btn-save {
@@ -2107,7 +2111,7 @@ canvas#particles {
   min-height: 52px;
   box-sizing: border-box;
   justify-content: center;
-  gap: 7px;
+  gap: var(--sp-2);
   padding: 5px 7px;
 
   border-color: var(--w-2);
@@ -2607,7 +2611,7 @@ body {
 .er-stars {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: var(--sp-3);
   margin-bottom: 12px;
 }
 .er-star {
@@ -2651,7 +2655,7 @@ body {
 }
 .er-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--sp-3);
   justify-content: center;
 }
 .er-btn-skip {
@@ -2689,7 +2693,7 @@ body {
 .ep-user-rating {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--sp-1);
   font-size: var(--fs-xs);
   color: rgba(255, 159, 10, 0.9);
   background: rgba(255, 159, 10, 0.12);
@@ -2709,7 +2713,7 @@ body {
 #panelRatingSummary {
   display: none;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-2);
   margin-top: 8px;
   font-family: var(--font);
 }
@@ -2812,7 +2816,7 @@ body {
     0 4px 16px rgba(0, 0, 0, 0.5),
     var(--ios-inset) !important;
   width: 32px !important;
-  height: 32px !important;
+  height: var(--h-sm) !important;
   font-size: var(--fs-sm) !important;
 }
 .close-btn:hover {
@@ -2872,7 +2876,7 @@ body {
   padding: 12px 14px !important;
   flex-direction: row !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: var(--sp-3) !important;
   width: 100% !important;
 }
 .episode-card .ep-num {
@@ -2907,7 +2911,7 @@ body {
   overflow: visible !important;
   margin-top: 0 !important;
   flex-shrink: 0 !important;
-  gap: 8px !important;
+  gap: var(--sp-2) !important;
 }
 .ep-btn-play-hbo {
   background: linear-gradient(135deg, var(--c-accent), var(--c-accent)) !important;
@@ -2929,7 +2933,7 @@ body {
 }
 .ep-btn-mark {
   width: 28px !important;
-  height: 28px !important;
+  height: var(--h-sm) !important;
   background: var(--w-1) !important;
   border: 0.5px solid var(--w-2) !important;
   border-radius: 50% !important;
@@ -3180,7 +3184,7 @@ body.mf-section-protebe #mfProfileBadge {
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sp-4);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.9);
 }
 .tmdb-av-title {
@@ -3191,7 +3195,7 @@ body.mf-section-protebe #mfProfileBadge {
 }
 .tmdb-av-search-row {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-2);
 }
 .tmdb-av-input {
   flex: 1;
@@ -3221,7 +3225,7 @@ body.mf-section-protebe #mfProfileBadge {
 .tmdb-av-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 10px;
+  gap: var(--sp-3);
   overflow-y: auto;
   max-height: 340px;
   padding-right: 4px;
@@ -3231,7 +3235,7 @@ body.mf-section-protebe #mfProfileBadge {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: var(--sp-1);
   cursor: pointer;
   border-radius: var(--r-modal);
   padding: 8px 4px;
@@ -3265,7 +3269,7 @@ body.mf-section-protebe #mfProfileBadge {
 }
 .tmdb-av-close-row {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-2);
   justify-content: flex-end;
 }
 .tmdb-av-cancel {
@@ -3700,13 +3704,13 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card:hover .ep-actions {
 body:not(.tv-mode):not(.appletv-mode) .episode-grid {
   display: flex !important;
   flex-direction: column !important;
-  gap: 2px !important;
+  gap: var(--sp-1) !important;
   padding: 8px 16px 120px !important;
   background: transparent !important;
   grid-template-columns: unset !important;
 }
 .season-all-btn {
-  height: 36px !important;
+  height: var(--h-md) !important;
   padding: 0 14px !important;
   color: var(--w-6) !important;
   background: var(--w-1) !important;
@@ -3734,7 +3738,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card:hover {
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-body {
   padding: 14px 18px !important;
-  gap: 6px !important;
+  gap: var(--sp-2) !important;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-num {
   color: var(--w-5) !important;
@@ -3751,7 +3755,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-actions {
   margin-top: 6px !important;
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo {
-  min-height: 30px;
+  min-height: var(--h-sm);
   padding: 0 11px;
   border-radius: var(--r-panel);
   background: var(--c-accent-a1);
@@ -3766,7 +3770,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo:hover {
 }
 body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   width: 30px;
-  height: 30px;
+  height: var(--h-sm);
   border-radius: var(--r-panel);
   background: var(--w-1);
   border: 1px solid var(--w-2);
@@ -3776,7 +3780,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   #seriesModal .episode-grid {
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 14px !important;
+    gap: var(--sp-4) !important;
     padding: 16px 24px 112px !important;
     align-items: stretch !important;
   }
@@ -3812,7 +3816,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
     width: auto !important;
     min-width: 0 !important;
     padding: 13px 14px 14px !important;
-    gap: 6px !important;
+    gap: var(--sp-2) !important;
     align-items: stretch !important;
   }
   body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-meta-row {
@@ -3841,7 +3845,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   body:not(.tv-mode):not(.appletv-mode) .episode-card:hover .ep-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 7px !important;
+    gap: var(--sp-2) !important;
     max-height: none !important;
     opacity: 1 !important;
     overflow: visible !important;
@@ -3850,7 +3854,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   }
   body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-play-hbo {
     flex: 1 1 auto !important;
-    min-height: 32px !important;
+    min-height: var(--h-sm) !important;
     justify-content: center !important;
     padding: 0 9px !important;
     border-radius: var(--r-panel) !important;
@@ -3867,7 +3871,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
   @media (max-width: 600px) {
     #seriesModal .episode-grid {
       grid-template-columns: 1fr !important;
-      gap: 10px !important;
+      gap: var(--sp-3) !important;
       padding: 12px 12px 100px !important;
     }
     body:not(.tv-mode):not(.appletv-mode) .episode-card {
@@ -3893,17 +3897,17 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
     font-size: clamp(1.65rem, 3vw, 2.15rem) !important;
   }
   #seriesModal .panel-btns {
-    gap: 8px !important;
+    gap: var(--sp-2) !important;
   }
   #seriesModal .panel-btns > button {
-    min-height: 42px !important;
+    min-height: var(--h-lg) !important;
     padding: 0 16px !important;
     font-size: var(--fs-sm) !important;
   }
   #seriesModal .episode-grid {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
+    gap: var(--sp-3) !important;
     padding: 12px 22px 110px !important;
   }
   body:not(.tv-mode):not(.appletv-mode) .episode-card {
@@ -3942,7 +3946,7 @@ body:not(.tv-mode):not(.appletv-mode) .episode-card .ep-btn-mark {
       flex-wrap: wrap !important;
     }
     #seriesModal .panel-btns > button {
-      min-height: 36px !important;
+      min-height: var(--h-md) !important;
       padding: 0 11px !important;
       font-size: var(--fs-xs) !important;
     }
@@ -4223,7 +4227,7 @@ body::before, body::after { display: none !important; }
 
 .mf-header-btn {
   width: 44px !important;
-  height: 44px !important;
+  height: var(--h-lg) !important;
   border-radius: var(--r-modal) !important;
   color: var(--tv-text-sub) !important;
   background: transparent !important;
@@ -4245,7 +4249,7 @@ body::before, body::after { display: none !important; }
   border: 1px solid rgba(255,159,10,0.22) !important;
   border-radius: var(--r-sheet) !important;
   padding: 6px 14px !important;
-  gap: 6px !important;
+  gap: var(--sp-2) !important;
 }
 #hdrStreakDays { font-size: 17px !important; font-weight: 800 !important; color: #ff9f0a !important; font-family: var(--font) !important; }
 
@@ -4505,7 +4509,7 @@ input, textarea, select {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 16px !important;
+  gap: var(--sp-4) !important;
 }
 #mfProfileGate.hiding {
   opacity: 0 !important;
