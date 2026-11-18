@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.102
+### Změněno
+- **Designový systém – JS:** zbylé animace a barvy zapsané přímo v JS (`fx.js`, `cinema.js`) používají tokeny `--t-*`, `--ease-*`, `--c-accent*` stejně jako CSS. Vzhled beze změny.
+
 ## 3.21.101
 ### Nově
 - **Stažení dolů na Domů (telefon):** když jsi úplně nahoře a přetáhneš prstem dolů, objeví se kolečko a po puštění se obnoví doporučení (jako na Instagramu).
