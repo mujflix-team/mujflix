@@ -44,6 +44,7 @@
   var DECADES = [['2020-2029', '2020–2029'], ['2010-2019', '2010–2019'], ['2000-2009', '2000–2009'], ['1990-1999', '1990–1999'], ['1980-1989', '1980–1989'], ['1970-1979', '1970–1979']];
   function labelOf(list, v) { var r = list.filter(function (x) { return x[0] === v; })[0]; return r ? r[1] : v; }
   function yearRange(v) { var m = /^(\d{4})-(\d{4})$/.exec(v || ''); return m ? [m[1], m[2]] : null; }
+  var varietySeed = 1 + Math.floor(Math.random() * 997); /* nové při každém načtení aplikace, změně profilu a „Zrušit filtry“ */
   var state = freshState();
   var run = 0;
   var searchTimer = null;
@@ -496,6 +497,7 @@
     body.appendChild(heroSlot);
     renderHistoryChips(body);
 
+    var vp = function () { return 1 + varietySeed % 4; }; /* každé načtení jiná stránka TMDB, aby řady nebyly pořád stejné */
     var prefs = onlyAnime() ? [] : topGenreIds();
     var seen = seenIds();
     var rows = [];
@@ -505,7 +507,7 @@
         return {
           title: title, sub: sub, showType: true, hero: !!hero,
           load: function () {
-            return Promise.all([fetchDiscover('tv', 1, { sort: sort }), fetchDiscover('movie', 1, { sort: sort })])
+            return Promise.all([fetchDiscover('tv', vp(), { sort: sort }), fetchDiscover('movie', vp(), { sort: sort })])
               .then(function (r) { return interleave(r[0].items, r[1].items); });
           }
         };
@@ -526,7 +528,7 @@
           var idsFor = function (type) { return window.mfGenreIdsFor ? window.mfGenreIdsFor(prefs, type) : prefs.map(String); };
           var one = function (type) {
             var ids = idsFor(type);
-            return ids.length ? fetchDiscover(type, 1, { genres: ids.join('|') }) : Promise.resolve({ items: [] });
+            return ids.length ? fetchDiscover(type, vp(), { genres: ids.join('|') }) : Promise.resolve({ items: [] });
           };
           return Promise.all([one('tv'), one('movie')])
             .then(function (r) { return interleave(r[0].items, r[1].items).filter(function (it) { return !seen[it.id]; }); });
@@ -551,8 +553,8 @@
           title: g.name, sub: 'Filmy i seriály jednoho žánru', showType: true, more: g.key,
           load: function () {
             return Promise.all([
-              g.tv ? fetchDiscover('tv', 1, { genres: g.tv }) : Promise.resolve({ items: [] }),
-              g.movie ? fetchDiscover('movie', 1, { genres: g.movie }) : Promise.resolve({ items: [] })
+              g.tv ? fetchDiscover('tv', vp(), { genres: g.tv }) : Promise.resolve({ items: [] }),
+              g.movie ? fetchDiscover('movie', vp(), { genres: g.movie }) : Promise.resolve({ items: [] })
             ]).then(function (r) {
               var list = interleave(r[0].items, r[1].items);
               return g.key === 'anim' ? list.filter(function (it) { return !it.anime; }) : list;
@@ -562,10 +564,10 @@
       });
 
       rows.push({ title: 'Nejlépe hodnocené filmy', load: function () {
-        return api('/movie/top_rated?language=cs-CZ').then(function (d) { return normList(d && d.results, 'movie'); });
+        return api('/movie/top_rated?language=cs-CZ&page=' + vp()).then(function (d) { return normList(d && d.results, 'movie'); });
       } });
       rows.push({ title: 'Nejlépe hodnocené seriály', load: function () {
-        return api('/tv/top_rated?language=cs-CZ').then(function (d) { return normList(d && d.results, 'tv'); });
+        return api('/tv/top_rated?language=cs-CZ&page=' + vp()).then(function (d) { return normList(d && d.results, 'tv'); });
       } });
       rows.push({ title: '🆕 Nově v kinech a v televizi', showType: true, load: function () {
         return Promise.all([api('/movie/now_playing?language=cs-CZ'), api('/tv/on_the_air?language=cs-CZ')]).then(function (r) {
@@ -585,7 +587,7 @@
       }
       sec.appendChild(rowSkeleton());
       body.appendChild(sec);
-      r.load().then(ageFilter).then(function (items) {
+      r.load().then(function (items) { return window.mfhSeededShuffle ? window.mfhSeededShuffle(items, varietySeed + rows.indexOf(r)) : items; }).then(ageFilter).then(function (items) {
         if (myRun !== run) return;
         if (items.length < (window.MFAge && window.MFAge.limit() ? 6 : 1)) { sec.remove(); return; }
         fillRow(sec, items.slice(0, 20), r.showType);
@@ -833,12 +835,18 @@
     var sel = selGenres();
     var types = state.type === 'all' ? ['movie', 'tv'] : [state.type];
     var jobs = [];
+    /* Výchozí nabídka (bez filtrů): při každém načtení začne na jiné stránce, liché stránky se berou podle oblíbených žánrů profilu
+       a pořadí se míchá, aby tam nebyly pořád stejné tituly na stejných místech. Jakmile je nastavený filtr, chová se jako dřív. */
+    var vary = !state.genres.length && !state.year && !state.minRating && !state.providers.length && !state.runtime && !state.lang && state.sort === 'popular';
+    var vpage = vary ? page + (varietySeed % 5) : page;
+    var vgen = vary && page % 2 === 1 && !onlyAnime() && window.mfhTopGenreIdsWithProfile ? window.mfhTopGenreIdsWithProfile() : [];
     types.forEach(function (t) {
       var ids = sel.map(function (g) { return g[t]; });
       if (ids.some(function (x) { return !x; })) return;
       /* Jeden žánr může být „A|B“ (nebo). Při více žánrech TMDB nepustí nebo uvnitř „a“, proto se vezme první ID z každého. */
       var gid = ids.length > 1 ? ids.map(function (x) { return String(x).split('|')[0]; }).join(',') : (ids[0] || '');
-      jobs.push(fetchDiscover(t, page, { sort: state.sort, genres: gid, year: state.year, minRating: state.minRating, providers: state.providers, runtime: state.runtime, lang: state.lang }));
+      if (vary && vgen.length && window.mfGenreIdsFor) { var pid = window.mfGenreIdsFor(vgen, t); if (pid && pid.length) gid = pid.join('|'); }
+      jobs.push(fetchDiscover(t, vpage, { sort: state.sort, genres: gid, year: state.year, minRating: state.minRating, providers: state.providers, runtime: state.runtime, lang: state.lang }));
     });
     if (!jobs.length) return Promise.resolve({ items: [], pages: 0 });
     return Promise.all(jobs).then(function (r) {
@@ -847,6 +855,7 @@
       r.forEach(function (x) { pages = Math.max(pages, x.pages); lists.push(x.items); });
       var merged = lists.length === 2 ? mergeBy(state.sort, lists[0], lists[1]) : lists[0];
       if (state.genres.indexOf('anim') > -1 && !onlyAnime()) merged = merged.filter(function (it) { return !it.anime; });
+      if (vary && window.mfhSeededShuffle) merged = window.mfhSeededShuffle(merged, varietySeed + page);
       return { items: merged, pages: pages };
     });
   }
@@ -999,6 +1008,7 @@
 
   function resetAll() {
     state = freshState();
+    varietySeed = 1 + Math.floor(Math.random() * 997);
     els.input.value = '';
     refresh();
   }
@@ -1168,6 +1178,7 @@
   };
   // Po změně věku/žánrů/zaměření se otevřený Objevovat sám obnoví (bez Ctrl+R)
   window.addEventListener('mf:profile-changed', function () {
+    varietySeed = 1 + Math.floor(Math.random() * 997);
     try { if (els && els.root && els.root.classList.contains('open')) refresh(); } catch (e) {}
   });
   window.openUniverse = function () { openUniverse(false); };

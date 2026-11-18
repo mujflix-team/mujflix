@@ -6,7 +6,8 @@
     /* návrat na stránku z paměti (zpět v PWA) – když zůstala prázdná/šedá, načti ji znovu */
     window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
     if (!("ontouchstart" in window)) return;
-    var TH = 70, MAX = 110, y0 = 0, pull = 0, on = false, busy = false, ind = null;
+    var TH = 64, MAX = 96, K = 0.45, y0 = 0, pull = 0, armed = false, on = false, busy = false, ind = null; /* TH = práh obnovení, K = odpor (prst musí ujet cca 2,2× víc) */
+    function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { void e; } } /* haptická odezva (Android; iOS vibrace nepodporuje) */
     function homeOk() {
       var r = document.documentElement;
       if (!r.classList.contains("mfh-home-on")) return false;
@@ -33,27 +34,30 @@
     }
     document.addEventListener("touchstart", function (e) {
       on = !busy && e.touches.length === 1 && homeOk();
-      pull = 0;
+      pull = 0; armed = false;
       if (on) y0 = e.touches[0].clientY;
     }, { passive: true });
     document.addEventListener("touchmove", function (e) {
       if (!on) return;
       var dy = e.touches[0].clientY - y0;
       if (dy <= 0 || !homeOk()) { if (pull) draw(0, true); pull = 0; return; }
-      pull = Math.min(MAX, dy * 0.5);
+      pull = Math.min(MAX, dy * K);
+      if (!armed && pull >= TH) { armed = true; buzz(14); }
+      else if (armed && pull < TH) { armed = false; }
       draw(pull, false);
     }, { passive: true });
     function end() {
       if (!on) return;
       on = false;
-      if (pull >= TH * 0.8 && !busy) {
+      if (pull >= TH && !busy) {
         busy = true;
+        buzz([10, 40, 18]);
         draw(TH * 0.7, true);
         if (typeof showToast === "function") showToast("Obnovuji doporučení…");
         try { (window.mfhNewPicks || window.mfhRefresh || function () {})(); } catch (e) {}
         setTimeout(function () { draw(0, true); busy = false; }, 900);
       } else draw(0, true);
-      pull = 0;
+      pull = 0; armed = false;
     }
     document.addEventListener("touchend", end, { passive: true });
     document.addEventListener("touchcancel", end, { passive: true });

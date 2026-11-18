@@ -1652,12 +1652,13 @@ const pullT = await page.evaluate(async () => {
   let n = 0; const origPicks = window.mfhNewPicks; window.mfhNewPicks = () => { n++; };
   await new Promise(r => { const sc = document.createElement("script"); sc.src = "js/shell/pull.js"; sc.onload = r; document.body.appendChild(sc); });
   const fire = (t, y) => { const e = new Event(t, { bubbles: true }); e.touches = t === "touchend" ? [] : [{ clientY: y }]; document.dispatchEvent(e); };
-  fire("touchstart", 100); fire("touchmove", 150); fire("touchend", 150); const short = n;
+  let vib = 0; navigator.vibrate = () => { vib++; return true; };
+  fire("touchstart", 100); fire("touchmove", 200); fire("touchend", 200); const short = n;
   fire("touchstart", 100); fire("touchmove", 300); fire("touchend", 300); const long = n;
   document.documentElement.classList.remove("mfh-home-on"); window.mfhNewPicks = origPicks;
-  return { short, long };
+  return { short, long, vib };
 });
-check("stažení dolů na Domů: krátké tažení nic, dlouhé obnoví doporučení", pullT.short === 0 && pullT.long === 1, JSON.stringify(pullT));
+check("stažení dolů na Domů: krátké tažení (100 px) nic, dlouhé obnoví doporučení a zavibruje", pullT.short === 0 && pullT.long === 1 && pullT.vib >= 2, JSON.stringify(pullT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });

@@ -22,7 +22,7 @@ const hostile = [
   { id: 5, title: "OK film", poster_path: "/e.jpg", vote_average: 6.2, release_date: "2021-05-05", media_type: "movie" },
 ];
 
-async function scenario(tmdbOk, anime = false) {
+async function scenario(tmdbOk, anime = false, rnd = null) {
   const urls = [];
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const errors = [];
@@ -36,6 +36,7 @@ async function scenario(tmdbOk, anime = false) {
       : r.abort();
     return r.abort();
   });
+  if (rnd !== null) await page.addInitScript(v => { Math.random = () => v; }, rnd);
   await page.addInitScript(anime => {
     if (location.protocol !== "http:" || localStorage.getItem("__s")) return; localStorage.setItem("__s", "1");
     localStorage.setItem("mf_profiles_v2", JSON.stringify([{ id: "p1", name: "Test", avatar: "🎬", color: "#007aff", ...(anime ? { prefs: { likesAnime: true, animeOnly: true }, likedGenres: [28] } : {}) }]));
@@ -56,6 +57,9 @@ async function scenario(tmdbOk, anime = false) {
 }
 
 const ok = await scenario(true);
+const vr = await scenario(true, false, 0.5);
+const vPages = vr.urls.filter(u => /top_rated|\/discover\//.test(u) && u.includes("include_adult=") || /top_rated/.test(u)).map(u => +(u.match(/[?&]page=(\d+)/) || [])[1]);
+check("Objevovat: výchozí nabídka nezačíná pořád na první stránce (každé načtení jiný začátek)", vPages.length > 0 && vPages.some(p => p > 1), JSON.stringify(vPages));
 check("Objevovat: špatné položky v odpovědi nerozbijí řady", ok.cards > 0, JSON.stringify(ok));
 check("Objevovat: HTML v názvech se nevykoná", ok.xss === 0);
 check("Objevovat: bez JS chyb", ok.errors.length === 0, ok.errors.join(" | "));
