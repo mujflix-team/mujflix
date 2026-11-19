@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.123
+### Opraveno
+- **Hlášky na telefonu** (např. „Na českých zdrojích se titul nenašel, zkouším zahraniční“): dlouhý text se zalomí místo ořezání, má menší písmo a je nad dockem, ne přes obsah pod hlavičkou.
+
 ## 3.21.122
 ### Opraveno
 - **Tlačítko obnovení v horní liště** je jen na telefonu. Na počítači se zobrazovalo vedle avataru profilu a překrývalo ho (obě jsou teď přepnuté na stejné šířce 899 px).
