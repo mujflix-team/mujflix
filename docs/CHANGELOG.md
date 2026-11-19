@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.117
+### Opraveno
+- **Silnější vibrace:** krátké impulzy (12–14 ms) na řadě Androidů nejsou cítit. Stažení dolů, tlačítko obnovení a menu karty teď vibrují 30–50 ms. iOS vibraci v prohlížeči/PWA nepodporuje vůbec.
+
 ## 3.21.116
 ### Nově
 - **Tlačítko obnovení v horní liště Domů (telefon):** vpravo ve stejné výšce jako logo MůjFlix je ikona šipky. Klepnutí obnoví doporučení (nový výběr titulů, vibrace, otočení ikony). Stažení dolů zůstává, tohle je jednodušší alternativa.

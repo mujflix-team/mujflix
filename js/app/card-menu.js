@@ -64,7 +64,7 @@
     current = item;
     sheet.querySelector(".cs-title").textContent = item.title || "";
     sheet.hidden = false;
-    try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) { void e; }
+    try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { void e; }
   }
   function close() { if (sheet) sheet.hidden = true; current = null; }
 

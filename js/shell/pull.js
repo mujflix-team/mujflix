@@ -7,7 +7,7 @@
     var rb = document.getElementById("hdrReload");
     if (rb) rb.addEventListener("click", function () {
       rb.classList.remove("spin"); void rb.offsetWidth; rb.classList.add("spin");
-      try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) { void e; }
+      try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { void e; }
       var dv = document.getElementById("universeOverlay");
       var onHome = document.documentElement.classList.contains("mfh-home-on") && !document.body.classList.contains("mf-section-protebe");
       try {
@@ -57,7 +57,7 @@
       var dy = e.touches[0].clientY - y0;
       if (dy <= 0 || (window.pageYOffset || document.documentElement.scrollTop || 0) > 0) { if (pull) draw(0, true); pull = 0; return; }
       pull = Math.min(MAX, dy * K);
-      if (!armed && pull >= TH) { armed = true; buzz(14); }
+      if (!armed && pull >= TH) { armed = true; buzz(30); }
       else if (armed && pull < TH) { armed = false; }
       draw(pull, false);
     }, { passive: true });
@@ -66,7 +66,7 @@
       on = false;
       if (pull >= TH && !busy) {
         busy = true;
-        buzz([10, 40, 18]);
+        buzz([35, 50, 45]);
         draw(TH * 0.7, true);
         if (typeof showToast === "function") showToast("Obnovuji doporučení…");
         try { (window.mfhNewPicks || window.mfhRefresh || function () {})(); } catch (e) {}
