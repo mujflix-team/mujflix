@@ -8,13 +8,14 @@
     if (!("ontouchstart" in window)) return;
     var TH = 64, MAX = 96, K = 0.45, y0 = 0, pull = 0, armed = false, on = false, busy = false, ind = null; /* TH = práh obnovení, K = odpor (prst musí ujet cca 2,2× víc) */
     function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { void e; } } /* haptická odezva (Android; iOS vibrace nepodporuje) */
-    function homeOk() {
+    var BLOCK = '#seriesModal, #universeOverlay, #watchlistOverlay, #mfStandaloneCinema, #mfProfileGate, #mfSettings, #epRatingOverlay, [role="dialog"], [aria-modal="true"], .modal, .modal-content';
+    /* jen když prst začne v horní části Domů (hlavní lišta nebo banner) a nic není otevřené nad ním (detail, epizody, Objevování, nastavení…) */
+    function homeOk(t) {
       var r = document.documentElement;
-      if (!r.classList.contains("mfh-home-on")) return false;
-      if (document.querySelector("#seriesModal.open, #universeOverlay.open, #watchlistOverlay.open, #mfStandaloneCinema.open, #mfProfileGate")) {
-        var g = document.getElementById("mfProfileGate");
-        if (!g || g.offsetParent !== null) return false;
-      }
+      if (!r.classList.contains("mfh-home-on") || document.body.classList.contains("mf-section-protebe")) return false;
+      if (!t || !t.closest) return false;
+      if (t.closest(BLOCK) || !t.closest("#mfHeader, #nfHero")) return false;
+      if (document.querySelector("#seriesModal.open, #seriesModal.visible, #universeOverlay.open, #watchlistOverlay.open")) return false;
       return (window.pageYOffset || r.scrollTop || 0) <= 0;
     }
     function make() {
@@ -33,14 +34,14 @@
       i.style.transform = "translateY(" + (d - 60) + "px) rotate(" + (d * 3) + "deg)";
     }
     document.addEventListener("touchstart", function (e) {
-      on = !busy && e.touches.length === 1 && homeOk();
+      on = !busy && e.touches.length === 1 && homeOk(e.target);
       pull = 0; armed = false;
       if (on) y0 = e.touches[0].clientY;
     }, { passive: true });
     document.addEventListener("touchmove", function (e) {
       if (!on) return;
       var dy = e.touches[0].clientY - y0;
-      if (dy <= 0 || !homeOk()) { if (pull) draw(0, true); pull = 0; return; }
+      if (dy <= 0 || (window.pageYOffset || document.documentElement.scrollTop || 0) > 0) { if (pull) draw(0, true); pull = 0; return; }
       pull = Math.min(MAX, dy * K);
       if (!armed && pull >= TH) { armed = true; buzz(14); }
       else if (armed && pull < TH) { armed = false; }

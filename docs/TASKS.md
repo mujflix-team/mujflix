@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.114 – stažení dolů jen na horní části Domů (claude/pull-jen-domu)
 - 3.21.113 – těžší stažení dolů + vibrace, proměnlivé Objevování (claude/pull-tezsi)
 - 3.21.112 – nové loading animace: modrý pruh + sjednocený skeleton (claude/loading)
 - 3.21.111 – Objevování na telefonu: filtry ve dvou sloupcích (claude/discover-mobil)

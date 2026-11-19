@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.114
+### Opraveno
+- **Stažení dolů pro obnovení** funguje jen na horní části Domů (hlavní lišta a velký banner). Už nespouští obnovení na řadách pod bannerem, ve výběru epizod ani v jiných oknech.
+
 ## 3.21.113
 ### Změněno
 - **Stažení dolů na Domů je těžší a vibruje:** prst musí ujet zhruba 2× víc než dřív (práh a odpor), v okamžiku, kdy se „nabije“, zavibruje (a ještě jednou při puštění). Vibrace funguje na Androidu, iPhone ji pro weby nepodporuje.
