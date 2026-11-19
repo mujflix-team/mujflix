@@ -1667,6 +1667,8 @@ const pullT = await page.evaluate(async () => {
   return { short, long, vib, inModal, inRows };
 });
 check("stažení dolů na Domů: krátké tažení (100 px) nic, dlouhé obnoví doporučení a zavibruje, v okně seriálu (epizody) ani na řadách pod bannerem nic", pullT.short === 0 && pullT.long === 1 && pullT.vib >= 2 && pullT.inModal === 0 && pullT.inRows === 0, JSON.stringify(pullT));
+const hapT = await page.evaluate(() => { let v = 0; const o = navigator.vibrate; navigator.vibrate = () => { v++; return true; }; const b = document.createElement("button"); b.className = "dock-btn"; document.body.appendChild(b); b.click(); const dock = v; v = 0; try { toggleWatchlistItem("__haptika_test__"); toggleWatchlistItem("__haptika_test__"); } catch (e) { void e; } const fav = v; navigator.vibrate = o; b.remove(); return { dock, fav, has: typeof window.mfHaptic }; });
+check("haptika: klepnutí na dock a přidání/odebrání z Oblíbených zavibruje", hapT.dock >= 1 && hapT.fav === 2 && hapT.has === "function", JSON.stringify(hapT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });

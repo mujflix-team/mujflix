@@ -170,7 +170,7 @@ function triggerPwaInstall() {
         }(t);
       const a = n,
         l = o;
-      closeEpRating(!0), s(a, l), "function" == typeof showToast && showToast("⭐ Hodnocení uloženo"), void 0 !== activeSeries && r(activeSeries);
+      "function" == typeof window.mfHaptic && window.mfHaptic([30, 40, 30]), closeEpRating(!0), s(a, l), "function" == typeof showToast && showToast("⭐ Hodnocení uloženo"), void 0 !== activeSeries && r(activeSeries);
       if (typeof aiBrain !== "undefined" && typeof db !== "undefined") {
         const parts = a.split("-"),
           epSlug = parts.slice(0, parts.length - 2).join("-"),
