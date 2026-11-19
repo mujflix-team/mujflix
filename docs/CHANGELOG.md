@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.124
+### Nově
+- **Nové díly:** při startu (nejvýš jednou za 12 hodin) appka u seriálů v Oblíbených zkontroluje TMDB a ukáže hlášku „Nový díl: …“, když od minula vyšla novější epizoda (za posledních 14 dní). První kontrola jen zapamatuje stav. Jen hláška v appce, žádná push oznámení. Nový `js/app/new-episodes.js`.
+
 ## 3.21.123
 ### Opraveno
 - **Hlášky na telefonu** (např. „Na českých zdrojích se titul nenašel, zkouším zahraniční“): dlouhý text se zalomí místo ořezání, má menší písmo a je nad dockem, ne přes obsah pod hlavičkou.

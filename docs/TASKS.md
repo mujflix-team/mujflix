@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.124 – hláška o nových dílech u Oblíbených seriálů (claude/nove-epizody)
 - 3.21.123 – hlášky (toast) na telefonu: zalomení, velikost, poloha (claude/movy)
 - 3.21.122 – tlačítko obnovení jen na telefonu, nepřekrývá avatar (claude/reload-desktop)
 - 3.21.121 – audit detailu: zpět do Objevování, název bez blikání, Označit sezónu pod epizodami (claude/audit-detail)
