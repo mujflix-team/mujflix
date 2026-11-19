@@ -1701,6 +1701,12 @@ const auT = await page.evaluate(() => {
 await page.waitForTimeout(300);
 const auN = await page.evaluate(() => 0);
 check("detail: Označit sezónu je pod epizodami, název čeká na logo bez blikání, křížek po Objevování ho znovu otevře", auT.markInEps && auT.allInTools && auT.held && auT.freed && auT.flagCleared && auN === 0, JSON.stringify(auT));
+await page.setViewportSize({ width: 1280, height: 800 }); await page.waitForTimeout(150);
+const rdDesk = await page.evaluate(() => getComputedStyle(document.getElementById("hdrReload")).display);
+await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeout(150);
+const rdMob = await page.evaluate(() => getComputedStyle(document.getElementById("hdrReload")).display);
+await page.setViewportSize({ width: 1280, height: 800 });
+check("tlačítko obnovení v horní liště: na počítači skryté (nepřekrývá avatar), na telefonu vidět", rdDesk === "none" && rdMob === "flex", rdDesk + "/" + rdMob);
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });
