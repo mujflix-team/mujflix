@@ -293,9 +293,13 @@ async function fetchTmdbDetails(e) {
 }
 async function loadTmdbDbData() {
   // Doplní vestavěným seriálům obrázky, hodnocení a žánry z TMDB (používá domovská stránka, hodnocení a AI).
-  for (const e of Object.keys(db)) {
-    const n = await fetchTmdbDetails(e);
-    if (n) db[e]._backdrop = n.backdrop, db[e]._poster = n.poster, db[e]._rating = n.rating || 0, n.genres.length && (db[e]._genres = n.genres.map(e => e.name))
+  // Po dávkách po 6 současně (dřív po jednom za sebou, takže při pomalé síti trvalo načtení desítky sekund).
+  const keys = Object.keys(db);
+  for (let i = 0; i < keys.length; i += 6) {
+    await Promise.all(keys.slice(i, i + 6).map(async e => {
+      const n = await fetchTmdbDetails(e);
+      if (n) db[e]._backdrop = n.backdrop, db[e]._poster = n.poster, db[e]._rating = n.rating || 0, n.genres.length && (db[e]._genres = n.genres.map(e => e.name))
+    }));
   }
 }
 

@@ -650,7 +650,7 @@
         var first = !hero.querySelector('.nf-hero-body');
         _trTok++; if (_trObs) { try { _trObs.disconnect(); } catch (e) {} _trObs = null; }
         var bg = h.image
-          ? '<img class="nf-hero-bg" src="' + esc(h.image) + '" alt="" decoding="async" onerror="this.style.display=\'none\'">'
+          ? '<img class="nf-hero-bg" src="' + esc(h.image) + '" alt="" decoding="async" fetchpriority="high" onerror="this.style.display=\'none\'">'
           : '';
         var meta = [];
         if (h.badge) meta.push('<span class="nf-hero-badge">' + esc(h.badge) + '</span>');
