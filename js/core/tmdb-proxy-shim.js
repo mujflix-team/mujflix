@@ -12,6 +12,13 @@
   if (!window.TMDB_KEY_DEFAULT) window.TMDB_KEY_DEFAULT = "via-proxy";
   window.MF_USING_TMDB_PROXY = true;
 
+  // Spojení s proxy se naváže dopředu, aby první data nečekala na TLS handshake.
+  try {
+    var pc = document.createElement("link");
+    pc.rel = "preconnect"; pc.href = new URL(proxy).origin; pc.crossOrigin = "anonymous";
+    document.head.appendChild(pc);
+  } catch (e) { void e; }
+
   var TMDB_PREFIX = "https://api.themoviedb.org/3";
   var nativeFetch = window.fetch.bind(window);
 
