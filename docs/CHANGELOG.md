@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.125
+### Nově
+- **Ukázka při najetí na kartu (počítač):** po 1 s nad plakátem v Domů a v Objevování se spustí krátký trailer z TMDB (YouTube, bez zvuku), po odjetí zmizí. Nespouští se na dotykových zařízeních, při úspoře dat ani když je otevřené okno. Vypnutí: `localStorage.mf_hover_trailer = "0"`. Nový `js/shell/hover-trailer.js`.
+
 ## 3.21.124
 ### Nově
 - **Nové díly:** při startu (nejvýš jednou za 12 hodin) appka u seriálů v Oblíbených zkontroluje TMDB a ukáže hlášku „Nový díl: …“, když od minula vyšla novější epizoda (za posledních 14 dní). První kontrola jen zapamatuje stav. Jen hláška v appce, žádná push oznámení. Nový `js/app/new-episodes.js`.

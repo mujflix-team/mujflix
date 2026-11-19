@@ -2027,3 +2027,10 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 @media (max-width: 899px) {
   html body #mf-toast { top: auto !important; bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; width: max-content; max-width: calc(100vw - 2 * var(--sp-4)) !important; white-space: normal !important; font-size: var(--fs-md) !important; line-height: 1.35; padding: var(--sp-3) var(--sp-4) !important; border-radius: var(--r-panel) !important; }
 }
+
+/* Ukázka při najetí na kartu (js/shell/hover-trailer.js): trailer 16:9 oříznutý na střed plakátu */
+.mf-hover-trailer { position: absolute; top: 0; left: 50%; height: 100%; width: 267%; transform: translateX(-50%); border: 0; opacity: 0; pointer-events: none; z-index: 1; transition: opacity var(--t-slow) var(--ease-std); }
+.mf-hover-trailer.on { opacity: 1; }
+/* při ukázce zmizí tlačítka, štítky a ukazatele na plakátu, zůstane čisté video */
+.mf-ht > *:not(.mf-hover-trailer) { opacity: 0 !important; transition: opacity var(--t-fast) var(--ease-std); }
+.mf-ht .mf-hover-trailer { z-index: 50; }
