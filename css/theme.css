@@ -2006,3 +2006,11 @@ html body #seriesModal .sd-trailer-btn:hover .sd-trailer-play svg, html body #se
 }
 @keyframes mfReloadSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { html body #nfTop .nf-reload-btn.spin svg { animation: none; } }
+
+/* Barva aplikace v Nastavení (výběr akcentu, js/shell/accent.js) */
+#mfSettingsModal .pf-accent { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); color: var(--c-text-2); }
+#mfSettingsModal .pf-accent strong { font-size: var(--fs-md); font-weight: 600; color: #fff; }
+#mfSettingsModal .pf-sws { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: flex-end; }
+#mfSettingsModal .pf-sw { width: var(--h-sm); height: var(--h-sm); padding: 0; border: 2px solid transparent; border-radius: var(--r-pill); background: var(--sw); cursor: pointer; transition: transform var(--t-fast) var(--ease-std); }
+#mfSettingsModal .pf-sw:active { transform: scale(var(--fx-press)); }
+#mfSettingsModal .pf-sw[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 2px var(--c-bg) inset; }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.120
+### Nově
+- **Barva aplikace:** v Nastavení je výběr akcentu (modrá, fialová, růžová, oranžová, zelená, tyrkysová). Přepíše tokeny `--c-accent*`, pamatuje se v zařízení (`mf_accent`) a načítá se hned při startu. Nový `js/shell/accent.js`.
+
 ## 3.21.119
 ### Nově
 - **Zavření okna tažením dolů (telefon):** detail seriálu, Oblíbené a Objevovat se zavřou stažením dolů o 120 px (okno jde za prstem, po zavření lehká vibrace). Nezačne, když je obsah odrolovaný, ani ve vodorovných řadách, formulářích a přehrávači. Nový `js/shell/swipe-close.js`.

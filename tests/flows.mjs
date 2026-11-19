@@ -1682,6 +1682,14 @@ const swcT = await page.evaluate(async () => {
   window.closeModal = o; return { short, long, side, scrolled, afterScroll };
 });
 check("gesto: tažení okna detailu dolů o 120+ px ho zavře, krátké, vodorovné ani odrolované ne", swcT.short === 0 && swcT.long === 1 && swcT.side === 0 && (!swcT.scrolled || swcT.afterScroll === 0), JSON.stringify(swcT));
+const acT = await page.evaluate(() => {
+  const r = document.documentElement, cs = () => getComputedStyle(r).getPropertyValue("--c-accent").trim();
+  const before = cs(); MFAccent.set("#bf5af2"); const after = cs(), stored = localStorage.getItem("mf_accent"), hi = getComputedStyle(r).getPropertyValue("--c-accent-hi").trim();
+  MFAccent.set("#123456"); const bad = cs();
+  MFAccent.set("#0a84ff"); const back = cs(), cleared = localStorage.getItem("mf_accent");
+  return { before, after, stored, hi, bad, back, cleared };
+});
+check("barva aplikace: výběr akcentu přepíše tokeny, uloží se, neznámá barva se ignoruje, modrá výchozí se vrátí", acT.before === "#0a84ff" && acT.after === "#bf5af2" && acT.stored === "#bf5af2" && /^rgb\(/.test(acT.hi) && acT.bad === "#bf5af2" && acT.back === "#0a84ff" && acT.cleared === null, JSON.stringify(acT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });
