@@ -154,13 +154,6 @@
   function rowHtml(r) {
     return '<button type="button" class="pf-row" data-st="' + r[0] + '"><span class="pf-row-ico">' + r[1] + '</span><span class="pf-row-txt"><strong>' + r[2] + "</strong><small>" + esc(r[3]) + '</small></span><span class="pf-row-go" aria-hidden="true">›</span></button>';
   }
-  function accentHtml() {
-    if (!window.MFAccent) return "";
-    var cur = MFAccent.get();
-    return '<div class="pf-accent" role="group" aria-label="Barva aplikace"><strong>Barva aplikace</strong><div class="pf-sws">' + MFAccent.COLORS.map(function (c) {
-      return '<button type="button" class="pf-sw" data-ac="' + c[0] + '" style="--sw:' + c[0] + '" aria-label="' + c[1] + '" aria-pressed="' + (c[0] === cur ? "true" : "false") + '"></button>';
-    }).join("") + "</div></div>";
-  }
   function hubOpen() {
     if (!hub) {
       hub = document.createElement("div");
@@ -170,12 +163,6 @@
       hub.setAttribute("aria-label", "Nastavení");
       hub.addEventListener("click", function (e) {
         if (e.target === hub) return hubClose();
-        var sw = e.target.closest && e.target.closest("[data-ac]");
-        if (sw) {
-          if (window.MFAccent) MFAccent.set(sw.getAttribute("data-ac"));
-          hub.querySelectorAll(".pf-sw").forEach(function (x) { x.setAttribute("aria-pressed", x === sw ? "true" : "false"); });
-          return;
-        }
         var b = e.target.closest && e.target.closest("[data-st]");
         if (!b) return;
         var a = b.getAttribute("data-st");
@@ -219,7 +206,6 @@
       '<div class="pf-title">Nastavení</div>' +
       ((profile() || {}).name ? '<div class="pf-text">Profil <b>' + esc(profile().name) + "</b></div>" : "") +
       '<div class="pf-rows">' + hubRows().filter(function (r) { return r[0] === "profile" || r[0] === "prefs"; }).map(rowHtml).join("") +
-      accentHtml() +
       '<button type="button" class="pf-adv" aria-expanded="false" data-st="adv">Pokročilé</button>' +
       '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return r[0] !== "profile" && r[0] !== "prefs"; }).map(rowHtml).join("") + "</div></div></div>";
     hub.classList.add("show");

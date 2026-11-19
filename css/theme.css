@@ -2007,14 +2007,6 @@ html body #nfTop .nf-reload-btn { display: none; } /* jen telefon: na počítač
 @keyframes mfReloadSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { html body #nfTop .nf-reload-btn.spin svg { animation: none; } }
 
-/* Barva aplikace v Nastavení (výběr akcentu, js/shell/accent.js) */
-#mfSettingsModal .pf-accent { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); color: var(--c-text-2); }
-#mfSettingsModal .pf-accent strong { font-size: var(--fs-md); font-weight: 600; color: #fff; }
-#mfSettingsModal .pf-sws { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: flex-end; }
-#mfSettingsModal .pf-sw { width: var(--h-sm); height: var(--h-sm); padding: 0; border: 2px solid transparent; border-radius: var(--r-pill); background: var(--sw); cursor: pointer; transition: transform var(--t-fast) var(--ease-std); }
-#mfSettingsModal .pf-sw:active { transform: scale(var(--fx-press)); }
-#mfSettingsModal .pf-sw[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 2px var(--c-bg) inset; }
-
 /* Název titulu čeká na logo z TMDB: text je průhledný, ať se nepřeskakuje (js: mfLogoHold) */
 html body .mf-logo-wait { color: transparent !important; text-shadow: none !important; }
 
@@ -2028,9 +2020,10 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
   html body #mf-toast { top: auto !important; bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; width: max-content; max-width: calc(100vw - 2 * var(--sp-4)) !important; white-space: normal !important; font-size: var(--fs-md) !important; line-height: 1.35; padding: var(--sp-3) var(--sp-4) !important; border-radius: var(--r-panel) !important; }
 }
 
-/* Ukázka při najetí na kartu (js/shell/hover-trailer.js): trailer 16:9 oříznutý na střed plakátu */
-.mf-hover-trailer { position: absolute; top: 0; left: 50%; height: 100%; width: 267%; transform: translateX(-50%); border: 0; opacity: 0; pointer-events: none; z-index: 1; transition: opacity var(--t-slow) var(--ease-std); }
-.mf-hover-trailer.on { opacity: 1; }
-/* při ukázce zmizí tlačítka, štítky a ukazatele na plakátu, zůstane čisté video */
-.mf-ht > *:not(.mf-hover-trailer) { opacity: 0 !important; transition: opacity var(--t-fast) var(--ease-std); }
-.mf-ht .mf-hover-trailer { z-index: 50; }
+/* Trailer v okně (js/shell/trailer.js): tlačítko v detailu seriálu a v přehrávači */
+#mfTrailerBox { position: fixed; inset: 0; z-index: 2147482000; display: flex; align-items: center; justify-content: center; padding: var(--sp-4); background: rgba(0, 0, 0, 0.86); opacity: 0; transition: opacity var(--t-base) var(--ease-std); }
+#mfTrailerBox.on { opacity: 1; }
+#mfTrailerBox .tb-frame { position: relative; width: min(100%, 960px); aspect-ratio: 16 / 9; border-radius: var(--r-modal); overflow: hidden; background: #000; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); }
+#mfTrailerBox iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#mfTrailerBox .tb-x { position: absolute; top: var(--sp-3); right: var(--sp-3); z-index: 2; width: var(--h-lg); height: var(--h-lg); border: 0; border-radius: var(--r-pill); background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 1.2rem; cursor: pointer; }
+#mfTrailerBox .tb-x:hover { background: rgba(0, 0, 0, 0.85); }

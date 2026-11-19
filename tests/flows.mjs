@@ -1682,14 +1682,6 @@ const swcT = await page.evaluate(async () => {
   window.closeModal = o; return { short, long, side, scrolled, afterScroll };
 });
 check("gesto: tažení okna detailu dolů o 120+ px ho zavře, krátké, vodorovné ani odrolované ne", swcT.short === 0 && swcT.long === 1 && swcT.side === 0 && (!swcT.scrolled || swcT.afterScroll === 0), JSON.stringify(swcT));
-const acT = await page.evaluate(() => {
-  const r = document.documentElement, cs = () => getComputedStyle(r).getPropertyValue("--c-accent").trim();
-  const before = cs(); MFAccent.set("#bf5af2"); const after = cs(), stored = localStorage.getItem("mf_accent"), hi = getComputedStyle(r).getPropertyValue("--c-accent-hi").trim();
-  MFAccent.set("#123456"); const bad = cs();
-  MFAccent.set("#0a84ff"); const back = cs(), cleared = localStorage.getItem("mf_accent");
-  return { before, after, stored, hi, bad, back, cleared };
-});
-check("barva aplikace: výběr akcentu přepíše tokeny, uloží se, neznámá barva se ignoruje, modrá výchozí se vrátí", acT.before === "#0a84ff" && acT.after === "#bf5af2" && acT.stored === "#bf5af2" && /^rgb\(/.test(acT.hi) && acT.bad === "#bf5af2" && acT.back === "#0a84ff" && acT.cleared === null, JSON.stringify(acT));
 const auT = await page.evaluate(() => {
   const mark = document.getElementById("seasonMarkBtn"), all = document.getElementById("seasonAllBtn");
   const h = document.createElement("h1"); document.body.appendChild(h); const rel = mfLogoHold(h); const held = h.classList.contains("mf-logo-wait"); rel(); const freed = !h.classList.contains("mf-logo-wait"); h.remove();
@@ -1725,15 +1717,17 @@ const neT = await page.evaluate(async () => {
   return { first: first.length, fresh: fresh.length, tag: fresh[0] && fresh[0].tag, stale: stale.length, same: same.length };
 });
 check("nové díly: první kontrola jen zapamatuje, čerstvý nový díl se ohlásí, starý a stejný ne", neT.first === 0 && neT.fresh === 1 && neT.tag === "S01E04" && neT.stale === 0 && neT.same === 0, JSON.stringify(neT));
-await page.evaluate(() => { window.__oTG = window.tmdbGet; window.tmdbGet = async () => ({ results: [{ site: "YouTube", key: "abc123XYZ", type: "Trailer", iso_639_1: "cs", official: true }] });
-  const c = document.createElement("div"); c.className = "dv-card"; c.id = "__htCard"; c._dvItem = { id: 424242, type: "tv", title: "T" }; c.style.cssText = "position:fixed;left:40px;top:40px;width:120px;height:180px;z-index:2147483647;background:#333";
-  const p = document.createElement("div"); p.className = "dv-poster"; p.style.cssText = "position:relative;width:120px;height:180px;overflow:hidden"; c.appendChild(p); document.body.appendChild(c); });
-await page.mouse.move(60, 60); await page.waitForTimeout(1500);
-const htOn = await page.evaluate(() => { const f = document.querySelector("#__htCard .mf-hover-trailer"); const top = document.elementFromPoint(60, 60); return f ? f.src + (document.querySelector("#__htCard .dv-poster.mf-ht") ? "|ht" : "|noht") : "NO"; });
-await page.mouse.move(600, 500); await page.waitForTimeout(200);
-const htOff = await page.evaluate(() => !document.querySelector("#__htCard .mf-hover-trailer"));
-await page.evaluate(() => { document.getElementById("__htCard").remove(); window.tmdbGet = window.__oTG; });
-check("ukázka při najetí: po 1 s se na kartě spustí trailer (YouTube, bez zvuku), po odjetí zmizí", /youtube-nocookie\.com\/embed\/abc123XYZ\?.*mute=1.*\|ht$/.test(htOn) && htOff, htOn + " / " + htOff);
+const trbT = await page.evaluate(async () => {
+  const o = window.tmdbGet; window.tmdbGet = async () => ({ results: [{ site: "YouTube", key: "abc123XYZ", type: "Trailer", iso_639_1: "cs", official: true }] });
+  const noId = (() => { mfPlayTrailer("tv", ""); return !document.getElementById("mfTrailerBox"); })();
+  mfPlayTrailer("tv", 424242); await new Promise(r => setTimeout(r, 120));
+  const f = document.querySelector("#mfTrailerBox iframe"), src = f ? f.src : "";
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })); await new Promise(r => setTimeout(r, 300));
+  const closed = !document.getElementById("mfTrailerBox");
+  window.tmdbGet = o;
+  return { noId, src, closed, serBtn: !!document.getElementById("modalTrailerBtn"), cinBtn: !!document.getElementById("mfCinTrailerBtn") || typeof MFCinemaPlayer !== "undefined" };
+});
+check("trailer: tlačítko v detailu seriálu a v přehrávači, trailer se přehraje v okně a zavře Esc", trbT.noId && /youtube-nocookie\.com\/embed\/abc123XYZ\?autoplay=1/.test(trbT.src) && trbT.closed && trbT.serBtn && trbT.cinBtn, JSON.stringify(trbT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });
