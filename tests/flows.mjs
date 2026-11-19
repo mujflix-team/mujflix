@@ -1669,6 +1669,19 @@ const pullT = await page.evaluate(async () => {
 check("stažení dolů na Domů: krátké tažení (100 px) nic, dlouhé obnoví doporučení a zavibruje, v okně seriálu (epizody) ani na řadách pod bannerem nic", pullT.short === 0 && pullT.long === 1 && pullT.vib >= 2 && pullT.inModal === 0 && pullT.inRows === 0, JSON.stringify(pullT));
 const hapT = await page.evaluate(() => { let v = 0; const o = navigator.vibrate; navigator.vibrate = () => { v++; return true; }; const b = document.createElement("button"); b.className = "dock-btn"; document.body.appendChild(b); b.click(); const dock = v; v = 0; try { toggleWatchlistItem("__haptika_test__"); toggleWatchlistItem("__haptika_test__"); } catch (e) { void e; } const fav = v; navigator.vibrate = o; b.remove(); return { dock, fav, has: typeof window.mfHaptic }; });
 check("haptika: klepnutí na dock a přidání/odebrání z Oblíbených zavibruje", hapT.dock >= 1 && hapT.fav === 2 && hapT.has === "function", JSON.stringify(hapT));
+const swcT = await page.evaluate(async () => {
+  window.ontouchstart = null;
+  await new Promise(r => { const sc = document.createElement("script"); sc.src = "js/shell/swipe-close.js"; sc.onload = r; document.body.appendChild(sc); });
+  const o = window.closeModal; let n = 0; window.closeModal = () => { n++; };
+  const m = document.getElementById("seriesModal"); const tgt = m.querySelector(".modal-content") || m;
+  const fire = (t, y, x) => { const e = new Event(t, { bubbles: true }); e.touches = t === "touchend" ? [] : [{ clientX: x || 50, clientY: y }]; tgt.dispatchEvent(e); };
+  fire("touchstart", 100); fire("touchmove", 150); fire("touchend", 150); const short = n;
+  fire("touchstart", 100); fire("touchmove", 160); fire("touchmove", 300); fire("touchend", 300); const long = n;
+  fire("touchstart", 100, 50); fire("touchmove", 140, 200); fire("touchmove", 320, 260); fire("touchend", 320, 260); const side = n - long;
+  const sc = m; const oldTop = sc.scrollTop; sc.scrollTop = 40; const scrolled = sc.scrollTop > 0; fire("touchstart", 100); fire("touchmove", 160); fire("touchmove", 320); fire("touchend", 320); const afterScroll = n - long - side; sc.scrollTop = oldTop;
+  window.closeModal = o; return { short, long, side, scrolled, afterScroll };
+});
+check("gesto: tažení okna detailu dolů o 120+ px ho zavře, krátké, vodorovné ani odrolované ne", swcT.short === 0 && swcT.long === 1 && swcT.side === 0 && (!swcT.scrolled || swcT.afterScroll === 0), JSON.stringify(swcT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });

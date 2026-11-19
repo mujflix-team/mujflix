@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.119
+### Nově
+- **Zavření okna tažením dolů (telefon):** detail seriálu, Oblíbené a Objevovat se zavřou stažením dolů o 120 px (okno jde za prstem, po zavření lehká vibrace). Nezačne, když je obsah odrolovaný, ani ve vodorovných řadách, formulářích a přehrávači. Nový `js/shell/swipe-close.js`.
+
 ## 3.21.118
 ### Nově
 - **Haptika v akcích (Android):** krátká vibrace při klepnutí na dock, při přidání či odebrání z Oblíbených a při uložení hodnocení epizody. Sdílená funkce `mfHaptic` (v `pull.js`).
