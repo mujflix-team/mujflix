@@ -40,6 +40,7 @@ async function openDiscoverTv(tmdbId, title) {
       db[slug] = rec;
     } catch(err) {
       console.error('[openDiscoverTv]', err);
+      window._mfBackToDiscover = null;
       if (typeof showToast === 'function') showToast('⚠ Nepodařilo se načíst', 3000);
       return;
     }
@@ -365,21 +366,31 @@ function mfFetchLogo(kind, id) {
   }).catch(() => (delete _logoCache[k], "")))
 }
 window.mfFetchLogo = mfFetchLogo;
+/* Prostý text názvu se na chvíli skryje (místo ať zabírá, jen je průhledný), dokud se nenačte logo z TMDB; bez loga se po chvíli ukáže. */
+function mfLogoHold(el) {
+  if (!el) return () => {};
+  let done = !1;
+  const rel = () => { done || (done = !0, clearTimeout(tm), el.classList.remove("mf-logo-wait")) }, tm = setTimeout(rel, 1500);
+  el.classList.add("mf-logo-wait");
+  return rel
+}
+window.mfLogoHold = mfLogoHold;
 
 function _sdLogo(slug) {
   const old = document.getElementById("sLogo");
   old && old.remove();
   const h = document.getElementById("sTitle");
-  h && h.classList.remove("sd-has-logo");
+  h && h.classList.remove("sd-has-logo", "mf-logo-wait");
   const t = db[slug];
   if (!t || !t.tmdbId || !(TMDB_KEY || window.MF_USING_TMDB_PROXY)) return;
+  const rel = mfLogoHold(h);
   mfFetchLogo("tv", t.tmdbId).then(u => {
-    if (!u || slug !== activeSeries || document.getElementById("sLogo")) return;
+    if (!u || slug !== activeSeries || document.getElementById("sLogo")) return rel();
     const im = new Image;
     im.id = "sLogo", im.className = "sd-logo", im.alt = t.name || "", im.onload = () => {
-      if (slug !== activeSeries || document.getElementById("sLogo")) return;
-      h.parentNode.insertBefore(im, h), h.classList.add("sd-has-logo")
-    }, im.src = u
+      if (slug !== activeSeries || document.getElementById("sLogo")) return rel();
+      h.parentNode.insertBefore(im, h), h.classList.add("sd-has-logo"), rel()
+    }, im.onerror = rel, im.src = u
   })
 }
 
@@ -464,6 +475,7 @@ async function _sdLoadSimilar() {
 
 function closeModal() {
   const e = document.getElementById("seriesModal");
+  { const b = window._mfBackToDiscover; window._mfBackToDiscover = null; if (b && e.classList.contains("open") && typeof window.mfDiscoverRestore === "function") setTimeout(() => window.mfDiscoverRestore(b), 200) } /* přišel jsem z Objevování: vrať se tam, ne na Domů */
   _sdResetTrailer();
   e.classList.remove("visible");
   const t = e.querySelector(".modal-hero-content");

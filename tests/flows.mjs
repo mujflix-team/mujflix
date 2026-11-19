@@ -1690,6 +1690,17 @@ const acT = await page.evaluate(() => {
   return { before, after, stored, hi, bad, back, cleared };
 });
 check("barva aplikace: výběr akcentu přepíše tokeny, uloží se, neznámá barva se ignoruje, modrá výchozí se vrátí", acT.before === "#0a84ff" && acT.after === "#bf5af2" && acT.stored === "#bf5af2" && /^rgb\(/.test(acT.hi) && acT.bad === "#bf5af2" && acT.back === "#0a84ff" && acT.cleared === null, JSON.stringify(acT));
+const auT = await page.evaluate(() => {
+  const mark = document.getElementById("seasonMarkBtn"), all = document.getElementById("seasonAllBtn");
+  const h = document.createElement("h1"); document.body.appendChild(h); const rel = mfLogoHold(h); const held = h.classList.contains("mf-logo-wait"); rel(); const freed = !h.classList.contains("mf-logo-wait"); h.remove();
+  window._mfBackToDiscover = { s: { type: "all", genres: [], sort: "popular", year: "", minRating: "", hideSeen: false, query: "", providers: [], runtime: "", lang: "" }, q: "" };
+  const o = window.mfDiscoverRestore; let n = 0; window.mfDiscoverRestore = () => { n++; };
+  const m = document.getElementById("seriesModal"); m.classList.add("open"); closeModal(); window.mfDiscoverRestore = o;
+  return { markInEps: !!mark.closest("#episodesView"), allInTools: !!all.closest("#sdTools"), held, freed, flagCleared: window._mfBackToDiscover === null, restoreCalled: n };
+});
+await page.waitForTimeout(300);
+const auN = await page.evaluate(() => 0);
+check("detail: Označit sezónu je pod epizodami, název čeká na logo bez blikání, křížek po Objevování ho znovu otevře", auT.markInEps && auT.allInTools && auT.held && auT.freed && auT.flagCleared && auN === 0, JSON.stringify(auT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });

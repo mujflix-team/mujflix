@@ -213,6 +213,7 @@
     } catch (e) {}
     window._cinYear = it.year || null;
     if (it.type === 'tv') {
+      window._mfBackToDiscover = { s: JSON.parse(JSON.stringify(state)), q: els.input.value }; /* křížek detailu vrátí do Objevování se stejnými filtry */
       if (typeof openDiscoverTv === 'function') openDiscoverTv(it.id, it.title);
     } else if (typeof _showCinemaOrFinderChoice === 'function') {
       _showCinemaOrFinderChoice(it.id, it.title, 'movie', it.title);
@@ -1183,6 +1184,7 @@
   });
   window.openUniverse = function () { openUniverse(false); };
   window.openDiscover = function () { openUniverse(false); };
+  window.mfDiscoverRestore = function (sn) { if (!sn || !built) return; state = sn.s; els.input.value = sn.q || ''; syncControls(); openUniverse(false); };
   window.mfDiscoverReroll = function () { varietySeed = 1 + Math.floor(Math.random() * 997); refresh(); }; /* tlačítko obnovení v hlavičce */
   window.openSearch = function () { openUniverse(true); };
   window.closeUniverse = closeUniverse;

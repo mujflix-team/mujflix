@@ -763,12 +763,15 @@
         try { nfHeroTrailer(it); } catch (e) {}
         try {
           var ltok = _trTok;
+          var hh = document.querySelector('#nfHero .nf-hero-title');
+          var rel = (window.mfLogoHold && window.mfFetchLogo && it.tmdbId) ? window.mfLogoHold(hh) : function () {}; /* text názvu je neviditelný, dokud se nenačte logo (žádné blikání) */
           if (window.mfFetchLogo && it.tmdbId) window.mfFetchLogo(it.mediaType === 'tv' ? 'tv' : 'movie', it.tmdbId).then(function (u) {
             var h1 = document.querySelector('#nfHero .nf-hero-title');
-            if (!u || ltok !== _trTok || !h1 || h1.querySelector('img')) return;
+            if (!u || ltok !== _trTok || !h1 || h1.querySelector('img')) { rel(); return; }
             var im = new Image();
             im.className = 'nf-hero-logo'; im.alt = it.title || '';
-            im.onload = function () { if (ltok === _trTok && !h1.querySelector('img')) { h1.classList.add('has-logo'); h1.appendChild(im); } };
+            im.onload = function () { if (ltok === _trTok && !h1.querySelector('img')) { h1.classList.add('has-logo'); h1.appendChild(im); } rel(); };
+            im.onerror = rel;
             im.src = u;
           });
         } catch (e) {}
