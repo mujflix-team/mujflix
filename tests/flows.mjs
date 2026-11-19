@@ -1729,7 +1729,7 @@ await page.evaluate(() => { window.__oTG = window.tmdbGet; window.tmdbGet = asyn
   const c = document.createElement("div"); c.className = "dv-card"; c.id = "__htCard"; c._dvItem = { id: 424242, type: "tv", title: "T" }; c.style.cssText = "position:fixed;left:40px;top:40px;width:120px;height:180px;z-index:2147483647;background:#333";
   const p = document.createElement("div"); p.className = "dv-poster"; p.style.cssText = "position:relative;width:120px;height:180px;overflow:hidden"; c.appendChild(p); document.body.appendChild(c); });
 await page.mouse.move(60, 60); await page.waitForTimeout(1500);
-const htOn = await page.evaluate(() => { const f = document.querySelector("#__htCard .mf-hover-trailer"); const top = document.elementFromPoint(60, 60); return f ? f.src + (document.querySelector("#__htCard .dv-poster.mf-ht") ? "|ht" : "|noht") : "NO"; });
+const htOn = await page.evaluate(() => { const f = document.querySelector("#__htCard .mf-hover-trailer"); return f ? f.src + (document.querySelector("#__htCard .dv-poster.mf-ht") ? "|ht" : "|noht") : "NO"; });
 await page.mouse.move(600, 500); await page.waitForTimeout(200);
 const htOff = await page.evaluate(() => !document.querySelector("#__htCard .mf-hover-trailer"));
 await page.evaluate(() => { document.getElementById("__htCard").remove(); window.tmdbGet = window.__oTG; });

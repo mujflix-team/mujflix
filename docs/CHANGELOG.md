@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.126
+### Opraveno
+- Lint v CI: nepoužitá proměnná v testu ukázky traileru (`tests/flows.mjs`).
+
 ## 3.21.125
 ### Nově
 - **Ukázka při najetí na kartu (počítač):** po 1 s nad plakátem v Domů a v Objevování se spustí krátký trailer z TMDB (YouTube, bez zvuku), po odjetí zmizí. Nespouští se na dotykových zařízeních, při úspoře dat ani když je otevřené okno. Vypnutí: `localStorage.mf_hover_trailer = "0"`. Nový `js/shell/hover-trailer.js`.
