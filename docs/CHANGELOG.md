@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.121
+### Opraveno
+- **Křížek v detailu seriálu z Objevování** vrací zpět do Objevování (se stejnými filtry), ne na Domů.
+- **Název titulu nebliká:** prostý text se při načítání loga z TMDB skryje (v detailu i v banneru), bez loga se po chvíli ukáže.
+- **Výběr epizod:** „Označit sezónu“ je pod seznamem epizod, v horní liště zůstalo jen „Všechny epizody“.
+
 ## 3.21.120
 ### Nově
 - **Barva aplikace:** v Nastavení je výběr akcentu (modrá, fialová, růžová, oranžová, zelená, tyrkysová). Přepíše tokeny `--c-accent*`, pamatuje se v zařízení (`mf_accent`) a načítá se hned při startu. Nový `js/shell/accent.js`.

@@ -2014,3 +2014,11 @@ html body #seriesModal .sd-trailer-btn:hover .sd-trailer-play svg, html body #se
 #mfSettingsModal .pf-sw { width: var(--h-sm); height: var(--h-sm); padding: 0; border: 2px solid transparent; border-radius: var(--r-pill); background: var(--sw); cursor: pointer; transition: transform var(--t-fast) var(--ease-std); }
 #mfSettingsModal .pf-sw:active { transform: scale(var(--fx-press)); }
 #mfSettingsModal .pf-sw[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 2px var(--c-bg) inset; }
+
+/* Název titulu čeká na logo z TMDB: text je průhledný, ať se nepřeskakuje (js: mfLogoHold) */
+html body .mf-logo-wait { color: transparent !important; text-shadow: none !important; }
+
+/* Označit sezónu jako zhlédnutou: pod seznamem epizod (v horní liště je místo „Všechny epizody“) */
+html body #seriesModal .season-mark-btn { display: block; margin: var(--sp-4) auto var(--sp-5); min-height: var(--h-md); padding: 0 var(--sp-4); border: 1px solid var(--w-2); border-radius: var(--r-pill); background: transparent; color: var(--c-text-3); font: inherit; font-size: var(--fs-sm); cursor: pointer; transition: color var(--t-fast) var(--ease-std), background var(--t-fast) var(--ease-std); }
+html body #seriesModal .season-mark-btn:hover { color: #fff; background: var(--w-1); }
+html body #seriesModal .season-mark-btn[hidden] { display: none; }

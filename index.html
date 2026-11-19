@@ -55,7 +55,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=16" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=16" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=88" />
+    <link rel="stylesheet" href="css/theme.css?v=89" />
     <link rel="stylesheet" href="css/wrapped.css?v=11" />
     <link rel="stylesheet" href="css/together.css?v=10" />
 
@@ -788,14 +788,6 @@
                 >
                   &#x2630; Všechny epizody
                 </button>
-                <button
-                  class="season-all-btn"
-                  id="seasonMarkBtn"
-                  onclick="toggleSeasonWatched()"
-                  hidden
-                >
-                  ✓ Označit sezónu
-                </button>
               </div>
             </div>
           </div>
@@ -826,6 +818,7 @@
             <div class="ep-view-trailer-container" id="epViewTrailer">
             </div>
             <div class="episode-grid" id="episodesGrid"></div>
+            <button type="button" class="season-mark-btn" id="seasonMarkBtn" onclick="toggleSeasonWatched()" hidden>✓ Označit sezónu</button>
           </div>
 
           <div id="seasonStrip" style="display: none">
@@ -1737,7 +1730,7 @@
     <script src="js/profiles/gate.js?v=10" defer></script>
     <script src="js/profiles/prefs.js" defer></script>
     <script src="js/app/core.js?v=12" defer></script>
-    <script src="js/app/series.js?v=18" defer></script>
+    <script src="js/app/series.js?v=19" defer></script>
     <script src="js/app/watchlist.js?v=10" defer></script>
     <script src="js/app/interaction.js?v=4" defer></script>
     <script src="js/app/notify.js?v=8" defer></script>
@@ -1748,7 +1741,7 @@
     <script src="js/app/sections.js?v=7" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=3" defer></script>
-    <script src="js/pages/discover.js?v=22" defer></script>
+    <script src="js/pages/discover.js?v=23" defer></script>
 
     <script>
       (function () {
@@ -1804,7 +1797,7 @@
 <script src="js/pages/cinema.js?v=22" defer></script>
     <script src="js/app/wrapped.js?v=4" defer></script>
     <script src="js/app/together.js?v=1" defer></script>
-    <script src="js/pages/home.js?v=41" defer></script>
+    <script src="js/pages/home.js?v=42" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/backup-reminder.js?v=1" defer></script>

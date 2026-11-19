@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.121 – audit detailu: zpět do Objevování, název bez blikání, Označit sezónu pod epizodami (claude/audit-detail)
 - 3.21.120 – výběr barvy akcentu v Nastavení (claude/akcent)
 - 3.21.119 – zavření oken tažením dolů (claude/gesto-zavrit)
 - 3.21.118 – haptika na dock, Oblíbené a hodnocení epizody (claude/haptika-akce)
