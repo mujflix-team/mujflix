@@ -253,6 +253,7 @@ async function mfFavFind(e) {
 
 function toggleWatchlistItem(e) {
   if ("string" != typeof e || !e) return;
+  "function" == typeof window.mfHaptic && window.mfHaptic(30);
   const t = getWatchlist(),
     n = t.findIndex(t => t.slug === e);
   if (n >= 0) t.splice(n, 1), showToast("Odebráno z Oblíbených");

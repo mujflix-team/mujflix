@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.118
+### Nově
+- **Haptika v akcích (Android):** krátká vibrace při klepnutí na dock, při přidání či odebrání z Oblíbených a při uložení hodnocení epizody. Sdílená funkce `mfHaptic` (v `pull.js`).
+
 ## 3.21.117
 ### Opraveno
 - **Silnější vibrace:** krátké impulzy (12–14 ms) na řadě Androidů nejsou cítit. Stažení dolů, tlačítko obnovení a menu karty teď vibrují 30–50 ms. iOS vibraci v prohlížeči/PWA nepodporuje vůbec.

@@ -22,6 +22,8 @@
     if (!("ontouchstart" in window)) return;
     var TH = 64, MAX = 96, K = 0.45, y0 = 0, pull = 0, armed = false, on = false, busy = false, ind = null; /* TH = práh obnovení, K = odpor (prst musí ujet cca 2,2× víc) */
     function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { void e; } } /* haptická odezva (Android; iOS vibrace nepodporuje) */
+    window.mfHaptic = buzz; /* sdílená haptika pro akce (dock, oblíbené, hodnocení) */
+    document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest(".dock-btn")) buzz(25); }, true);
     var BLOCK = '#seriesModal, #universeOverlay, #watchlistOverlay, #mfStandaloneCinema, #mfProfileGate, #mfSettings, #epRatingOverlay, [role="dialog"], [aria-modal="true"], .modal, .modal-content';
     /* jen když prst začne v horní části Domů (hlavní lišta nebo banner) a nic není otevřené nad ním (detail, epizody, Objevování, nastavení…) */
     function homeOk(t) {
