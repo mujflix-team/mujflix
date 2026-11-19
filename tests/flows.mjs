@@ -1711,6 +1711,20 @@ await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeo
 const tsT = await page.evaluate(() => { showToast("Na českých zdrojích se titul nenašel, zkouším zahraniční zdroje a taky ještě jeden delší text", 3800); const e = document.getElementById("mf-toast"), b = e.getBoundingClientRect(), c = getComputedStyle(e); return { l: Math.round(b.left), r: Math.round(b.right), h: Math.round(b.height), ws: c.whiteSpace, w: innerWidth }; });
 await page.setViewportSize({ width: 1280, height: 800 });
 check("hláška na telefonu: dlouhý text se zalomí a vejde do šířky obrazovky", tsT.ws === "normal" && tsT.l >= 0 && tsT.r <= tsT.w && tsT.h > 40, JSON.stringify(tsT));
+const neT = await page.evaluate(async () => {
+  const oT = window.tmdbGet, oW = getWatchlist(), oK = window.MF_USING_TMDB_PROXY; window.MF_USING_TMDB_PROXY = true;
+  saveWatchlistData([{ slug: "__tmdbfav_tv_990001", name: "Test seriál", type: "series", poster: "", tmdbId: 990001 }]);
+  localStorage.removeItem(uKey("mf_newep")); localStorage.removeItem(uKey("mf_newep_at"));
+  const day = d => new Date(Date.now() - d * 864e5).toISOString().slice(0, 10);
+  let ep = 3, air = day(1); window.tmdbGet = async () => ({ last_episode_to_air: { season_number: 1, episode_number: ep, air_date: air } });
+  const first = await mfNewEpisodesCheck(true);
+  ep = 4; const fresh = await mfNewEpisodesCheck(true);
+  ep = 5; air = day(60); const stale = await mfNewEpisodesCheck(true);
+  const same = await mfNewEpisodesCheck(true);
+  window.tmdbGet = oT; window.MF_USING_TMDB_PROXY = oK; saveWatchlistData(oW); localStorage.removeItem(uKey("mf_newep")); localStorage.removeItem(uKey("mf_newep_at"));
+  return { first: first.length, fresh: fresh.length, tag: fresh[0] && fresh[0].tag, stale: stale.length, same: same.length };
+});
+check("nové díly: první kontrola jen zapamatuje, čerstvý nový díl se ohlásí, starý a stejný ne", neT.first === 0 && neT.fresh === 1 && neT.tag === "S01E04" && neT.stale === 0 && neT.same === 0, JSON.stringify(neT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });
