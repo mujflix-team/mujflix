@@ -1707,6 +1707,10 @@ await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeo
 const rdMob = await page.evaluate(() => getComputedStyle(document.getElementById("hdrReload")).display);
 await page.setViewportSize({ width: 1280, height: 800 });
 check("tlačítko obnovení v horní liště: na počítači skryté (nepřekrývá avatar), na telefonu vidět", rdDesk === "none" && rdMob === "flex", rdDesk + "/" + rdMob);
+await page.setViewportSize({ width: 390, height: 800 }); await page.waitForTimeout(150);
+const tsT = await page.evaluate(() => { showToast("Na českých zdrojích se titul nenašel, zkouším zahraniční zdroje a taky ještě jeden delší text", 3800); const e = document.getElementById("mf-toast"), b = e.getBoundingClientRect(), c = getComputedStyle(e); return { l: Math.round(b.left), r: Math.round(b.right), h: Math.round(b.height), ws: c.whiteSpace, w: innerWidth }; });
+await page.setViewportSize({ width: 1280, height: 800 });
+check("hláška na telefonu: dlouhý text se zalomí a vejde do šířky obrazovky", tsT.ws === "normal" && tsT.l >= 0 && tsT.r <= tsT.w && tsT.h > 40, JSON.stringify(tsT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });

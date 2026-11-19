@@ -2022,3 +2022,8 @@ html body .mf-logo-wait { color: transparent !important; text-shadow: none !impo
 html body #seriesModal .season-mark-btn { display: block; margin: var(--sp-4) auto var(--sp-5); min-height: var(--h-md); padding: 0 var(--sp-4); border: 1px solid var(--w-2); border-radius: var(--r-pill); background: transparent; color: var(--c-text-3); font: inherit; font-size: var(--fs-sm); cursor: pointer; transition: color var(--t-fast) var(--ease-std), background var(--t-fast) var(--ease-std); }
 html body #seriesModal .season-mark-btn:hover { color: #fff; background: var(--w-1); }
 html body #seriesModal .season-mark-btn[hidden] { display: none; }
+
+/* Hlášky (toast) na telefonu: dlouhý text se zalomí místo ořezání, menší písmo, nad dockem místo přes obsah pod hlavičkou */
+@media (max-width: 899px) {
+  html body #mf-toast { top: auto !important; bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important; width: max-content; max-width: calc(100vw - 2 * var(--sp-4)) !important; white-space: normal !important; font-size: var(--fs-md) !important; line-height: 1.35; padding: var(--sp-3) var(--sp-4) !important; border-radius: var(--r-panel) !important; }
+}
