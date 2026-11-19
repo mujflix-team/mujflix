@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.122
+### Opraveno
+- **Tlačítko obnovení v horní liště** je jen na telefonu. Na počítači se zobrazovalo vedle avataru profilu a překrývalo ho (obě jsou teď přepnuté na stejné šířce 899 px).
+
 ## 3.21.121
 ### Opraveno
 - **Křížek v detailu seriálu z Objevování** vrací zpět do Objevování (se stejnými filtry), ne na Domů.
