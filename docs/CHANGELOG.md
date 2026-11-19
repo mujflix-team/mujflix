@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.116
+### Nově
+- **Tlačítko obnovení v horní liště Domů (telefon):** vpravo ve stejné výšce jako logo MůjFlix je ikona šipky. Klepnutí obnoví doporučení (nový výběr titulů, vibrace, otočení ikony). Stažení dolů zůstává, tohle je jednodušší alternativa.
+
 ## 3.21.114
 ### Opraveno
 - **Stažení dolů pro obnovení** funguje jen na horní části Domů (hlavní lišta a velký banner). Už nespouští obnovení na řadách pod bannerem, ve výběru epizod ani v jiných oknech.

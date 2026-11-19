@@ -3,6 +3,20 @@
    kolečko a po puštění se obnoví doporučení na Domů. Jen dotykové displeje. */
 (function mfPullRefresh() {
   try {
+    /* Tlačítko obnovení v hlavičce: na Domů nový výběr titulů, v Objevování nové řady, v ostatních sekcích překreslení sekce */
+    var rb = document.getElementById("hdrReload");
+    if (rb) rb.addEventListener("click", function () {
+      rb.classList.remove("spin"); void rb.offsetWidth; rb.classList.add("spin");
+      try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) { void e; }
+      var dv = document.getElementById("universeOverlay");
+      var onHome = document.documentElement.classList.contains("mfh-home-on") && !document.body.classList.contains("mf-section-protebe");
+      try {
+        if (dv && dv.classList.contains("open") && window.mfDiscoverReroll) window.mfDiscoverReroll();
+        else if (onHome && window.mfhNewPicks) window.mfhNewPicks();
+        else if (typeof window.mfShowSection === "function") window.mfShowSection(window._mfCurrentSection || "serialy");
+      } catch (e) { void e; }
+      if (typeof showToast === "function") showToast("Obnovuji…");
+    });
     /* návrat na stránku z paměti (zpět v PWA) – když zůstala prázdná/šedá, načti ji znovu */
     window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
     if (!("ontouchstart" in window)) return;

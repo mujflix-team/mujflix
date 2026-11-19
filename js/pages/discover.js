@@ -1183,6 +1183,7 @@
   });
   window.openUniverse = function () { openUniverse(false); };
   window.openDiscover = function () { openUniverse(false); };
+  window.mfDiscoverReroll = function () { varietySeed = 1 + Math.floor(Math.random() * 997); refresh(); }; /* tlačítko obnovení v hlavičce */
   window.openSearch = function () { openUniverse(true); };
   window.closeUniverse = closeUniverse;
   window.closeSearch = closeUniverse;

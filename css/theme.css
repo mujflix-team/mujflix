@@ -1996,3 +1996,13 @@ html body #seriesModal .sd-trailer-btn:hover .sd-trailer-play svg, html body #se
 #mfLoadBar.on { opacity: 1; }
 #mfLoadBar i { position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; background: var(--c-accent); border-radius: var(--ld-bar-h); animation: mfLdBar var(--sk-dur) var(--ease-std) infinite; }
 @media (prefers-reduced-motion: reduce) { #mfLoadBar i { animation: none; left: 0; width: 100%; opacity: .6; } }
+
+/* Tlačítko obnovení v horní liště Domů (jen telefon/tablet; viz js/shell/pull.js) */
+.nf-reload-btn { display: none; }
+@media (max-width: 900px) {
+  html body #nfTop .nf-reload-btn { display: flex; align-items: center; justify-content: center; flex: none; width: var(--h-lg); height: var(--h-lg); padding: 0; border: 0; border-radius: var(--r-pill); color: #fff; background: var(--w-2); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--t-fast) var(--ease-out), background var(--t-fast); }
+  html body #nfTop .nf-reload-btn:active { transform: scale(var(--fx-press)); background: var(--w-3); }
+  html body #nfTop .nf-reload-btn.spin svg { animation: mfReloadSpin .7s var(--ease-std) 1; }
+}
+@keyframes mfReloadSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { html body #nfTop .nf-reload-btn.spin svg { animation: none; } }
