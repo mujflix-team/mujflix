@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.116
+### Nově
+- **Tlačítko obnovení v horní liště Domů (telefon):** vpravo ve stejné výšce jako logo MůjFlix je ikona šipky. Klepnutí obnoví doporučení (nový výběr titulů, vibrace, otočení ikony). Stažení dolů zůstává, tohle je jednodušší alternativa.
+
 ## 3.21.115
 ### Změněno
 - **Rychlejší start:** doplnění obrázků, hodnocení a žánrů vestavěným seriálům se načítá po šesti najednou místo jednoho po druhém (při pomalé síti to dřív zabíralo desítky sekund), spojení s TMDB proxy se naváže už při startu a velký banner na Domů se načítá s vyšší prioritou.

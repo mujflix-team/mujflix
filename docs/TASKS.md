@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.116 – tlačítko obnovení vpravo v horní liště Domů (claude/ikona-obnovit)
 - 3.21.115 – rychlejší start: paralelní načtení detailů seriálů, preconnect, priorita banneru (claude/vykon)
 - 3.21.114 – stažení dolů jen na horní části Domů (claude/pull-jen-domu)
 - 3.21.113 – těžší stažení dolů + vibrace, proměnlivé Objevování (claude/pull-tezsi)

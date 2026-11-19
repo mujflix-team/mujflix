@@ -1348,9 +1348,13 @@ const setHash = await page.evaluate(async () => {
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const out = { oldGone: typeof window.MFSettings === "undefined" && typeof window.openSettings === "undefined" };
   if (location.hash === "#settings") { location.hash = "#serialy"; await wait(150); } // stejná adresa by hashchange nespustila
-  location.hash = "#settings";
   let m = null;
-  for (let i = 0; i < 30; i++) { await wait(100); m = document.getElementById("mfSettingsModal"); if (m && getComputedStyle(m).display !== "none") break; } // na pomalém CI trvá otevření déle než 300 ms
+  for (let att = 0; att < 3; att++) { // občas se hashchange při zaneprázdněné stránce ztratí, proto až 3 pokusy
+    if (att) { location.hash = "#serialy"; await wait(250); }
+    location.hash = "#settings";
+    for (let i = 0; i < 20; i++) { await wait(100); m = document.getElementById("mfSettingsModal"); if (m && getComputedStyle(m).display !== "none") break; } // na pomalém CI trvá otevření dél
+    if (m && getComputedStyle(m).display !== "none") break;
+  }
   out.opened = !!m && getComputedStyle(m).display !== "none";
   out.noKeyInputs = !document.getElementById("mfSetTmdb") && !document.getElementById("mfSetAnthro");
   if (window.MFProfileSettings) MFProfileSettings.close();
@@ -1647,6 +1651,8 @@ const focT = await page.evaluate(() => { const b = document.getElementById("focP
 check("kroužek při klávesnici: jednotný bílý 2px (--focus-ring)", focT[0] === "2px" && focT[1] === "rgb(255, 255, 255)" && focT[2] === "2px", JSON.stringify(focT));
 const fxT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--fx-hover-md").trim(), r.getPropertyValue("--fx-press").trim(), r.getPropertyValue("--blur-md").trim()]; });
 check("efekty: existují tokeny --fx-* a --blur-*", fxT.join() === "1.06,.96,20px", JSON.stringify(fxT));
+const rbT = await page.evaluate(() => { const o = window.mfhNewPicks; let n = 0; window.mfhNewPicks = () => { n++; }; document.documentElement.classList.add("mfh-home-on"); document.body.classList.remove("mf-section-protebe"); const b = document.getElementById("hdrReload"); b.click(); window.mfhNewPicks = o; document.documentElement.classList.remove("mfh-home-on"); return { n, inTop: !!b.closest("#nfTop"), spin: b.classList.contains("spin") }; });
+check("tlačítko obnovení v horní liště Domů: klepnutí vyvolá nový výběr titulů", rbT.n === 1 && rbT.inTop && rbT.spin, JSON.stringify(rbT));
 const pullT = await page.evaluate(async () => {
   window.ontouchstart = null; document.documentElement.classList.add("mfh-home-on"); window.scrollTo(0, 0);
   let n = 0; const origPicks = window.mfhNewPicks; window.mfhNewPicks = () => { n++; };
