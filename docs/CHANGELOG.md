@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.128
+### Nově
+- **TV ikona na kartách:** vlevo od srdíčka je na kartách v Domů a v Objevování ikona trailer (na počítači se ukáže při najetí, na telefonu je vidět stále). Klepnutí otevře trailer ve velkém okně. Nenajde-li se trailer, ukáže se hláška.
+
 ## 3.21.127
 ### Změněno
 - **Barva aplikace odstraněna:** výběr barvy akcentu v Nastavení je pryč (`js/shell/accent.js`), aplikace je vždy modrá.
