@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.133
+### Nově
+- **Tažení do strany přepíná sekce (telefon):** doleva další, doprava předchozí sekce na dolní liště (Domů, Seriály, Filmy, Oblíbené, Profil), s lehkou vibrací. Nezačne ve vodorovně posuvných řadách (na Domů funguje na bannerech a v mezerách mezi řadami), ve formulářích ani když je otevřené okno. Nový `js/shell/swipe-tabs.js`.
+
 ## 3.21.132
 ### Výkon
 - **Méně dotazů na TMDB:** stejný dotaz, který právě běží, se už neposílá znovu (do cache se ukládalo až po odpovědi, takže se tentýž seznam mohl žádat vícekrát souběžně). V testovacím měření spadl počet dotazů při startu ze 75 na 65; skutečný přínos na telefonu bude záviset na síti. Chybný dotaz se při dalším pokusu zkusí znovu.
