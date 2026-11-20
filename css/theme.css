@@ -2045,6 +2045,10 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 #mfStandaloneCinema .mf-cin-ep-chip.has-still.current { background: #000; color: #fff; outline: 2px solid #fff; outline-offset: -2px; }
 #mfStandaloneCinema .mf-cin-ep-chip.has-still.current img { opacity: 0.85; }
 
+/* kino: lišta bez hvězdy/hledání/tlačítka Epizody; výběr epizody otevírá klepnutí na číslo, jiný zdroj klepnutí na vybranou vlajku */
+#mfStandaloneCinema #mfCinRateBtn, #mfStandaloneCinema #mfCinSearchSrc, #mfStandaloneCinema #mfCinPickEp { display: none !important; }
+#mfStandaloneCinema #mfCinEpCurrent { cursor: pointer; }
+
 /* epizoda bez náhledu: místo opakovaného plakátu klidná dlaždice s číslem */
 .episode-card .ep-thumb .ep-noimg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: rgba(255, 255, 255, 0.22); background: linear-gradient(135deg, #2a2a2a, #181818); }
 

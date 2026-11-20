@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.138
+### Změněno
+- **Kino – horní lišta:** trailer má ikonu TV; pryč hvězdička (hodnocení), lupa a tlačítko Epizody. Klepnutí na už vybranou vlajku (CZ/EN) zkusí další zdroj ve skupině, klepnutí na číslo epizody otevře výběr epizod.
+
 ## 3.21.137
 ### Nově
 - **Epizody doplněné z TVmaze:** když TMDB u epizody nemá název, popis nebo náhled (starší pořady, talk show), doplní se z TVmaze (hledá se přes IMDb ID). Nic dalšího se v CSP povolovat nemuselo.

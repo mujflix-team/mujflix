@@ -406,7 +406,7 @@
           '<button type="button" class="mf-cin-fav-btn" id="mfCinBadSrc" aria-label="Zdroj nejde, zkusit další" title="Zdroj nejde – zkusit další"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn mf-cin-rate-btn" id="mfCinRateBtn" aria-label="Ohodnotit" title="Ohodnotit" style="display:none">☆</button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených" title="Přidat do Oblíbených">♡</button>' +
-          '<button type="button" class="mf-cin-fav-btn" id="mfCinTrailerBtn" aria-label="Přehrát trailer" title="Přehrát trailer"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>' +
+          '<button type="button" class="mf-cin-fav-btn" id="mfCinTrailerBtn" aria-label="Přehrát trailer" title="Přehrát trailer"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinShareBtn" aria-label="Sdílet odkaz" title="Sdílet odkaz"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinSearchSrc" aria-label="Hledat titul na tomto zdroji" title="Hledat titul na tomto zdroji (další klik zkusí jiný název)">' +
             '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
@@ -431,8 +431,10 @@
 
     modal.querySelector("#mfStandaloneCinemaClose").onclick = close;
     modal.querySelector("#mfCinSearchSrc").onclick = searchOnSource;
-    modal.querySelector("#mfCinLangCs").onclick = function () { setLang("cs"); };
-    modal.querySelector("#mfCinLangEn").onclick = function () { setLang("en"); };
+    /* už vybraná vlajka = zkusit další zdroj ve stejné skupině; druhá vlajka přepne skupinu */
+    modal.querySelector("#mfCinLangCs").onclick = function () { if (srcLang === "cs" && current) { cycleSource(1); toastSrc(); } else setLang("cs"); };
+    modal.querySelector("#mfCinLangEn").onclick = function () { if (srcLang === "en" && current) { cycleSource(1); toastSrc(); } else setLang("en"); };
+    modal.querySelector("#mfCinEpCurrent").onclick = toggleEpGrid;
     modal.querySelector("#mfCinBadSrc").onclick = reportBadSource;
     modal.querySelector("#mfCinPrevEp").onclick = function () { stepEpisode(-1); };
     modal.querySelector("#mfCinNextEp").onclick = function () { stepEpisode(1); };
@@ -688,6 +690,7 @@
     if (typeof showToast === "function") showToast(bad + " označen jako nefunkční, zkouším " + currentSrcLabel(), 2600);
   }
 
+  function toastSrc() { if (typeof showToast === "function") showToast("Zkouším " + currentSrcLabel(), 1800); }
   function cycleSource(dir, skipQuickCheck) {
     var sources = sourcesFor(current.type);
     // rychlé „Jiný zdroj“ krátce po načtení = zdroj nefungoval
