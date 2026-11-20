@@ -418,7 +418,7 @@
       /* Při startu volá překreslení víc míst za sebou (profil, historie, oblíbené…); sloučí se do jednoho, ať řady neblikají víckrát */
       var _rhT = 0;
       window.mfhNewPicks = function () {
-        _nfBump++; _nfCache = {}; _heroOpenPick = null; _heroSeed = Math.random(); _nfSig = '';
+        _nfBump++; _nfCache = {}; _heroOpenPick = null; _heroOpenItem = null; _heroSeed = Math.random(); _nfSig = '';
         try { renderHomepage(); } catch (e) { void e; }
       };
       window.mfhRefresh = function () { _nfSig = ''; try { window.renderHomepage(); } catch (e) { void e; } }; /* po změně doporučování se řady obnoví */
@@ -1119,17 +1119,18 @@
       window.mfhHeroReason = mfhHeroReason; // pro testy
 
       /* Banner: nedávno ukázané tituly (na profil) se vynechají; v rámci jednoho otevření aplikace zůstává stejný titul */
-      var _heroOpenPick = null;
+      var _heroOpenPick = null, _heroOpenItem = null, _heroOpenKey = '';
       function mfhPickHero(pool) {
         if (!pool.length) return null;
         var hkey = 'mf_hero_hist_' + ((typeof getActiveProfileId === 'function' && getActiveProfileId()) || 'default'), hist = [];
         try { hist = JSON.parse(localStorage.getItem(hkey) || '[]'); if (!Array.isArray(hist)) hist = []; } catch (e) { hist = []; }
         var idOf = function (it) { return (it.mediaType || '') + ':' + it.tmdbId; };
-        if (_heroOpenPick) { var again = pool.filter(function (it) { return idOf(it) === _heroOpenPick; })[0]; if (again) return again; }
+        if (_heroOpenKey !== hkey) { _heroOpenKey = hkey; _heroOpenPick = null; _heroOpenItem = null; }
+        if (_heroOpenPick) { var again = pool.filter(function (it) { return idOf(it) === _heroOpenPick; })[0]; if (again) { _heroOpenItem = again; return again; } if (_heroOpenItem) return _heroOpenItem; }
         var rest = pool.filter(function (it) { return hist.indexOf(idOf(it)) < 0; });
         if (!rest.length) rest = pool;
         var pick = rest[Math.floor(_heroSeed * rest.length)];
-        _heroOpenPick = idOf(pick);
+        _heroOpenPick = idOf(pick); _heroOpenItem = pick;
         hist = hist.filter(function (x) { return x !== _heroOpenPick; }); hist.push(_heroOpenPick);
         try { localStorage.setItem(hkey, JSON.stringify(hist.slice(-8))); } catch (e) {}
         return pick;

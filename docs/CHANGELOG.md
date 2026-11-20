@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.135
+### Opraveno
+- **Banner na Domů se při prvním startu neměnil víckrát:** když se během načítání změnil seznam kandidátů (načtené žánry apod.), vybral se jiný titul. Teď zůstává titul, který už se ukázal, po celé otevření aplikace (do ručního obnovení nebo změny profilu).
+
 ## 3.21.134
 ### Opraveno
 - **Stabilita testů:** test popisu v banneru občas padal, protože stránka z dřívějších testů byla odrolovaná a klik přes `page.click` ji posouval; teď se stránka před měřením vrátí nahoru a klik jde přímo na prvek. Test načítacího pruhu (od #139) čeká na zmizení pruhu místo pevných 150 ms. Test paměti zdrojů zůstává s opakováním (příčina souběhu se sondou zdrojů není jednoznačná).
