@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.136
+### Opraveno
+- **Epizody bez náhledu:** místo stejného plakátu u každé epizody se ukáže klidná dlaždice s číslem.
+- **Telefon:** barva systémové lišty (theme-color) sjednocena s dolní lištou aplikace (#121212), aby pod ní nebyl černý pás.
+
 ## 3.21.135
 ### Opraveno
 - **Banner na Domů se při prvním startu neměnil víckrát:** když se během načítání změnil seznam kandidátů (načtené žánry apod.), vybral se jiný titul. Teď zůstává titul, který už se ukázal, po celé otevření aplikace (do ručního obnovení nebo změny profilu).
