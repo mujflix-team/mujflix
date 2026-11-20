@@ -38,4 +38,36 @@
     });
   };
   window.mfCloseTrailer = close;
+
+  /* TV ikony na kartách jsou skryté (hidden + data-tk/data-tid), dokud se neověří, že trailer existuje:
+     zjišťuje se líně, až když je karta na očích, a nejvýš 4 dotazy naráz. Bez traileru se ikona z karty odstraní. */
+  var queue = [], running = 0;
+  function pump() {
+    while (running < 4 && queue.length) {
+      (function (b) {
+        running++;
+        keyFor(b.getAttribute("data-tk"), b.getAttribute("data-tid")).then(function (key) {
+          if (!b.isConnected) return;
+          if (key) b.hidden = false; else b.parentNode && b.parentNode.removeChild(b);
+        }).then(function () { running--; pump(); });
+      })(queue.shift());
+    }
+  }
+  if (window.IntersectionObserver && window.MutationObserver) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        var b = e.target.querySelector("[data-tk][hidden]");
+        if (b) { queue.push(b); pump(); }
+      });
+    }, { rootMargin: "200px" });
+    var scan = function (root) {
+      if (window.__mfNoTrailerProbe || !root.querySelectorAll) return;
+      var list = root.matches && root.matches("[data-tk][hidden]") ? [root] : [].slice.call(root.querySelectorAll("[data-tk][hidden]"));
+      list.forEach(function (b) { if (!b._mfp && b.parentNode) { b._mfp = 1; io.observe(b.parentNode); } });
+    };
+    new MutationObserver(function (ms) { ms.forEach(function (m) { [].forEach.call(m.addedNodes, function (n) { if (n.nodeType === 1) scan(n); }); }); }).observe(document.documentElement, { childList: true, subtree: true });
+    scan(document.documentElement);
+  }
 })();

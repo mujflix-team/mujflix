@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.129
+### Změněno
+- **TV ikona (trailer) na kartách** je v levém horním rohu plakátu, srdíčko zůstává vpravo.
+- **Ikona jen s trailerem:** TV ikona se na kartě ukáže, jen když TMDB trailer má; bez něj se odstraní. Ověřuje se líně, až když je karta na očích (nejvýš 4 dotazy naráz).
+
 ## 3.21.128
 ### Nově
 - **TV ikona na kartách:** vlevo od srdíčka je na kartách v Domů a v Objevování ikona trailer (na počítači se ukáže při najetí, na telefonu je vidět stále). Klepnutí otevře trailer ve velkém okně. Nenajde-li se trailer, ukáže se hláška.

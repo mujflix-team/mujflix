@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.129 – TV ikona (trailer) v levém rohu karty (claude/trailer-vlevo)
 - 3.21.128 – TV ikona (trailer) na kartách vlevo od srdíčka (claude/trailer-tlacitko)
 - 3.21.127 – trailer jako tlačítko místo najetí myší (claude/trailer-tlacitko)
 - 3.21.126 – oprava lintu v testu (claude/lint-fix)

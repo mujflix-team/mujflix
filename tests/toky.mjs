@@ -102,6 +102,7 @@ const myList = await page.evaluate(async () => {
   document.getElementById("mfProfileGate")?.style.setProperty("display", "none", "important");
   const slug = Object.keys(db)[0];
   saveWatchlistData([{ slug, name: db[slug].name, type: "series", poster: "" }, { slug: "__tmdbfav_movie_603", name: "Matrix", type: "movie", poster: "", tmdbId: 603 }]);
+  window.__mfNoTrailerProbe = true; /* ověření traileru testuje samostatný test v flows */
   window.mfhResetSig && window.mfhResetSig();
   window.renderHomepage(); await wait(2600);
   const cards = () => [...document.querySelectorAll("#mfhMyList .nf-card")];
@@ -118,7 +119,7 @@ const myList = await page.evaluate(async () => {
 });
 check("úvodní stránka: v řadě Oblíbené mají srdíčko všechny karty (i starší seriál bez TMDB ID) a klik ji odebere", myList.cards === 2 && myList.hearts === 2 && myList.left === "Matrix" && myList.cardsAfter === 1, JSON.stringify(myList));
 
-check("karta v Domů: TV ikona (trailer) je u titulu s TMDB ID, vlevo od srdíčka, ostatním chybí", myList.trl >= 1 && myList.trl < myList.cards + 1 && myList.trlOrder, JSON.stringify({ trl: myList.trl, order: myList.trlOrder }));
+check("karta v Domů: TV ikona (trailer) je u titulu s TMDB ID, v levém rohu před srdíčkem, ostatním chybí", myList.trl >= 1 && myList.trl < myList.cards + 1 && myList.trlOrder, JSON.stringify({ trl: myList.trl, order: myList.trlOrder }));
 
 // --- Detail seriálu: tlačítko „Označit sezónu“ označí všechny díly sezóny a druhým klepnutím je odznačí
 await seedProfiles(page, "p_A");
