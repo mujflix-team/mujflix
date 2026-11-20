@@ -205,6 +205,7 @@ function _tmdbMemGet(key) {
   return entry.data;
 }
 
+const _tmdbInflight = new Map();
 async function tmdbGet(e) {
   try {
     const t = e.startsWith("http") ? e : `${TMDB}${e}`,
@@ -213,18 +214,25 @@ async function tmdbGet(e) {
     const o = n.toString();
     const cached = _tmdbMemGet(o);
     if (cached) return cached;
-    const i = await mfFetch(o);
-    if (!i.ok) {
-      console.warn("[TMDB] HTTP error:", i.status, i.statusText);
-      return null;
-    }
-    const a = await i.json();
-    if (!a || typeof a !== 'object') {
-      console.warn("[TMDB] Invalid response structure");
-      return null;
-    }
-    _tmdbMemSet(o, a);
-    return a
+    /* Stejný dotaz, který právě běží, se nespouští znovu (při startu se tentýž seznam žádal až 14× souběžně) */
+    const fl = _tmdbInflight.get(o);
+    if (fl) return await fl;
+    const pr = (async () => {
+      const i = await mfFetch(o);
+      if (!i.ok) {
+        console.warn("[TMDB] HTTP error:", i.status, i.statusText);
+        return null;
+      }
+      const a = await i.json();
+      if (!a || typeof a !== 'object') {
+        console.warn("[TMDB] Invalid response structure");
+        return null;
+      }
+      _tmdbMemSet(o, a);
+      return a
+    })();
+    _tmdbInflight.set(o, pr);
+    try { return await pr } finally { _tmdbInflight.delete(o) }
   } catch (e) {
     console.error("[TMDB] Fetch error:", e.message);
     return null
