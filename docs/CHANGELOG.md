@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.21.128
+### Nově
+- **TV ikona na kartách:** vlevo od srdíčka je na kartách v Domů a v Objevování ikona trailer (na počítači se ukáže při najetí, na telefonu je vidět stále). Klepnutí otevře trailer ve velkém okně. Nenajde-li se trailer, ukáže se hláška.
+
+## 3.21.127
+### Změněno
+- **Barva aplikace odstraněna:** výběr barvy akcentu v Nastavení je pryč (`js/shell/accent.js`), aplikace je vždy modrá.
+- **Trailer jako tlačítko:** ukázka při najetí myší na kartu je pryč. Místo ní je v detailu seriálu tlačítko „Trailer“ (vedle sdílení) a v přehrávači filmů a epizod ikona přehrát v horní liště. Trailer se otevře v okně přes aplikaci (zavře křížek, klepnutí mimo nebo Esc). Nový `js/shell/trailer.js`.
+
 ## 3.21.126
 ### Opraveno
 - Lint v CI: nepoužitá proměnná v testu ukázky traileru (`tests/flows.mjs`).

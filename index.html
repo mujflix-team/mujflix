@@ -51,11 +51,10 @@
 
     <link rel="stylesheet" href="css/styles.css?v=24" />
     <link rel="stylesheet" href="css/patches.css" />
-    <script src="js/shell/accent.js?v=1"></script>
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
-    <link rel="stylesheet" href="css/discover.css?v=16" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="css/discover.css?v=16" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=92" />
+    <link rel="stylesheet" href="css/discover.css?v=17" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="css/discover.css?v=17" /></noscript>
+    <link rel="stylesheet" href="css/theme.css?v=94" />
     <link rel="stylesheet" href="css/wrapped.css?v=11" />
     <link rel="stylesheet" href="css/together.css?v=10" />
 
@@ -770,6 +769,14 @@
                 title="Sdílet odkaz" aria-label="Sdílet odkaz"
                 style="padding: 0 14px"
               ><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button>
+              <button
+                class="btn-shuffle"
+                id="modalTrailerBtn"
+                type="button"
+                onclick="mfPlayTrailer('tv', typeof activeSeries !== 'undefined' && db[activeSeries] && db[activeSeries].tmdbId)"
+                title="Přehrát trailer" aria-label="Přehrát trailer"
+                style="padding: 0 14px; gap: 6px"
+              ><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Trailer</span></button>
             </div>
           </div>
           <div class="sd-scroller sd-seasons-wrap"><div class="sd-seasons" id="sdSeasons" role="tablist" aria-label="Sezóny"></div></div>
@@ -1728,7 +1735,7 @@
     <script src="js/core/sync-ui.js?v=4" defer></script>
     <script src="js/ai/brain.js?v=2" defer></script>
     <script src="js/profiles/gate.js?v=10" defer></script>
-    <script src="js/profiles/prefs.js" defer></script>
+    <script src="js/profiles/prefs.js?v=2" defer></script>
     <script src="js/app/core.js?v=12" defer></script>
     <script src="js/app/series.js?v=19" defer></script>
     <script src="js/app/watchlist.js?v=10" defer></script>
@@ -1742,7 +1749,7 @@
     <script src="js/app/sections.js?v=7" defer></script>
     <script src="js/app/cinema-legacy.js?v=2" defer></script>
     <script src="js/app/fx.js?v=3" defer></script>
-    <script src="js/pages/discover.js?v=23" defer></script>
+    <script src="js/pages/discover.js?v=24" defer></script>
 
     <script>
       (function () {
@@ -1795,10 +1802,10 @@
     </script>
 
 <script src="js/app/card-menu.js?v=4" defer></script>
-<script src="js/pages/cinema.js?v=22" defer></script>
+<script src="js/pages/cinema.js?v=23" defer></script>
     <script src="js/app/wrapped.js?v=4" defer></script>
     <script src="js/app/together.js?v=1" defer></script>
-    <script src="js/pages/home.js?v=42" defer></script>
+    <script src="js/pages/home.js?v=43" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/backup-reminder.js?v=1" defer></script>
@@ -1807,7 +1814,7 @@
     <script src="js/shell/progress.js?v=1" defer></script>
     <script src="js/shell/pull.js?v=7" defer></script>
     <script src="js/shell/swipe-close.js?v=1" defer></script>
-    <script src="js/shell/hover-trailer.js?v=2" defer></script>
+    <script src="js/shell/trailer.js?v=1" defer></script>
     <script src="js/shell/titleurl.js?v=6" defer></script>
 
 </body>

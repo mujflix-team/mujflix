@@ -444,12 +444,20 @@
         if (f.slug) return getWatchlist().some(function (w) { return w.slug === f.slug; });
         return isTmdbFavorite(f.id, f.type);
       }
+      /* Tlačítko s TV ikonou vlevo od srdíčka: otevře trailer v okně (mfPlayTrailer, js/shell/trailer.js) */
+      function mfhTrailerButton(it) {
+        var id = it && (it.tmdbId || (it.fav && it.fav.tmdbId));
+        if (!id || it.slug) return '';
+        var k = (it.mediaType === 'tv' || (it.fav && it.fav.type === 'series')) ? 'tv' : 'movie';
+        return '<button type="button" class="nf-trl" title="Přehrát trailer" aria-label="Trailer: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfPlayTrailer(\'' + k + '\', ' + (+id) + ')">' +
+          '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>';
+      }
       function mfhFavButton(it, cid, idx) {
         var f = mfhFavInfo(it);
-        if (!f || typeof isTmdbFavorite !== 'function') return '';
+        if (!f || typeof isTmdbFavorite !== 'function') return mfhTrailerButton(it);
         var on = false;
         try { on = mfhFavOn(f); } catch (e) {}
-        return '<button type="button" class="nf-fav' + (on ? ' on' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + (on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených') + '" aria-label="Oblíbené: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfhToggleFav(this, \'' + cid + '\', ' + idx + ')">' +
+        return mfhTrailerButton(it) + '<button type="button" class="nf-fav' + (on ? ' on' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + (on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených') + '" aria-label="Oblíbené: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfhToggleFav(this, \'' + cid + '\', ' + idx + ')">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z"/></svg></button>';
       }
       window.mfhToggleFav = function (btn, cid, idx) {

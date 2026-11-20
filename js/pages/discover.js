@@ -255,6 +255,22 @@
     return b;
   }
 
+  /* TV ikona vlevo od srdíčka: otevře trailer v okně (mfPlayTrailer, js/shell/trailer.js) */
+  function trailerButton(it) {
+    var b = el('button', 'dv-trl');
+    b.type = 'button';
+    b.title = 'Přehrát trailer';
+    b.setAttribute('aria-label', 'Trailer: ' + it.title);
+    var s = svg('', 18), ns = 'http://www.w3.org/2000/svg';
+    s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+    var r = document.createElementNS(ns, 'rect'); r.setAttribute('x', 3); r.setAttribute('y', 5); r.setAttribute('width', 18); r.setAttribute('height', 12); r.setAttribute('rx', 2);
+    var l = document.createElementNS(ns, 'path'); l.setAttribute('d', 'M8 21h8M12 17v4');
+    s.appendChild(r); s.appendChild(l);
+    b.appendChild(s);
+    b.addEventListener('click', function (e) { e.stopPropagation(); if (typeof window.mfPlayTrailer === 'function') window.mfPlayTrailer(it.type === 'tv' ? 'tv' : 'movie', it.id); });
+    return b;
+  }
+
   /* Symbol přehrání uprostřed plakátu: jen šedý trojúhelník jako na náhledu epizody, zbělá a zvětší se při najetí přímo na něj.
      Je jen vizuální, klik (i na trojúhelník) otevírá kartu jako dřív. */
   function playCue() {
@@ -294,6 +310,7 @@
     if (it.rating > 0) p.appendChild(el('span', 'dv-rate', '★ ' + it.rating.toFixed(1)));
     if (showType) p.appendChild(el('span', 'dv-type', it.type === 'tv' ? 'Seriál' : 'Film'));
     p.appendChild(playCue());
+    if (it.id) p.appendChild(trailerButton(it));
     p.appendChild(favButton(it));
     c.appendChild(p);
 
