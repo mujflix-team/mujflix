@@ -252,6 +252,17 @@ async function mfFetch(url, options = {}) {
    Chybějící údaje se proto doplní z anglické verze (název jen když není také jen „Episode N“). */
 const _genericEpName = n => !n || /^(\d+\.\s*)?(epizoda|episode|díl|dil)\s*\d*\.?$/i.test(String(n).trim());
 
+/* Doplnění chybějících údajů epizod z TVmaze (TMDB je u starších pořadů často nemá). Vyhledá se přes IMDb ID, výsledek se drží v paměti. */
+const _tvmazeShow = {};
+function mfTvmazeEpisodes(tmdbId) {
+  if (_tvmazeShow[tmdbId]) return _tvmazeShow[tmdbId];
+  const j = u => fetch(u).then(r => r.ok ? r.json() : null);
+  return _tvmazeShow[tmdbId] = tmdbGet(`/tv/${tmdbId}/external_ids`).then(x => x && x.imdb_id ? j("https://api.tvmaze.com/lookup/shows?imdb=" + x.imdb_id) : null)
+    .then(sh => sh && sh.id ? j(`https://api.tvmaze.com/shows/${sh.id}/episodes`) : null)
+    .then(list => { if (!Array.isArray(list)) return null; const m = {}; list.forEach(e => { m[e.season + "-" + e.number] = e }); return m })
+    .catch(() => null);
+}
+
 async function fetchTmdbSeason(e, t) {
   const n = `${e}-S${t}`;
   if (void 0 !== tmdbCache[n]) return tmdbCache[n];
@@ -271,11 +282,19 @@ async function fetchTmdbSeason(e, t) {
           vote_count: x.vote_count || f.vote_count, vote_average: x.vote_average || f.vote_average } })
       }
     }
+    if (eps.some(x => _genericEpName(x.name) || !x.still_path || !x.overview)) {
+      const tv = await mfTvmazeEpisodes(id);
+      if (tv) eps = eps.map(x => { const f = tv[t + "-" + x.episode_number]; if (!f) return x; const img = f.image && (f.image.original || f.image.medium);
+        return { ...x, name: _genericEpName(x.name) && f.name && !_genericEpName(f.name) ? f.name : x.name,
+          overview: x.overview || String(f.summary || "").replace(/<[^>]*>/g, "").trim(),
+          runtime: x.runtime || f.runtime || 0, _still: !x.still_path && img ? String(img).replace(/^http:/, "https:") : null,
+          vote_count: x.vote_count || (f.rating && f.rating.average ? 3 : 0), vote_average: x.vote_average || (f.rating && f.rating.average) || 0 } });
+    }
     return tmdbCache[n] = eps.map(e => ({
       ep: e.episode_number,
       name: e.name || `Epizoda ${e.episode_number}`,
-      still: e.still_path ? IMG + e.still_path : null,
-      stillS: e.still_path ? IMG_S + e.still_path : null,
+      still: e.still_path ? IMG + e.still_path : e._still || null,
+      stillS: e.still_path ? IMG_S + e.still_path : e._still || null,
       overview: e.overview || "",
       runtime: e.runtime || 0,
       rating: e.vote_count > 2 ? e.vote_average || 0 : 0

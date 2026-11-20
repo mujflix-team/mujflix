@@ -1349,6 +1349,14 @@ const heroPickT = await page.evaluate(() => {
   } finally { window.getActiveProfileId = origId; localStorage.removeItem("mf_hero_hist_pid-hero"); }
 });
 check("banner: nevybírá nedávno ukázané tituly a v rámci jednoho otevření se nemění", heroPickT.first === 105 && heroPickT.same && heroPickT.hist === 6, JSON.stringify(heroPickT));
+const tvmT = await page.evaluate(async () => {
+  const og = window.tmdbGet, of = window.fetch, slug = "__tvm_test";
+  db[slug] = { tmdbId: 777 };
+  window.tmdbGet = async p => p.includes("external_ids") ? { imdb_id: "tt1" } : p.includes("/season/") ? { episodes: [{ episode_number: 1, name: "1. epizoda", overview: "", still_path: null }] } : null;
+  window.fetch = async u => String(u).includes("lookup") ? { ok: true, json: async () => ({ id: 5 }) } : String(u).includes("/episodes") ? { ok: true, json: async () => [{ season: 1, number: 1, name: "Pilot", summary: "<p>Popis</p>", image: { original: "http://x/y.jpg" }, runtime: 30 }] } : of(u);
+  try { const r = await fetchTmdbSeason(slug, 1); return r && r[0]; } finally { window.tmdbGet = og; window.fetch = of; delete db[slug]; delete tmdbCache[slug + "-S1"]; }
+});
+check("epizody: chybějící název, popis a náhled se doplní z TVmaze", tvmT && tvmT.name === "Pilot" && tvmT.overview === "Popis" && tvmT.still === "https://x/y.jpg", JSON.stringify(tvmT));
 const heroReasonT = await page.evaluate(() => ({
   match: mfhHeroReason({ genreIds: [878, 28, 18] }, ["878", "28", "35"]),
   none: mfhHeroReason({ genreIds: [27] }, ["878", "28"]),

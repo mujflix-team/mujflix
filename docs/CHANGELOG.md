@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.136
+### Nově
+- **Epizody doplněné z TVmaze:** když TMDB u epizody nemá název, popis nebo náhled (starší pořady, talk show), doplní se z TVmaze (hledá se přes IMDb ID). Nic dalšího se v CSP povolovat nemuselo.
+
 ## 3.21.135
 ### Opraveno
 - **Banner na Domů se při prvním startu neměnil víckrát:** když se během načítání změnil seznam kandidátů (načtené žánry apod.), vybral se jiný titul. Teď zůstává titul, který už se ukázal, po celé otevření aplikace (do ručního obnovení nebo změny profilu).
