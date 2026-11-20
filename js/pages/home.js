@@ -449,7 +449,7 @@
         var id = it && (it.tmdbId || (it.fav && it.fav.tmdbId));
         if (!id || it.slug) return '';
         var k = (it.mediaType === 'tv' || (it.fav && it.fav.type === 'series')) ? 'tv' : 'movie';
-        return '<button type="button" class="nf-trl" title="Přehrát trailer" aria-label="Trailer: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfPlayTrailer(\'' + k + '\', ' + (+id) + ')">' +
+        return '<button type="button" class="nf-trl" hidden data-tk="' + k + '" data-tid="' + (+id) + '" title="Přehrát trailer" aria-label="Trailer: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfPlayTrailer(\'' + k + '\', ' + (+id) + ')">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>';
       }
       function mfhFavButton(it, cid, idx) {

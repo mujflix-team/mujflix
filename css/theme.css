@@ -2028,8 +2028,9 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 #mfTrailerBox .tb-x { position: absolute; top: var(--sp-3); right: var(--sp-3); z-index: 2; width: var(--h-lg); height: var(--h-lg); border: 0; border-radius: var(--r-pill); background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 1.2rem; cursor: pointer; }
 #mfTrailerBox .tb-x:hover { background: rgba(0, 0, 0, 0.85); }
 
-/* TV ikona (trailer) vlevo od srdíčka na kartách Domů a Objevovat */
-.nf-trl { position: absolute; z-index: 3; top: 6px; right: 40px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #fff; background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity var(--t-fast), background var(--t-fast); }
+/* TV ikona (trailer) v levém horním rohu plakátu na kartách Domů a Objevovat (srdíčko je vpravo) */
+.nf-trl { position: absolute; z-index: 3; top: 6px; left: 6px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #fff; background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity var(--t-fast), background var(--t-fast); }
 .nf-card:hover .nf-trl, .nf-card:focus-within .nf-trl { opacity: 1; }
 .nf-trl:hover { background: rgba(0, 0, 0, 0.85); }
-@media (hover: none) { .nf-trl { opacity: 1; width: 28px; height: 28px; right: 38px; } .nf-trl svg { width: 15px; height: 15px; } }
+@media (hover: none) { .nf-trl { opacity: 1; width: 28px; height: 28px; } .nf-trl svg { width: 15px; height: 15px; } }
+.nf-trl[hidden] { display: none !important; }

@@ -259,6 +259,7 @@
   function trailerButton(it) {
     var b = el('button', 'dv-trl');
     b.type = 'button';
+    b.hidden = true; b.setAttribute('data-tk', it.type === 'tv' ? 'tv' : 'movie'); b.setAttribute('data-tid', String(it.id)); /* ukáže se, až se ověří, že trailer existuje (trailer.js) */
     b.title = 'Přehrát trailer';
     b.setAttribute('aria-label', 'Trailer: ' + it.title);
     var s = svg('', 18), ns = 'http://www.w3.org/2000/svg';

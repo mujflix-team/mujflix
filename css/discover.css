@@ -300,10 +300,11 @@
 }
 
 #universeOverlay .dv-trl {
-  position: absolute; z-index: 3; top: 6px; right: 44px; width: 32px; height: 32px; border-radius: 50%; border: 0; cursor: pointer;
+  position: absolute; z-index: 3; top: 6px; left: 6px; width: 32px; height: 32px; border-radius: 50%; border: 0; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; color: #fff; padding: 0;
   background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity var(--t-fast), background var(--t-fast);
 }
 #universeOverlay .dv-card:hover .dv-trl, #universeOverlay .dv-card:focus-within .dv-trl { opacity: 1; }
 #universeOverlay .dv-trl:hover { background: rgba(0, 0, 0, 0.85); }
 @media (hover: none) { #universeOverlay .dv-trl { opacity: 1; } }
+#universeOverlay .dv-trl[hidden] { display: none !important; }

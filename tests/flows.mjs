@@ -1728,6 +1728,16 @@ const trbT = await page.evaluate(async () => {
   return { noId, src, closed, serBtn: !!document.getElementById("modalTrailerBtn"), cinBtn: !!document.getElementById("mfCinTrailerBtn") || typeof MFCinemaPlayer !== "undefined" };
 });
 check("trailer: tlačítko v detailu seriálu a v přehrávači, trailer se přehraje v okně a zavře Esc", trbT.noId && /youtube-nocookie\.com\/embed\/abc123XYZ\?autoplay=1/.test(trbT.src) && trbT.closed && trbT.serBtn && trbT.cinBtn, JSON.stringify(trbT));
+const tvikT = await page.evaluate(async () => {
+  const o = window.tmdbGet; let calls = 0;
+  window.tmdbGet = async p => { calls++; return { results: /\/tv\/7001\//.test(p) ? [{ site: "YouTube", key: "kk1", type: "Trailer", iso_639_1: "cs" }] : [] }; };
+  const host = document.createElement("div"); host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px;z-index:99999";
+  host.innerHTML = '<div class="p1" style="width:80px;height:80px"><button class="nf-trl" hidden data-tk="tv" data-tid="7001"></button></div><div class="p2" style="width:80px;height:80px"><button class="nf-trl" hidden data-tk="tv" data-tid="7002"></button></div>';
+  document.body.appendChild(host); await new Promise(r => setTimeout(r, 700));
+  const shown = !host.querySelector('[data-tid="7001"]').hidden, removed = !host.querySelector('[data-tid="7002"]');
+  host.remove(); window.tmdbGet = o; return { shown, removed, calls };
+});
+check("TV ikona na kartě: ukáže se jen u titulu s trailerem, bez traileru se odstraní", tvikT.shown && tvikT.removed && tvikT.calls === 2, JSON.stringify(tvikT));
 const ldRoute = /^(?!http:\/\/localhost)/;
 await page.route(ldRoute, r => setTimeout(() => r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: "{}" }).catch(() => {}), 900));
 await page.evaluate(() => { window.__ldP = fetch("https://api.themoviedb.org/3/x").catch(() => {}); });
