@@ -4,6 +4,10 @@
 ### Výkon
 - **Méně dotazů na TMDB:** stejný dotaz, který právě běží, se už neposílá znovu (do cache se ukládalo až po odpovědi, takže se tentýž seznam mohl žádat vícekrát souběžně). V testovacím měření spadl počet dotazů při startu ze 75 na 65; skutečný přínos na telefonu bude záviset na síti. Chybný dotaz se při dalším pokusu zkusí znovu.
 
+## 3.21.130
+### Nově
+- **Náhledy epizod ve výběru epizod** v přehrávači: dřív tam byla jen čísla, teď je za číslem náhled epizody z TMDB (chybějící obrázek a název se doplní z angličtiny). Funguje i u seriálů bez českých zdrojů; epizoda bez obrázku zůstane jen s číslem.
+
 ## 3.21.129
 ### Změněno
 - **TV ikona (trailer) na kartách** je v levém horním rohu plakátu, srdíčko zůstává vpravo.
