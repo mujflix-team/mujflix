@@ -2048,3 +2048,9 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 /* kino: lišta bez hvězdy/hledání/tlačítka Epizody; výběr epizody otevírá klepnutí na číslo, jiný zdroj klepnutí na vybranou vlajku */
 #mfStandaloneCinema #mfCinRateBtn, #mfStandaloneCinema #mfCinSearchSrc, #mfStandaloneCinema #mfCinPickEp { display: none !important; }
 #mfStandaloneCinema #mfCinEpCurrent { cursor: pointer; }
+
+/* epizoda bez náhledu: místo opakovaného plakátu klidná dlaždice s číslem */
+.episode-card .ep-thumb .ep-noimg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: rgba(255, 255, 255, 0.22); background: linear-gradient(135deg, #2a2a2a, #181818); }
+
+/* telefon: pás pod spodní lištou ve stejné šedé jako lišta (ne černá) */
+@media (max-width: 899px) { html, body { background-color: #121212; } }
