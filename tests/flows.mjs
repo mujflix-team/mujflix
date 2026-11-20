@@ -1344,7 +1344,8 @@ const heroPickT = await page.evaluate(() => {
     const pool = Array.from({ length: 6 }, (_, i) => ({ mediaType: "tv", tmdbId: 100 + i }));
     localStorage.setItem("mf_hero_hist_pid-hero", JSON.stringify(pool.slice(0, 5).map(x => "tv:" + x.tmdbId)));
     const first = mfhPickHero(pool), again = mfhPickHero(pool);
-    return { first: first.tmdbId, same: again.tmdbId === first.tmdbId, hist: JSON.parse(localStorage.getItem("mf_hero_hist_pid-hero")).length };
+    const other = mfhPickHero([{ mediaType: "tv", tmdbId: 900 }, { mediaType: "tv", tmdbId: 901 }]);
+    return { first: first.tmdbId, same: again.tmdbId === first.tmdbId && other.tmdbId === first.tmdbId, hist: JSON.parse(localStorage.getItem("mf_hero_hist_pid-hero")).length };
   } finally { window.getActiveProfileId = origId; localStorage.removeItem("mf_hero_hist_pid-hero"); }
 });
 check("banner: nevybírá nedávno ukázané tituly a v rámci jednoho otevření se nemění", heroPickT.first === 105 && heroPickT.same && heroPickT.hist === 6, JSON.stringify(heroPickT));
