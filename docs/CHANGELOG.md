@@ -4,6 +4,18 @@
 ### Opraveno
 - **Stabilita testů:** test popisu v banneru občas padal, protože stránka z dřívějších testů byla odrolovaná a klik přes `page.click` ji posouval; teď se stránka před měřením vrátí nahoru a klik jde přímo na prvek. Test načítacího pruhu (od #139) čeká na zmizení pruhu místo pevných 150 ms. Test paměti zdrojů zůstává s opakováním (příčina souběhu se sondou zdrojů není jednoznačná).
 
+## 3.21.133
+### Nově
+- **Tažení do strany přepíná sekce (telefon):** doleva další, doprava předchozí sekce na dolní liště (Domů, Seriály, Filmy, Oblíbené, Profil), s lehkou vibrací. Nezačne ve vodorovně posuvných řadách (na Domů funguje na bannerech a v mezerách mezi řadami), ve formulářích ani když je otevřené okno. Nový `js/shell/swipe-tabs.js`.
+
+## 3.21.132
+### Výkon
+- **Méně dotazů na TMDB:** stejný dotaz, který právě běží, se už neposílá znovu (do cache se ukládalo až po odpovědi, takže se tentýž seznam mohl žádat vícekrát souběžně). V testovacím měření spadl počet dotazů při startu ze 75 na 65; skutečný přínos na telefonu bude záviset na síti. Chybný dotaz se při dalším pokusu zkusí znovu.
+
+## 3.21.131
+### Opraveno
+- **Šedá obrazovka po gestu Zpět v nainstalované aplikaci:** na úvodní obrazovce Zpět rovnou opouštělo aplikaci a Android při tom zešedl celou obrazovku (náhled odchodu). Teď je pod aplikací pojistná položka historie: první Zpět jen ukáže „Pro ukončení stiskni Zpět ještě jednou“ a zůstane v aplikaci, druhý Zpět do 2 s ji normálně opustí. Jen v nainstalované aplikaci (standalone). Nový `js/shell/back-guard.js`.
+
 ## 3.21.130
 ### Nově
 - **Náhledy epizod ve výběru epizod** v přehrávači: dřív tam byla jen čísla, teď je za číslem náhled epizody z TMDB (chybějící obrázek a název se doplní z angličtiny). Funguje i u seriálů bez českých zdrojů; epizoda bez obrázku zůstane jen s číslem.

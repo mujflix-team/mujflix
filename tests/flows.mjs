@@ -118,6 +118,40 @@ const cin = await page.evaluate(() => {
 });
 check("cinema: neoznačuje epizody cizího seriálu", cin.marked.length === 0, JSON.stringify(cin));
 
+// --- Tažení do strany přepíná sekce na dolní liště (jen mimo vodorovné řady a okna)
+const swtT = await page.evaluate(async () => {
+  window.ontouchstart = null;
+  await new Promise(r => { const sc = document.createElement("script"); sc.src = "js/shell/swipe-tabs.js"; sc.onload = r; document.body.appendChild(sc); });
+  const ORDER = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"];
+  const gate = document.getElementById("mfProfileGate"); if (gate) gate.style.setProperty("display", "none", "important");
+  const openMods = [...document.querySelectorAll("#seriesModal.open, #mfStandaloneCinema.open, #epRatingOverlay.open")]; openMods.forEach(m => m.classList.remove("open")); /* okno z dřívějšího testu swipe správně blokuje */ /* otevřený výběr profilu swipe správně blokuje */
+  const prevAct = document.querySelector(".dock-btn.active"); document.querySelectorAll(".dock-btn.active").forEach(b => b.classList.remove("active")); document.getElementById("dockFilmy").classList.add("active");
+  const act = document.querySelector(".dock-btn.active"); const i = ORDER.indexOf(act && act.id);
+  const clicks = []; const cap = e => { const b = e.target.closest && e.target.closest(".dock-btn"); if (b) { clicks.push(b.id); e.stopPropagation(); e.preventDefault(); } };
+  document.addEventListener("click", cap, true);
+  const wide = document.createElement("div"); wide.style.cssText = "position:fixed;left:0;top:0;width:200px;height:50px;overflow-x:auto;z-index:99999"; wide.innerHTML = '<div style="width:900px;height:20px"></div>'; document.body.appendChild(wide);
+  const sw = (tgt, x0, x1, y1) => { const f = (t, x, y) => { const e = new Event(t, { bubbles: true }); const pt = { clientX: x, clientY: y }; e.touches = t === "touchend" ? [] : [pt]; e.changedTouches = [pt]; tgt.dispatchEvent(e); }; f("touchstart", x0, 300); f("touchmove", (x0 + x1) / 2, 300); f("touchend", x1, y1 === undefined ? 300 : y1); };
+  sw(document.body, 300, 120); const left = clicks.slice();
+  sw(document.body, 300, 260); const shortSw = clicks.length - left.length;
+  sw(document.body, 300, 120, 480); const vert = clicks.length - left.length - shortSw;
+  sw(wide, 180, 20); const inRow = clicks.length - left.length - shortSw - vert;
+  sw(document.body, 120, 300); const right = clicks.slice(left.length + shortSw + vert + inRow);
+  document.removeEventListener("click", cap, true); wide.remove();
+  document.getElementById("dockFilmy").classList.remove("active"); prevAct && prevAct.classList.add("active"); if (gate) gate.style.removeProperty("display"); openMods.forEach(m => m.classList.add("open"));
+  return { start: act && act.id, left, right, shortSw, vert, inRow, i };
+});
+const expLeft = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"][swtT.i + 1], expRight = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"][swtT.i - 1];
+check("sekce tažením: doleva další, doprava předchozí; krátké, svislé a tažení ve vodorovné řadě nic nepřepne", swtT.i >= 0 && swtT.left.length === 1 && swtT.left[0] === expLeft && swtT.shortSw === 0 && swtT.vert === 0 && swtT.inRow === 0 && swtT.right.length === 1 && swtT.right[0] === expRight, JSON.stringify(swtT));
+// --- Výkon: stejný souběžný dotaz na TMDB se pošle jen jednou
+const dedupT = await page.evaluate(async () => {
+  const o = window.fetch; let n = 0;
+  window.fetch = async (u, ...r) => { if (!/__dedupe/.test(String(u))) return o(u, ...r); n++; await new Promise(x => setTimeout(x, 60)); return new Response(JSON.stringify({ results: [1] }), { status: 200 }); };
+  const rs = await Promise.all([tmdbGet("/__dedupe/test"), tmdbGet("/__dedupe/test"), tmdbGet("/__dedupe/test")]);
+  const first = n; window.fetch = async (u, ...r) => { if (!/__dedupe/.test(String(u))) return o(u, ...r); n++; return new Response("{}", { status: 500 }); };
+  await tmdbGet("/__dedupe/err"); await tmdbGet("/__dedupe/err");
+  window.fetch = o; return { first, same: rs[0] === rs[1] && rs[1] === rs[2] && rs[0].results.length === 1, errCalls: n - first };
+});
+check("výkon: tři souběžné stejné dotazy na TMDB = jeden požadavek; chyba se při dalším pokusu zkusí znovu", dedupT.first === 1 && dedupT.same && dedupT.errCalls === 2, JSON.stringify(dedupT));
 // --- Výběr epizod v přehrávači: náhledy epizod z TMDB (i bez českých zdrojů), chybějící obrázek se doplní z angličtiny
 const epTh = await page.evaluate(async () => {
   const o = window.tmdbGet, calls = [];
@@ -2751,5 +2785,15 @@ check("soukromí: odkazy se otevírají ve stejném okně (bez nové karty)", le
 }
 
 check("žádné JS chyby", errors.length === 0, errors.join(" | "));
+// --- PWA: pojistná položka historie, první Zpět ukáže hlášku a zůstane v aplikaci (poslední test, mění historii)
+await page.evaluate(() => { window.__mfForceStandalone = true; });
+await page.evaluate(() => new Promise(r => { const s = document.createElement("script"); s.src = "js/shell/back-guard.js"; s.onload = r; document.body.appendChild(s); }));
+const bg0 = await page.evaluate(() => ({ guard: !!(history.state && history.state.mfGuard) }));
+await page.goBack().catch(() => {}); await page.waitForTimeout(400);
+const bg1 = await page.evaluate(() => ({ base: !!(history.state && history.state.mfBase), toast: /Zpět ještě jednou/.test((document.getElementById("mf-toast") || {}).textContent || "") }));
+await page.waitForTimeout(2400);
+const bg2 = await page.evaluate(() => ({ guard: !!(history.state && history.state.mfGuard) }));
+check("PWA zpět: pojistná položka historie; první Zpět ukáže hlášku, po chvíli se pojistka vrátí", bg0.guard && bg1.base && bg1.toast && bg2.guard, JSON.stringify({ bg0, bg1, bg2 }));
+
 await close();
 finish();
