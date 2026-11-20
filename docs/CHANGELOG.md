@@ -1,8 +1,12 @@
 # Changelog
 
-## 3.21.136
+## 3.21.137
 ### Nově
 - **Epizody doplněné z TVmaze:** když TMDB u epizody nemá název, popis nebo náhled (starší pořady, talk show), doplní se z TVmaze (hledá se přes IMDb ID). Nic dalšího se v CSP povolovat nemuselo.
+
+### Opraveno
+- **Epizody bez náhledu:** místo stejného plakátu u každé epizody se ukáže klidná dlaždice s číslem.
+- **Telefon:** barva systémové lišty (theme-color) sjednocena s dolní lištou aplikace (#121212), aby pod ní nebyl černý pás.
 
 ## 3.21.135
 ### Opraveno
