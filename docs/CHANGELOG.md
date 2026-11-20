@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.133
+### Nově
+- **Tažení do strany přepíná sekce (telefon):** doleva další, doprava předchozí sekce na dolní liště (Domů, Seriály, Filmy, Oblíbené, Profil), s lehkou vibrací. Nezačne ve vodorovně posuvných řadách (na Domů funguje na bannerech a v mezerách mezi řadami), ve formulářích ani když je otevřené okno. Nový `js/shell/swipe-tabs.js`.
+
 ## 3.21.129
 ### Změněno
 - **TV ikona (trailer) na kartách** je v levém horním rohu plakátu, srdíčko zůstává vpravo.
