@@ -118,6 +118,17 @@ const cin = await page.evaluate(() => {
 });
 check("cinema: neoznačuje epizody cizího seriálu", cin.marked.length === 0, JSON.stringify(cin));
 
+// --- Výkon: stejný souběžný dotaz na TMDB se pošle jen jednou
+const dedupT = await page.evaluate(async () => {
+  const o = window.fetch; let n = 0;
+  window.fetch = async (u, ...r) => { if (!/__dedupe/.test(String(u))) return o(u, ...r); n++; await new Promise(x => setTimeout(x, 60)); return new Response(JSON.stringify({ results: [1] }), { status: 200 }); };
+  const rs = await Promise.all([tmdbGet("/__dedupe/test"), tmdbGet("/__dedupe/test"), tmdbGet("/__dedupe/test")]);
+  const first = n; window.fetch = async (u, ...r) => { if (!/__dedupe/.test(String(u))) return o(u, ...r); n++; return new Response("{}", { status: 500 }); };
+  await tmdbGet("/__dedupe/err"); await tmdbGet("/__dedupe/err");
+  window.fetch = o; return { first, same: rs[0] === rs[1] && rs[1] === rs[2] && rs[0].results.length === 1, errCalls: n - first };
+});
+check("výkon: tři souběžné stejné dotazy na TMDB = jeden požadavek; chyba se při dalším pokusu zkusí znovu", dedupT.first === 1 && dedupT.same && dedupT.errCalls === 2, JSON.stringify(dedupT));
+
 // --- Onboarding: jedna obrazovka (žánry, věk, upozornění na reklamy) + jediný odkaz na blokovač podle prohlížeče
 const tut = await page.evaluate(() => {
   const w = document.getElementById("mfProfileWelcome");
