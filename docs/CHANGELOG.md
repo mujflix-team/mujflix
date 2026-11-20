@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.134
+### Opraveno
+- **Stabilita testů:** test popisu v banneru občas padal, protože stránka z dřívějších testů byla odrolovaná a klik přes `page.click` ji posouval; teď se stránka před měřením vrátí nahoru a klik jde přímo na prvek. Test načítacího pruhu (od #139) čeká na zmizení pruhu místo pevných 150 ms. Test paměti zdrojů zůstává s opakováním (příčina souběhu se sondou zdrojů není jednoznačná).
+
 ## 3.21.133
 ### Nově
 - **Tažení do strany přepíná sekce (telefon):** doleva další, doprava předchozí sekce na dolní liště (Domů, Seriály, Filmy, Oblíbené, Profil), s lehkou vibrací. Nezačne ve vodorovně posuvných řadách (na Domů funguje na bannerech a v mezerách mezi řadami), ve formulářích ani když je otevřené okno. Nový `js/shell/swipe-tabs.js`.
