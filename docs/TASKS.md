@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.127 – trailer jako tlačítko místo najetí myší (claude/trailer-tlacitko)
+- 3.21.126 – oprava lintu v testu (claude/lint-fix)
 - 3.21.125 – trailer při najetí na kartu (claude/trailer-hover)
 - 3.21.124 – hláška o nových dílech u Oblíbených seriálů (claude/nove-epizody)
 - 3.21.123 – hlášky (toast) na telefonu: zalomení, velikost, poloha (claude/movy)
