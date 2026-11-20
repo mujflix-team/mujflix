@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.136 – kino: lišta (claude/cinema-lista)
 - 3.21.135 – banner na Domů se při startu nemění víckrát (claude/home-prvni-start)
 - 3.21.134 – stabilita testů: popis v banneru (claude/testy-stabilita)
 - 3.21.133 – tažení do strany mezi sekcemi (claude/tazeni-sekci)

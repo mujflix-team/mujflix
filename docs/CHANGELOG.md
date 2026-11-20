@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.136
+### Změněno
+- **Kino – horní lišta:** trailer má ikonu TV; pryč hvězdička (hodnocení), lupa a tlačítko Epizody. Klepnutí na už vybranou vlajku (CZ/EN) zkusí další zdroj ve skupině, klepnutí na číslo epizody otevře výběr epizod.
+
 ## 3.21.135
 ### Opraveno
 - **Banner na Domů se při prvním startu neměnil víckrát:** když se během načítání změnil seznam kandidátů (načtené žánry apod.), vybral se jiný titul. Teď zůstává titul, který už se ukázal, po celé otevření aplikace (do ručního obnovení nebo změny profilu).
