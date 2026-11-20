@@ -4,6 +4,10 @@
 ### Opraveno
 - **Šedá obrazovka po gestu Zpět v nainstalované aplikaci:** na úvodní obrazovce Zpět rovnou opouštělo aplikaci a Android při tom zešedl celou obrazovku (náhled odchodu). Teď je pod aplikací pojistná položka historie: první Zpět jen ukáže „Pro ukončení stiskni Zpět ještě jednou“ a zůstane v aplikaci, druhý Zpět do 2 s ji normálně opustí. Jen v nainstalované aplikaci (standalone). Nový `js/shell/back-guard.js`.
 
+## 3.21.130
+### Nově
+- **Náhledy epizod ve výběru epizod** v přehrávači: dřív tam byla jen čísla, teď je za číslem náhled epizody z TMDB (chybějící obrázek a název se doplní z angličtiny). Funguje i u seriálů bez českých zdrojů; epizoda bez obrázku zůstane jen s číslem.
+
 ## 3.21.129
 ### Změněno
 - **TV ikona (trailer) na kartách** je v levém horním rohu plakátu, srdíčko zůstává vpravo.

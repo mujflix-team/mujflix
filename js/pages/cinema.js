@@ -810,6 +810,7 @@
           "mf-cin-ep-chip" +
           (watched ? " watched" : "") +
           (e === current.episode ? " current" : "");
+        b.setAttribute("data-ep", e);
         b.innerHTML =
           '<span class="mf-cin-ep-chip-num">E' + pad2(e) + "</span>" +
           '<span class="mf-cin-ep-chip-mark">' + (watched ? "✓" : "") + "</span>";
@@ -825,6 +826,46 @@
         epGridBody.appendChild(b);
       })(e);
     }
+    loadEpThumbs();
+  }
+
+  /* Náhledy epizod ve výběru (výběr nemá jinak žádný obrázek): z TMDB, chybějící obrázky a názvy se doplní z angličtiny.
+     Funguje i u seriálů bez českých zdrojů. Výsledek se drží v paměti po sezónách. */
+  var epThumbCache = {};
+  function seasonThumbs(id, season) {
+    var k = id + "-" + season;
+    if (!epThumbCache[k]) {
+      var base = "/tv/" + id + "/season/" + season;
+      epThumbCache[k] = tmdbGet(base).then(function (cs) {
+        var eps = cs && Array.isArray(cs.episodes) ? cs.episodes : null;
+        if (!eps) { delete epThumbCache[k]; return {}; }
+        var need = eps.some(function (x) { return !x.still_path; });
+        return (need ? tmdbGet(base + "?language=en-US").catch(function () { return null; }) : Promise.resolve(null)).then(function (en) {
+          var by = {}; ((en && en.episodes) || []).forEach(function (x) { by[x.episode_number] = x; });
+          var out = {};
+          eps.forEach(function (x) { var f = by[x.episode_number] || {}, p = x.still_path || f.still_path; out[x.episode_number] = { still: p ? "https://image.tmdb.org/t/p/w300" + p : "", name: x.name || f.name || "" }; });
+          return out;
+        });
+      }).catch(function () { delete epThumbCache[k]; return {}; });
+    }
+    return epThumbCache[k];
+  }
+  function loadEpThumbs() {
+    var id = String(current.tmdbId || ""), season = current.season;
+    if (!/^\d+$/.test(id) || typeof tmdbGet !== "function") return;
+    seasonThumbs(id, season).then(function (map) {
+      if (String(current.tmdbId) !== id || current.season !== season) return;
+      var any = false;
+      [].forEach.call(epGridBody.querySelectorAll(".mf-cin-ep-chip"), function (b) {
+        var m = map[b.getAttribute("data-ep")];
+        if (!m || !m.still || b.querySelector("img")) return;
+        any = true;
+        var im = new Image(); im.alt = ""; im.loading = "lazy"; im.decoding = "async"; im.src = m.still;
+        b.classList.add("has-still"); b.insertBefore(im, b.firstChild);
+        if (m.name) b.title = m.name;
+      });
+      if (any) epGridBody.classList.add("has-stills");
+    });
   }
 
   /* Přehrávač běží bez sandboxu: hostingy videa (např. Filemoon uvnitř SvetSerialu) sandbox detekují a odmítnou přehrávat. */
