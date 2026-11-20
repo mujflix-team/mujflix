@@ -1130,9 +1130,10 @@ const descRes = {};
 for (const [w, h] of [[1280, 800], [768, 1024], [390, 844]]) {
   await page.setViewportSize({ width: w, height: h });
   await descSetup(false); await page.waitForTimeout(4200);
+  await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(100); /* stabilní poloha banneru (zbytek stránky z dřívějších testů může být odrolovaný) */
   const a = await descState();
   if (!a) { descRes[w] = { skip: true }; continue; }
-  if (w >= 900) { await page.click("#nfHero .nf-hero-desc"); await page.waitForTimeout(250); } // na širokém displeji klik nic nepřepíná
+  if (w >= 900) { await page.evaluate(() => document.querySelector("#nfHero .nf-hero-desc").click()); await page.waitForTimeout(250); } // na širokém displeji klik nic nepřepíná
   const b = await descState();
   descRes[w] = { a, b };
 }

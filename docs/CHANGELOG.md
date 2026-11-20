@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.134
+### Opraveno
+- **Stabilita testů:** test popisu v banneru občas padal, protože stránka z dřívějších testů byla odrolovaná a klik přes `page.click` ji posouval; teď se stránka před měřením vrátí nahoru a klik jde přímo na prvek. Test načítacího pruhu (od #139) čeká na zmizení pruhu místo pevných 150 ms. Test paměti zdrojů zůstává s opakováním (příčina souběhu se sondou zdrojů není jednoznačná).
+
 ## 3.21.130
 ### Nově
 - **Náhledy epizod ve výběru epizod** v přehrávači: dřív tam byla jen čísla, teď je za číslem náhled epizody z TMDB (chybějící obrázek a název se doplní z angličtiny). Funguje i u seriálů bez českých zdrojů; epizoda bez obrázku zůstane jen s číslem.
