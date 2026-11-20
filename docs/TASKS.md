@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.133 – tažení do strany mezi sekcemi (claude/tazeni-sekci)
+- 3.21.130 – náhledy epizod ve výběru epizod v přehrávači (claude/nahledy-epizod)
 - 3.21.129 – TV ikona (trailer) v levém rohu karty (claude/trailer-vlevo)
 - 3.21.128 – TV ikona (trailer) na kartách vlevo od srdíčka (claude/trailer-tlacitko)
 - 3.21.127 – trailer jako tlačítko místo najetí myší (claude/trailer-tlacitko)

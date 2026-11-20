@@ -142,6 +142,18 @@ const swtT = await page.evaluate(async () => {
 });
 const expLeft = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"][swtT.i + 1], expRight = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"][swtT.i - 1];
 check("sekce tažením: doleva další, doprava předchozí; krátké, svislé a tažení ve vodorovné řadě nic nepřepne", swtT.i >= 0 && swtT.left.length === 1 && swtT.left[0] === expLeft && swtT.shortSw === 0 && swtT.vert === 0 && swtT.inRow === 0 && swtT.right.length === 1 && swtT.right[0] === expRight, JSON.stringify(swtT));
+// --- Výběr epizod v přehrávači: náhledy epizod z TMDB (i bez českých zdrojů), chybějící obrázek se doplní z angličtiny
+const epTh = await page.evaluate(async () => {
+  const o = window.tmdbGet, calls = [];
+  window.tmdbGet = async p => { calls.push(p); const en = /language=en-US/.test(p); return { episodes: [{ episode_number: 1, name: "Pilot", still_path: "/a.jpg" }, { episode_number: 2, name: en ? "Second" : "", still_path: en ? "/b.jpg" : null }, { episode_number: 3, name: "Three", still_path: null }] }; };
+  MFCinemaPlayer.open("777001", "Test", "tv_ep", { season: 1, episode: 1 });
+  const pick = document.getElementById("mfCinPickEp"); pick && pick.click();
+  await new Promise(r => setTimeout(r, 500));
+  const chips = [...document.querySelectorAll("#mfCinEpGridBody .mf-cin-ep-chip")];
+  const out = { imgs: chips.filter(c => c.querySelector("img")).length, e2: (chips[1] && chips[1].querySelector("img") || {}).src || "", t2: chips[1] && chips[1].title, cls: document.getElementById("mfCinEpGridBody").classList.contains("has-stills"), calls: calls.length };
+  window.tmdbGet = o; MFCinemaPlayer.close(); return out;
+});
+check("výběr epizod: náhledy z TMDB, chybějící obrázek z angličtiny, epizoda bez obrázku zůstane s číslem", epTh.imgs === 2 && /\/b\.jpg$/.test(epTh.e2) && epTh.t2 === "Second" && epTh.cls && epTh.calls === 2, JSON.stringify(epTh));
 
 // --- Onboarding: jedna obrazovka (žánry, věk, upozornění na reklamy) + jediný odkaz na blokovač podle prohlížeče
 const tut = await page.evaluate(() => {
