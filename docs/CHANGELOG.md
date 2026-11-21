@@ -5,6 +5,10 @@
 - **Probliknutí Domů po křížku:** po zavření detailu otevřeného z Objevování se Objevování vracelo se zpožděním 200 ms a mezitím bylo vidět Domů. Teď se vrací hned pod mizející okno.
 - **Názvy epizod bez mezer** (např. „d2.1_syst3mova_pan…“) se v seznamu epizod zalomí místo ořezání.
 
+## 3.21.144
+### Nově
+- **Verze v patičce Domů je tlačítko:** klepnutí zkontroluje, jestli existuje novější verze (stejná kontrola jako v Profilu), a výsledek ukáže v hlášce.
+
 ## 3.21.143
 ### Opraveno
 - **Kino, telefon:** lišta zůstává vždy na dvou řadách. Tlačítka se podle místa zužují místo zalamování, číslo epizody drží u šipek a sdílení se na telefonu skrylo.
