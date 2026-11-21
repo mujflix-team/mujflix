@@ -215,6 +215,15 @@
     netBar();
     var fv = document.getElementById('nfFootVer');
     if (fv) fv.textContent = 'v' + String(window.MF_VERSION || '').replace(/[^\w.\-]/g, '');
+    /* klepnutí na verzi = zkontrolovat, jestli není novější */
+    if (fv) fv.addEventListener('click', function () {
+      var t = function (m) { if (typeof showToast === 'function') showToast(m, 2600); };
+      t('Kontroluji verzi…');
+      Promise.resolve(window.mfCheckUpdate ? window.mfCheckUpdate(true) : null).then(function () {
+        if (document.getElementById('mfUpdateBar')) t('Je dostupná nová verze – tlačítko Obnovit je dole');
+        else t('Máš nejnovější verzi (' + (window.MF_VERSION || '?') + ')');
+      });
+    });
     initArrows();
     setTimeout(checkHomeLoaded, 14000);
     setInterval(function () {
