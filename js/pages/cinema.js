@@ -364,14 +364,15 @@
     }
   }
 
-  function findNextSeriesSlug() {
+  function findNextSeriesSlug(dir) {
+    dir = dir || 1;
     var d = appDb();
     if (!d || !current.localSlug) return null;
     var keys = Object.keys(d);
     var idx = keys.indexOf(current.localSlug);
     if (idx === -1) return null;
     for (var i = 1; i <= keys.length; i++) {
-      var candidate = keys[(idx + i) % keys.length];
+      var candidate = keys[((idx + dir * i) % keys.length + keys.length) % keys.length];
       if (candidate !== current.localSlug) return candidate;
     }
     return null;
@@ -392,10 +393,11 @@
 
         '<div class="mf-cin-tvbar" id="mfCinTvBar" style="display:none">' +
           '<button type="button" class="mf-cin-ep-btn" id="mfCinPrevEp" aria-label="Předchozí epizoda" title="Předchozí epizoda">‹ Předchozí</button>' +
+          '<button type="button" class="mf-cin-ep-btn mf-cin-prev-series" id="mfCinPrevSeries" aria-label="Předchozí seriál" title="Předchozí seriál">‹</button>' +
           '<span class="mf-cin-ep-current" id="mfCinEpCurrent"></span>' +
           '<button type="button" class="mf-cin-ep-btn" id="mfCinNextEp" aria-label="Další epizoda" title="Další epizoda">Další ›</button>' +
           '<button type="button" class="mf-cin-ep-btn mf-cin-ep-pick" id="mfCinPickEp" aria-label="Výběr epizody" title="Výběr epizody">Epizody</button>' +
-          '<button type="button" class="mf-cin-ep-btn mf-cin-next-series" id="mfCinNextSeries">Další seriál</button>' +
+          '<button type="button" class="mf-cin-ep-btn mf-cin-next-series" id="mfCinNextSeries" aria-label="Další seriál" title="Další seriál">›</button>' +
         "</div>" +
 
         '<div class="mf-cin-actions">' +
@@ -407,6 +409,7 @@
           '<button type="button" class="mf-cin-fav-btn mf-cin-rate-btn" id="mfCinRateBtn" aria-label="Ohodnotit" title="Ohodnotit" style="display:none">☆</button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinFavBtn" aria-label="Přidat do Oblíbených" title="Přidat do Oblíbených">♡</button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinTrailerBtn" aria-label="Přehrát trailer" title="Přehrát trailer"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>' +
+          '<button type="button" class="mf-cin-fav-btn" id="mfCinAllEps" aria-label="Všechny série a epizody" title="Všechny série a epizody" style="display:none"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinShareBtn" aria-label="Sdílet odkaz" title="Sdílet odkaz"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button>' +
           '<button type="button" class="mf-cin-fav-btn" id="mfCinSearchSrc" aria-label="Hledat titul na tomto zdroji" title="Hledat titul na tomto zdroji (další klik zkusí jiný název)">' +
             '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
@@ -454,7 +457,9 @@
     modal.querySelector("#mfCinPrevEp").onclick = function () { stepEpisode(-1); };
     modal.querySelector("#mfCinNextEp").onclick = function () { stepEpisode(1); };
     modal.querySelector("#mfCinPickEp").onclick = toggleEpGrid;
-    modal.querySelector("#mfCinNextSeries").onclick = goNextSeries;
+    modal.querySelector("#mfCinNextSeries").onclick = function () { goNextSeries(1); };
+    modal.querySelector("#mfCinPrevSeries").onclick = function () { goNextSeries(-1); };
+    modal.querySelector("#mfCinAllEps").onclick = toggleEpGrid;
 
     favBtn = modal.querySelector("#mfCinFavBtn");
     if (favBtn) favBtn.onclick = toggleCurrentFavorite;
@@ -705,7 +710,7 @@
     if (typeof showToast === "function") showToast(bad + " označen jako nefunkční, zkouším " + currentSrcLabel(), 2600);
   }
 
-  function stepBtns(d) { ["#mfCinPrevEp", "#mfCinNextEp"].forEach(function (x) { var b = modal.querySelector(x); if (b) b.style.display = d; }); }
+  function stepBtns(d) { ["#mfCinPrevEp", "#mfCinNextEp", "#mfCinAllEps"].forEach(function (x) { var b = modal.querySelector(x); if (b) b.style.display = d; }); }
   function showSourceMenu(lang) {
     if (!current) return;
     var old = modal.querySelector("#mfCinSrcMenu"); if (old) old.remove();
@@ -787,8 +792,8 @@
     });
   }
 
-  function goNextSeries() {
-    var nextSlug = findNextSeriesSlug();
+  function goNextSeries(dir) {
+    var nextSlug = findNextSeriesSlug(dir === -1 ? -1 : 1);
     if (!nextSlug) {
       if (typeof showToast === "function") showToast("Žádný další seriál v seznamu nenalezen", "error");
       return;
@@ -998,7 +1003,7 @@
     if (current.type === "tv") {
       tvBar.style.display = "flex"; stepBtns("");
       updateEpCurrentLabel();
-      modal.querySelector("#mfCinNextSeries").style.display = findNextSeriesSlug() ? "inline-flex" : "none";
+      modal.querySelector("#mfCinNextSeries").style.display = modal.querySelector("#mfCinPrevSeries").style.display = findNextSeriesSlug() ? "inline-flex" : "none";
     } else {
       tvBar.style.display = "none"; stepBtns("none");
       epGridPanel.style.display = "none";

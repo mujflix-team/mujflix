@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.141
+### Změněno
+- **Kino, PC:** tlačítko „Další seriál“ nahrazeno šipkami ‹ › (předchozí / další seriál) u čísla série a epizody.
+- **Kino, telefon:** první řádek je jen zpět + název, druhý řádek číslo epizody a všechna tlačítka. Nové tlačítko se seznamem otevře všechny série a epizody (není třeba klepat na číslo).
+
 ## 3.21.140
 ### Opraveno
 - **Probliknutí Domů při otevření titulu z Objevování:** Objevování se zavíralo dřív, než se otevřel detail nebo kino, a na chvíli bylo vidět Domů. Teď se detail otevře hned a Objevování se zavře až pod ním.
