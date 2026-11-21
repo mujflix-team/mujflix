@@ -339,7 +339,7 @@ function _sdFill(slug, next) {
   if (btn) {
     const seen = seriesStarted(slug), lbl = next ? `S${next.se} E${next.ep}` : "";
     const svg = btn.querySelector("svg");
-    btn.textContent = "", svg && btn.appendChild(svg), (() => { const sp = document.createElement("span"); sp.className = "bc-txt"; sp.textContent = (seen ? "Pokračovat" : "Přehrát") + (lbl ? " · " + lbl : ""); btn.appendChild(sp) })()
+    btn.textContent = "", svg && btn.appendChild(svg), (() => { const sp = document.createElement("span"); sp.className = "bc-txt"; sp.textContent = (seen ? "Pokračovat" : "Přehrát") + (lbl ? " · " + lbl : ""); btn.appendChild(sp); btn.setAttribute("aria-label", sp.textContent), btn.title = sp.textContent })()
   }
   _sdPaint(slug, _sdCache[t.tmdbId]);
   if (!t.tmdbId || _sdCache[t.tmdbId] || !(TMDB_KEY || window.MF_USING_TMDB_PROXY)) return;

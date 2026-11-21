@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.155
+### Opraveno
+- **Telefon, detail seriálu:** tlačítko Pokračovat/Přehrát v řadě tlačítek ukazuje jen ikonu (text se uřezával na „Po…“); logo titulu je malé ve všech režimech okna, ať ho neořezává horní hrana.
+
 ## 3.21.154
 ### Opraveno
 - **Telefon, seznam epizod:** logo/název titulu v hlavičce už nepřesahuje přes horní hranu (bylo oříznuté); logo je na telefonu menší a textový název se přizpůsobí.
