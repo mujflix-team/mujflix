@@ -8,6 +8,8 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 | | | | |
 
 ## Další nápady / otevřené
+- PC, Domů: logo MůjFlix je moc roztažené a mezera mezi řadou filtrů (Akční, Komedie…) a tlačítkem Přehrát v banneru je moc velká (zadal Jakub, 2026-11-21, s fotkou z PC).
+- Objevování: tlačítko Filtry na telefonu nic nedělá; na PC zjistit, jestli funguje (zadal Jakub, 2026-11-21).
 - Právní (potřebuje rozhodnutí): (1) [vyřešeno v 3.21.67] logo TMDB je v Soukromí a podmínky; (2) [vyřešeno v 3.21.67] písmo – ale starý Netflix Sans zůstává v historii gitu; (3) u Soukromí chybí správce údajů a soukromý kontakt (e-mail) pro žádosti o smazání a oznámení o porušení práv; (4) odkazování na weby s nelicencovaným obsahem: upozornění „odpovídáš ty“ odpovědnost provozovatele neruší.
 - Rychlost: změřit v Chrome Lighthouse; velké soubory `js/app.js` (237 kB) a `css/styles.css` (187 kB, hodně přepsáno v `netflix.css`) – po změření rozdělit / odstranit mrtvé CSS.
 - Service worker: celý „stale-while-revalidate“ zatím ne (hrozil by starý kód po opravě); písma už jdou z cache.
@@ -18,6 +20,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.145 – Domů neprobliká po křížku, dlouhé názvy epizod; verze v patičce bez podtržení (claude/ep-nazev-blik)
 - 3.21.144 – verze v patičce jako tlačítko pro kontrolu aktualizace (claude/verze-tlacitko)
 - 3.21.143 – kino: vždy dvě řady na telefonu (claude/cinema-2rady)
 - 3.21.142 – kino: pořadí tlačítek na telefonu (claude/cinema-poradi)

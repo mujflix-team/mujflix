@@ -2080,6 +2080,9 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
   html body #mfStandaloneCinema .mf-cin-lang { flex: 2 1 0; max-width: 80px; min-width: 0; }
 }
 
+/* názvy epizod bez mezer (např. „d2.1_syst3mova_pan…“) se lámou, ne ořezávají */
+html body #seriesModal #episodesGrid .ep-title { overflow-wrap: anywhere; word-break: break-word; min-width: 0; }
+
 /* verze v patičce Domů je tlačítko pro kontrolu aktualizace */
-.nf-foot .nf-ver { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
-.nf-foot .nf-ver:hover, .nf-foot .nf-ver:focus-visible { color: #fff; }
+.nf-foot .nf-ver { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: none; }
+.nf-foot .nf-ver:hover, .nf-foot .nf-ver:focus-visible { color: #fff; text-decoration: underline; }
