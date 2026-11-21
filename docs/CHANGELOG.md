@@ -1,9 +1,12 @@
 # Changelog
 
-## 3.21.156
+## 3.21.158
 ### Opraveno
 - **Telefon:** tlačítko Profil v docku otevře nabídku profilu (přepnutí profilu, Spravovat profily, Wrapped, Co dnes pustíme dohromady, Nastavení, Odhlásit se) nad dockem; dřív se na telefonu k těmto položkám nešlo dostat.
 
+## 3.21.157
+### Změněno
+- **Karty v Domů:** hodnocení (★) je stejně jako v Objevování v tmavém štítku vlevo dole na plakátu, pod názvem zůstává rok / díl.
 ## 3.21.156
 ### Opraveno
 - **Telefon, detail seriálu:** po posunu seznamu epizod je tlačítko Pokračovat/Přehrát přes celou šířku, a tak má zase text; jen ikona zůstává v řadě tlačítek nahoře.
