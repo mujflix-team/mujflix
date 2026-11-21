@@ -3,6 +3,9 @@
 ## 3.21.157
 ### Změněno
 - **Karty v Domů:** hodnocení (★) je stejně jako v Objevování v tmavém štítku vlevo dole na plakátu, pod názvem zůstává rok / díl.
+## 3.21.156
+### Opraveno
+- **Telefon, detail seriálu:** po posunu seznamu epizod je tlačítko Pokračovat/Přehrát přes celou šířku, a tak má zase text; jen ikona zůstává v řadě tlačítek nahoře.
 
 ## 3.21.155
 ### Opraveno

@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.157 – hodnocení na kartách v Domů jako v Objevování (claude/karta-hvezdicky)
+- 3.21.156 – Pokračovat má text po posunu seznamu (claude/pokracovat-text)
 - 3.21.155 – Pokračovat jen ikona na telefonu, menší logo ve všech režimech (claude/tlacitko-ikona)
 - 3.21.154 – logo titulu v hlavičce se na telefonu nezkracuje (claude/hero-logo-orez)
 - 3.21.153 – přepínač Vše/Filmy/Seriály vždy viditelný (claude/ochrana-filmy)
