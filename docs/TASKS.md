@@ -19,6 +19,8 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.147 – název čeká na logo déle (claude/logo-hned)
+- 3.21.146 – PC logo a mezera v banneru, tlačítko Filtry (claude/pc-logo-filtry)
+- 3.21.145 – Domů neprobliká po křížku, dlouhé názvy epizod; verze v patičce bez podtržení (claude/ep-nazev-blik)
 - 3.21.144 – verze v patičce jako tlačítko pro kontrolu aktualizace (claude/verze-tlacitko)
 - 3.21.143 – kino: vždy dvě řady na telefonu (claude/cinema-2rady)
 - 3.21.142 – kino: pořadí tlačítek na telefonu (claude/cinema-poradi)

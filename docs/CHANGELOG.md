@@ -4,6 +4,16 @@
 ### Opraveno
 - **Název před logem:** na pomalejší síti se prostý text názvu ukázal po 1,5 s a hned poté ho nahradilo logo z TMDB. Text je teď skrytý, dokud TMDB neodpoví (nejdéle 4,5 s); bez loga se ukáže ihned po odpovědi.
 
+## 3.21.146
+### Opraveno
+- **PC, Domů:** menší logo MůjFlix a menší mezera mezi tlačítky v banneru a řadou žánrů.
+- **Objevování, telefon:** tlačítko Filtry po posunutí dolů nic neukázalo (řada byla schovaná při posouvání); teď ji zase zobrazí.
+
+## 3.21.145
+### Opraveno
+- **Probliknutí Domů po křížku:** po zavření detailu otevřeného z Objevování se Objevování vracelo se zpožděním 200 ms a mezitím bylo vidět Domů. Teď se vrací hned pod mizející okno.
+- **Názvy epizod bez mezer** (např. „d2.1_syst3mova_pan…“) se v seznamu epizod zalomí místo ořezání.
+
 ## 3.21.144
 ### Nově
 - **Verze v patičce Domů je tlačítko:** klepnutí zkontroluje, jestli existuje novější verze (stejná kontrola jako v Profilu), a výsledek ukáže v hlášce.
