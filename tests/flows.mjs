@@ -1976,7 +1976,7 @@ const cinOrder = await page.evaluate(() => {
   const ids = [...document.querySelectorAll("#mfStandaloneCinema .mf-standalone-cinema-top .mf-cin-actions > button")].map(b => b.id).filter(Boolean);
   MFCinemaPlayer.close(); return ids;
 });
-check("kino: srdce je až za hvězdou", cinOrder.indexOf("mfCinRateBtn") > -1 && cinOrder.indexOf("mfCinFavBtn") === cinOrder.indexOf("mfCinRateBtn") + 1, JSON.stringify(cinOrder));
+check("kino: šipky epizod jsou těsně před srdcem", cinOrder.indexOf("mfCinPrevEp") > -1 && cinOrder.indexOf("mfCinNextEp") === cinOrder.indexOf("mfCinPrevEp") + 1 && cinOrder.indexOf("mfCinFavBtn") === cinOrder.indexOf("mfCinNextEp") + 1, JSON.stringify(cinOrder));
 
 const nextT = await page.evaluate(() => {
   const slug = "the-simpsons"; const w = getWatched();

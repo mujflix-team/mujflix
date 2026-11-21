@@ -426,6 +426,12 @@
     frame = modal.querySelector("#mfStandaloneCinemaFrame");
     titleNode = modal.querySelector("#mfStandaloneCinemaTitle");
     tvBar = modal.querySelector("#mfCinTvBar");
+    /* šipky předchozí/další epizoda jdou do horní řady k srdci */
+    var _acts = modal.querySelector(".mf-cin-actions"), _fav = modal.querySelector("#mfCinFavBtn");
+    ["#mfCinPrevEp", "#mfCinNextEp"].forEach(function (sel, i) {
+      var b = modal.querySelector(sel); if (!b || !_acts) return;
+      b.className = "mf-cin-fav-btn mf-cin-step"; b.textContent = i ? "›" : "‹"; _acts.insertBefore(b, _fav);
+    });
     epGridPanel = modal.querySelector("#mfCinEpGrid");
     epGridBody = modal.querySelector("#mfCinEpGridBody");
 
@@ -435,6 +441,15 @@
     modal.querySelector("#mfCinLangCs").onclick = function () { if (srcLang === "cs" && current) { cycleSource(1); toastSrc(); } else setLang("cs"); };
     modal.querySelector("#mfCinLangEn").onclick = function () { if (srcLang === "en" && current) { cycleSource(1); toastSrc(); } else setLang("en"); };
     modal.querySelector("#mfCinEpCurrent").onclick = toggleEpGrid;
+    /* podržení vlajky = seznam všech zdrojů dané skupiny (CZ / EN) */
+    ["Cs", "En"].forEach(function (k) {
+      var btn = modal.querySelector("#mfCinLang" + k), lang = k === "Cs" ? "cs" : "en", tm = null, fired = false;
+      var cancel = function () { clearTimeout(tm); };
+      btn.addEventListener("pointerdown", function () { fired = false; clearTimeout(tm); tm = setTimeout(function () { fired = true; showSourceMenu(lang); }, 500); });
+      ["pointerup", "pointerleave", "pointercancel"].forEach(function (ev) { btn.addEventListener(ev, cancel); });
+      btn.addEventListener("click", function (e) { if (fired) { e.stopImmediatePropagation(); e.preventDefault(); fired = false; } }, true);
+      btn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    });
     modal.querySelector("#mfCinBadSrc").onclick = reportBadSource;
     modal.querySelector("#mfCinPrevEp").onclick = function () { stepEpisode(-1); };
     modal.querySelector("#mfCinNextEp").onclick = function () { stepEpisode(1); };
@@ -690,6 +705,26 @@
     if (typeof showToast === "function") showToast(bad + " označen jako nefunkční, zkouším " + currentSrcLabel(), 2600);
   }
 
+  function stepBtns(d) { ["#mfCinPrevEp", "#mfCinNextEp"].forEach(function (x) { var b = modal.querySelector(x); if (b) b.style.display = d; }); }
+  function showSourceMenu(lang) {
+    if (!current) return;
+    var old = modal.querySelector("#mfCinSrcMenu"); if (old) old.remove();
+    var keep = srcLang; srcLang = lang; var list = sourcesFor(current.type); srcLang = keep;
+    var menu = document.createElement("div"); menu.id = "mfCinSrcMenu"; menu.setAttribute("role", "menu");
+    list.forEach(function (src, i) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = src.label;
+      if (lang === srcLang && i === current.sourceIdx) b.className = "on";
+      if (srcIsBad(src.label)) b.className += " bad";
+      b.onclick = function () {
+        menu.remove(); current._manual = true; current._srcSince = Date.now();
+        if (lang !== srcLang) { current._langManual = true; srcLang = lang; updateLangUI(); }
+        current.sourceIdx = i; renderCurrent(); probeSources();
+      };
+      menu.appendChild(b);
+    });
+    modal.appendChild(menu);
+    setTimeout(function () { document.addEventListener("pointerdown", function h(e) { if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener("pointerdown", h, true); } }, true); }, 0);
+  }
   function toastSrc() { if (typeof showToast === "function") showToast("Zkouším " + currentSrcLabel(), 1800); }
   function cycleSource(dir, skipQuickCheck) {
     var sources = sourcesFor(current.type);
@@ -961,11 +996,11 @@
     var rateBtn = modal.querySelector("#mfCinRateBtn");
     if (rateBtn) rateBtn.style.display = "inline-flex";
     if (current.type === "tv") {
-      tvBar.style.display = "flex";
+      tvBar.style.display = "flex"; stepBtns("");
       updateEpCurrentLabel();
       modal.querySelector("#mfCinNextSeries").style.display = findNextSeriesSlug() ? "inline-flex" : "none";
     } else {
-      tvBar.style.display = "none";
+      tvBar.style.display = "none"; stepBtns("none");
       epGridPanel.style.display = "none";
     }
   }

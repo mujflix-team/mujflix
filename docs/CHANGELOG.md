@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.139
+### Změněno
+- **Kino:** pryč šipka „jiný zdroj“ a trailer; šipky předchozí/další epizoda jsou nahoře u srdce (jiný zdroj = klepnutí na vybranou vlajku). Podržení vlajky CZ/EN ukáže seznam všech zdrojů té skupiny.
+
 ## 3.21.138
 ### Změněno
 - **Kino – horní lišta:** trailer má ikonu TV; pryč hvězdička (hodnocení), lupa a tlačítko Epizody. Klepnutí na už vybranou vlajku (CZ/EN) zkusí další zdroj ve skupině, klepnutí na číslo epizody otevře výběr epizod.

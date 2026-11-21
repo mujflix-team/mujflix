@@ -2054,3 +2054,13 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 
 /* telefon: pás pod spodní lištou ve stejné šedé jako lišta (ne černá) */
 @media (max-width: 899px) { html, body { background-color: #121212; } }
+
+/* kino: bez „jiný zdroj“ a traileru; šipky epizod u srdce */
+#mfStandaloneCinema #mfCinBadSrc, #mfStandaloneCinema #mfCinTrailerBtn { display: none !important; }
+#mfStandaloneCinema .mf-cin-step { font-size: 1.4rem; font-weight: 700; line-height: 1; }
+
+/* seznam zdrojů po podržení vlajky */
+#mfCinSrcMenu { position: absolute; top: 56px; right: 12px; z-index: 30; display: flex; flex-direction: column; min-width: 180px; max-height: 60vh; overflow: auto; padding: var(--sp-1); background: rgba(24, 24, 24, 0.98); border: 1px solid var(--c-line); border-radius: var(--r-md); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6); }
+#mfCinSrcMenu button { text-align: left; padding: 10px 12px; background: none; border: 0; border-radius: var(--r-sm); color: #fff; font: inherit; cursor: pointer; }
+#mfCinSrcMenu button:hover, #mfCinSrcMenu button.on { background: rgba(255, 255, 255, 0.12); }
+#mfCinSrcMenu button.bad { opacity: 0.45; text-decoration: line-through; }
