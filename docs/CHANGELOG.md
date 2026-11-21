@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.142
+### Opraveno
+- **Kino, telefon:** číslo epizody už nepřekrývají vlajky. Druhý řádek je v pořadí zdroje · srdce · všechny díly · ‹ · číslo · › · sdílet.
+
 ## 3.21.141
 ### Změněno
 - **Kino, PC:** tlačítko „Další seriál“ nahrazeno šipkami ‹ › (předchozí / další seriál) u čísla série a epizody.
