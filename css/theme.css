@@ -2116,3 +2116,7 @@ html body #seriesModal #modalFavBtn { order: 4; }
   html body #seriesModal:not(.sd-detail):not(.nf-compact) .btn-continue { padding: 0 !important; justify-content: center; }
   html body #seriesModal:not(.sd-detail) .modal-hero-left h2:not(.sd-has-logo) { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; }
 }
+
+/* hodnocení na kartě v Domů = stejný štítek jako v Objevování */
+.nf-poster { position: relative; }
+.nf-poster .nf-rate { position: absolute; z-index: 2; left: 6px; bottom: 6px; padding: 3px 7px; border-radius: var(--r-media); font-size: var(--fs-xs); font-weight: 700; background: rgba(0, 0, 0, 0.68); color: #ffd60a; pointer-events: none; }
