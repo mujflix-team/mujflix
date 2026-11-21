@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.148 – jednotná velikost loga, filtry se při posouvání neschovávají (claude/logo-velikost)
 - 3.21.144 – verze v patičce jako tlačítko pro kontrolu aktualizace (claude/verze-tlacitko)
 - 3.21.143 – kino: vždy dvě řady na telefonu (claude/cinema-2rady)
 - 3.21.142 – kino: pořadí tlačítek na telefonu (claude/cinema-poradi)

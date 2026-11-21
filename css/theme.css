@@ -2083,3 +2083,8 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 /* verze v patičce Domů je tlačítko pro kontrolu aktualizace */
 .nf-foot .nf-ver { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
 .nf-foot .nf-ver:hover, .nf-foot .nf-ver:focus-visible { color: #fff; }
+
+/* jedna velikost loga MůjFlix: horní lišta Domů i výběr profilu („Kdo se dívá“) */
+:root { --mf-logo-size: clamp(1.45rem, 2.4vw, 1.9rem); }
+@media (min-width: 900px) { :root { --mf-logo-size: clamp(1.25rem, 1.6vw, 1.55rem); } }
+#nfTop .nf-logo, html body #mfProfileGate .pg-logo { font-size: var(--mf-logo-size) !important; letter-spacing: -1px !important; font-weight: 900 !important; }

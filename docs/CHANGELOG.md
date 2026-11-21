@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.148
+### Opraveno
+- **Logo MůjFlix** má stejnou velikost v horní liště Domů i na výběru profilu („Kdo se dívá“).
+- **Objevování:** zapnuté filtry (otevřený panel nebo aktivní filtr) se při posouvání dolů už neschovávají.
+
 ## 3.21.144
 ### Nově
 - **Verze v patičce Domů je tlačítko:** klepnutí zkontroluje, jestli existuje novější verze (stejná kontrola jako v Profilu), a výsledek ukáže v hlášce.
