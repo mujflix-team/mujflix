@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.158
+### Opraveno
+- **Telefon:** tlačítko Profil v docku otevře nabídku profilu (přepnutí profilu, Spravovat profily, Wrapped, Co dnes pustíme dohromady, Nastavení, Odhlásit se) nad dockem; dřív se na telefonu k těmto položkám nešlo dostat.
+
 ## 3.21.157
 ### Změněno
 - **Karty v Domů:** hodnocení (★) je stejně jako v Objevování v tmavém štítku vlevo dole na plakátu, pod názvem zůstává rok / díl.
