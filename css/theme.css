@@ -2116,3 +2116,8 @@ html body #seriesModal #modalFavBtn { order: 4; }
   html body #seriesModal:not(.sd-detail):not(.nf-compact) .btn-continue { padding: 0 !important; justify-content: center; }
   html body #seriesModal:not(.sd-detail) .modal-hero-left h2:not(.sd-has-logo) { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; }
 }
+
+/* menu profilu otevřené z docku (telefon): nad tlačítkem, bez šipky nahoře */
+#nfProfileMenu.nf-pm-up::before { display: none; }
+#nfProfileMenu.nf-pm-up { animation-name: nfPmUp; max-height: calc(100vh - 120px); overflow-y: auto; }
+@keyframes nfPmUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }

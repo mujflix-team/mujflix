@@ -302,7 +302,7 @@
       }
       function mfProfileMenuOutside(e) {
         var m = document.getElementById('nfProfileMenu');
-        if (m && !m.contains(e.target) && !(e.target.closest && e.target.closest('#nfAvatar'))) mfCloseProfileMenu();
+        if (m && !m.contains(e.target) && !(e.target.closest && e.target.closest('#nfAvatar, #dockProfile'))) mfCloseProfileMenu();
       }
       function mfProfileMenuKey(e) { if (e.key === 'Escape') mfCloseProfileMenu(); }
       window.mfToggleProfileMenu = function (btn) {
@@ -327,7 +327,9 @@
           '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="logout"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg><span>Odhlásit se</span></button>';
         document.body.appendChild(m);
         var r = btn.getBoundingClientRect();
-        m.style.top = Math.round(r.bottom + 12) + 'px';
+        /* tlačítko dole v docku (telefon): menu se otevře nad ním */
+        if (r.top > window.innerHeight / 2) { m.classList.add('nf-pm-up'); m.style.bottom = Math.round(window.innerHeight - r.top + 10) + 'px'; }
+        else m.style.top = Math.round(r.bottom + 12) + 'px';
         m.style.right = Math.max(12, Math.round(window.innerWidth - r.right)) + 'px';
         m.addEventListener('click', function (e) {
           var it = e.target.closest && e.target.closest('.nf-pm-item');

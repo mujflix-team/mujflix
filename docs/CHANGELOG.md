@@ -2,6 +2,10 @@
 
 ## 3.21.156
 ### Opraveno
+- **Telefon:** tlačítko Profil v docku otevře nabídku profilu (přepnutí profilu, Spravovat profily, Wrapped, Co dnes pustíme dohromady, Nastavení, Odhlásit se) nad dockem; dřív se na telefonu k těmto položkám nešlo dostat.
+
+## 3.21.156
+### Opraveno
 - **Telefon, detail seriálu:** po posunu seznamu epizod je tlačítko Pokračovat/Přehrát přes celou šířku, a tak má zase text; jen ikona zůstává v řadě tlačítek nahoře.
 
 ## 3.21.155
