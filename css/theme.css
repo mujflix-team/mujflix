@@ -2124,3 +2124,9 @@ html body #seriesModal #modalFavBtn { order: 4; }
 /* hodnocení na kartě v Domů = stejný štítek jako v Objevování */
 .nf-poster { position: relative; }
 .nf-poster .nf-rate { position: absolute; z-index: 2; left: 6px; bottom: 6px; padding: 3px 7px; border-radius: var(--r-media); font-size: var(--fs-xs); font-weight: 700; background: rgba(0, 0, 0, 0.68); color: #ffd60a; pointer-events: none; }
+
+/* menu profilu: ostatní profily jako řada avatarů (méně řádků) */
+#nfProfileMenu .nf-pm-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding: 4px 12px 2px; }
+#nfProfileMenu .nf-pm-prof { flex-direction: column; width: 64px; padding: 4px 0; gap: 4px; text-align: center; }
+#nfProfileMenu .nf-pm-prof:hover { text-decoration: none; }
+#nfProfileMenu .nf-pm-nm { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-xs); }

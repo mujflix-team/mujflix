@@ -194,10 +194,11 @@ check("ui: Zavřít zavře okno", !(await isOpen()));
 
 // z menu profilu
 await page.evaluate(() => { const b = document.createElement("button"); b.id = "t-av"; b.style.cssText = "position:fixed;top:10px;right:10px"; document.body.appendChild(b); mfToggleProfileMenu(b); });
-const hasItem = await page.evaluate(() => !!document.querySelector('#nfProfileMenu [data-act="wrapped"]'));
-await page.evaluate(() => document.querySelector('#nfProfileMenu [data-act="wrapped"]').click()); // pod menu leží výběr profilu, myší by se nedalo kliknout
+await page.evaluate(() => document.querySelector('#nfProfileMenu [data-act="settings"]').click());
+const hasItem = await page.evaluate(() => !!document.querySelector('#mfSettingsModal [data-st="wrapped"]'));
+await page.evaluate(() => document.querySelector('#mfSettingsModal [data-st="wrapped"]').click()); // pod menu leží výběr profilu, myší by se nedalo kliknout
 await page.waitForTimeout(400);
-check("ui: v menu profilu je Wrapped a otevře okno", hasItem && await isOpen() && !(await page.evaluate(() => !!document.getElementById("nfProfileMenu"))));
+check("ui: v Nastavení je Wrapped a otevře okno", hasItem && await isOpen() && !(await page.evaluate(() => !!document.getElementById("nfProfileMenu"))));
 await page.keyboard.press("Escape");
 await page.waitForTimeout(400);
 

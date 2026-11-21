@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.159
+### Změněno
+- **Menu profilu:** ostatní profily jsou řada avatarů, v menu zůstalo Spravovat profily, Nastavení a Odhlásit se; Wrapped a „Co dnes pustíme dohromady?“ jsou v Nastavení.
+
 ## 3.21.158
 ### Opraveno
 - **Telefon:** tlačítko Profil v docku otevře nabídku profilu (přepnutí profilu, Spravovat profily, Wrapped, Co dnes pustíme dohromady, Nastavení, Odhlásit se) nad dockem; dřív se na telefonu k těmto položkám nešlo dostat.
