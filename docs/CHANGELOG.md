@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.21.149
+### Změněno
+- **Detail seriálu:** tlačítka jsou v pořadí Pokračovat · Náhodná · Trailer · Sdílet · Srdce.
+- **Telefon:** dlouhé názvy epizod z TMDB mají menší písmo a lámou se, ať se vejdou.
+
+## 3.21.148
+### Opraveno
+- **Logo MůjFlix** má stejnou velikost v horní liště Domů i na výběru profilu („Kdo se dívá“).
+- **Objevování:** zapnuté filtry (otevřený panel nebo aktivní filtr) se při posouvání dolů už neschovávají.
+
 ## 3.21.147
 ### Opraveno
 - **Název před logem:** na pomalejší síti se prostý text názvu ukázal po 1,5 s a hned poté ho nahradilo logo z TMDB. Text je teď skrytý, dokud TMDB neodpoví (nejdéle 4,5 s); bez loga se ukáže ihned po odpovědi.

@@ -118,7 +118,8 @@
       if (!t || t.id !== 'dvBody') return;
       var root = document.getElementById('universeOverlay'); if (!root) return;
       var y = t.scrollTop, dy = y - last;
-      if (y > 70 && dy > 5) collapse(root, t);
+      var dot = root.querySelector('.dv-filter-dot'), keep = root.classList.contains('dv-filters-open') || (dot && !dot.hidden); /* zapnuté filtry se při posouvání neschovávají */
+      if (y > 70 && dy > 5 && !keep) collapse(root, t);
       else if (dy < -5 || y <= 10) expand(root, t);
       last = t.scrollTop;
     }, true);

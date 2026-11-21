@@ -18,6 +18,8 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.149 – pořadí tlačítek v detailu, menší názvy epizod na telefonu (claude/logo-velikost)
+- 3.21.148 – jednotná velikost loga, filtry se při posouvání neschovávají (claude/logo-velikost)
 - 3.21.147 – název čeká na logo déle (claude/logo-hned)
 - 3.21.146 – PC logo a mezera v banneru, tlačítko Filtry (claude/pc-logo-filtry)
 - 3.21.145 – Domů neprobliká po křížku, dlouhé názvy epizod; verze v patičce bez podtržení (claude/ep-nazev-blik)
