@@ -310,3 +310,6 @@
 #universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { display: none; }
 #universeOverlay.dv-filters-open .dv-top .dv-filters { display: flex; }
 #universeOverlay.dv-filters-open .dv-top .dv-chips { display: flex; }
+
+/* přepínač typu pod hledáním (mimo schované Filtry) */
+#universeOverlay .dv-top .dv-seg.dv-seg-top { display: inline-flex; margin-top: 12px; }
