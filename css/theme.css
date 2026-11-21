@@ -2063,3 +2063,16 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
 #mfCinSrcMenu button { text-align: left; padding: 10px 12px; background: none; border: 0; border-radius: var(--r-sm); color: #fff; font: inherit; cursor: pointer; }
 #mfCinSrcMenu button:hover, #mfCinSrcMenu button.on { background: rgba(255, 255, 255, 0.12); }
 #mfCinSrcMenu button.bad { opacity: 0.45; text-decoration: line-through; }
+
+/* kino, telefon: jeden řádek tlačítek v pořadí zdroje · srdce · všechny díly · ‹ · číslo · › · sdílet */
+@media (max-width: 900px) {
+  html body #mfStandaloneCinema #mfCinTvBar { display: contents !important; }
+  html body #mfStandaloneCinema .mf-standalone-cinema-top { gap: 8px 4px; }
+  html body #mfStandaloneCinema .mf-cin-lang { order: 4; }
+  html body #mfStandaloneCinema #mfCinFavBtn { order: 5; }
+  html body #mfStandaloneCinema #mfCinAllEps { order: 6; }
+  html body #mfStandaloneCinema #mfCinPrevEp { order: 7; }
+  html body #mfStandaloneCinema #mfCinEpCurrent { order: 8; flex: 1 1 auto; min-width: 0; text-align: center; font-size: var(--fs-sm); }
+  html body #mfStandaloneCinema #mfCinNextEp { order: 9; }
+  html body #mfStandaloneCinema #mfCinShareBtn { order: 10; }
+}

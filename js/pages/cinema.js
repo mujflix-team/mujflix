@@ -1005,7 +1005,7 @@
       updateEpCurrentLabel();
       modal.querySelector("#mfCinNextSeries").style.display = modal.querySelector("#mfCinPrevSeries").style.display = findNextSeriesSlug() ? "inline-flex" : "none";
     } else {
-      tvBar.style.display = "none"; stepBtns("none");
+      tvBar.style.display = "none"; stepBtns("none"); modal.querySelector("#mfCinEpCurrent").textContent = "";
       epGridPanel.style.display = "none";
     }
   }
