@@ -2111,8 +2111,8 @@ html body #seriesModal #modalFavBtn { order: 4; }
 /* telefon, seznam epizod: logo titulu se vejde do hlavičky (dřív ho z horní hrany ořezávalo) */
 @media (max-width: 899px) {
   html body #seriesModal .sd-logo { max-height: 52px; max-width: 62vw; margin-bottom: 6px; }
-  /* tlačítko Pokračovat/Přehrát v řadě tlačítek: jen ikona (text se uřezával na „Po…“) */
-  html body #seriesModal:not(.sd-detail) .btn-continue .bc-txt { display: none; }
-  html body #seriesModal:not(.sd-detail) .btn-continue { padding: 0 !important; justify-content: center; }
+  /* tlačítko Pokračovat/Přehrát v řadě tlačítek: jen ikona (text se uřezával na „Po…“); po posunu seznamu (nf-compact) je tlačítko přes celou šířku, tak má text */
+  html body #seriesModal:not(.sd-detail):not(.nf-compact) .btn-continue .bc-txt { display: none; }
+  html body #seriesModal:not(.sd-detail):not(.nf-compact) .btn-continue { padding: 0 !important; justify-content: center; }
   html body #seriesModal:not(.sd-detail) .modal-hero-left h2:not(.sd-has-logo) { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; }
 }
