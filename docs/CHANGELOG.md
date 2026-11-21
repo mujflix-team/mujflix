@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.143
+### Opraveno
+- **Kino, telefon:** lišta zůstává vždy na dvou řadách. Tlačítka se podle místa zužují místo zalamování, číslo epizody drží u šipek a sdílení se na telefonu skrylo.
+
 ## 3.21.142
 ### Opraveno
 - **Kino, telefon:** číslo epizody už nepřekrývají vlajky. Druhý řádek je v pořadí zdroje · srdce · všechny díly · ‹ · číslo · › · sdílet.
