@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.146
+### Opraveno
+- **PC, Domů:** menší logo MůjFlix a menší mezera mezi tlačítky v banneru a řadou žánrů.
+- **Objevování, telefon:** tlačítko Filtry po posunutí dolů nic neukázalo (řada byla schovaná při posouvání); teď ji zase zobrazí.
+
 ## 3.21.145
 ### Opraveno
 - **Probliknutí Domů po křížku:** po zavření detailu otevřeného z Objevování se Objevování vracelo se zpožděním 200 ms a mezitím bylo vidět Domů. Teď se vrací hned pod mizející okno.

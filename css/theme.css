@@ -2086,3 +2086,10 @@ html body #seriesModal #episodesGrid .ep-title { overflow-wrap: anywhere; word-b
 /* verze v patičce Domů je tlačítko pro kontrolu aktualizace */
 .nf-foot .nf-ver { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: none; }
 .nf-foot .nf-ver:hover, .nf-foot .nf-ver:focus-visible { color: #fff; text-decoration: underline; }
+
+/* PC, Domů: menší logo a menší mezera mezi tlačítky v banneru a řadou žánrů */
+@media (min-width: 900px) {
+  #nfTop .nf-logo { font-size: clamp(1.25rem, 1.6vw, 1.55rem); letter-spacing: -0.8px; }
+  html body .nf-hero-body:has(> .nf-hero-desc) { --mf-pb: clamp(40px, 6vh, 64px); }
+  html body .nf-hero-body { padding-bottom: clamp(40px, 6vh, 64px); }
+}
