@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.157
+### Změněno
+- **Karty v Domů:** hodnocení (★) je stejně jako v Objevování v tmavém štítku vlevo dole na plakátu, pod názvem zůstává rok / díl.
+
 ## 3.21.155
 ### Opraveno
 - **Telefon, detail seriálu:** tlačítko Pokračovat/Přehrát v řadě tlačítek ukazuje jen ikonu (text se uřezával na „Po…“); logo titulu je malé ve všech režimech okna, ať ho neořezává horní hrana.
