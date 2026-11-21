@@ -1121,6 +1121,7 @@
     if (els.fbtn) els.fbtn.addEventListener('click', function () {
       var on = !root.classList.contains('dv-filters-open');
       root.classList.toggle('dv-filters-open', on);
+      if (on) root.classList.remove('dv-collapsed', 'dv-gone'); /* po posunu dolů byly filtry schované a tlačítko se tvářilo, že nic nedělá */
       els.fbtn.setAttribute('aria-expanded', on ? 'true' : 'false');
     });
 
