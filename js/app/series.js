@@ -474,7 +474,7 @@ async function _sdLoadSimilar() {
 
 function closeModal() {
   const e = document.getElementById("seriesModal");
-  { const b = window._mfBackToDiscover; window._mfBackToDiscover = null; if (b && e.classList.contains("open") && typeof window.mfDiscoverRestore === "function") setTimeout(() => window.mfDiscoverRestore(b), 200) } /* přišel jsem z Objevování: vrať se tam, ne na Domů */
+  { const b = window._mfBackToDiscover; window._mfBackToDiscover = null; if (b && e.classList.contains("open") && typeof window.mfDiscoverRestore === "function") window.mfDiscoverRestore(b) } /* přišel jsem z Objevování: vrať se tam hned (pod mizející okno), ať mezitím neprobliká Domů */
   _sdResetTrailer();
   e.classList.remove("visible");
   const t = e.querySelector(".modal-hero-content");

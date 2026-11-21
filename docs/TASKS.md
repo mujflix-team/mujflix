@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.145 – Domů neprobliká po křížku, dlouhé názvy epizod (claude/ep-nazev-blik)
 - 3.21.143 – kino: vždy dvě řady na telefonu (claude/cinema-2rady)
 - 3.21.142 – kino: pořadí tlačítek na telefonu (claude/cinema-poradi)
 - 3.21.141 – kino: dvě řady na telefonu, šipky seriálů na PC (claude/cinema-rady)
