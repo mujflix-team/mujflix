@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.156
+### Opraveno
+- **Telefon, detail seriálu:** po posunu seznamu epizod je tlačítko Pokračovat/Přehrát přes celou šířku, a tak má zase text; jen ikona zůstává v řadě tlačítek nahoře.
+
 ## 3.21.155
 ### Opraveno
 - **Telefon, detail seriálu:** tlačítko Pokračovat/Přehrát v řadě tlačítek ukazuje jen ikonu (text se uřezával na „Po…“); logo titulu je malé ve všech režimech okna, ať ho neořezává horní hrana.
