@@ -89,41 +89,7 @@
   window.addEventListener('online', netBar); window.addEventListener('offline', netBar);
 
 
-  /* Procházení: řada filtrů a žánrů se při posouvání dolů schová (nejdřív plynule zprůhlední, pak se jednorázově vyjme z rozložení
-     a posuv se opraví o její výšku, ať obsah neposkočí), při posunu nahoru se vrátí. Po zastavení posouvání zůstane schovaná (sama se nevrací, protože by posunula obsah). Třídy se mění jen při skutečné změně stavu. */
-  (function () {
-    var last = 0, gone = 0;
-    function setGone(root, body, on) {
-      var top = root.querySelector('.dv-top');
-      if (!top || root.classList.contains('dv-gone') === on) return;
-      var h0 = top.offsetHeight;
-      root.classList.toggle('dv-gone', on);
-      var d = h0 - top.offsetHeight;
-      if (d && body) { body.scrollTop += d; last = body.scrollTop; }
-    }
-    function collapse(root, body) {
-      if (root.classList.contains('dv-collapsed')) return;
-      root.classList.add('dv-collapsed');
-      clearTimeout(gone);
-      gone = setTimeout(function () { if (root.classList.contains('dv-collapsed')) setGone(root, body, true); }, 230);
-    }
-    function expand(root, body) {
-      if (!root.classList.contains('dv-collapsed') && !root.classList.contains('dv-gone')) return;
-      clearTimeout(gone);
-      setGone(root, body, false);
-      root.classList.remove('dv-collapsed');
-    }
-    document.addEventListener('scroll', function (e) {
-      var t = e.target;
-      if (!t || t.id !== 'dvBody') return;
-      var root = document.getElementById('universeOverlay'); if (!root) return;
-      var y = t.scrollTop, dy = y - last;
-      var dot = root.querySelector('.dv-filter-dot'), keep = root.classList.contains('dv-filters-open') || (dot && !dot.hidden); /* zapnuté filtry se při posouvání neschovávají */
-      if (y > 70 && dy > 5 && !keep) collapse(root, t);
-      else if (dy < -5 || y <= 10) expand(root, t);
-      last = t.scrollTop;
-    }, true);
-  })();
+  /* Procházení: filtry jsou za tlačítkem Filtry; při posouvání se nic nesbaluje (dřív obsah poskakoval). */
 
 
   /* Plynulé objevení obrázků z TMDB: během načítání shimmer, po načtení jemné rozsvícení s malým zpožděním podle pořadí karty.

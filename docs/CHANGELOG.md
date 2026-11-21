@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.150
+### Změněno
+- **Objevování:** filtry a žánry jsou i na PC schované za tlačítkem Filtry (dřív jen na telefonu).
+- **Objevování:** při posouvání se řada filtrů už nesbaluje a nevrací, takže obsah neskáče.
+
 ## 3.21.149
 ### Změněno
 - **Detail seriálu:** tlačítka jsou v pořadí Pokračovat · Náhodná · Trailer · Sdílet · Srdce.
