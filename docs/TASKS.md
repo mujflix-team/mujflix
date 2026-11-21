@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.151 – stará sekce Doporučení se už nezobrazí (claude/stara-oblibene)
 - 3.21.150 – Objevování: filtry za tlačítkem i na PC, bez sbalování při posouvání (claude/filtry-pod-tlacitko)
 - 3.21.149 – pořadí tlačítek v detailu, menší názvy epizod na telefonu (claude/logo-velikost)
 - 3.21.148 – jednotná velikost loga, filtry se při posouvání neschovávají (claude/logo-velikost)

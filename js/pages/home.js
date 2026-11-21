@@ -1486,6 +1486,8 @@
             forceHome();
             return;
           }
+          /* starou sekci „Doporučení“ už nikdy neukazovat; #protebe (např. z historie při gestu zpět) otevře nové Oblíbené nad Domů */
+          if (name === 'protebe') { forceHome(); if (typeof window.openWatchlist === 'function') window.openWatchlist(); return; }
           hideHome();
           if (typeof orig === 'function') return orig.apply(this, arguments);
         };
