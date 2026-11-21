@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.147
+### Opraveno
+- **Název před logem:** na pomalejší síti se prostý text názvu ukázal po 1,5 s a hned poté ho nahradilo logo z TMDB. Text je teď skrytý, dokud TMDB neodpoví (nejdéle 4,5 s); bez loga se ukáže ihned po odpovědi.
+
 ## 3.21.146
 ### Opraveno
 - **PC, Domů:** menší logo MůjFlix a menší mezera mezi tlačítky v banneru a řadou žánrů.

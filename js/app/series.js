@@ -365,11 +365,11 @@ function mfFetchLogo(kind, id) {
   }).catch(() => (delete _logoCache[k], "")))
 }
 window.mfFetchLogo = mfFetchLogo;
-/* Prostý text názvu se na chvíli skryje (místo ať zabírá, jen je průhledný), dokud se nenačte logo z TMDB; bez loga se po chvíli ukáže. */
+/* Prostý text názvu se na chvíli skryje (místo ať zabírá, jen je průhledný), dokud se nenačte logo z TMDB. Bez loga se ukáže hned, jak TMDB odpoví; pomalá síť se čeká až 4,5 s (dřív 1,5 s, a text pak před logem problikl). */
 function mfLogoHold(el) {
   if (!el) return () => {};
   let done = !1;
-  const rel = () => { done || (done = !0, clearTimeout(tm), el.classList.remove("mf-logo-wait")) }, tm = setTimeout(rel, 1500);
+  const rel = () => { done || (done = !0, clearTimeout(tm), el.classList.remove("mf-logo-wait")) }, tm = setTimeout(rel, 4500);
   el.classList.add("mf-logo-wait");
   return rel
 }
