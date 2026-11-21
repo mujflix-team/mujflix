@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.154
+### Opraveno
+- **Telefon, seznam epizod:** logo/název titulu v hlavičce už nepřesahuje přes horní hranu (bylo oříznuté); logo je na telefonu menší a textový název se přizpůsobí.
+
 ## 3.21.153
 ### Změněno
 - **Objevování:** přepínač Vše / Filmy / Seriály je pořád vidět pod hledáním, ne schovaný za tlačítkem Filtry.

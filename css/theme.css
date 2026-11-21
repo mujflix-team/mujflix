@@ -2107,3 +2107,9 @@ html body #seriesModal #modalFavBtn { order: 4; }
 @media (max-width: 600px) {
   html body #seriesModal #episodesGrid .ep-title { font-size: var(--fs-md) !important; line-height: 1.25; overflow-wrap: anywhere; word-break: break-word; }
 }
+
+/* telefon, seznam epizod: logo titulu se vejde do hlavičky (dřív ho z horní hrany ořezávalo) */
+@media (max-width: 899px) {
+  html body #seriesModal:not(.sd-detail) .sd-logo { max-height: 52px; max-width: 62vw; margin-bottom: 6px; }
+  html body #seriesModal:not(.sd-detail) .modal-hero-left h2:not(.sd-has-logo) { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; }
+}
