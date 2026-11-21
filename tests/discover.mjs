@@ -43,6 +43,7 @@ async function scenario(tmdbOk, anime = false, rnd = null) {
     localStorage.setItem("mf_active_pid", "p1"); localStorage.setItem("mf_tmdb_key", "K");
   }, anime);
   await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
+  await page.addStyleTag({ content: "#universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { display: flex !important; }" }); /* filtry jsou za tlačítkem Filtry; testy je potřebují vidět */
   await page.waitForTimeout(2000);
   await page.evaluate(() => window.openDiscover());
   await page.waitForTimeout(2500);
@@ -116,6 +117,7 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
     localStorage.setItem("mf_active_pid", "p1"); localStorage.setItem("mf_tmdb_key", "K");
   });
   await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
+  await page.addStyleTag({ content: "#universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { display: flex !important; }" }); /* filtry jsou za tlačítkem Filtry; testy je potřebují vidět */
   await page.waitForTimeout(1500);
   await page.evaluate(() => window.openSearch());
   await page.waitForTimeout(800);
@@ -182,6 +184,7 @@ check("Objevovat: Jen anime ukáže anime řady", /anime/i.test(an.titles) && an
     localStorage.setItem("mf_active_pid", "p1"); localStorage.setItem("mf_tmdb_key", "K");
   });
   await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
+  await page.addStyleTag({ content: "#universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { display: flex !important; }" }); /* filtry jsou za tlačítkem Filtry; testy je potřebují vidět */
   await page.waitForTimeout(2000);
   await page.getByText("Test", { exact: true }).first().click().catch(() => {});
   await page.waitForTimeout(1500);

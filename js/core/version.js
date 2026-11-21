@@ -1,2 +1,2 @@
 /* GENEROVÁNO z package.json (node scripts/version.mjs) – needituj ručně. */
-window.MF_VERSION = "3.21.149";
+window.MF_VERSION = "3.21.150";

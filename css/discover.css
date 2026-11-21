@@ -290,10 +290,6 @@
   #universeOverlay .dv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 10px; }
   #universeOverlay .dv-card-title { font-size: var(--fs-sm); }
   #universeOverlay .dv-row-title { font-size: var(--fs-base); }
-  #universeOverlay .dv-filter-btn { display: inline-flex; }
-  #universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { display: none; }
-  #universeOverlay.dv-filters-open .dv-top .dv-filters { display: flex; }
-  #universeOverlay.dv-filters-open .dv-top .dv-chips { display: flex; }
 }
 @media (max-width: 380px) {
   #universeOverlay .dv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -308,3 +304,9 @@
 #universeOverlay .dv-trl:hover { background: rgba(0, 0, 0, 0.85); }
 @media (hover: none) { #universeOverlay .dv-trl { opacity: 1; } }
 #universeOverlay .dv-trl[hidden] { display: none !important; }
+
+/* Filtry a žánry jsou všude (i na PC) schované za tlačítkem Filtry */
+#universeOverlay .dv-filter-btn { display: inline-flex; }
+#universeOverlay .dv-top .dv-filters, #universeOverlay .dv-top .dv-chips { display: none; }
+#universeOverlay.dv-filters-open .dv-top .dv-filters { display: flex; }
+#universeOverlay.dv-filters-open .dv-top .dv-chips { display: flex; }

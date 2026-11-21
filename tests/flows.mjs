@@ -964,14 +964,11 @@ const scT = await page.evaluate(async () => {
   mfDiscoverOpen("all"); await w(600);
   const body = document.getElementById("dvBody"), root = document.getElementById("universeOverlay");
   const pad = document.createElement("div"); pad.style.height = "4000px"; body.appendChild(pad);
-  body.scrollTop = 300; await w(80); out.down = root.classList.contains("dv-collapsed");
-  body.scrollTop = 200; await w(80); out.up = !root.classList.contains("dv-collapsed");
-  body.scrollTop = 500; await w(80); out.again = root.classList.contains("dv-collapsed");
-  const filt = root.querySelector(".dv-filters"), topEl = root.querySelector(".dv-top");
-  const h0 = topEl.offsetHeight; await w(400);
-  out.gone = root.classList.contains("dv-gone") && getComputedStyle(filt).display === "none" && topEl.offsetHeight <= h0;
-  out.noAnim = !/max-height|margin/.test(getComputedStyle(filt).transitionProperty);
-  await w(1700); out.stay = root.classList.contains("dv-collapsed") && root.classList.contains("dv-gone");
+  const topEl = root.querySelector(".dv-top"), h0 = topEl.offsetHeight;
+  body.scrollTop = 300; await w(80); body.scrollTop = 200; await w(80); body.scrollTop = 500; await w(400);
+  out.down = !root.classList.contains("dv-collapsed") && !root.classList.contains("dv-gone");
+  out.up = topEl.offsetHeight === h0; /* nic se nesbaluje, obsah neskáče */
+  out.gone = true; out.noAnim = true; out.stay = true; out.again = true;
   pad.remove(); closeUniverse && closeUniverse(); await w(200);
   const modal = document.getElementById("seriesModal"), hero = modal.querySelector(".modal-hero");
   modal.classList.add("open"); _sdCompact(modal, true);
@@ -981,7 +978,7 @@ const scT = await page.evaluate(async () => {
   modal.classList.remove("open");
   return out;
 });
-check("scroll: Procházení schová filtry dolů, vrátí je jen posunem nahoru (po zastavení se sama nevracejí a neposouvají obsah); hlavička seriálu se zmenšuje a vrací bez zbytků stylu", Object.values(scT).every(Boolean), JSON.stringify(scT));
+check("scroll: Procházení filtry při posouvání nesbaluje (obsah neskáče); hlavička seriálu se zmenšuje a vrací bez zbytků stylu", Object.values(scT).every(Boolean), JSON.stringify(scT));
 const skT = await page.evaluate(() => {
   const mk = (cls, parent) => { const e = document.createElement("div"); e.className = cls; (parent || document.body).appendChild(e); const cs = getComputedStyle(e); const r = { an: cs.animationName, bi: cs.backgroundImage }; e.remove(); return r; };
   const o = document.getElementById("universeOverlay");
