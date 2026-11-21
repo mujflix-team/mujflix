@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.144
+### Nově
+- **Verze v patičce Domů je tlačítko:** klepnutí zkontroluje, jestli existuje novější verze (stejná kontrola jako v Profilu), a výsledek ukáže v hlášce.
+
 ## 3.21.143
 ### Opraveno
 - **Kino, telefon:** lišta zůstává vždy na dvou řadách. Tlačítka se podle místa zužují místo zalamování, číslo epizody drží u šipek a sdílení se na telefonu skrylo.
