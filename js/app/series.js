@@ -45,8 +45,9 @@ async function openDiscoverTv(tmdbId, title) {
       return;
     }
   }
-  if (typeof closeUniverse === 'function') closeUniverse();
-  setTimeout(() => { if (typeof openSeries === 'function') openSeries(slug); }, 150);
+  /* detail se otevře hned a Objevování se zavře až pod ním, aby mezitím neprobliklo Domů */
+  if (typeof openSeries === 'function') openSeries(slug);
+  setTimeout(() => { if (typeof closeUniverse === 'function') closeUniverse(); }, 450);
   const modal = document.getElementById('seriesModal');
   if (modal) {
     let opened = false;
@@ -66,12 +67,10 @@ async function openDiscoverTv(tmdbId, title) {
 
 
 function _showCinemaOrFinderChoice(e, t, n, o) {
-  try {
-    closeUniverse()
-  } catch (e) {
-    console.warn("[Cinema] Discover close failed:", e)
-  }
-  openMovieInCinema(e, t, n)
+  openMovieInCinema(e, t, n);
+  setTimeout(() => {
+    try { closeUniverse() } catch (e) { console.warn("[Cinema] Discover close failed:", e) }
+  }, 450)
 }
 
 

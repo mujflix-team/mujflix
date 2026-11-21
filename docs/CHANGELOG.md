@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.140
+### Opraveno
+- **Probliknutí Domů při otevření titulu z Objevování:** Objevování se zavíralo dřív, než se otevřel detail nebo kino, a na chvíli bylo vidět Domů. Teď se detail otevře hned a Objevování se zavře až pod ním.
+
 ## 3.21.139
 ### Změněno
 - **Kino:** pryč šipka „jiný zdroj“ a trailer; šipky předchozí/další epizoda jsou nahoře u srdce (jiný zdroj = klepnutí na vybranou vlajku). Podržení vlajky CZ/EN ukáže seznam všech zdrojů té skupiny.
