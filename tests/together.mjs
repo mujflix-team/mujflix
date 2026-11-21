@@ -47,8 +47,9 @@ const text = sel => page.evaluate(s => (document.querySelector(s)?.textContent |
 
 check("ui: obrazovka je v appce k dispozici", await page.evaluate(() => typeof window.MFTogether?.open === "function"));
 await page.evaluate(() => { const b = document.body; window.mfToggleProfileMenu(b); });
-check("ui: v menu profilu je položka Co dnes pustíme dohromady?", await page.evaluate(() => !!document.querySelector('#nfProfileMenu [data-act="together"]')));
-await page.evaluate(() => document.querySelector('#nfProfileMenu [data-act="together"]').click());
+await page.evaluate(() => document.querySelector('#nfProfileMenu [data-act="settings"]').click());
+check("ui: v Nastavení je položka Co dnes pustíme dohromady?", await page.evaluate(() => !!document.querySelector('#mfSettingsModal [data-st="together"]')));
+await page.evaluate(() => document.querySelector('#mfSettingsModal [data-st="together"]').click());
 await page.waitForTimeout(200);
 check("ui: položka z menu otevře dialog se třemi profily", await isOpen() && await page.evaluate(() => document.querySelectorAll("#mfTogether .mft-chip").length) === 3
   && await page.evaluate(() => document.getElementById("mfTogether").getAttribute("role")) === "dialog");

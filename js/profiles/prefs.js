@@ -145,6 +145,8 @@
     return [
       ["profile", ic('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'), "Upravit profil", (p.name || "Profil") + " · jméno, avatar, PIN"],
       ["prefs", ic('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'), "Zaměření a žánry", (only ? "Jen anime" : "Všechno") + " · " + (n ? n + " oblíbených žánrů" : "žánry nevybrány") + ((window.MFAge && MFAge.limit()) ? " · do " + MFAge.limit() + " let" : "")],
+      ["wrapped", ic('<path d="M5 20V10M12 20V4M19 20v-7"/>'), "Wrapped", "Tvůj rok ve filmech a seriálech"],
+      ["together", ic('<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6"/>'), "Co dnes pustíme dohromady?", "Titul, který se hodí všem vybraným profilům"],
       ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno")],
       ["backup", ic('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>'), "Záloha a obnova dat", "Stáhnout nebo načíst soubor"],
       ["version", ic('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>'), "Verze a aktualizace", "Verze " + (window.MF_VERSION || "?") + " · zkontrolovat novou"],
@@ -195,6 +197,8 @@
         if (a === "close") return;
         if (a === "profile") { var pr = profile(); if (pr && window.ProfileGate) ProfileGate.openCreate(pr.id); }
         else if (a === "prefs") open();
+        else if (a === "wrapped" && window.MFWrapped) MFWrapped.open();
+        else if (a === "together" && window.MFTogether) MFTogether.open();
         else if (a === "sync" && window.MFSyncUI) MFSyncUI.open("home");
         else if (a === "backup" && window.MFSyncUI) MFSyncUI.open("backup", { from: "settings" });
       });
@@ -205,9 +209,9 @@
       '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
       '<div class="pf-title">Nastavení</div>' +
       ((profile() || {}).name ? '<div class="pf-text">Profil <b>' + esc(profile().name) + "</b></div>" : "") +
-      '<div class="pf-rows">' + hubRows().filter(function (r) { return r[0] === "profile" || r[0] === "prefs"; }).map(rowHtml).join("") +
+      '<div class="pf-rows">' + hubRows().filter(function (r) { return /^(profile|prefs|wrapped|together)$/.test(r[0]); }).map(rowHtml).join("") +
       '<button type="button" class="pf-adv" aria-expanded="false" data-st="adv">Pokročilé</button>' +
-      '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return r[0] !== "profile" && r[0] !== "prefs"; }).map(rowHtml).join("") + "</div></div></div>";
+      '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return !/^(profile|prefs|wrapped|together)$/.test(r[0]); }).map(rowHtml).join("") + "</div></div></div>";
     hub.classList.add("show");
     var f = hub.querySelector(".pf-row"); if (f) f.focus();
   }
