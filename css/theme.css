@@ -2072,7 +2072,10 @@ html body #seriesModal .season-mark-btn[hidden] { display: none; }
   html body #mfStandaloneCinema #mfCinFavBtn { order: 5; }
   html body #mfStandaloneCinema #mfCinAllEps { order: 6; }
   html body #mfStandaloneCinema #mfCinPrevEp { order: 7; }
-  html body #mfStandaloneCinema #mfCinEpCurrent { order: 8; flex: 1 1 auto; min-width: 0; text-align: center; font-size: var(--fs-sm); }
+  html body #mfStandaloneCinema #mfCinEpCurrent { order: 8; flex: 0 0 auto; padding: 0 4px; text-align: center; font-size: var(--fs-sm); }
   html body #mfStandaloneCinema #mfCinNextEp { order: 9; }
-  html body #mfStandaloneCinema #mfCinShareBtn { order: 10; }
+  html body #mfStandaloneCinema #mfCinShareBtn { display: none !important; }
+  /* vždy jen dvě řady: tlačítka se podle místa zužují (základ 0), místo aby se zalamovala */
+  html body #mfStandaloneCinema .mf-cin-actions .mf-cin-fav-btn, html body #mfStandaloneCinema .mf-cin-lang-btn { flex: 1 1 0; min-width: 0; width: auto; max-width: 38px; }
+  html body #mfStandaloneCinema .mf-cin-lang { flex: 2 1 0; max-width: 80px; min-width: 0; }
 }
