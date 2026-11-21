@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.160
+### Změněno
+- **Menu profilu:** „Nastavení“ se jmenuje „Další“ (je v něm i Wrapped a Co dnes pustíme dohromady).
+
 ## 3.21.159
 ### Změněno
 - **Menu profilu:** ostatní profily jsou řada avatarů, v menu zůstalo Spravovat profily, Nastavení a Odhlásit se; Wrapped a „Co dnes pustíme dohromady?“ jsou v Nastavení.
