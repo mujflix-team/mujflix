@@ -162,7 +162,7 @@
       hub.id = "mfSettingsModal";
       hub.setAttribute("role", "dialog");
       hub.setAttribute("aria-modal", "true");
-      hub.setAttribute("aria-label", "Nastavení");
+      hub.setAttribute("aria-label", "Další");
       hub.addEventListener("click", function (e) {
         if (e.target === hub) return hubClose();
         var b = e.target.closest && e.target.closest("[data-st]");
@@ -207,7 +207,7 @@
     }
     hub.innerHTML = '<div class="pf-box">' +
       '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
-      '<div class="pf-title">Nastavení</div>' +
+      '<div class="pf-title">Další</div>' +
       ((profile() || {}).name ? '<div class="pf-text">Profil <b>' + esc(profile().name) + "</b></div>" : "") +
       '<div class="pf-rows">' + hubRows().filter(function (r) { return /^(profile|prefs|wrapped|together)$/.test(r[0]); }).map(rowHtml).join("") +
       '<button type="button" class="pf-adv" aria-expanded="false" data-st="adv">Pokročilé</button>' +
