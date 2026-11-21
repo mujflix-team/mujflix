@@ -1346,6 +1346,14 @@ const heroPickT = await page.evaluate(() => {
   } finally { window.getActiveProfileId = origId; localStorage.removeItem("mf_hero_hist_pid-hero"); }
 });
 check("banner: nevybírá nedávno ukázané tituly a v rámci jednoho otevření se nemění", heroPickT.first === 105 && heroPickT.same && heroPickT.hist === 6, JSON.stringify(heroPickT));
+const oldFavT = await page.evaluate(async () => {
+  mfShowSection("protebe"); await new Promise(r => setTimeout(r, 500));
+  const wl = document.getElementById("watchlistOverlay"), prot = document.getElementById("mfSectionProtebe");
+  const out = { wl: wl.classList.contains("open") || wl.classList.contains("visible"), old: !!prot && getComputedStyle(prot).display !== "none", top: getComputedStyle(document.getElementById("nfTop")).display !== "none" };
+  if (typeof closeWatchlist === "function") closeWatchlist();
+  return out;
+});
+check("oblíbené: #protebe neukáže starou sekci Doporučení, otevře nové Oblíbené a nechá horní lištu", oldFavT.wl && !oldFavT.old, JSON.stringify(oldFavT));
 const tvmT = await page.evaluate(async () => {
   const og = window.tmdbGet, of = window.fetch, slug = "__tvm_test";
   db[slug] = { tmdbId: 777 };

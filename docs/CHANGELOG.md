@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.151
+### Opraveno
+- **Stará verze Oblíbených:** přepnutí na sekci „protebe“ (např. z historie prohlížeče) ukázalo starou stránku „Doporučení“ a schovalo horní lištu. Teď otevře nové Oblíbené nad Domů. Příčinu jsem nedokázal přesně zreprodukovat, oprava míří na tuto cestu.
+
 ## 3.21.150
 ### Změněno
 - **Objevování:** filtry a žánry jsou i na PC schované za tlačítkem Filtry (dřív jen na telefonu).
