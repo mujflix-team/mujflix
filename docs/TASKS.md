@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.158 – menu profilu na telefonu z docku (claude/mobil-menu-profilu)
 - 3.21.157 – hodnocení na kartách v Domů jako v Objevování (claude/karta-hvezdicky)
 - 3.21.156 – Pokračovat má text po posunu seznamu (claude/pokracovat-text)
 - 3.21.155 – Pokračovat jen ikona na telefonu, menší logo ve všech režimech (claude/tlacitko-ikona)
