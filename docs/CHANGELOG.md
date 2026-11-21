@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.21.153
+### Změněno
+- **Objevování:** přepínač Vše / Filmy / Seriály je pořád vidět pod hledáním, ne schovaný za tlačítkem Filtry.
+
+## 3.21.152
+### Změněno
+- **Ochrana proti nechtěnému „zhlédnutí“ u filmů:** film se do Pokračovat ve sledování zapíše až po 20 s v přehrávači (stejně jako zhlédnutí epizody u seriálů); špatný klik a okamžité zavření ho tam nepřidá.
+
 ## 3.21.151
 ### Opraveno
 - **Stará verze Oblíbených:** přepnutí na sekci „protebe“ (např. z historie prohlížeče) ukázalo starou stránku „Doporučení“ a schovalo horní lištu. Teď otevře nové Oblíbené nad Domů. Příčinu jsem nedokázal přesně zreprodukovat, oprava míří na tuto cestu.

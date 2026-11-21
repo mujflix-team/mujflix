@@ -302,6 +302,9 @@
     }
   }
 
+  var _movieRec = null;
+  function cancelMovieRecord() { if (_movieRec) { clearTimeout(_movieRec); _movieRec = null; } }
+
   function appMarkWatched(uid) {
     try {
       if (typeof markWatched === "function") markWatched(uid);
@@ -1048,7 +1051,12 @@
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
 
-    if (current.type === "movie" && typeof window.mfRecordContinueMovie === "function") window.mfRecordContinueMovie(current.tmdbId, current.title);
+    /* Film se do „Pokračovat ve sledování“ zapíše až po chvíli v přehrávači (špatný klik ho tam nepřidá), stejně jako zhlédnutí epizody u seriálů */
+    cancelMovieRecord();
+    if (current.type === "movie" && typeof window.mfRecordContinueMovie === "function") {
+      var mvId = current.tmdbId, mvTitle = current.title;
+      _movieRec = setTimeout(function () { _movieRec = null; if (current && current.type === "movie" && current.tmdbId === mvId) window.mfRecordContinueMovie(mvId, mvTitle); }, 20000);
+    }
     srcLang = "cs";
     current.sourceIdx = startIndex();
     var first = sourcesFor(current.type)[current.sourceIdx], opened = current;
@@ -1086,6 +1094,7 @@
     if (!modal) return;
     if (current && modal.classList.contains("open")) noteGoodIfStayed();
     try { if (typeof window.mfCancelWatchSoon === "function") window.mfCancelWatchSoon(); } catch (e) {}
+    cancelMovieRecord();
     modal.classList.remove("open");
     frame.innerHTML = "";
     if (epGridPanel) epGridPanel.style.display = "none";

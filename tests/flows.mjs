@@ -1346,6 +1346,18 @@ const heroPickT = await page.evaluate(() => {
   } finally { window.getActiveProfileId = origId; localStorage.removeItem("mf_hero_hist_pid-hero"); }
 });
 check("banner: nevybírá nedávno ukázané tituly a v rámci jednoho otevření se nemění", heroPickT.first === 105 && heroPickT.same && heroPickT.hist === 6, JSON.stringify(heroPickT));
+const mvRecT = await page.evaluate(async () => {
+  const recOrig = window.mfRecordContinueMovie, stOrig = window.setTimeout, calls = [], pend = [];
+  window.mfRecordContinueMovie = (id) => calls.push(String(id));
+  window.setTimeout = function (fn, ms, ...a) { if (ms === 20000) { pend.push(fn); return 0; } return stOrig.call(window, fn, ms, ...a); };
+  try {
+    MFCinemaPlayer.open("4242", "Test film", "movie", { year: 2020 }); await new Promise(r => stOrig(r, 200));
+    const early = calls.length; pend.forEach(f => f()); const late = calls.length;
+    MFCinemaPlayer.close();
+    return { early, late, id: calls[0] };
+  } finally { window.mfRecordContinueMovie = recOrig; window.setTimeout = stOrig; }
+});
+check("film: do „Pokračovat ve sledování“ se zapíše až po chvíli v přehrávači, ne hned po otevření", mvRecT.early === 0 && mvRecT.late === 1 && mvRecT.id === "4242", JSON.stringify(mvRecT));
 const oldFavT = await page.evaluate(async () => {
   mfShowSection("protebe"); await new Promise(r => setTimeout(r, 500));
   const wl = document.getElementById("watchlistOverlay"), prot = document.getElementById("mfSectionProtebe");
