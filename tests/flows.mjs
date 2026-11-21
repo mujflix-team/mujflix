@@ -554,7 +554,7 @@ const barT = await page.evaluate(async () => {
   MFCinemaPlayer.close(); await w(300);
   return { rows, ns, vw: innerWidth };
 });
-check("kino: lišta se nezalamuje (PC 1 řádek, telefon max 2) a „Další seriál“ je jen na velkém PC", barT.rows <= (barT.vw > 900 ? 1 : 2) && (barT.vw >= 1360 || barT.ns === "none"), JSON.stringify(barT));
+check("kino: lišta se nezalamuje (PC 1 řádek, telefon max 2) a šipky přepínání seriálu jsou jen na PC", barT.rows <= (barT.vw > 900 ? 1 : 2) && (barT.vw > 900 || barT.ns === "none"), JSON.stringify(barT));
 check("ověření zdrojů: u seriálu se neptá znovu při každé epizodě (ověřuje 1. epizodu)", prT.noRepeat && prT.ep1, JSON.stringify(prT));
 check("ověření zdrojů: Worker se zeptá a otevře se zdroj, který titul má (ne svetserialu)", prT.sent && /bombuj/.test(prT.url) && !/svetserialu/.test(prT.url), JSON.stringify(prT));
 

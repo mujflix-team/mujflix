@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.141 – kino: dvě řady na telefonu, šipky seriálů na PC (claude/cinema-rady)
 - 3.21.140 – bez probliknutí Domů při otevření z Objevování (claude/home-blik)
 - 3.21.139 – kino: šipky u srdce, bez traileru a šipky zdroje (claude/cinema-sipky)
 - 3.21.138 – kino: lišta (claude/cinema-lista)
