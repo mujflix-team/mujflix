@@ -965,6 +965,8 @@
     b.querySelector(".mf-cin-switch-go").onclick = function () { hideSwitchOffer(); if (!watched) appMarkWatched(uid); stepEpisode(1, true); };
     b.querySelector(".mf-cin-switch-x").onclick = hideSwitchOffer;
     modal.appendChild(b); _switchBar = b;
+    /* lišta sedí hned pod horním panelem (nad stránkou přehrávače), ať nezakrývá tlačítka a přehrávač dole */
+    try { var tp = modal.querySelector(".mf-standalone-cinema-top"); if (tp) b.style.top = Math.round(tp.getBoundingClientRect().bottom + 8) + "px"; } catch (e) {}
     _switchTimer = setTimeout(hideSwitchOffer, 20000);
   }
 
