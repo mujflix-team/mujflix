@@ -1205,7 +1205,7 @@
   });
   window.openUniverse = function () { openUniverse(false); };
   window.openDiscover = function () { openUniverse(false); };
-  window.mfDiscoverRestore = function (sn) { if (!sn || !built) return; state = sn.s; els.input.value = sn.q || ''; syncControls(); openUniverse(false); };
+  window.mfDiscoverRestore = function (sn) { if (!sn || !built) return; state = sn.s; els.input.value = sn.q || ''; syncControls(); els.root.style.transition = 'none'; openUniverse(false); setTimeout(function () { els.root.style.transition = ''; }, 500); }; /* bez prolínání: Objevování je hned pod mizejícím detailem, jinak se při křížku na chvíli ukázalo Domů */
   window.mfDiscoverReroll = function () { varietySeed = 1 + Math.floor(Math.random() * 997); refresh(); }; /* tlačítko obnovení v hlavičce */
   window.openSearch = function () { openUniverse(true); };
   window.closeUniverse = closeUniverse;

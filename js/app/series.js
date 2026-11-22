@@ -47,7 +47,18 @@ async function openDiscoverTv(tmdbId, title) {
   }
   /* detail se otevře hned a Objevování se zavře až pod ním, aby mezitím neprobliklo Domů */
   if (typeof openSeries === 'function') openSeries(slug);
-  setTimeout(() => { if (typeof closeUniverse === 'function') closeUniverse(); }, 450);
+  /* Objevování se skryje (bez prolínání) až když je detail celý vidět – na pomalém telefonu 450 ms nestačilo a probliklo Domů */
+  (function hideDiscoverUnder() {
+    const m = document.getElementById('seriesModal'), c = m && m.querySelector('.modal-content'), u = document.getElementById('universeOverlay');
+    let tries = 0;
+    (function wait() {
+      const ready = m && m.classList.contains('visible') && c && parseFloat(getComputedStyle(c).opacity) >= 0.99;
+      if (!ready && ++tries < 50) return void setTimeout(wait, 50);
+      if (u) u.style.transition = 'none';
+      if (typeof closeUniverse === 'function') closeUniverse();
+      setTimeout(() => { if (u) u.style.transition = ''; }, 500);
+    })();
+  })();
   const modal = document.getElementById('seriesModal');
   if (modal) {
     let opened = false;
