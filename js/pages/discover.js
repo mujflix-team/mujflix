@@ -309,7 +309,6 @@
     if (it.poster) { img.src = it.poster; p.appendChild(img); }
     else { p.classList.remove('dv-skel'); p.appendChild(el('div', 'dv-poster-fallback', (it.title || '?').trim().charAt(0).toUpperCase())); }
     if (it.rating > 0) p.appendChild(el('span', 'dv-rate', '★ ' + it.rating.toFixed(1)));
-    if (showType) p.appendChild(el('span', 'dv-type', it.type === 'tv' ? 'Seriál' : 'Film'));
     p.appendChild(playCue());
     if (it.id) p.appendChild(trailerButton(it));
     p.appendChild(favButton(it));
@@ -318,7 +317,7 @@
     c.appendChild(el('div', 'dv-card-title', it.title));
     var meta = [];
     if (it.year) meta.push(it.year);
-    if (!showType) meta.push(it.type === 'tv' ? 'Seriál' : 'Film');
+    meta.push(it.type === 'tv' ? 'Seriál' : 'Film'); /* typ vždy pod názvem „rok · Film“ (stejně jako v Domů), žádný odznak přes ikony na plakátu */
     c.appendChild(el('div', 'dv-card-meta', meta.join(' · ')));
 
     c.addEventListener('click', function () { openItem(it); });
