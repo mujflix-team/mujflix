@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.169
+### Opraveno
+- **Cinema, přepnutí epizody na webu:** lišta měla špatný styl (nepřijímala CSS), teď je to karta dole se zprávou „Přepnul jsi na webu?“ a tlačítky „Označit S2 E2 jako zhlédnutou“ a ✕. Ukáže se i když se díl mezitím sám označil (pak nabídne „Přejít na další epizodu“), takže při dalším přepnutí nezmizí.
+- **Hláška „S2 · E3 označeno jako zhlédnuté – Zpět“:** už se nezalamuje do úzkého sloupce, má šířku podle textu.
+
 ## 3.21.168
 ### Přidáno
 - **Cinema mode:** když v přehrávači přepneš epizodu přímo na webu (ne našimi tlačítky), objeví se lišta „Přepnul jsi epizodu na webu? [Označit S1 E3 a posunout]“. Klepnutí označí aktuální díl jako zhlédnutý a posune na další; samo se nic neoznačí, po 15 s lišta zmizí.
