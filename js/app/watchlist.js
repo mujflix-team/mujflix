@@ -212,7 +212,18 @@ function renderWatchlist() {
 }
 
 function openFavoriteItem(e) {
-  try { closeWatchlist() } catch (err) {}
+  /* Oblíbené se zavřou až když je detail/přehrávač vidět (dřív se zavřely hned a během načítání probliklo Domů) */
+  (function hideWatchlistUnder() {
+    const w = document.getElementById("watchlistOverlay"), m = document.getElementById("seriesModal"), c = m && m.querySelector(".modal-content"), cin = () => document.getElementById("mfStandaloneCinema");
+    let tries = 0;
+    (function wait() {
+      const detail = m && m.classList.contains("visible") && c && parseFloat(getComputedStyle(c).opacity) >= 0.99, cinema = cin() && getComputedStyle(cin()).display !== "none";
+      if (!(detail || cinema) && ++tries < 60) return void setTimeout(wait, 50);
+      if (w) w.style.transition = "none";
+      try { closeWatchlist() } catch (err) {}
+      setTimeout(() => { if (w) w.style.transition = "" }, 500)
+    })()
+  })();
   setTimeout(() => {
     try {
       if (e.tmdbId && "series" === e.type) {
@@ -235,7 +246,7 @@ function openFavoriteItem(e) {
     } catch (err) {
       mfFavFind(e)
     }
-  }, 300);
+  }, 0);
 }
 
 /* Položka bez ID i místního seriálu: dohledá se v TMDB podle názvu a otevře se normální detail (žádný vyhledávací dialog) */

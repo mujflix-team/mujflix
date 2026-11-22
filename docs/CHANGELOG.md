@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.21.173
+### Opraveno
+- **Probliknutí Domů z Oblíbených:** klepnutí na seriál v Oblíbených už neukáže Domů – Oblíbené se zavřou až když je detail vidět.
+- **Detail seriálu:** v řadě herců je až 30 jmen místo 14 (TMDB jich vrací víc, zobrazovalo se jen prvních 14).
+
+## 3.21.172
+### Opraveno
+- **Cinema:** přepnutí na jiný seriál tlačítky (šipky u názvu) se teď zapíše jako rozkoukaný seriál (Pokračovat míří na novou epizodu); dřív se zapsala jen změna epizody.
+
 ## 3.21.171
 ### Opraveno
 - **Cinema:** lišta „Přepnul jsi na webu?“ je nahoře pod horním panelem, menší a v jednom řádku; dole zakrývala tlačítka Předchozí/Další epizoda a přehrávač na stránce.

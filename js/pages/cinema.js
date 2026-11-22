@@ -838,6 +838,7 @@
       episode: episode,
       localSlug: nextSlug
     });
+    appWatchSoon(nextSlug + "-S" + season + "-E" + episode); // nový seriál se zapíše jako rozkoukaný (Pokračovat) stejně jako při přepnutí epizody
   }
 
   function toggleEpGrid() {

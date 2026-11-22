@@ -18,6 +18,8 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.173 – Oblíbené bez probliknutí Domů, 30 herců (claude/oblibene-bez-blikani)
+- 3.21.172 – cinema: přepnutí seriálu se zapíše jako rozkoukaný (claude/serial-zacal-koukat)
 - 3.21.171 – cinema: lišta po přepnutí nahoře, nezakrývá tlačítka (claude/lista-nahore)
 - 3.21.170 – cinema: po přepnutí na webu se označí předchozí díl, přehrávač se nepřerušuje (claude/undo-toast-sirka)
 - 3.21.169 – toast Zpět má správnou šířku (claude/undo-toast-sirka)
