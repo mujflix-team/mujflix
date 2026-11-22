@@ -321,7 +321,7 @@
             return '<button type="button" role="menuitem" class="nf-pm-item nf-pm-prof" data-pid="' + esc(p.id) + '" title="' + esc(p.name || 'Profil') + '"><span class="nf-pm-av" style="--c:' + esc(p.color || '#0a84ff') + '">' + avatarHtml(p) + '</span><span class="nf-pm-nm">' + esc(p.name || 'Profil') + '</span></button>';
           }).join('') + '</div><div class="nf-pm-sep"></div>' : '') +
           '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="manage"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M17 5v6M14 8h6"/></svg><span>Spravovat profily</span></button>' +
-          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="settings"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Další</span></button>' +
+          '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="settings"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span>Další</span></button>' +
           '<button type="button" role="menuitem" class="nf-pm-item nf-pm-act" data-act="logout"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg><span>Odhlásit se</span></button>';
         document.body.appendChild(m);
         var r = btn.getBoundingClientRect();
@@ -482,7 +482,7 @@
         var epTxt = it.ep || '';
         var isTv = it.mediaType === 'tv' || it.mediaType === 'tv_ep' || !!it.slug || (it.fav && it.fav.type === 'series');
         var typeTxt = isTv ? 'Seriál' : 'Film';
-        epTxt = epTxt ? epTxt + ' · ' + typeTxt : typeTxt;
+        epTxt = !epTxt || epTxt === typeTxt ? typeTxt : epTxt + ' · ' + typeTxt;
         /* hodnocení je stejně jako v Objevování v tmavém štítku na plakátu (ne v textu pod názvem) */
         var ratePill = (it.rating > 0) ? '<span class="nf-rate">★ ' + Number(it.rating).toFixed(1) + '</span>' : '';
         return (
@@ -521,16 +521,28 @@
       function mfhFillRatings(el) {
         if (typeof tmdbGet !== 'function') return;
         (el._mfhItems || []).forEach(function (it, i) {
-          if (!it || it.rating > 0 || !it.tmdbId) return;
+          if (!it || !it.tmdbId) return;
+          var noYear = !it.ep || it.ep === 'Film' || it.ep === 'Seriál';
+          if (it.rating > 0 && !noYear) return;
           var kind = (it.mediaType === 'tv' || it.mediaType === 'tv_ep' || it.slug) ? 'tv' : 'movie';
           tmdbGet('/' + kind + '/' + it.tmdbId + '?language=cs-CZ').then(function (d) {
-            var r = d && d.vote_average;
-            if (!(r > 0)) return;
-            it.rating = r;
+            if (!d) return;
             var card = el.querySelector('.nf-card[data-idx="' + i + '"]'), poster = card && card.querySelector('.nf-poster');
-            if (!poster || poster.querySelector('.nf-rate')) return;
-            var sp = document.createElement('span'); sp.className = 'nf-rate'; sp.textContent = '★ ' + Number(r).toFixed(1);
-            poster.appendChild(sp);
+            if (!card) return;
+            var r = d.vote_average;
+            if (r > 0 && !(it.rating > 0)) {
+              it.rating = r;
+              if (poster && !poster.querySelector('.nf-rate')) {
+                var sp = document.createElement('span'); sp.className = 'nf-rate'; sp.textContent = '★ ' + Number(r).toFixed(1);
+                poster.appendChild(sp);
+              }
+            }
+            /* místo „Film · Film“ ukáže rok: „2015 · Film“ */
+            var y = String(d.release_date || d.first_air_date || '').slice(0, 4), ep = card.querySelector('.nf-card-ep');
+            if (noYear && /^\d{4}$/.test(y) && ep) {
+              ep.textContent = y + ' · ' + (kind === 'tv' ? 'Seriál' : 'Film');
+              ep.title = ep.textContent;
+            }
           }).catch(function () {});
         });
       }
