@@ -2,6 +2,7 @@
 
 ## 3.21.175
 ### Změněno
+- **Další:** nahoře zůstalo, co se používá běžně (Upravit profil, Zaměření a žánry, Wrapped, Co dnes pustíme dohromady, Propojení zařízení); technické věci (Priorita zdrojů, Záloha a obnova, Verze, Smazat data) jsou v Pokročilé.
 - **Cinema na počítači:** zdroje, které nejdou vložit do aplikace (Uzi.la, Movy, Cinejoy), se otevřou v malém samostatném okně (po instalaci jako okno aplikace) místo v nové záložce; opakované otevření použije stejné okno. Telefon beze změny.
 
 ## 3.21.174
