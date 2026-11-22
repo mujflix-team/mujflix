@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.161
+### Změněno
+- **Karty v Domů:** pod názvem je i „Film“ / „Seriál“ jako v Objevování; hodnocení ★ mají i karty v Pokračovat a Oblíbené (dotáhne se z TMDB); Pokračovat má taky trailer a srdíčko a tlačítko „Dokoukal jsem“ je vpravo dole.
+
 ## 3.21.160
 ### Změněno
 - **Menu profilu:** „Nastavení“ se jmenuje „Další“ (je v něm i Wrapped a Co dnes pustíme dohromady).

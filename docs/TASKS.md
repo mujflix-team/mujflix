@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.161 – karty v Domů: typ, hodnocení, trailer a srdíčko v Pokračovat (claude/home-karty-typ-hodnoceni)
 - 3.21.160 – Nastavení přejmenované na Další (claude/dalsi-nazev)
 - 3.21.159 – menší menu profilu (claude/mensi-menu-profilu)
 - 3.21.158 – menu profilu na telefonu z docku (claude/mobil-menu-profilu)
