@@ -356,7 +356,7 @@ function _sdFill(slug, next) {
   if (!t.tmdbId || _sdCache[t.tmdbId] || !(TMDB_KEY || window.MF_USING_TMDB_PROXY)) return;
   const id = t.tmdbId;
   Promise.all([tmdbGet(`/tv/${id}?language=cs-CZ`).catch(() => null), tmdbGet(`/tv/${id}/credits?language=cs-CZ`).catch(() => null), tmdbGet(`/tv/${id}/videos?language=cs-CZ&include_video_language=cs,en,null`).catch(() => null)]).then(([d, c, v]) => {
-    const castFull = ((c && c.cast) || []).filter(x => x && x.name).slice(0, 14).map(x => ({ id: x.id, name: x.name, role: x.character || "", photo: x.profile_path ? "https://image.tmdb.org/t/p/w185" + x.profile_path : "" }));
+    const castFull = ((c && c.cast) || []).filter(x => x && x.name).slice(0, 30).map(x => ({ id: x.id, name: x.name, role: x.character || "", photo: x.profile_path ? "https://image.tmdb.org/t/p/w185" + x.profile_path : "" }));
     const info = Object.assign({}, d || {}, { cast: ((c && c.cast) || []).map(x => x && x.name).filter(Boolean), castFull, trailer: _sdPickTrailer(v) });
     _sdCache[id] = info, _sdPaint(slug, info)
   })
