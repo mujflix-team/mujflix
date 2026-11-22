@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.164
+### Opraveno
+- **Objevování:** ve „Vše“ už není odznak Film/Seriál přes ikony na plakátu, typ je jako v Domů pod názvem („rok · Film“).
+- **Objevování, telefon:** horní banner je nižší, název má max. dva řádky, údaje jeden řádek a tlačítka jsou v jedné řadě, nic se neořezává.
+
 ## 3.21.163
 ### Opraveno
 - **Menu profilu:** „Další“ má ikonu tří teček místo ozubeného kola.
