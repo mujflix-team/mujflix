@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.175 – cinema PC: zdroje bez vložení v malém okně (claude/male-okno-pc)
 - 3.21.174 – priorita zdrojů v Další (claude/priorita-zdroju)
 - 3.21.173 – Oblíbené bez probliknutí Domů, 30 herců (claude/oblibene-bez-blikani)
 - 3.21.172 – cinema: přepnutí seriálu se zapíše jako rozkoukaný (claude/serial-zacal-koukat)
