@@ -478,8 +478,11 @@
         var open = "mfhOpenIdx('" + cid + "'," + idx + ")";
         // pod názvem: rok / díl; hodnocení je štítek na plakátu
         var epTxt = it.ep || '';
+        var isTv = it.mediaType === 'tv' || it.mediaType === 'tv_ep' || !!it.slug || (it.fav && it.fav.type === 'series');
+        var typeTxt = isTv ? 'Seriál' : 'Film';
+        epTxt = epTxt ? epTxt + ' · ' + typeTxt : typeTxt;
         /* hodnocení je stejně jako v Objevování v tmavém štítku na plakátu (ne v textu pod názvem) */
-        var ratePill = (it.rating > 0 && typeof it.progress !== 'number') ? '<span class="nf-rate">★ ' + Number(it.rating).toFixed(1) + '</span>' : '';
+        var ratePill = (it.rating > 0) ? '<span class="nf-rate">★ ' + Number(it.rating).toFixed(1) + '</span>' : '';
         return (
           '<div class="nf-card' + (rank ? ' nf-ranked' : '') + '" tabindex="0" role="button" aria-label="' + esc(it.title) + '" ' +
             'data-cid="' + cid + '" data-idx="' + idx + '" ' +
@@ -490,7 +493,8 @@
               '<span class="nf-play" aria-hidden="true"><span class="nf-play-btn"><svg viewBox="8 5 11 14" width="30" height="36" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span>' +
               ratePill +
               (typeof it.progress === 'number' ? '<div class="nf-cprog" aria-hidden="true"><i style="width:' + Math.round(it.progress) + '%"></i></div>' : '') +
-                            (it.resume ? '<button type="button" class="nf-cx" title="Dokoukal jsem – odebrat z pokračování" aria-label="Dokoukal jsem – odebrat z pokračování" onclick="event.stopPropagation(); mfhFinishItem(\'' + esc(String(it.key || '')).replace(/'/g, '') + '\')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>' : mfhFavButton(it, cid, idx)) +
+                            mfhFavButton(it, cid, idx) +
+              (it.resume ? '<button type="button" class="nf-cx" title="Dokoukal jsem – odebrat z pokračování" aria-label="Dokoukal jsem – odebrat z pokračování" onclick="event.stopPropagation(); mfhFinishItem(\'' + esc(String(it.key || '')).replace(/'/g, '') + '\')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>' : '') +
             '</div>' +
             '<div class="nf-card-info">' +
               '<p class="nf-card-title">' + esc(it.title) + '</p>' +
@@ -511,6 +515,24 @@
         });
       }
 
+      /* Karty bez hodnocení (Pokračovat, Oblíbené…) si hodnocení dotáhnou z TMDB (výsledky se cachují) a ukážou štítek ★ */
+      function mfhFillRatings(el) {
+        if (typeof tmdbGet !== 'function') return;
+        (el._mfhItems || []).forEach(function (it, i) {
+          if (!it || it.rating > 0 || !it.tmdbId) return;
+          var kind = (it.mediaType === 'tv' || it.mediaType === 'tv_ep' || it.slug) ? 'tv' : 'movie';
+          tmdbGet('/' + kind + '/' + it.tmdbId + '?language=cs-CZ').then(function (d) {
+            var r = d && d.vote_average;
+            if (!(r > 0)) return;
+            it.rating = r;
+            var card = el.querySelector('.nf-card[data-idx="' + i + '"]'), poster = card && card.querySelector('.nf-poster');
+            if (!poster || poster.querySelector('.nf-rate')) return;
+            var sp = document.createElement('span'); sp.className = 'nf-rate'; sp.textContent = '★ ' + Number(r).toFixed(1);
+            poster.appendChild(sp);
+          }).catch(function () {});
+        });
+      }
+
       function renderCarousel(id, items, ranked) {
         var el = document.getElementById(id);
         if (!el) return;
@@ -518,6 +540,7 @@
         el.removeAttribute('aria-busy');
         el.innerHTML = el._mfhItems.map(function (it, i) { return mfhCardHtml(it, id, i, ranked ? i + 1 : 0); }).join('');
         mfhBindCardImages(el);
+        mfhFillRatings(el);
         if (id === 'mfhRecent') mfhMarkNewEpisodes(el);
       }
 
