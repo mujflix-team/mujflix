@@ -2137,8 +2137,11 @@ html body #seriesModal #modalFavBtn { order: 4; }
 .nf-card:has(.nf-cprog) .nf-poster .nf-rate { bottom: 10px; }
 
 /* cinema: nabídka po přepnutí epizody přímo na webu přehrávače */
-#cinemaModal .mf-cin-switch { position: absolute; z-index: 30; left: 50%; transform: translateX(-50%); bottom: 96px; max-width: calc(100% - 24px); display: flex; align-items: center; gap: var(--sp-2); padding: 8px 8px 8px 14px; border-radius: var(--r-media); background: rgba(28, 28, 30, 0.96); border: 1px solid var(--w-2); color: #fff; font-size: var(--fs-sm); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5); }
-#cinemaModal .mf-cin-switch span { min-width: 0; }
-#cinemaModal .mf-cin-switch-go { flex: none; height: 34px; padding: 0 12px; border: 0; border-radius: var(--r-media); background: #fff; color: #000; font: inherit; font-weight: 700; white-space: nowrap; cursor: pointer; }
-#cinemaModal .mf-cin-switch-x { flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: #aaa; cursor: pointer; }
-@media (max-width: 899px) { #cinemaModal .mf-cin-switch { bottom: 150px; flex-wrap: wrap; justify-content: center; } }
+#mfStandaloneCinema .mf-cin-switch { position: fixed; z-index: 2147482000; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: calc(100vw - 24px); display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: 12px 14px; border-radius: var(--r-lg, 16px); background: rgba(28, 28, 30, 0.97); border: 1px solid var(--w-2); color: #fff; font-size: var(--fs-sm); font-weight: 600; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55); }
+#mfStandaloneCinema .mf-cin-switch-row { display: flex; align-items: center; gap: var(--sp-2); }
+#mfStandaloneCinema .mf-cin-switch-go { height: 36px; padding: 0 16px; border: 0; border-radius: var(--r-media); background: #fff; color: #000; font: inherit; font-weight: 700; white-space: nowrap; cursor: pointer; }
+#mfStandaloneCinema .mf-cin-switch-x { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--w-2); color: #ddd; font: inherit; cursor: pointer; }
+
+/* toast „označeno jako zhlédnuté – Zpět“: nesmí se zalamovat do úzkého sloupce (left:50% omezovalo šířku na půl obrazovky) */
+#mf-undo-toast { width: max-content; max-width: calc(100vw - 32px); white-space: nowrap; }
+#mf-undo-toast span { white-space: normal; min-width: 0; }

@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.169 – toast Zpět má správnou šířku (claude/undo-toast-sirka)
 - 3.21.168 – cinema: nabídka označit a posunout po přepnutí epizody na webu (claude/prepnuti-na-webu)
 - 3.21.167 – kontrola verze: toast nepřekrývá lištu Obnovit (claude/update-bar-prekryv)
 - 3.21.166 – probliknutí Domů při otevření/zavření detailu z Objevování (claude/blik-detail)

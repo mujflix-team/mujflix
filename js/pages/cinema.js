@@ -932,16 +932,17 @@
   function offerSwitchedEpisode() {
     if (!current || current.type !== "tv" || !current.localSlug || !modal || _switchBar) return;
     var uid = current.localSlug + "-S" + current.season + "-E" + current.episode;
-    if (isEpWatched(current.season, current.episode)) return;
     var from = "S" + current.season + " E" + current.episode;
+    var watched = isEpWatched(current.season, current.episode); // po pár sekundách v přehrávači se díl označí sám, nabídka se i tak ukáže
     var b = document.createElement("div");
     b.className = "mf-cin-switch"; b.setAttribute("role", "status");
-    b.innerHTML = '<span>Přepnul jsi epizodu na webu?</span><button type="button" class="mf-cin-switch-go"></button><button type="button" class="mf-cin-switch-x" aria-label="Zavřít">✕</button>';
-    b.querySelector(".mf-cin-switch-go").textContent = "Označit " + from + " a posunout";
-    b.querySelector(".mf-cin-switch-go").onclick = function () { hideSwitchOffer(); appMarkWatched(uid); stepEpisode(1); };
+    b.innerHTML = '<div class="mf-cin-switch-q"></div><div class="mf-cin-switch-row"><button type="button" class="mf-cin-switch-go"></button><button type="button" class="mf-cin-switch-x" aria-label="Zavřít">✕</button></div>';
+    b.querySelector(".mf-cin-switch-q").textContent = "Přepnul jsi na webu?";
+    b.querySelector(".mf-cin-switch-go").textContent = watched ? "Přejít na další epizodu" : "Označit " + from + " jako zhlédnutou";
+    b.querySelector(".mf-cin-switch-go").onclick = function () { hideSwitchOffer(); if (!watched) appMarkWatched(uid); stepEpisode(1); };
     b.querySelector(".mf-cin-switch-x").onclick = hideSwitchOffer;
     modal.appendChild(b); _switchBar = b;
-    _switchTimer = setTimeout(hideSwitchOffer, 15000);
+    _switchTimer = setTimeout(hideSwitchOffer, 20000);
   }
 
   function loadUrl(url, label, noEmbed) {
