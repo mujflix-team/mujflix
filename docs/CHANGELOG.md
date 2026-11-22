@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.163
+### Opraveno
+- **Menu profilu:** „Další“ má ikonu tří teček místo ozubeného kola.
+- **Karty v Domů:** místo „Film · Film“ / „Seriál · Seriál“ je „rok · Film“ / „rok · Seriál“ (rok se dotáhne z TMDB, do té doby jen typ).
+
 ## 3.21.162
 ### Opraveno
 - **Karty v Domů:** seriály z Pokračovat (uložené pod místním slugem) neměly srdíčko ani trailer; teď je mají všechny karty, u kterých to jde.
