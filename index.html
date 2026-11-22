@@ -435,7 +435,7 @@
         id="dockProtebe"
         style="order:3"
         data-hash="#protebe"
-        onclick="if (typeof closeUniverse === 'function') closeUniverse(); setDockActive('dockProtebe'); openWatchlist()"
+        onclick="setDockActive('dockProtebe'); openWatchlist(); setTimeout(function () { if (typeof closeUniverse === 'function') closeUniverse(); setDockActive('dockProtebe'); }, 320)"
         title="Oblíbené"
         aria-label="Oblíbené a doporučení"
       >

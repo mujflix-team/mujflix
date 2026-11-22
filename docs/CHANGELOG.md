@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.165
+### Opraveno
+- **Probliknutí Domů:** přechod z Objevování (Seriály/Filmy) na Oblíbené v docku na chvilku ukázal úvodní stránku; Objevování se teď zavře až pod už otevřenými Oblíbenými.
+
 ## 3.21.164
 ### Opraveno
 - **Objevování:** ve „Vše“ už není odznak Film/Seriál přes ikony na plakátu, typ je jako v Domů pod názvem („rok · Film“).
