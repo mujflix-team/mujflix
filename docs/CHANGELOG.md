@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.171
+### Opraveno
+- **Cinema:** přepnutí na jiný seriál tlačítky (šipky u názvu) se teď zapíše jako rozkoukaný seriál (Pokračovat míří na novou epizodu); dřív se zapsala jen změna epizody.
+
 ## 3.21.170
 ### Opraveno
 - **Cinema, přepnutí epizody na webu:** lišta se ptá „Přepnul jsi na webu na další epizodu?“ a tlačítko označí díl, ze kterého jsi přepnul; přehrávač se přitom znovu nenačítá (nepřeruší se, co už na webu sleduješ), jen se štítek S · E posune na další díl.
