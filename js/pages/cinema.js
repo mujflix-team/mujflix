@@ -642,21 +642,29 @@
   /** Zdroj, od kterého se začíná: ten, co pro titul fungoval; jinak první, který není označen jako nefunkční. */
   /* Vlastní priorita zdrojů z Nastavení (Další → Priorita zdrojů): seznam id zdrojů od nejdůležitějšího. Prázdný = výchozí chování. */
   var PRIO_KEY = "mf_src_prio";
-  function userPrio() { try { var a = JSON.parse(localStorage.getItem(PRIO_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
-  function baseSources() {
+  function prioKind(kind) { return kind === "movie" ? "movie" : "tv"; }
+  function userPrio(kind) {
+    kind = prioKind(kind);
+    try {
+      var raw = localStorage.getItem(PRIO_KEY + "_" + kind) || localStorage.getItem(PRIO_KEY) || "[]"; // starší společný seznam platí pro oba druhy, dokud se neuloží zvlášť
+      var a = JSON.parse(raw); return Array.isArray(a) ? a : [];
+    } catch (e) { return []; }
+  }
+  function userPrioCustom(kind) { kind = prioKind(kind); try { return !!(localStorage.getItem(PRIO_KEY + "_" + kind) || localStorage.getItem(PRIO_KEY)); } catch (e) { return false; } }
+  function baseSources(kind) {
     var seen = {}, out = [];
-    TV_SOURCES.concat(MOVIE_SOURCES).forEach(function (x) { var id = String(x.id).replace(/-(noyear|year)$/, ""); if (!seen[id]) { seen[id] = 1; out.push({ id: id, label: String(x.label).replace(/ \(.*\)$/, "") }); } });
+    (prioKind(kind) === "movie" ? MOVIE_SOURCES : TV_SOURCES).forEach(function (x) { var id = String(x.id).replace(/-(noyear|year)$/, ""); if (!seen[id]) { seen[id] = 1; out.push({ id: id, label: String(x.label).replace(/ \(.*\)$/, "") }); } });
     return out;
   }
-  function prioList() {
-    var base = baseSources(), up = userPrio(), out = [];
+  function prioList(kind) {
+    var base = baseSources(kind), up = userPrio(kind), out = [];
     up.forEach(function (id) { var b = base.filter(function (x) { return x.id === id; })[0]; if (b && out.indexOf(b) < 0) out.push(b); });
     base.forEach(function (b) { if (out.indexOf(b) < 0) out.push(b); });
     return out;
   }
   function startIndex() {
     var sources = sourcesFor(current.type), e = prefEntry();
-    var up = userPrio();
+    var up = userPrio(current.type);
     for (var u = 0; u < up.length; u++) for (var si = 0; si < sources.length; si++) {
       if ((sources[si].id === up[u] || String(sources[si].id).indexOf(up[u] + "-") === 0) && !srcIsBad(sources[si].label) && probeState(sources[si]) !== false) return si;
     }
@@ -1156,7 +1164,7 @@
     document.body.style.overflow = "";
   }
 
-  window.MFCinemaPlayer = { priority: { list: function () { return prioList(); }, isCustom: function () { return userPrio().length > 0; }, set: function (ids) { try { localStorage.setItem(PRIO_KEY, JSON.stringify(ids)); } catch (e) {} }, reset: function () { try { localStorage.removeItem(PRIO_KEY); } catch (e) {} } }, open: open, close: close, nextSource: function () { if (current) cycleSource(1); }, sourceLabel: function () { return currentSrcLabel(); }, state: function () { return current && modal && modal.classList.contains("open") ? { title: current.title, type: current.type, id: current.tmdbId, season: current.season, episode: current.episode } : null; }, sourceLabels: function (type, alts) { var prev = current; current = Object.assign({}, prev || {}, { altTitles: alts }); try { return sourcesFor(type).map(function (s) { return s.label; }); } finally { current = prev; } }, currentUrl: function () { return current ? buildUrl() : ""; }, sourceIds: function (type) { return (type === "movie" ? MOVIE_SOURCES : TV_SOURCES).filter(inLang).map(function (s) { return s.id; }); }, lang: function (l) { if (l) setLang(l); return srcLang; } };
+  window.MFCinemaPlayer = { priority: { list: function (k) { return prioList(k); }, isCustom: function (k) { return userPrioCustom(k); }, set: function (k, ids) { try { localStorage.setItem(PRIO_KEY + "_" + prioKind(k), JSON.stringify(ids)); } catch (e) {} }, reset: function (k) { try { localStorage.removeItem(PRIO_KEY + "_" + prioKind(k)); localStorage.removeItem(PRIO_KEY); } catch (e) {} } }, open: open, close: close, nextSource: function () { if (current) cycleSource(1); }, sourceLabel: function () { return currentSrcLabel(); }, state: function () { return current && modal && modal.classList.contains("open") ? { title: current.title, type: current.type, id: current.tmdbId, season: current.season, episode: current.episode } : null; }, sourceLabels: function (type, alts) { var prev = current; current = Object.assign({}, prev || {}, { altTitles: alts }); try { return sourcesFor(type).map(function (s) { return s.label; }); } finally { current = prev; } }, currentUrl: function () { return current ? buildUrl() : ""; }, sourceIds: function (type) { return (type === "movie" ? MOVIE_SOURCES : TV_SOURCES).filter(inLang).map(function (s) { return s.id; }); }, lang: function (l) { if (l) setLang(l); return srcLang; } };
 })();
 
 (function() {

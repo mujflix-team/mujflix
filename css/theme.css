@@ -2155,3 +2155,6 @@ html body #seriesModal #modalFavBtn { order: 4; }
 #mfStandaloneCinema .mf-cin-switch-go { height: 30px; padding: 0 12px; font-size: var(--fs-xs); }
 #mfStandaloneCinema .mf-cin-switch-x { width: 30px; height: 30px; }
 #mfStandaloneCinema .mf-cin-switch-row { gap: var(--sp-1); }
+#mfSettingsModal .pf-tabs { display: flex; gap: var(--sp-2); margin: 0 0 var(--sp-3); }
+#mfSettingsModal .pf-tab { flex: 1; height: 40px; border: 0; border-radius: var(--r-media); background: var(--w-2); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+#mfSettingsModal .pf-tab.on { background: #fff; color: #000; }
