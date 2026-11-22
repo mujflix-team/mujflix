@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.174
+### Přidáno
+- **Priorita zdrojů:** v Další přibyla položka „Priorita zdrojů“, kde se šipkami nastaví pořadí, v jakém přehrávač zdroje zkouší. Výchozí pořadí zůstává, dokud ho nezměníš; tlačítko „Výchozí pořadí“ ho vrátí.
+
 ## 3.21.173
 ### Opraveno
 - **Probliknutí Domů z Oblíbených:** klepnutí na seriál v Oblíbených už neukáže Domů – Oblíbené se zavřou až když je detail vidět.
