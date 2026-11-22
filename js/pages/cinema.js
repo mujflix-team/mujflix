@@ -929,6 +929,15 @@
         "<span>Web vložení do jiné stránky blokuje. Otevři ho v novém okně, nebo přepni na jiný zdroj.</span>" +
         '<a class="mf-cin-noembed-btn" href="' + safe + '" target="_blank" rel="noopener">Otevřít v novém okně</a>' +
       "</div>";
+    /* Počítač: web se otevře v malém samostatném okně vedle MůjFlixu (v nainstalované aplikaci jako vlastní okno), ne v nové záložce; telefon dál otevírá systémové okno prohlížeče */
+    var lnk = frame.querySelector(".mf-cin-noembed-btn");
+    if (lnk) lnk.addEventListener("click", function (ev) {
+      try {
+        if (!window.matchMedia("(min-width: 900px) and (pointer: fine)").matches) return;
+        var w = window.open(url, "mfWebPlayer", "popup=yes,width=1180,height=760,left=" + Math.max(0, Math.round((screen.width - 1180) / 2)) + ",top=" + Math.max(0, Math.round((screen.height - 760) / 3)));
+        if (w) { ev.preventDefault(); try { w.opener = null; } catch (e) {} w.focus && w.focus(); }
+      } catch (e) {}
+    });
   }
 
   /* Epizodu přepnul člověk přímo na webu přehrávače (MůjFlix to nevidí): nabídne označit aktuální díl a posunout na další. Nic se neoznačí samo. */

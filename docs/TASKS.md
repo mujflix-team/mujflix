@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.175 – cinema PC: zdroje bez vložení v malém okně (claude/male-okno-pc)
 - 3.21.171 – cinema: lišta po přepnutí nahoře, nezakrývá tlačítka (claude/lista-nahore)
 - 3.21.170 – cinema: po přepnutí na webu se označí předchozí díl, přehrávač se nepřerušuje (claude/undo-toast-sirka)
 - 3.21.169 – toast Zpět má správnou šířku (claude/undo-toast-sirka)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.175
+### Změněno
+- **Cinema na počítači:** zdroje, které nejdou vložit do aplikace (Uzi.la, Movy, Cinejoy), se otevřou v malém samostatném okně (po instalaci jako okno aplikace) místo v nové záložce; opakované otevření použije stejné okno. Telefon beze změny.
+
 ## 3.21.171
 ### Opraveno
 - **Cinema:** lišta „Přepnul jsi na webu?“ je nahoře pod horním panelem, menší a v jednom řádku; dole zakrývala tlačítka Předchozí/Další epizoda a přehrávač na stránce.
