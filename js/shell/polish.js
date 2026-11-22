@@ -187,7 +187,8 @@
       var t = function (m) { if (typeof showToast === 'function') showToast(m, 2600); };
       t('Kontroluji verzi…');
       Promise.resolve(window.mfCheckUpdate ? window.mfCheckUpdate(true) : null).then(function () {
-        if (document.getElementById('mfUpdateBar')) t('Je dostupná nová verze – tlačítko Obnovit je dole');
+        /* hláška o nové verzi je sama lišta s tlačítkem Obnovit; druhá hláška (toast) by ji na stejném místě překrývala */
+        var tb = document.getElementById('mf-toast'); if (document.getElementById('mfUpdateBar')) { if (tb) { tb.style.opacity = '0'; tb.style.pointerEvents = 'none'; } }
         else t('Máš nejnovější verzi (' + (window.MF_VERSION || '?') + ')');
       });
     });
