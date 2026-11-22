@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.168
+### Přidáno
+- **Cinema mode:** když v přehrávači přepneš epizodu přímo na webu (ne našimi tlačítky), objeví se lišta „Přepnul jsi epizodu na webu? [Označit S1 E3 a posunout]“. Klepnutí označí aktuální díl jako zhlédnutý a posune na další; samo se nic neoznačí, po 15 s lišta zmizí.
+
 ## 3.21.167
 ### Opraveno
 - **Kontrola verze:** po klepnutí na verzi v Domů se už nová verze neoznamuje dvakrát přes sebe (toast překrýval lištu s tlačítkem Obnovit); zůstane jen lišta.

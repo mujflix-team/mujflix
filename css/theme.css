@@ -2135,3 +2135,10 @@ html body #seriesModal #modalFavBtn { order: 4; }
 .nf-card .nf-cx { top: auto; bottom: 10px; right: 6px; }
 @media (hover: none) { .nf-card .nf-cx { top: auto; bottom: 9px; right: 5px; } }
 .nf-card:has(.nf-cprog) .nf-poster .nf-rate { bottom: 10px; }
+
+/* cinema: nabídka po přepnutí epizody přímo na webu přehrávače */
+#cinemaModal .mf-cin-switch { position: absolute; z-index: 30; left: 50%; transform: translateX(-50%); bottom: 96px; max-width: calc(100% - 24px); display: flex; align-items: center; gap: var(--sp-2); padding: 8px 8px 8px 14px; border-radius: var(--r-media); background: rgba(28, 28, 30, 0.96); border: 1px solid var(--w-2); color: #fff; font-size: var(--fs-sm); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5); }
+#cinemaModal .mf-cin-switch span { min-width: 0; }
+#cinemaModal .mf-cin-switch-go { flex: none; height: 34px; padding: 0 12px; border: 0; border-radius: var(--r-media); background: #fff; color: #000; font: inherit; font-weight: 700; white-space: nowrap; cursor: pointer; }
+#cinemaModal .mf-cin-switch-x { flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: #aaa; cursor: pointer; }
+@media (max-width: 899px) { #cinemaModal .mf-cin-switch { bottom: 150px; flex-wrap: wrap; justify-content: center; } }
