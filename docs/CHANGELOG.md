@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.173
+### Přidáno
+- **Priorita zdrojů:** v Další přibyla položka „Priorita zdrojů“, kde se šipkami nastaví pořadí, v jakém přehrávač zdroje zkouší. Výchozí pořadí zůstává, dokud ho nezměníš; tlačítko „Výchozí pořadí“ ho vrátí.
+
 ## 3.21.170
 ### Opraveno
 - **Cinema, přepnutí epizody na webu:** lišta se ptá „Přepnul jsi na webu na další epizodu?“ a tlačítko označí díl, ze kterého jsi přepnul; přehrávač se přitom znovu nenačítá (nepřeruší se, co už na webu sleduješ), jen se štítek S · E posune na další díl.
