@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.167
+### Opraveno
+- **Kontrola verze:** po klepnutí na verzi v Domů se už nová verze neoznamuje dvakrát přes sebe (toast překrýval lištu s tlačítkem Obnovit); zůstane jen lišta.
+
 ## 3.21.166
 ### Opraveno
 - **Probliknutí Domů v detailu:** křížek v detailu otevřeném z Objevování už nepřelévá mizející detail s nabíhajícím Objevováním (bylo vidět Domů); Objevování je hned pod ním. Při otevření detailu se Objevování skryje, až když je detail celý vidět (ne po pevných 450 ms).
