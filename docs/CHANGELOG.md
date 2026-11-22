@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.171
+### Opraveno
+- **Cinema:** lišta „Přepnul jsi na webu?“ je nahoře pod horním panelem, menší a v jednom řádku; dole zakrývala tlačítka Předchozí/Další epizoda a přehrávač na stránce.
+
 ## 3.21.170
 ### Opraveno
 - **Cinema, přepnutí epizody na webu:** lišta se ptá „Přepnul jsi na webu na další epizodu?“ a tlačítko označí díl, ze kterého jsi přepnul; přehrávač se přitom znovu nenačítá (nepřeruší se, co už na webu sleduješ), jen se štítek S · E posune na další díl.
