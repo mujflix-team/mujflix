@@ -148,7 +148,7 @@
       ["wrapped", ic('<path d="M5 20V10M12 20V4M19 20v-7"/>'), "Wrapped", "Tvůj rok ve filmech a seriálech"],
       ["together", ic('<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6"/>'), "Co dnes pustíme dohromady?", "Titul, který se hodí všem vybraným profilům"],
       ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno")],
-      ["sources", ic('<path d="M7 4v16M7 4 4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3"/>'), "Priorita zdrojů", (window.MFCinemaPlayer && MFCinemaPlayer.priority && MFCinemaPlayer.priority.isCustom() ? "Vlastní pořadí" : "Výchozí pořadí") + " · které zdroje se zkusí první"],
+      ["sources", ic('<path d="M7 4v16M7 4 4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3"/>'), "Priorita zdrojů", (window.MFCinemaPlayer && MFCinemaPlayer.priority && (MFCinemaPlayer.priority.isCustom("tv") || MFCinemaPlayer.priority.isCustom("movie")) ? "Vlastní pořadí" : "Výchozí pořadí") + " · zvlášť seriály a filmy"],
       ["backup", ic('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>'), "Záloha a obnova dat", "Stáhnout nebo načíst soubor"],
       ["version", ic('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>'), "Verze a aktualizace", "Verze " + (window.MF_VERSION || "?") + " · zkontrolovat novou"],
       ["reset", ic('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>'), "Smazat data v tomto zařízení", "Profily a historie. Nejdřív zálohuj"]
@@ -158,11 +158,14 @@
     return '<button type="button" class="pf-row" data-st="' + r[0] + '"><span class="pf-row-ico">' + r[1] + '</span><span class="pf-row-txt"><strong>' + r[2] + "</strong><small>" + esc(r[3]) + '</small></span><span class="pf-row-go" aria-hidden="true">›</span></button>';
   }
   /* Priorita zdrojů: pořadí, v jakém přehrávač zdroje zkouší (výchozí chování zůstává, dokud se pořadí nezmění) */
-  function hubSources() {
-    var list = MFCinemaPlayer.priority.list(), custom = MFCinemaPlayer.priority.isCustom();
+  var _srcKind = "tv";
+  function hubSources(kind) {
+    _srcKind = kind === "movie" ? "movie" : "tv";
+    var list = MFCinemaPlayer.priority.list(_srcKind), custom = MFCinemaPlayer.priority.isCustom(_srcKind);
     hub.innerHTML = '<div class="pf-box">' +
       '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
       '<div class="pf-title">Priorita zdrojů</div>' +
+      '<div class="pf-tabs" role="tablist"><button type="button" role="tab" class="pf-tab' + (_srcKind === "tv" ? " on" : "") + '" data-st="src-kind:tv" aria-selected="' + (_srcKind === "tv") + '">Seriály</button><button type="button" role="tab" class="pf-tab' + (_srcKind === "movie" ? " on" : "") + '" data-st="src-kind:movie" aria-selected="' + (_srcKind === "movie") + '">Filmy</button></div>' +
       '<div class="pf-text">Přehrávač zkouší zdroje od shora. ' + (custom ? "Máš vlastní pořadí." : "Teď platí výchozí pořadí.") + "</div>" +
       '<div class="pf-rows">' + list.map(function (x, i) {
         return '<div class="pf-row pf-src"><span class="pf-row-txt"><strong>' + (i + 1) + ". " + esc(x.label) + '</strong></span>' +
@@ -184,13 +187,14 @@
         var b = e.target.closest && e.target.closest("[data-st]");
         if (!b) return;
         var a = b.getAttribute("data-st");
-        if (a === "sources") return hubSources();
+        if (a === "sources") return hubSources(_srcKind);
         if (a === "src-back") return hubOpen();
-        if (a === "src-reset") { MFCinemaPlayer.priority.reset(); return hubSources(); }
+        if (/^src-kind:/.test(a)) return hubSources(a.split(":")[1]);
+        if (a === "src-reset") { MFCinemaPlayer.priority.reset(_srcKind); return hubSources(_srcKind); }
         if (/^src-(up|dn):/.test(a)) {
-          var mv = a.split(":"), ids = MFCinemaPlayer.priority.list().map(function (x) { return x.id; }), ix = ids.indexOf(mv[1]), to = mv[0] === "src-up" ? ix - 1 : ix + 1;
-          if (ix >= 0 && to >= 0 && to < ids.length) { var t = ids[ix]; ids[ix] = ids[to]; ids[to] = t; MFCinemaPlayer.priority.set(ids); }
-          return hubSources();
+          var mv = a.split(":"), ids = MFCinemaPlayer.priority.list(_srcKind).map(function (x) { return x.id; }), ix = ids.indexOf(mv[1]), to = mv[0] === "src-up" ? ix - 1 : ix + 1;
+          if (ix >= 0 && to >= 0 && to < ids.length) { var t = ids[ix]; ids[ix] = ids[to]; ids[to] = t; MFCinemaPlayer.priority.set(_srcKind, ids); }
+          return hubSources(_srcKind);
         }
         if (a === "adv") {
           var box = hub.querySelector(".pf-adv-box"), expand = box.hasAttribute("hidden");
