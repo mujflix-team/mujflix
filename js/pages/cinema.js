@@ -762,7 +762,7 @@
     if (lab) lab.hidden = true;
   }
 
-  function stepEpisode(dir) {
+  function stepEpisode(dir, noReload) {
     ensureEpCounts(function () {
       var countFn = getEpCountFn();
       var epsInThis = countFn(current.season);
@@ -786,6 +786,11 @@
       current.season = newSeason;
       current.episode = newEp;
       if (current.localSlug) appWatchSoon(current.localSlug + "-S" + current.season + "-E" + current.episode);
+      if (noReload) { // uživatel už na webu přepnul sám: jen sesouhlasit štítek, přehrávač se nepřerušuje
+        updateEpCurrentLabel();
+        if (epGridPanel.style.display !== "none") renderEpGrid();
+        return;
+      }
       noteGoodIfStayed();
       current._manual = false; current._noneToast = false;
       current.sourceIdx = startIndex();
@@ -937,9 +942,9 @@
     var b = document.createElement("div");
     b.className = "mf-cin-switch"; b.setAttribute("role", "status");
     b.innerHTML = '<div class="mf-cin-switch-q"></div><div class="mf-cin-switch-row"><button type="button" class="mf-cin-switch-go"></button><button type="button" class="mf-cin-switch-x" aria-label="Zavřít">✕</button></div>';
-    b.querySelector(".mf-cin-switch-q").textContent = "Přepnul jsi na webu?";
-    b.querySelector(".mf-cin-switch-go").textContent = watched ? "Přejít na další epizodu" : "Označit " + from + " jako zhlédnutou";
-    b.querySelector(".mf-cin-switch-go").onclick = function () { hideSwitchOffer(); if (!watched) appMarkWatched(uid); stepEpisode(1); };
+    b.querySelector(".mf-cin-switch-q").textContent = "Přepnul jsi na webu na další epizodu?";
+    b.querySelector(".mf-cin-switch-go").textContent = watched ? "Ano, jsem na další epizodě" : "Ano, označit " + from + " jako zhlédnutou";
+    b.querySelector(".mf-cin-switch-go").onclick = function () { hideSwitchOffer(); if (!watched) appMarkWatched(uid); stepEpisode(1, true); };
     b.querySelector(".mf-cin-switch-x").onclick = hideSwitchOffer;
     modal.appendChild(b); _switchBar = b;
     _switchTimer = setTimeout(hideSwitchOffer, 20000);

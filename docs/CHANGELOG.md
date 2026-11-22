@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.170
+### Opraveno
+- **Cinema, přepnutí epizody na webu:** lišta se ptá „Přepnul jsi na webu na další epizodu?“ a tlačítko označí díl, ze kterého jsi přepnul; přehrávač se přitom znovu nenačítá (nepřeruší se, co už na webu sleduješ), jen se štítek S · E posune na další díl.
+
 ## 3.21.169
 ### Opraveno
 - **Cinema, přepnutí epizody na webu:** lišta měla špatný styl (nepřijímala CSS), teď je to karta dole se zprávou „Přepnul jsi na webu?“ a tlačítky „Označit S2 E2 jako zhlédnutou“ a ✕. Ukáže se i když se díl mezitím sám označil (pak nabídne „Přejít na další epizodu“), takže při dalším přepnutí nezmizí.
