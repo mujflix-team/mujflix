@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.166
+### Opraveno
+- **Probliknutí Domů v detailu:** křížek v detailu otevřeném z Objevování už nepřelévá mizející detail s nabíhajícím Objevováním (bylo vidět Domů); Objevování je hned pod ním. Při otevření detailu se Objevování skryje, až když je detail celý vidět (ne po pevných 450 ms).
+
 ## 3.21.165
 ### Opraveno
 - **Probliknutí Domů:** přechod z Objevování (Seriály/Filmy) na Oblíbené v docku na chvilku ukázal úvodní stránku; Objevování se teď zavře až pod už otevřenými Oblíbenými.

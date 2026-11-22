@@ -18,6 +18,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.166 – probliknutí Domů při otevření/zavření detailu z Objevování (claude/blik-detail)
 - 3.21.165 – probliknutí Domů při přechodu Objevování → Oblíbené (claude/blik-oblibene)
 - 3.21.164 – Objevování: typ pod názvem, kompaktní banner na telefonu (claude/discover-hero-karty)
 - 3.21.163 – ikona tří teček u Další, bez zdvojeného typu (claude/ikona-dalsi)
