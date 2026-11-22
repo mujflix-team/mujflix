@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.162
+### Opraveno
+- **Karty v Domů:** seriály z Pokračovat (uložené pod místním slugem) neměly srdíčko ani trailer; teď je mají všechny karty, u kterých to jde.
+
 ## 3.21.161
 ### Změněno
 - **Karty v Domů:** pod názvem je i „Film“ / „Seriál“ jako v Objevování; hodnocení ★ mají i karty v Pokračovat a Oblíbené (dotáhne se z TMDB); Pokračovat má taky trailer a srdíčko a tlačítko „Dokoukal jsem“ je vpravo dole.
