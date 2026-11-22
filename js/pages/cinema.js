@@ -926,7 +926,26 @@
       "</div>";
   }
 
+  /* Epizodu přepnul člověk přímo na webu přehrávače (MůjFlix to nevidí): nabídne označit aktuální díl a posunout na další. Nic se neoznačí samo. */
+  var _switchBar = null, _switchTimer = null;
+  function hideSwitchOffer() { clearTimeout(_switchTimer); if (_switchBar) { _switchBar.remove(); _switchBar = null; } }
+  function offerSwitchedEpisode() {
+    if (!current || current.type !== "tv" || !current.localSlug || !modal || _switchBar) return;
+    var uid = current.localSlug + "-S" + current.season + "-E" + current.episode;
+    if (isEpWatched(current.season, current.episode)) return;
+    var from = "S" + current.season + " E" + current.episode;
+    var b = document.createElement("div");
+    b.className = "mf-cin-switch"; b.setAttribute("role", "status");
+    b.innerHTML = '<span>Přepnul jsi epizodu na webu?</span><button type="button" class="mf-cin-switch-go"></button><button type="button" class="mf-cin-switch-x" aria-label="Zavřít">✕</button>';
+    b.querySelector(".mf-cin-switch-go").textContent = "Označit " + from + " a posunout";
+    b.querySelector(".mf-cin-switch-go").onclick = function () { hideSwitchOffer(); appMarkWatched(uid); stepEpisode(1); };
+    b.querySelector(".mf-cin-switch-x").onclick = hideSwitchOffer;
+    modal.appendChild(b); _switchBar = b;
+    _switchTimer = setTimeout(hideSwitchOffer, 15000);
+  }
+
   function loadUrl(url, label, noEmbed) {
+    hideSwitchOffer();
     if (noEmbed) return loadNoEmbed(url, label);
     frame.classList.remove("mf-cinema-ready");
     frame.innerHTML =
@@ -952,7 +971,7 @@
     var firstLoadAt = 0;
     playerFrame.addEventListener("load", function () {
       if (!firstLoadAt) { firstLoadAt = Date.now(); return; }
-      if (Date.now() - firstLoadAt > 1500) hideStaleEpLabel(); // krátké přesměrování hned po startu se nepočítá
+      if (Date.now() - firstLoadAt > 1500) { hideStaleEpLabel(); offerSwitchedEpisode(); } // krátké přesměrování hned po startu se nepočítá
     });
   }
 
