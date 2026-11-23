@@ -19,6 +19,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
+- 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
 - 3.21.177 – cinema-legacy.js přejmenováno na cinema-bridge.js (claude/uklid-legacy)
 - 3.21.176 – hlavička CORP same-origin (claude/hlavicka-corp)
 - 3.21.175 – cinema PC: zdroje bez vložení v malém okně (claude/male-okno-pc)
