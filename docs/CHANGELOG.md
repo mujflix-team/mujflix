@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.180
+### Přidáno
+- **Další → Pokročilé → Přihlášení ke zdrojům:** odkazy na přihlášení/registraci u SvetSerialu, Bombuj, Uzi.la, NajSerialy, Prehrajto, Movy a Cinejoy (kde web nemá vlastní stránku, otevře se titulka).
+
 ## 3.21.179
 ### Změněno
 - Znovu přidáno (3.21.175 se omylem neslilo do mainu): priorita zdrojů zvlášť pro seriály a filmy, přeuspořádané Další/Pokročilé.
