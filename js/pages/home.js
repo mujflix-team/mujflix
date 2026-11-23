@@ -710,7 +710,7 @@
         hero.innerHTML =
           bg + '<div class="nf-hero-shade"></div>' +
           '<div class="nf-hero-body">' +
-            (h.eyebrow ? '<div class="nf-hero-eyebrow">' + esc(h.eyebrow) + '</div>' : '') +
+            (h.eyebrow ? '<div class="nf-hero-eyebrow' + (/^Podle /.test(h.eyebrow) ? ' nf-hero-why' : '') + '">' + esc(h.eyebrow) + '</div>' : '') +
             '<h1 class="nf-hero-title' + ((h.title || '').length > 26 ? ' nf-long' : '') + '">' + esc(h.title) + '</h1>' +
             '<div class="nf-hero-meta">' + meta.join('') + '</div>' +
             (h.progress != null ? '<div class="nf-hero-bar"><div style="width:' + Math.max(2, h.progress) + '%"></div></div>' : '') +
