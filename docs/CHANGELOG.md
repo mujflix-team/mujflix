@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.178
+### Změněno
+- **Cinema na počítači:** malé okno s webem se otevře přesně na místě přehrávače (stejná šířka a poloha pod horní lištou), takže lišta cinema módu zůstane vidět.
+
 ## 3.21.177
 ### Změněno
 - **Hlavičky:** `Cross-Origin-Resource-Policy: same-origin` přidána i do funkcí (`functions/_shared/og.js`), aby seděla s `_headers` (test hlaviček po #187 padal).

@@ -953,7 +953,11 @@
     if (lnk) lnk.addEventListener("click", function (ev) {
       try {
         if (!window.matchMedia("(min-width: 900px) and (pointer: fine)").matches) return;
-        var w = window.open(url, "mfWebPlayer", "popup=yes,width=1180,height=760,left=" + Math.max(0, Math.round((screen.width - 1180) / 2)) + ",top=" + Math.max(0, Math.round((screen.height - 760) / 3)));
+        /* okno sedí přesně na místě přehrávače, takže horní lišta cinema módu zůstane vidět */
+        var r = frame.getBoundingClientRect(), chromeTop = Math.max(0, window.outerHeight - window.innerHeight - 8), titleBar = 40;
+        var left = Math.round(window.screenX + (window.outerWidth - window.innerWidth) / 2 + r.left), top = Math.round(window.screenY + chromeTop + r.top);
+        var wd = Math.round(r.width), ht = Math.max(300, Math.round(r.height - titleBar));
+        var w = window.open(url, "mfWebPlayer", "popup=yes,width=" + wd + ",height=" + ht + ",left=" + left + ",top=" + top);
         if (w) { ev.preventDefault(); try { w.opener = null; } catch (e) {} w.focus && w.focus(); }
       } catch (e) {}
     });
