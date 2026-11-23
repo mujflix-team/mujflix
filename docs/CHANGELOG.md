@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.179
+### Změněno
+- Znovu přidáno (3.21.175 se omylem neslilo do mainu): priorita zdrojů zvlášť pro seriály a filmy, přeuspořádané Další/Pokročilé.
+### Testy
+- Nový `tests/priorita.mjs` (priorita zdrojů, záložky Seriály/Filmy, menu Další).
+
 ## 3.21.178
 ### Změněno
 - **Cinema na počítači:** malé okno s webem se otevře přesně na místě přehrávače (stejná šířka a poloha pod horní lištou), takže lišta cinema módu zůstane vidět.

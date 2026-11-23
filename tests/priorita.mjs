@@ -19,7 +19,7 @@ const o2 = await page.evaluate(() => {
   const rows = [...document.querySelectorAll("#mfSettingsModal [data-st]")].map((b) => b.dataset.st);
   r.rows = rows.join(",");
   document.querySelector('#mfSettingsModal [data-st="adv"]').click();
-  return { rows: r.rows, advOpen: !!document.querySelector('#mfSettingsModal [data-st="sources"]'), btns: [...document.querySelectorAll("#mfSettingsModal [data-st],#mfSettingsModal [data-act]")].map((b) => b.dataset.st || b.dataset.act).join(",") };
+  document.querySelector('#mfSettingsModal [data-st="sources"]').click();
   r.tabs = document.querySelectorAll("#mfSettingsModal .pf-tab").length;
   const n = document.querySelectorAll("#mfSettingsModal .pf-src").length;
   document.querySelector('#mfSettingsModal [data-st="src-kind:movie"]').click();
