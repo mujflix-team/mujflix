@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.177
+### Změněno
+- **Úklid:** `cinema-legacy.js` se jmenuje `cinema-bridge.js` (je to jen most na nový přehrávač), `closeCinema` zavírá přímo nový přehrávač (starý prvek už neexistoval).
+
 ## 3.21.175
 ### Změněno
 - **Další:** nahoře zůstalo, co se používá běžně (Upravit profil, Zaměření a žánry, Wrapped, Co dnes pustíme dohromady, Propojení zařízení); technické věci (Priorita zdrojů, Záloha a obnova, Verze, Smazat data) jsou v Pokročilé.
