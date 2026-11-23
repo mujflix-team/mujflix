@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.179
+### Změněno
+- Znovu přidáno (3.21.175 se omylem neslilo do mainu): priorita zdrojů zvlášť pro seriály a filmy, přeuspořádané Další/Pokročilé.
+### Testy
+- Nový `tests/priorita.mjs` (priorita zdrojů, záložky Seriály/Filmy, menu Další).
+
 ## 3.21.178
 ### Změněno
 - **Cinema na počítači:** malé okno s webem se otevře přesně na místě přehrávače (stejná šířka a poloha pod horní lištou), takže lišta cinema módu zůstane vidět.
@@ -15,6 +21,7 @@
 
 ## 3.21.175
 ### Změněno
+- **Priorita zdrojů:** pořadí se nastavuje zvlášť pro seriály a pro filmy (záložky Seriály / Filmy); dříve uložené společné pořadí platí pro oba, dokud ho nezměníš.
 - **Další:** nahoře zůstalo, co se používá běžně (Upravit profil, Zaměření a žánry, Wrapped, Co dnes pustíme dohromady, Propojení zařízení); technické věci (Priorita zdrojů, Záloha a obnova, Verze, Smazat data) jsou v Pokročilé.
 - **Cinema na počítači:** zdroje, které nejdou vložit do aplikace (Uzi.la, Movy, Cinejoy), se otevřou v malém samostatném okně (po instalaci jako okno aplikace) místo v nové záložce; opakované otevření použije stejné okno. Telefon beze změny.
 
