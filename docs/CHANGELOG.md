@@ -1,10 +1,12 @@
 # Changelog
 
-## 3.21.180
+## 3.21.181
 ### Opraveno
 - **Domů na telefonu:** text „Podle tvých žánrů…“ nad názvem velkého banneru se skrývá (překrýval plakát).
 ### Změněno
 - **Další:** řádky jsou rozdělené do skupin s nadpisy (Profil, Funkce, Zařízení, Přehrávání, Data a aplikace).
+
+## 3.21.180
 ### Přidáno
 - **Další → Pokročilé → Přihlášení ke zdrojům:** odkazy na přihlášení/registraci u SvetSerialu, Bombuj, Uzi.la, NajSerialy, Prehrajto, Movy a Cinejoy (kde web nemá vlastní stránku, otevře se titulka).
 
