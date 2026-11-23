@@ -15,10 +15,12 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 - Ověřit, jestli NajSerialy.io nebrání vložení do iframe; pokud ano, označit zdroj jako `noEmbed`.
 - Úklid přehrávače hotov (3.21.177): starý přehrávač už neexistuje, zbyl tenký most `js/app/cinema-bridge.js` (`openMovieInCinema`, `closeCinema` → `MFCinemaPlayer`); volání z `home.js` a `series.js` jdou jít přímo na `MFCinemaPlayer.open` a most pak smazat.
 - Bezpečnost (dluh): CSP `script-src 'unsafe-inline'` kvůli inline `onclick` v generovaném HTML – postupně nahradit `addEventListener` a pak přepnout na `script-src 'self'`. Iframe přehrávače běží bez `sandbox` (hostingy ho detekují); zkusit užší `sandbox` zdroj od zdroje a ručně ověřit všechny 4 zdroje. Limity ve Workeru (`probeHits`, `srcHits`) jsou v paměti jedné instance; do KV až při skutečném zneužití (KV zápis na free tarifu max. 1000/den, každý požadavek jako zápis by kvótu vyčerpal). Opatření mimo kód: branch protection na `main`, ověřit hlavičky na securityheaders.com a observatory.mozilla.org.
+- Bezpečnostní report (mujflix.pages.dev): `Cross-Origin-Embedder-Policy: credentialless` může rozbít iframe přehrávače a obrázky – jen po otestování; `require-trusted-types-for 'script'` vyžaduje přepsat všechny `innerHTML`; `access-control-allow-origin: *` v repu není nastaveno.
 - Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
 
 ## Hotovo
 - 3.21.177 – cinema-legacy.js přejmenováno na cinema-bridge.js (claude/uklid-legacy)
+- 3.21.176 – hlavička CORP same-origin (claude/hlavicka-corp)
 - 3.21.175 – cinema PC: zdroje bez vložení v malém okně (claude/male-okno-pc)
 - 3.21.174 – priorita zdrojů v Další (claude/priorita-zdroju)
 - 3.21.173 – Oblíbené bez probliknutí Domů, 30 herců (claude/oblibene-bez-blikani)
