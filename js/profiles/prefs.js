@@ -155,6 +155,11 @@
       ["reset", ic('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>'), "Smazat data v tomto zařízení", "Profily a historie. Nejdřív zálohuj"]
     ];
   }
+  /* nadpisy skupin v Další (pořadí řádků se nemění) */
+  var HUB_SEC = { profile: "Profil", wrapped: "Funkce", sync: "Zařízení", sources: "Přehrávání", backup: "Data a aplikace" };
+  function rowsHtml(rows) {
+    return rows.map(function (r) { return (HUB_SEC[r[0]] ? '<div class="pf-sec">' + HUB_SEC[r[0]] + "</div>" : "") + rowHtml(r); }).join("");
+  }
   function rowHtml(r) {
     return '<button type="button" class="pf-row" data-st="' + r[0] + '"><span class="pf-row-ico">' + r[1] + '</span><span class="pf-row-txt"><strong>' + r[2] + "</strong><small>" + esc(r[3]) + '</small></span><span class="pf-row-go" aria-hidden="true">›</span></button>';
   }
@@ -261,9 +266,9 @@
       '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
       '<div class="pf-title">Další</div>' +
       ((profile() || {}).name ? '<div class="pf-text">Profil <b>' + esc(profile().name) + "</b></div>" : "") +
-      '<div class="pf-rows">' + hubRows().filter(function (r) { return /^(profile|prefs|wrapped|together|sync)$/.test(r[0]); }).map(rowHtml).join("") +
+      '<div class="pf-rows">' + rowsHtml(hubRows().filter(function (r) { return /^(profile|prefs|wrapped|together|sync)$/.test(r[0]); })) +
       '<button type="button" class="pf-adv" aria-expanded="false" data-st="adv">Pokročilé</button>' +
-      '<div class="pf-adv-box" hidden>' + hubRows().filter(function (r) { return !/^(profile|prefs|wrapped|together|sync)$/.test(r[0]); }).map(rowHtml).join("") + "</div></div></div>";
+      '<div class="pf-adv-box" hidden>' + rowsHtml(hubRows().filter(function (r) { return !/^(profile|prefs|wrapped|together|sync)$/.test(r[0]); })) + "</div></div></div>";
     hub.classList.add("show");
     var f = hub.querySelector(".pf-row"); if (f) f.focus();
   }

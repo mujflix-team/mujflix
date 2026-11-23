@@ -1890,6 +1890,8 @@ html body .nf-chip:active, html body #seriesModal .sd-tab:active, html body #ser
 }
 
 /* Nastavení: pokročilé věci jsou schované pod jednou položkou */
+#mfSettingsModal .pf-sec { margin: 14px 2px 4px; font-size: var(--fs-xs, 0.75rem); font-weight: var(--fw-medium); letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-text-3); }
+#mfSettingsModal .pf-sec:first-child { margin-top: 2px; }
 #mfSettingsModal .pf-adv { display: block; width: 100%; text-align: left; margin: 10px 0 0; padding: 8px 2px; background: none; border: 0; color: var(--c-text-3); font: inherit; font-weight: var(--fw-medium); cursor: pointer; }
 #mfSettingsModal .pf-adv::after { content: "›"; display: inline-block; margin-left: 8px; transition: transform var(--t-base) ease; }
 #mfSettingsModal .pf-adv[aria-expanded="true"]::after { transform: rotate(90deg); }
@@ -2159,3 +2161,6 @@ html body #seriesModal #modalFavBtn { order: 4; }
 #mfSettingsModal .pf-tabs { display: flex; gap: var(--sp-2); margin: 0 0 var(--sp-3); }
 #mfSettingsModal .pf-tab { flex: 1; height: 40px; border: 0; border-radius: var(--r-media); background: var(--w-2); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 #mfSettingsModal .pf-tab.on { background: #fff; color: #000; }
+
+/* telefon: „Podle tvých žánrů…" nad názvem v hero se skrývá (překrývalo plakát) */
+@media (max-width: 700px) { .nf-hero-why { display: none; } }
