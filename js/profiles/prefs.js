@@ -149,6 +149,7 @@
       ["together", ic('<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6"/>'), "Co dnes pustíme dohromady?", "Titul, který se hodí všem vybraným profilům"],
       ["sync", ic('<rect x="2" y="5" width="13" height="10" rx="1.5"/><path d="M6 19h5M8.5 15v4"/><rect x="16" y="9" width="6" height="11" rx="1.5"/>'), "Propojení zařízení", (linked ? "Propojeno" : "Zatím nepropojeno")],
       ["sources", ic('<path d="M7 4v16M7 4 4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3"/>'), "Priorita zdrojů", (window.MFCinemaPlayer && MFCinemaPlayer.priority && (MFCinemaPlayer.priority.isCustom("tv") || MFCinemaPlayer.priority.isCustom("movie")) ? "Vlastní pořadí" : "Výchozí pořadí") + " · zvlášť seriály a filmy"],
+      ["logins", ic('<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/>'), "Přihlášení ke zdrojům", "Účty na webech, odkud se přehrává"],
       ["backup", ic('<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>'), "Záloha a obnova dat", "Stáhnout nebo načíst soubor"],
       ["version", ic('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>'), "Verze a aktualizace", "Verze " + (window.MF_VERSION || "?") + " · zkontrolovat novou"],
       ["reset", ic('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>'), "Smazat data v tomto zařízení", "Profily a historie. Nejdřív zálohuj"]
@@ -175,6 +176,28 @@
       '<button type="button" class="pf-row" data-st="src-reset"><span class="pf-row-txt"><strong>Výchozí pořadí</strong><small>Zruší vlastní pořadí</small></span></button>' +
       '<button type="button" class="pf-row" data-st="src-back"><span class="pf-row-txt"><strong>Zpět</strong></span></button></div></div>';
   }
+  /* Přihlášení ke zdrojům: jen odkazy na weby (jen s tím, co web opravdu nabízí; kde je jen titulka, je to „Otevřít web") */
+  var LOGINS = [
+    ["SvetSerialu", ["https://svetserialu.to/", "Otevřít web"]],
+    ["Bombuj", ["https://www.bombuj.si/prihlasit.php", "Přihlásit"], ["https://www.bombuj.si/registrovat.php", "Registrovat"]],
+    ["Uzi.la", ["https://uzi.la/login", "Přihlásit"], ["https://uzi.la/register", "Registrovat"]],
+    ["NajSerialy", ["https://www.najserialy.io/prihlaseni-registrace", "Přihlášení / registrace"]],
+    ["Prehrajto.cz", ["https://prehrajto.cz/", "Otevřít web"]],
+    ["Movy", ["https://www.movy.sx/", "Otevřít web"]],
+    ["Cinejoy", ["https://cinejoy.pk/", "Otevřít web"]]
+  ];
+  function hubLogins() {
+    hub.innerHTML = '<div class="pf-box">' +
+      '<button type="button" class="pf-x" data-st="close" aria-label="Zavřít">×</button>' +
+      '<div class="pf-title">Přihlášení ke zdrojům</div>' +
+      '<div class="pf-text">Odkazy se otevřou v novém okně. Některé weby mají přihlášení jen na titulní straně.</div>' +
+      '<div class="pf-rows">' + LOGINS.map(function (x) {
+        return '<div class="pf-row pf-src"><span class="pf-row-txt"><strong>' + esc(x[0]) + "</strong></span>" + x.slice(1).map(function (l) {
+          return '<a class="pf-login" href="' + esc(l[0]) + '" target="_blank" rel="noopener noreferrer">' + esc(l[1]) + "</a>";
+        }).join("") + "</div>";
+      }).join("") +
+      '<button type="button" class="pf-row" data-st="src-back"><span class="pf-row-txt"><strong>Zpět</strong></span></button></div></div>';
+  }
   function hubOpen() {
     if (!hub) {
       hub = document.createElement("div");
@@ -189,6 +212,7 @@
         var a = b.getAttribute("data-st");
         if (a === "sources") return hubSources(_srcKind);
         if (a === "src-back") return hubOpen();
+        if (a === "logins") return hubLogins();
         if (/^src-kind:/.test(a)) return hubSources(a.split(":")[1]);
         if (a === "src-reset") { MFCinemaPlayer.priority.reset(_srcKind); return hubSources(_srcKind); }
         if (/^src-(up|dn):/.test(a)) {

@@ -32,5 +32,12 @@ check("priorita: filmy a seriály mají vlastní seznam", o.mv === "prehrajto" &
 check("priorita: seriál začne na zdroji s nejvyšší prioritou", /najserial/i.test(o.tvSrc || ""), o.tvSrc);
 check("priorita: reset vrátí výchozí", o.custom1 === false);
 check("menu Další: Priorita zdrojů je v Pokročilé a záložky Seriály/Filmy fungují", /adv,sources/.test(o.rows) && o.tabs === 2 && o.rowsMv < o.rowsTv, JSON.stringify(o));
+const lg = await page.evaluate(() => {
+  document.querySelector('#mfSettingsModal [data-st="src-back"]').click();
+  document.querySelector('#mfSettingsModal [data-st="adv"]').click();
+  document.querySelector('#mfSettingsModal [data-st="logins"]').click();
+  return { n: document.querySelectorAll("#mfSettingsModal .pf-login").length, ok: [...document.querySelectorAll("#mfSettingsModal .pf-login")].every((a) => /^https:\/\//.test(a.href) && a.rel.includes("noopener")) };
+});
+check("Přihlášení ke zdrojům: odkazy na weby (bezpečné)", lg.n === 9 && lg.ok, JSON.stringify(lg));
 await close();
 finish();
