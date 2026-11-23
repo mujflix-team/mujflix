@@ -2,6 +2,7 @@
 
 ## 3.21.177
 ### Změněno
+- **Hlavičky:** `Cross-Origin-Resource-Policy: same-origin` přidána i do funkcí (`functions/_shared/og.js`), aby seděla s `_headers` (test hlaviček po #187 padal).
 - **Úklid:** `cinema-legacy.js` se jmenuje `cinema-bridge.js` (je to jen most na nový přehrávač), `closeCinema` zavírá přímo nový přehrávač (starý prvek už neexistoval).
 
 ## 3.21.176
