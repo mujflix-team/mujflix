@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.176
+### Změněno
+- **Bezpečnost:** hlavička `Cross-Origin-Resource-Policy: same-origin` (jiné weby si nemohou vkládat naše soubory). Další návrhy z bezpečnostního reportu (CSP bez `unsafe-inline`, Trusted Types, COEP) jsou v TASKS jako dluh – rozbily by inline `onclick`, `innerHTML` a iframe přehrávače.
+
 ## 3.21.175
 ### Změněno
 - **Další:** nahoře zůstalo, co se používá běžně (Upravit profil, Zaměření a žánry, Wrapped, Co dnes pustíme dohromady, Propojení zařízení); technické věci (Priorita zdrojů, Záloha a obnova, Verze, Smazat data) jsou v Pokročilé.
