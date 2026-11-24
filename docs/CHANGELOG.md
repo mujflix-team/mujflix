@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.183
+### Přidáno
+- **Pokračovat ve sledování:** u seriálu, na který ses nekoukal víc než týden, přibyde „před 9 dny“ (vedle „zbývá …“).
+
 ## 3.21.182
 ### Přidáno
 - **Domů:** pozdrav v hlavním banneru („Dobrý večer, Jakube“ podle denní doby a jména profilu); u „Pokračovat ve sledování“ se nezobrazuje.
