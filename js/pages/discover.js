@@ -430,6 +430,29 @@
     actions.appendChild(fav);
     body.appendChild(actions);
     h.appendChild(body);
+
+    /* PC: popis v panelu vpravo dole a nad ním náhled traileru (jako banner na Domů); na telefonu se skrývá */
+    var side = el('div', 'dv-hero-side');
+    if (it.id) {
+      var kind = it.type === 'tv' ? 'tv' : 'movie';
+      api('/' + kind + '/' + it.id + '/videos?language=cs-CZ&include_video_language=cs,en,null').then(function (d) {
+        var yt = ((d && d.results) || []).filter(function (v) { return v && v.site === 'YouTube' && /^[\w-]{6,20}$/.test(v.key || ''); });
+        var pool = yt.filter(function (v) { return v.type === 'Trailer'; });
+        if (!pool.length) pool = yt.filter(function (v) { return v.type === 'Teaser'; });
+        if (!pool.length || !side.isConnected) return;
+        var tb = el('button', 'dv-hero-trl');
+        tb.type = 'button';
+        tb.setAttribute('aria-label', 'Přehrát trailer: ' + it.title);
+        var im = new Image(); im.alt = ''; im.loading = 'lazy'; im.src = 'https://i.ytimg.com/vi/' + pool[0].key + '/hqdefault.jpg';
+        tb.appendChild(im);
+        tb.appendChild(el('span', 'dv-hero-trl-play', '▶'));
+        tb.appendChild(el('span', 'dv-hero-trl-lbl', 'Trailer'));
+        tb.addEventListener('click', function () { if (typeof window.mfPlayTrailer === 'function') window.mfPlayTrailer(kind, it.id); });
+        side.insertBefore(tb, side.firstChild);
+      });
+    }
+    if (it.overview) side.appendChild(el('p', 'dv-hero-side-desc', it.overview));
+    h.appendChild(side);
     return h;
   }
 
@@ -889,7 +912,7 @@
       return fetchPage(ctx).then(function (res) {
         if (ctx.run !== run) return;
         ctx.page++;
-        ctx.pages = Math.min(res.pages || 0, 500);
+        ctx.pages = Math.max(ctx.pages || 0, Math.min(res.pages || 0, 500)); /* lichá stránka podle žánrů má méně stránek, nesmí zkrátit celý seznam */
         if (ctx.page === 1) ctx.grid.querySelectorAll('.dv-ph').forEach(function (n) { n.remove(); });
         res.items.forEach(function (it) { ctx.grid.appendChild(card(it, state.type === 'all')); added++; ctx.total++; });
         if (ctx.page >= ctx.pages || !res.pages) ctx.done = true;

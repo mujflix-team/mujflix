@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.192
+### Změněno
+- **Objevování na PC:** popis banneru je v panelu vpravo dole a nad ním náhled traileru (jako na Domů).
+### Opraveno
+- **Objevování → Vše:** seznam se mohl zastavit dřív než Filmy/Seriály, protože lichá stránka podle žánrů měla méně stránek a zkrátila celý seznam; teď se počet stránek jen zvyšuje.
+
 ## 3.21.191
 ### Opraveno
 - **Soukromí a podmínky (#tmdb):** logo TMDB se nenačítalo (špatná relativní cesta ze stránky v `/pages/`), je teď větší a pod ním je text s odkazem na themoviedb.org.
