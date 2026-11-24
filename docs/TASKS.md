@@ -20,6 +20,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.182 – pozdrav v hero na Domů
 - 3.21.181 – skupiny v Další, skrytý důvod v hero na telefonu
 - 3.21.180 – Přihlášení ke zdrojům v Další → Pokročilé
 - 3.21.179 – znovu priorita zdrojů zvlášť pro seriály/filmy (omylem se neslila) + test priorita.mjs

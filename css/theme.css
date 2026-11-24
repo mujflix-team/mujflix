@@ -2164,3 +2164,4 @@ html body #seriesModal #modalFavBtn { order: 4; }
 
 /* telefon: „Podle tvých žánrů…" nad názvem v hero se skrývá (překrývalo plakát) */
 @media (max-width: 700px) { .nf-hero-why { display: none; } }
+.nf-hero-hi { font-size: var(--fs-lg, 1.1rem); font-weight: 700; color: #fff; margin-bottom: 4px; }

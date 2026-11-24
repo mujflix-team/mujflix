@@ -276,6 +276,15 @@
         } catch (e) { return null; }
       }
 
+      /* pozdrav v hero: podle denní doby a jména aktivního profilu (5. pád) */
+      function nfGreeting() {
+        var hr = new Date().getHours(), g = hr < 10 ? 'Dobré ráno' : hr < 18 ? 'Dobrý den' : 'Dobrý večer';
+        var p = nfActiveProfile(), n = p && p.name ? String(p.name).trim().split(/\s+/)[0] : '';
+        try { if (n && window.czechVocative) n = window.czechVocative(n) || n; } catch (e) { /* jméno bez 5. pádu */ }
+        return g + (n ? ', ' + n : '');
+      }
+      window.nfGreeting = nfGreeting; // pro testy
+
       function nfRenderProfile() {
         var b = document.getElementById('nfAvatar');
         if (!b) return;
@@ -710,6 +719,7 @@
         hero.innerHTML =
           bg + '<div class="nf-hero-shade"></div>' +
           '<div class="nf-hero-body">' +
+            (h.eyebrow && /^Podle /.test(h.eyebrow) ? '<div class="nf-hero-hi">' + esc(nfGreeting()) + '</div>' : '') +
             (h.eyebrow ? '<div class="nf-hero-eyebrow' + (/^Podle /.test(h.eyebrow) ? ' nf-hero-why' : '') + '">' + esc(h.eyebrow) + '</div>' : '') +
             '<h1 class="nf-hero-title' + ((h.title || '').length > 26 ? ' nf-long' : '') + '">' + esc(h.title) + '</h1>' +
             '<div class="nf-hero-meta">' + meta.join('') + '</div>' +
