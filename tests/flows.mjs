@@ -212,7 +212,7 @@ const uzi = await page.evaluate(() => {
 });
 check("uzi.la: film → /p/forrest-gump", uzi.movie === "https://uzi.la/p/forrest-gump#frm", uzi.movie);
 check("uzi.la: seriál → /tv/jack-reacher/S04E08", uzi.tv === "https://uzi.la/tv/jack-reacher/S04E08#frm", uzi.tv);
-check("uzi.la: diakritika a dvojtečka se v odkazu odstraní", /^https:\/\/uzi\.la\/p\/[a-z0-9-]+\#frm$/.test(uzi.cz), uzi.cz);
+check("uzi.la: diakritika a dvojtečka se v odkazu odstraní", /^https:\/\/uzi\.la\/p\/[a-z0-9-]+#frm$/.test(uzi.cz), uzi.cz);
 
 // --- Uzi.la: varianty názvu z TMDB (SK / CZ / původní)
 const alt = await page.evaluate(async () => {

@@ -3,6 +3,14 @@
 ## 3.21.193
 ### Přidáno
 - **Soukromí a podmínky → Kontakt:** přibyl kontaktní e-mail mujflix@proton.me.
+### Opraveno
+- Lint v `tests/flows.mjs` (zbytečný `\#` v regulárním výrazu po 3.21.189).
+
+## 3.21.192
+### Změněno
+- **Objevování na PC:** popis banneru je v panelu vpravo dole a nad ním náhled traileru (jako na Domů).
+### Opraveno
+- **Objevování → Vše:** seznam se mohl zastavit dřív než Filmy/Seriály, protože lichá stránka podle žánrů měla méně stránek a zkrátila celý seznam; teď se počet stránek jen zvyšuje.
 
 ## 3.21.191
 ### Opraveno
