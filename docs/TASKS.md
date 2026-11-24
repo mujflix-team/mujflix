@@ -21,6 +21,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.193 – kontaktní e-mail v Soukromí
 - 3.21.191 – logo TMDB v Soukromí (cesta) + text s odkazem
 - 3.21.190 – Objevování na PC: průhledná lišta přes hero
 - 3.21.189 – Uzi.la: kotva #frm na přehrávač

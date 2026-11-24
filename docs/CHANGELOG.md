@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.193
+### Přidáno
+- **Soukromí a podmínky → Kontakt:** přibyl kontaktní e-mail mujflix@proton.me.
+
 ## 3.21.191
 ### Opraveno
 - **Soukromí a podmínky (#tmdb):** logo TMDB se nenačítalo (špatná relativní cesta ze stránky v `/pages/`), je teď větší a pod ním je text s odkazem na themoviedb.org.
