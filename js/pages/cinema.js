@@ -69,18 +69,20 @@
     return "https://prehrajto.cz/hledej/" + encodeURIComponent(searchQuery(query) || String(query || "").trim());
   }
 
+  /* SvetSerialu: kotva na první přehrávač (<iframe id="source-1-iframe">), stránka se odscrolluje rovnou k němu */
+  var SVET_PLAYER_HASH = "#source-1-iframe";
   function svetSerialuUrl(title, season, episode, siteSlug) {
     if (typeof window._svetSerialuSlugVariants === "function") {
       try {
         var variants = window._svetSerialuSlugVariants(siteSlug, title);
         if (variants && variants[0]) {
-          return "https://svetserialu.to/serial/" + variants[0] + "/s" + pad2(season) + "e" + pad2(episode);
+          return "https://svetserialu.to/serial/" + variants[0] + "/s" + pad2(season) + "e" + pad2(episode) + SVET_PLAYER_HASH;
         }
       } catch (e) {}
     }
     var s = daslug(title);
     return s
-      ? "https://svetserialu.to/serial/" + s + "/s" + pad2(season) + "e" + pad2(episode)
+      ? "https://svetserialu.to/serial/" + s + "/s" + pad2(season) + "e" + pad2(episode) + SVET_PLAYER_HASH
       : "https://svetserialu.to/?s=" + encodeURIComponent(title || "");
   }
 
