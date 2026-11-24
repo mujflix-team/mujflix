@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.193
+### Přidáno
+- **Soukromí a podmínky → Kontakt:** přibyl kontaktní e-mail mujflix@proton.me.
+### Opraveno
+- Lint v `tests/flows.mjs` (zbytečný `\#` v regulárním výrazu po 3.21.189).
+
 ## 3.21.192
 ### Změněno
 - **Objevování na PC:** popis banneru je v panelu vpravo dole a nad ním náhled traileru (jako na Domů).
