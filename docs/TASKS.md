@@ -9,6 +9,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Další nápady / otevřené
 - Plán na věci se zařízením (bridge, CSP po částech, CSS, Lighthouse, NajSerialy, Uzi.la): `docs/PLAN-zarizeni.md`.
+- Přihlášení ke zdrojům se neudrží: po přihlášení v Další → Přihlášení ke zdrojům tam uživatel při otevření seriálu/filmu už přihlášený není (iframe + cizí cookies; zjistit, co jde: zdroje v popup okně, jiný způsob přihlášení, nebo jen upozornit v textu).
 - Právní (potřebuje rozhodnutí): (1) [vyřešeno v 3.21.67] logo TMDB je v Soukromí a podmínky; (2) [vyřešeno v 3.21.67] písmo – ale starý Netflix Sans zůstává v historii gitu; (3) u Soukromí chybí správce údajů a soukromý kontakt (e-mail) pro žádosti o smazání a oznámení o porušení práv; (4) odkazování na weby s nelicencovaným obsahem: upozornění „odpovídáš ty“ odpovědnost provozovatele neruší.
 - Rychlost: změřit v Chrome Lighthouse; velké soubory `js/app.js` (237 kB) a `css/styles.css` (187 kB, hodně přepsáno v `netflix.css`) – po změření rozdělit / odstranit mrtvé CSS.
 - Service worker: celý „stale-while-revalidate“ zatím ne (hrozil by starý kód po opravě); písma už jdou z cache.
