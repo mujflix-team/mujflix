@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.194
+### Změněno
+- **SvetSerialu:** adresa dílu končí kotvou `#source-1-iframe`, takže se stránka odscrolluje rovnou k přehrávači.
+
 ## 3.21.193
 ### Přidáno
 - **Soukromí a podmínky → Kontakt:** přibyl kontaktní e-mail mujflix@proton.me.
