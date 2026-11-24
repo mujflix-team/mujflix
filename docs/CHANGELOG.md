@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.186
+### Opraveno
+- **Domů:** pozdrav v banneru se zobrazuje i na novém účtu (dřív jen když šlo napsat „Podle tvých žánrů…“).
+
 ## 3.21.185
 ### Změněno
 - **Úklid:** zmizel soubor `js/app/cinema-bridge.js`; `openMovieInCinema` a `closeCinema` jsou přímo v `js/pages/cinema.js` (chování stejné).
