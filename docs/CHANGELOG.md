@@ -6,6 +6,10 @@
 ### Opraveno
 - **Objevování → Vše:** seznam se mohl zastavit dřív než Filmy/Seriály, protože lichá stránka podle žánrů měla méně stránek a zkrátila celý seznam; teď se počet stránek jen zvyšuje.
 
+## 3.21.191
+### Opraveno
+- **Soukromí a podmínky (#tmdb):** logo TMDB se nenačítalo (špatná relativní cesta ze stránky v `/pages/`), je teď větší a pod ním je text s odkazem na themoviedb.org.
+
 ## 3.21.190
 ### Změněno
 - **Objevování na PC:** horní lišta (hledání, Filtry, typ) leží průhledně přes velký banner jako na Domů místo černého pruhu; po posunutí dolů se zase zapne plná.
