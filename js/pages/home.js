@@ -725,7 +725,7 @@
         hero.innerHTML =
           bg + '<div class="nf-hero-shade"></div>' +
           '<div class="nf-hero-body">' +
-            (h.eyebrow && /^Podle /.test(h.eyebrow) ? '<div class="nf-hero-hi">' + esc(nfGreeting()) + '</div>' : '') +
+            (h.greet ? '<div class="nf-hero-hi">' + esc(nfGreeting()) + '</div>' : '') +
             (h.eyebrow ? '<div class="nf-hero-eyebrow' + (/^Podle /.test(h.eyebrow) ? ' nf-hero-why' : '') + '">' + esc(h.eyebrow) + '</div>' : '') +
             '<h1 class="nf-hero-title' + ((h.title || '').length > 26 ? ' nf-long' : '') + '">' + esc(h.title) + '</h1>' +
             '<div class="nf-hero-meta">' + meta.join('') + '</div>' +
@@ -812,7 +812,7 @@
       function nfHeroFromTmdb(it, reason) {
         _heroItem = it;
         nfHeroShow({
-          image: it.backdrop, title: it.title, eyebrow: reason || '', badge: it.mediaType === 'tv' ? 'Seriál' : 'Film',
+          image: it.backdrop, title: it.title, eyebrow: reason || '', greet: true, badge: it.mediaType === 'tv' ? 'Seriál' : 'Film',
           rating: it.rating, year: it.ep, overview: it.overview,
           genres: (it.genreIds || []).map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean),
           playLabel: 'Přehrát',
