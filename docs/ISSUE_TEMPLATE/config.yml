@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Bezpečnostní nález
+    url: https://github.com/mujflix-team/mujflix/security/advisories/new
+    about: Zranitelnost nehlas přes veřejný Issue, ale soukromě tady.

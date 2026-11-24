@@ -1,0 +1,4 @@
+# config.js se commituje (obsahuje jen veřejnou adresu Workeru, žádné klíče)
+node_modules/
+.wrangler/
+.dev.vars

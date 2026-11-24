@@ -1,0 +1,37 @@
+name: CI
+# Spouští se při pull requestu a při změně na main (větev s pull requestem se tak nekontroluje dvakrát).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Nový commit ve stejné větvi zruší rozběhnutou kontrolu, doběhne jen ta poslední.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      # Prohlížeč Playwrightu se ukládá do cache podle verze; při shodě se nestahuje znovu
+      - id: pw
+        run: |
+          V=$(node -p 'require("playwright/package.json").version')
+          echo "v=$V" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        id: pwcache
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}
+      - if: steps.pwcache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pwcache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run lint
+      - run: npm test

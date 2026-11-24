@@ -1,0 +1,640 @@
+/* Základ: úložiště, TMDB, postup sledování, hlášky, žánry a výpočty vkusu. Část původního app.js, načítá se v tomto pořadí (viz index.html). */
+
+
+function safeLS(e, t) {
+  // Výchozí hodnota (rozparsovaná) – použije se i tehdy, když uložená data mají špatný typ (null, číslo místo pole…)
+  let d;
+  try {
+    d = JSON.parse(String(t))
+  } catch {
+    d = t
+  }
+  try {
+    const v = JSON.parse(localStorage.getItem(e) || String(t));
+    // Oprava: null == [] je true v loose equality, musíme porovnávat typy striktně
+    const dIsArray = Array.isArray(d), vIsArray = Array.isArray(v);
+    const dIsNull = d === null, vIsNull = v === null;
+    const dType = typeof d, vType = typeof v;
+    if (vIsNull && dIsNull) return v;
+    if (vIsNull !== dIsNull) return d;
+    if (vIsArray !== dIsArray) return d;
+    if (vType !== dType) return d;
+    return v
+  } catch {
+    return d
+  }
+}
+
+function escapeHTML(e) {
+  return e || 0 === e ? String(e).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;") : ""
+}
+
+function _esc(e) {
+  return escapeHTML(e)
+}
+
+function safeSetItem(e, t) {
+  try {
+    return localStorage.setItem(e, t), !0
+  } catch (e) {
+    return "QuotaExceededError" !== e.name && 22 !== e.code || showToast("⚠ Paměť prohlížeče plná – data se neukládají", 4e3), !1
+  }
+}
+
+! function() {
+  var e = EventTarget.prototype.addEventListener,
+    t = {
+      wheel: !0,
+      touchstart: !0,
+      touchmove: !0
+    };
+  EventTarget.prototype.addEventListener = function(n, o, i) {
+    return t[n] && (void 0 === i || !1 === i || "object" == typeof i && void 0 === i.passive) && ("object" == typeof i ? i.passive = !0 : i = {
+      passive: !0,
+      capture: !!i
+    }), e.call(this, n, o, i)
+  }
+}(), ["https://image.tmdb.org/t/p/w500/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg", "https://image.tmdb.org/t/p/w500/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg", "https://image.tmdb.org/t/p/w500/lMZv8bGHDWQFbUMAfBOsyHAR3dX.jpg", "https://image.tmdb.org/t/p/w500/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"].forEach(e => {
+  const t = new Image;
+  t.src = e, t.loading = "eager"
+}), window.MF_DEBUG = !1, window.addEventListener("unhandledrejection", e => {
+  window.MF_DEBUG && console.error("[MF] Unhandled rejection:", e.reason)
+});
+
+/* Jediné místo, odkud se bere TMDB klíč: vlastní klíč v nastavení > klíč profilu > výchozí (proxy) */
+function mfTmdbKey() {
+  try {
+    const own = localStorage.getItem("mf_tmdb_key");
+    if (own) return own;
+    const pid = localStorage.getItem("mf_active_pid");
+    const per = pid ? localStorage.getItem("mf_tmdb_key_" + pid) : null;
+    if (per) return per;
+  } catch (e) {}
+  return window.TMDB_KEY_DEFAULT || "";
+}
+let TMDB_KEY = mfTmdbKey(),
+  TMDB = "https://api.themoviedb.org/3",
+  IMG = "https://image.tmdb.org/t/p/w400",
+  IMG_S = "https://image.tmdb.org/t/p/w185",
+  IMG_P = "https://image.tmdb.org/t/p/w300",
+  IMG_B = "https://image.tmdb.org/t/p/w780",
+  epsBySeason = {
+    "the-simpsons": [13, 22, 24, 22, 22, 25, 25, 25, 25, 23, 22, 21, 22, 22, 22, 21, 22, 22, 20, 21, 23, 22, 22, 22, 22, 22, 22, 21, 23, 23, 22, 22, 22, 22, 18, 22, 22],
+    "family-guy": [7, 21, 22, 30, 18, 12, 16, 16, 13, 22, 22, 22, 13, 16, 20, 20, 20, 20, 20, 20, 20, 20, 21],
+    "south-park": [13, 18, 17, 17, 14, 17, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 10, 10, 10, 10, 10, 10, 2, 6, 6, 6, 6, 6],
+    futurama: [13, 19, 22, 18, 16, 26, 26, 10, 10, 10],
+    "breaking-bad": [7, 13, 13, 13, 16]
+  },
+  db = {
+    "the-simpsons": {
+      name: "The Simpsons",
+      tmdbId: 456,
+      poster: "https://image.tmdb.org/t/p/w400/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg",
+      totalEps: 805,
+      runtime: 22,
+      type: "tv",
+      trailerKey: "oMXk1wi-9Zs"
+    },
+    "family-guy": {
+      name: "Family Guy",
+      tmdbId: 1434,
+      poster: "https://image.tmdb.org/t/p/w400/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg",
+      totalEps: 432,
+      runtime: 22,
+      type: "tv",
+      trailerKey: "J32iwo65RMc"
+    },
+    "south-park": {
+      name: "South Park",
+      tmdbId: 2190,
+      poster: "https://image.tmdb.org/t/p/w400/lMZv8bGHDWQFbUMAfBOsyHAR3dX.jpg",
+      totalEps: 327,
+      runtime: 22,
+      type: "tv",
+      trailerKey: "FMKcPao7A6Y"
+    },
+    futurama: {
+      name: "Futurama",
+      tmdbId: 615,
+      poster: "https://image.tmdb.org/t/p/w400/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg",
+      totalEps: 140,
+      runtime: 22,
+      type: "tv",
+      trailerKey: "GxEY6KNsz44"
+    },
+    "breaking-bad": {
+      name: "Breaking Bad",
+      tmdbId: 1396,
+      poster: "https://image.tmdb.org/t/p/w400/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+      totalEps: 62,
+      runtime: 47,
+      type: "tv",
+      trailerKey: "HhesaQXLuRY"
+    }
+  };
+
+try {
+  const _savedDb = JSON.parse(localStorage.getItem("mf_db_custom") || "{}");
+  Object.assign(db, _savedDb);
+} catch (err) {}
+
+window.TMDB_KEY = TMDB_KEY;
+
+function epsInSeason(e, t) {
+  const n = epsBySeason[e];
+  if (n && n[t - 1]) return n[t - 1];
+  const d = db[e];
+  if (d && d._seasonEpCounts && d._seasonEpCounts[t - 1]) return d._seasonEpCounts[t - 1];
+  return 10
+}
+
+function totalSeasons(e) {
+  const t = epsBySeason[e];
+  if (t) return t.length;
+  const d = db[e];
+  if (d && d._seasonEpCounts && d._seasonEpCounts.length) return d._seasonEpCounts.length;
+  return 1
+}
+const tmdbCache = {};
+let activeSeries = "",
+  activeSeason = 1,
+  showAllSeasons = !1,
+  kbMenuIndex = 0,
+  kbSeasonIndex = -1,
+  kbEpIndex = -1,
+  kbLayer = "menu",
+  kbSearchIndex = 0,
+  modalOpen = !1,
+  aiPanelOpen = !1,
+  aiThinking = !1,
+  _forYouSeries = null,
+  _ratingSlug = null;
+
+function getWatched() {
+  return safeLS(uKey("mf_watched"), "{}")
+}
+
+function saveWatched(e) {
+  safeSetItem(uKey("mf_watched"), JSON.stringify(e))
+}
+
+/* Naposledy pustená (i nedokoukaná) epizoda každého seriálu: {slug: {se, ep}}. „Pokračovat“ míří na ni, dokud se neoznačí jako zhlédnutá. */
+function getLastPlayed() {
+  return safeLS(uKey("mf_lastplayed"), "{}")
+}
+
+function setLastPlayed(slug, se, ep) {
+  const o = getLastPlayed();
+  o[slug] = { se, ep }, safeSetItem(uKey("mf_lastplayed"), JSON.stringify(o))
+}
+const _tmdbMemCache = new Map();
+const TMDB_CACHE_MAX = 100;
+const TMDB_CACHE_TTL = 30 * 60 * 1000;
+
+function _tmdbMemSet(key, value) {
+  const now = Date.now();
+  for (const [k, v] of _tmdbMemCache) {
+    if (now - v._ts > TMDB_CACHE_TTL) _tmdbMemCache.delete(k);
+  }
+  if (_tmdbMemCache.size >= TMDB_CACHE_MAX) {
+    const firstKey = _tmdbMemCache.keys().next().value;
+    _tmdbMemCache.delete(firstKey);
+  }
+  _tmdbMemCache.set(key, { data: value, _ts: now });
+}
+
+function _tmdbMemGet(key) {
+  const entry = _tmdbMemCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry._ts > TMDB_CACHE_TTL) {
+    _tmdbMemCache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+const _tmdbInflight = new Map();
+async function tmdbGet(e) {
+  try {
+    const t = e.startsWith("http") ? e : `${TMDB}${e}`,
+      n = new URL(t);
+    n.searchParams.has("api_key") || n.searchParams.set("api_key", mfTmdbKey()), n.searchParams.has("language") || n.searchParams.set("language", "cs-CZ");
+    const o = n.toString();
+    const cached = _tmdbMemGet(o);
+    if (cached) return cached;
+    /* Stejný dotaz, který právě běží, se nespouští znovu (při startu se tentýž seznam žádal až 14× souběžně) */
+    const fl = _tmdbInflight.get(o);
+    if (fl) return await fl;
+    const pr = (async () => {
+      const i = await mfFetch(o);
+      if (!i.ok) {
+        console.warn("[TMDB] HTTP error:", i.status, i.statusText);
+        return null;
+      }
+      const a = await i.json();
+      if (!a || typeof a !== 'object') {
+        console.warn("[TMDB] Invalid response structure");
+        return null;
+      }
+      _tmdbMemSet(o, a);
+      return a
+    })();
+    _tmdbInflight.set(o, pr);
+    try { return await pr } finally { _tmdbInflight.delete(o) }
+  } catch (e) {
+    console.error("[TMDB] Fetch error:", e.message);
+    return null
+  }
+}
+
+async function mfFetch(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+/* TMDB u starších / méně známých seriálů často nemá český název, obrázek ani délku epizody a místo názvu vrací „Epizoda 4“.
+   Chybějící údaje se proto doplní z anglické verze (název jen když není také jen „Episode N“). */
+const _genericEpName = n => !n || /^(\d+\.\s*)?(epizoda|episode|díl|dil)\s*\d*\.?$/i.test(String(n).trim());
+
+/* Doplnění chybějících údajů epizod z TVmaze (TMDB je u starších pořadů často nemá). Vyhledá se přes IMDb ID, výsledek se drží v paměti. */
+const _tvmazeShow = {};
+function mfTvmazeEpisodes(tmdbId) {
+  if (_tvmazeShow[tmdbId]) return _tvmazeShow[tmdbId];
+  const j = u => fetch(u).then(r => r.ok ? r.json() : null);
+  return _tvmazeShow[tmdbId] = tmdbGet(`/tv/${tmdbId}/external_ids`).then(x => x && x.imdb_id ? j("https://api.tvmaze.com/lookup/shows?imdb=" + x.imdb_id) : null)
+    .then(sh => sh && sh.id ? j(`https://api.tvmaze.com/shows/${sh.id}/episodes`) : null)
+    .then(list => { if (!Array.isArray(list)) return null; const m = {}; list.forEach(e => { m[e.season + "-" + e.number] = e }); return m })
+    .catch(() => null);
+}
+
+async function fetchTmdbSeason(e, t) {
+  const n = `${e}-S${t}`;
+  if (void 0 !== tmdbCache[n]) return tmdbCache[n];
+  try {
+    const id = db[e].tmdbId, o = await tmdbGet(`/tv/${id}/season/${t}`);
+    // Neúspěch (síť, 404) se necachuje, ať se příště zkusí znovu
+    if (!o || !Array.isArray(o.episodes)) return null;
+    let eps = o.episodes;
+    if (eps.some(x => _genericEpName(x.name) || !x.still_path || !x.runtime || !x.overview)) {
+      let en = null;
+      try { en = await tmdbGet(`/tv/${id}/season/${t}?language=en-US`) } catch { en = null }
+      if (en && Array.isArray(en.episodes)) {
+        const by = {}; en.episodes.forEach(x => by[x.episode_number] = x);
+        eps = eps.map(x => { const f = by[x.episode_number]; if (!f) return x; return { ...x,
+          name: _genericEpName(x.name) && !_genericEpName(f.name) ? f.name : x.name,
+          still_path: x.still_path || f.still_path, runtime: x.runtime || f.runtime, overview: x.overview || f.overview,
+          vote_count: x.vote_count || f.vote_count, vote_average: x.vote_average || f.vote_average } })
+      }
+    }
+    if (eps.some(x => _genericEpName(x.name) || !x.still_path || !x.overview)) {
+      const tv = await mfTvmazeEpisodes(id);
+      if (tv) eps = eps.map(x => { const f = tv[t + "-" + x.episode_number]; if (!f) return x; const img = f.image && (f.image.original || f.image.medium);
+        return { ...x, name: _genericEpName(x.name) && f.name && !_genericEpName(f.name) ? f.name : x.name,
+          overview: x.overview || String(f.summary || "").replace(/<[^>]*>/g, "").trim(),
+          runtime: x.runtime || f.runtime || 0, _still: !x.still_path && img ? String(img).replace(/^http:/, "https:") : null,
+          vote_count: x.vote_count || (f.rating && f.rating.average ? 3 : 0), vote_average: x.vote_average || (f.rating && f.rating.average) || 0 } });
+    }
+    return tmdbCache[n] = eps.map(e => ({
+      ep: e.episode_number,
+      name: e.name || `Epizoda ${e.episode_number}`,
+      still: e.still_path ? IMG + e.still_path : e._still || null,
+      stillS: e.still_path ? IMG_S + e.still_path : e._still || null,
+      overview: e.overview || "",
+      runtime: e.runtime || 0,
+      rating: e.vote_count > 2 ? e.vote_average || 0 : 0
+    }))
+  } catch {
+    return null
+  }
+}
+
+async function fetchTmdbDetails(e) {
+  if (!db[e]) return null;
+  try {
+    const t = await tmdbGet(`/tv/${db[e].tmdbId}`);
+    return t ? {
+      poster: t.poster_path ? IMG_P + t.poster_path : null,
+      backdrop: t.backdrop_path ? IMG_B + t.backdrop_path : null,
+      genres: t.genres || [],
+      rating: t.vote_average || 0
+    } : null
+  } catch {
+    return null
+  }
+}
+async function loadTmdbDbData() {
+  // Doplní vestavěným seriálům obrázky, hodnocení a žánry z TMDB (používá domovská stránka, hodnocení a AI).
+  // Po dávkách po 6 současně (dřív po jednom za sebou, takže při pomalé síti trvalo načtení desítky sekund).
+  const keys = Object.keys(db);
+  for (let i = 0; i < keys.length; i += 6) {
+    await Promise.all(keys.slice(i, i + 6).map(async e => {
+      const n = await fetchTmdbDetails(e);
+      if (n) db[e]._backdrop = n.backdrop, db[e]._poster = n.poster, db[e]._rating = n.rating || 0, n.genres.length && (db[e]._genres = n.genres.map(e => e.name))
+    }));
+  }
+}
+
+function calcProgress(e) {
+  const t = getWatched(),
+    n = totalSeasons(e);
+  let o = 0,
+    i = 0;
+  for (let a = 1; a <= n; a++) {
+    const n = epsInSeason(e, a);
+    for (let s = 1; s <= n; s++) o++, t[`${e}-S${a}-E${s}`] && i++
+  }
+  return {
+    total: o,
+    seen: i,
+    pct: o ? Math.round(i / o * 100) : 0
+  }
+}
+
+/* Seriál je rozkoukaný, když má zhlédnutý díl nebo pustený (ještě neoznačený) díl. */
+function seriesStarted(e) {
+  return calcProgress(e).seen > 0 || !!getLastPlayed()[e]
+}
+
+function findNextEp(e) {
+  // Pokračuje se za nejvyšší zhlédnutou epizodou (ne první mezerou): když jsi viděl S1E2, nabídne se S1E3, ne S1E1.
+  const t = getWatched(),
+    n = totalSeasons(e);
+  let hs = 0,
+    he = 0;
+  for (let o = 1; o <= n; o++)
+    for (let n = 1; n <= epsInSeason(e, o); n++)
+      if (t[`${e}-S${o}-E${n}`]) hs = o, he = n;
+  let s = hs || 1,
+    p = hs ? he + 1 : 1;
+  if (hs && p > epsInSeason(e, s)) {
+    if (s >= n) return null;
+    s++, p = 1
+  }
+  // Rozkoukaná epizoda (pustená, ale ještě neoznačená) má přednost, pokud není před místem, kde jsi skončil
+  const lp = getLastPlayed()[e];
+  if (lp && lp.se >= 1 && lp.se <= n && lp.ep >= 1 && lp.ep <= epsInSeason(e, lp.se) && !t[`${e}-S${lp.se}-E${lp.ep}`] && (lp.se > s || lp.se === s && lp.ep >= p)) return {
+    se: lp.se,
+    ep: lp.ep,
+    uid: `${e}-S${lp.se}-E${lp.ep}`
+  };
+  return {
+    se: s,
+    ep: p,
+    uid: `${e}-S${s}-E${p}`
+  }
+}
+
+function updateTileProgress(e) {
+  const t = document.getElementById(`prog-${e}`);
+  t && (t.style.width = calcProgress(e).pct + "%")
+}
+
+function updateContinueBadge(e) {
+  const t = document.getElementById(`cont-${e}`),
+    n = document.getElementById(`cont-text-${e}`);
+  if (!t || !n) return;
+  const o = findNextEp(e),
+    {
+      seen: i
+    } = calcProgress(e);
+  o && i > 0 ? (n.textContent = `S${o.se}·E${o.ep}`, t.classList.add("visible")) : t.classList.remove("visible")
+}
+
+function updatePanelProgress() {
+  const {
+    total: e,
+    seen: t,
+    pct: n
+  } = calcProgress(activeSeries);
+  const o = findNextEp(activeSeries);
+  document.getElementById("panelProgressFill").style.width = n + "%", document.getElementById("panelProgressText").textContent = `${t} / ${e} zhlédnuto${o && t ? ` · Další S${o.se} E${o.ep}` : ""}`, "function" == typeof _epRatingRefreshPanel && _epRatingRefreshPanel(activeSeries)
+}
+
+function calcTotalProgress() {
+  const e = getWatched();
+  let t = 0,
+    n = 0;
+  for (const o of Object.keys(db)) {
+    // položky bez známého počtu epizod (např. nově přidané z Objevovat) by přidaly falešných 10 epizod na sérii
+    if (!epsBySeason[o] && !(db[o] && db[o]._seasonEpCounts && db[o]._seasonEpCounts.length)) continue;
+    const i = totalSeasons(o);
+    for (let a = 1; a <= i; a++) {
+      const i = epsInSeason(o, a);
+      for (let s = 1; s <= i; s++) t++, e[`${o}-S${a}-E${s}`] && n++
+    }
+  }
+  return {
+    total: t,
+    seen: n,
+    pct: t ? Math.round(n / t * 100) : 0
+  }
+}
+
+function updateLogoProgress() {
+  const {
+    pct: e
+  } = calcTotalProgress();
+  document.getElementById("logoProgressFill").style.width = e + "%", document.getElementById("logoProgressText").textContent = e + "%"
+}! function() {
+  const e = {
+    "the-simpsons": "#f5c518",
+    "family-guy": "#1a73e8",
+    "south-park": "#ff6b35",
+    futurama: "#7c4dff"
+  };
+  Object.entries({
+    "the-simpsons": "/b0WmHGc8LHTdGCVzxRb3IBMur57.jpg",
+    "family-guy": "/q0S0K5XJHA6DDYP4CmHoJbxBhMd.jpg",
+    "south-park": "/lMZv8bGHDWQFbUMAfBOsyHAR3dX.jpg",
+    futurama: "/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"
+  }).forEach(([t, n]) => {
+    const o = document.getElementById("tile-bg-" + t);
+    if (!o) return;
+    const i = void 0 !== db && db[t] ? db[t].name : t,
+      a = e[t] || "#333",
+      s = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450"><rect width="300" height="450" fill="${a}22"/><rect width="300" height="450" fill="url(%23g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}" stop-opacity="0.3"/><stop offset="1" stop-color="#000" stop-opacity="0.8"/></linearGradient></defs><text x="150" y="220" text-anchor="middle" fill="white" font-size="18" font-family="sans-serif" font-weight="bold">${i}</text></svg>`)}`;
+    o.onerror = () => {
+      o.src = s, o.onerror = null, o.classList.add("loaded")
+    }, o.src = "https://image.tmdb.org/t/p/w500" + n, o.complete && o.naturalWidth > 0 ? o.classList.add("loaded") : o.addEventListener("load", () => o.classList.add("loaded"), {
+      once: !0
+    })
+  })
+}();
+
+function showToast(e, t) {
+  let n = document.getElementById("mf-toast");
+  n || (n = document.createElement("div"), n.id = "mf-toast", n.setAttribute("role", "status"), n.setAttribute("aria-live", "polite"), n.style.cssText = "position:fixed;bottom:85px;left:50%;transform:translateX(-50%) translateY(12px);z-index:2147483000;background:rgba(10,10,12,0.96);color:#fff;font-weight:700;font-size:0.8rem;padding:10px 22px;border-radius:var(--r-pill);opacity:0;transition:opacity 0.25s,transform 0.3s cubic-bezier(0.34,1.4,0.64,1),border-color 0.2s;pointer-events:none;backdrop-filter:blur(20px);white-space:nowrap;max-width:90vw;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.7);", document.body.appendChild(n)), n.style.border = "1px solid " + ("success" === t ? "rgba(100,255,120,0.5)" : "error" === t ? "rgba(255,80,80,0.5)" : "rgba(0,122,255,0.25)"), n.textContent = e, n.style.opacity = "1", n.style.transform = "translateX(-50%) translateY(0)", clearTimeout(n._tm), n._tm = setTimeout(() => {
+    n.style.opacity = "0", n.style.transform = "translateX(-50%) translateY(8px)"
+  }, "error" === t ? 3500 : 2400)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const TMDB_GENRE_CS = {
+    28: "Akce",
+    12: "Dobrodružství",
+    16: "Animák",
+    35: "Komedie",
+    80: "Krimi",
+    99: "Dokument",
+    18: "Drama",
+    10751: "Rodinné",
+    14: "Fantasy",
+    36: "Historie",
+    27: "Horor",
+    10402: "Hudba",
+    9648: "Mystérium",
+    10749: "Romantika",
+    878: "Sci-Fi",
+    10770: "TV film",
+    53: "Thriller",
+    10752: "Válečný",
+    37: "Western",
+    10759: "Akce & Dobrodružství",
+    10762: "Dětský",
+    10763: "Zpravodajství",
+    10764: "Reality",
+    10765: "Sci-Fi & Fantasy",
+    10766: "Telenovela",
+    10767: "Talk show",
+    10768: "Válka & Politika"
+  },
+  TMDB_ID_TO_CZKEY = {
+    28: "akcni",
+    12: "dobrodruzny",
+    16: "animovany",
+    35: "komedie",
+    80: "krimi",
+    99: "dokument",
+    18: "drama",
+    10751: "rodinny",
+    14: "fantasy",
+    36: "historicky",
+    27: "horor",
+    10402: "hudba",
+    9648: "krimi",
+    10749: "romantika",
+    878: "sci-fi",
+    53: "napinavy",
+    10752: "valecny",
+    37: "western",
+    10759: "akcni",
+    10762: "detsky",
+    10764: "reality",
+    10765: "sci-fi",
+    10768: "valecny"
+  };
+
+let _momentumCache = null,
+  _momentumTs = 0;
+
+function recordWatchToTimeline(e, t) {
+  try {
+    const n = safeLS(uKey("mf_watch_timeline"), "[]");
+    const d = typeof db !== "undefined" ? db[e] : null;
+    n.push({
+      ts: Date.now(),
+      slug: e,
+      genres: t || [],
+      name: d?.name || "",
+      poster: d?._poster || d?.poster || "",
+      tmdbId: d?.tmdbId || null
+    }), n.length > 500 && n.splice(0, n.length - 500), localStorage.setItem(uKey("mf_watch_timeline"), JSON.stringify(n)), _momentumCache = null, window.mfhMarkDirty && window.mfhMarkDirty()
+  } catch {}
+}
+
+function _isNonLatin(e) {
+  return /[\u3000-\u9fff\uac00-\ud7af\u0600-\u06ff\u0400-\u04ff\u4e00-\u9fff]/.test(e)
+}
+
+/* Vlastní rozbalovací seznam místo systémového (ten je na tmavém pozadí špatně čitelný, hlavně vybraná položka).
+   Původní <select> zůstává skrytý jako zdroj hodnoty: výběr v seznamu ho přepne a vyvolá jeho událost change, takže se nic dalšího nemění. */
+function mfEnhanceDropdown(sel) {
+  if (!sel || sel._mfdd || !sel.parentNode) return;
+  const wrap = document.createElement("div"), btn = document.createElement("button"), lab = document.createElement("span"), list = document.createElement("ul");
+  wrap.className = "mf-dd", btn.type = "button", btn.className = "mf-dd-btn", btn.setAttribute("aria-haspopup", "listbox"), btn.setAttribute("aria-expanded", "false");
+  const lblId = sel.getAttribute("aria-labelledby");
+  lblId && btn.setAttribute("aria-labelledby", lblId + " " + (btn.id = (sel.id || "mfdd") + "Btn"));
+  lab.className = "mf-dd-label";
+  btn.appendChild(lab), btn.insertAdjacentHTML("beforeend", '<svg class="mf-dd-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>');
+  list.className = "mf-dd-list", list.setAttribute("role", "listbox"), list.tabIndex = -1, list.hidden = !0;
+  const lblRef = lblId && document.getElementById(lblId);
+  lblRef && list.setAttribute("aria-labelledby", lblId);
+  const opts = [...sel.options].map((o, i) => {
+    const li = document.createElement("li");
+    li.className = "mf-dd-opt", li.id = (sel.id || "mfdd") + "Opt" + i, li.setAttribute("role", "option"), li.textContent = o.text;
+    li.addEventListener("click", () => choose(i)), li.addEventListener("pointermove", () => mark(i));
+    list.appendChild(li);
+    return li
+  });
+  let cur = 0;
+  function mark(i) {
+    cur = Math.max(0, Math.min(opts.length - 1, i));
+    opts.forEach((o, k) => o.classList.toggle("active", k === cur));
+    list.setAttribute("aria-activedescendant", opts[cur].id), opts[cur].scrollIntoView && opts[cur].scrollIntoView({ block: "nearest" })
+  }
+  function sync() {
+    const i = Math.max(0, sel.selectedIndex);
+    lab.textContent = sel.options[i] ? sel.options[i].text : "";
+    opts.forEach((o, k) => o.setAttribute("aria-selected", k === i ? "true" : "false"))
+  }
+  function isOpen() { return !list.hidden }
+  function open() {
+    if (isOpen()) return;
+    sync(), list.hidden = !1, wrap.classList.add("open"), btn.setAttribute("aria-expanded", "true");
+    wrap.classList.remove("up");
+    const r = list.getBoundingClientRect();
+    r.bottom > innerHeight - 8 && btn.getBoundingClientRect().top > r.height + 16 && wrap.classList.add("up");
+    mark(Math.max(0, sel.selectedIndex)), list.focus({ preventScroll: !0 })
+  }
+  function close(refocus) {
+    if (!isOpen()) return;
+    list.hidden = !0, wrap.classList.remove("open", "up"), btn.setAttribute("aria-expanded", "false"), refocus && btn.focus()
+  }
+  function choose(i) {
+    const changed = sel.selectedIndex !== i;
+    sel.selectedIndex = i, sync(), close(!0), changed && sel.dispatchEvent(new Event("change", { bubbles: !0 }))
+  }
+  btn.addEventListener("click", () => isOpen() ? close(!0) : open());
+  btn.addEventListener("keydown", e => { if ("ArrowDown" === e.key || "ArrowUp" === e.key) e.preventDefault(), open() });
+  list.addEventListener("keydown", e => {
+    const k = e.key;
+    if ("ArrowDown" === k) e.preventDefault(), mark(cur + 1);
+    else if ("ArrowUp" === k) e.preventDefault(), mark(cur - 1);
+    else if ("Home" === k) e.preventDefault(), mark(0);
+    else if ("End" === k) e.preventDefault(), mark(opts.length - 1);
+    else if ("Enter" === k || " " === k) e.preventDefault(), choose(cur);
+    else if ("Escape" === k) e.preventDefault(), e.stopPropagation(), close(!0);
+    else if ("Tab" === k) close(!1)
+  });
+  document.addEventListener("pointerdown", e => { wrap.contains(e.target) || close(!1) });
+  list.addEventListener("focusout", e => { e.relatedTarget && !wrap.contains(e.relatedTarget) && close(!1) });
+  wrap.append(btn, list), sel.parentNode.insertBefore(wrap, sel), sel.hidden = !0, sel._mfdd = { sync };
+  sync()
+}
+window.mfSyncDropdown = sel => { sel && sel._mfdd && sel._mfdd.sync() };
