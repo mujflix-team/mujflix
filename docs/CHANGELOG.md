@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.185
+### Změněno
+- **Úklid:** zmizel soubor `js/app/cinema-bridge.js`; `openMovieInCinema` a `closeCinema` jsou přímo v `js/pages/cinema.js` (chování stejné).
+
 ## 3.21.184
 ### Přidáno
 - **Oblíbené:** záložka „Nový díl“ (jen seriály, které máš rozkoukané a za posledních 14 dní jim vyšla epizoda). Zobrazí se, jen když nějaký takový je.

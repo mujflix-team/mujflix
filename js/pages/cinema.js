@@ -1591,19 +1591,14 @@
     };
   }
 
-  const originalOpenMovieInCinema = window.openMovieInCinema;
+  /* Volání z Domů / Seriálů / Objevování */
   window.openMovieInCinema = function(tmdbId, title, type) {
-    if (originalOpenMovieInCinema) {
-      originalOpenMovieInCinema.apply(this, arguments);
-    }
-    // MFCinemaPlayer.open je už obalený výše — nevykreslovat podruhé
-    if (window.MFCinemaPlayer && typeof window.MFCinemaPlayer.open === 'function') return;
-
-    const actualTmdbId = String(tmdbId).split('/')[0];
-
-    setTimeout(() => {
-      renderLegalProviders(actualTmdbId, title, type);
-    }, 800);
+    // jednorázově předávané hodnoty se vždy vynulují, i kdyby je přehrávač nepřečetl
+    const r = window.MFCinemaPlayer ? window.MFCinemaPlayer.open(tmdbId, title, type) : void 0;
+    return window._cinSiteSlug = null, window._cinYear = null, r;
+  };
+  window.closeCinema = function() {
+    if (window.MFCinemaPlayer && window.MFCinemaPlayer.close) window.MFCinemaPlayer.close();
   };
 
 })();
