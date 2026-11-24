@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.184
+### Přidáno
+- **Oblíbené:** záložka „Nový díl“ (jen seriály, které máš rozkoukané a za posledních 14 dní jim vyšla epizoda). Zobrazí se, jen když nějaký takový je.
+
 ## 3.21.183
 ### Přidáno
 - **Pokračovat ve sledování:** u seriálu, na který ses nekoukal víc než týden, přibyde „před 9 dny“ (vedle „zbývá …“).

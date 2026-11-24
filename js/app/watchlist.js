@@ -117,6 +117,41 @@ function closeWatchlist() {
 window._wlFilter = "all";
 window._wlQuery = "";
 
+/* Nový díl: rozkoukaný seriál, kterému za posledních 14 dní vyšla epizoda (stejná cache `mf_newep_<id>` jako odznak v Domů) */
+function wlNewEpId(item) {
+  const r = wlResumeInfo(item);
+  if (!r || "series" !== r.kind || r.done) return null;
+  return db[r.slug] && db[r.slug].tmdbId || item.tmdbId || null
+}
+function wlHasNewEp(item) {
+  try {
+    const id = wlNewEpId(item);
+    if (!id) return false;
+    const c = JSON.parse(localStorage.getItem("mf_newep_" + id) || "null"), age = c && c.air ? (Date.now() - new Date(c.air).getTime()) / 864e5 : 999;
+    return age >= 0 && age <= 14
+  } catch (e) { return false }
+}
+let _wlNewEpAt = 0;
+function wlRefreshNewEps() {
+  if (Date.now() - _wlNewEpAt < 60000 || "function" != typeof tmdbGet) return;
+  _wlNewEpAt = Date.now();
+  let changed = 0, pending = 0;
+  getWatchlist().forEach(item => {
+    const id = wlNewEpId(item);
+    if (!id) return;
+    const ck = "mf_newep_" + id;
+    let c = null;
+    try { c = JSON.parse(localStorage.getItem(ck) || "null") } catch (e) {}
+    if (c && Date.now() - c.t < 432e5) return;
+    pending++;
+    tmdbGet("/tv/" + id + "?language=cs-CZ").then(r => {
+      const air = r && r.last_episode_to_air && r.last_episode_to_air.air_date || "";
+      try { localStorage.setItem(ck, JSON.stringify({ t: Date.now(), air })) } catch (e) {}
+      changed++
+    }).catch(() => {}).then(() => { --pending || (changed && renderWatchlist()) })
+  })
+}
+
 function wlSetFilter(f) {
   window._wlFilter = f, renderWatchlist()
 }
@@ -165,16 +200,21 @@ function renderWatchlist() {
       b && (b.textContent = txt + " · " + n, b.classList.toggle("active", b.dataset.f === f))
     };
     set("wlTabAll", "Vše", all.length), set("wlTabMovie", "Filmy", nMovie), set("wlTabSeries", "Seriály", nSeries);
+    const nNew = all.filter(wlHasNewEp).length, nb = document.getElementById("wlTabNew");
+    nb && (nb.textContent = "Nový díl · " + nNew, nb.classList.toggle("active", "newep" === f), nb.style.display = nNew || "newep" === f ? "" : "none");
     const nRes = all.filter(x => { const r = wlResumeInfo(x); return r && !r.done }).length, rb = document.getElementById("wlTabResume");
     rb && (rb.textContent = "Rozkoukané · " + nRes, rb.classList.toggle("active", "resume" === f), rb.style.display = nRes || "resume" === f ? "" : "none");
     const so = document.getElementById("wlSort");
     so && so.value !== (window._wlSort || "new") && (so.value = window._wlSort || "new", window.mfSyncDropdown && window.mfSyncDropdown(so))
   }
+  wlRefreshNewEps();
   if (!all.length) return void(empty.style.display = "flex");
   empty.style.display = "none";
   const shown = [];
   all.forEach((item, idx) => {
-    if ("resume" === f) {
+    if ("newep" === f) {
+      if (!wlHasNewEp(item)) return
+    } else if ("resume" === f) {
       const r = wlResumeInfo(item);
       if (!r || r.done) return
     } else if ("all" !== f && ("series" === f ? "series" !== item.type : "series" === item.type)) return;
