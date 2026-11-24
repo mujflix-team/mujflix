@@ -1119,6 +1119,20 @@
     /* Přepínač Vše / Filmy / Seriály je pořád vidět pod hledáním (ne za tlačítkem Filtry), ať se dá přepnout jedním klepnutím */
     try { var fl = document.getElementById('dvFilters'); if (els.type && fl && fl.parentNode) { els.type.classList.add('dv-seg-top'); fl.parentNode.insertBefore(els.type, fl); } } catch (e) {}
 
+    /* PC: horní lišta leží průhledně přes hero banner (jako na Domů); po posunutí dolů se zase zapne plná */
+    function overUpdate() {
+      var r = els.root, b = els.body;
+      if (!r || !b) return;
+      var hero = window.innerWidth > 700 && !!b.querySelector('.dv-hero:not(.dv-skel)');
+      r.classList.toggle('dv-over', hero);
+      r.classList.toggle('dv-solid', !hero || b.scrollTop > 60);
+    }
+    if (els.body) {
+      els.body.addEventListener('scroll', overUpdate, { passive: true });
+      new MutationObserver(overUpdate).observe(els.body, { childList: true, subtree: true });
+      window.addEventListener('resize', overUpdate);
+    }
+
     // Telefon: filtry jsou za tlačítkem „Filtry“ (nic se samo nesbaluje při posouvání)
     if (els.fbtn) els.fbtn.addEventListener('click', function () {
       var on = !root.classList.contains('dv-filters-open');

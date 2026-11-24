@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.190
+### Změněno
+- **Objevování na PC:** horní lišta (hledání, Filtry, typ) leží průhledně přes velký banner jako na Domů místo černého pruhu; po posunutí dolů se zase zapne plná.
+
 ## 3.21.189
 ### Změněno
 - **Uzi.la:** adresa filmu/dílu končí kotvou `#frm`, takže se okno s webem otevře odscrollované rovnou k přehrávači.
