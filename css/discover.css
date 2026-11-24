@@ -336,3 +336,11 @@
   #universeOverlay .dv-hero-title { font-size: clamp(1.9rem, 3.6vw, 2.9rem); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; padding-bottom: 2px; }
   #universeOverlay .dv-hero-desc { -webkit-line-clamp: 2; max-width: 640px; }
 }
+
+/* PC: lišta průhledně přes hero (jako na Domů), po posunutí plná */
+@media (min-width: 701px) {
+  #universeOverlay .dv-top { transition: background var(--t-base) ease, border-color var(--t-base) ease; }
+  #universeOverlay.dv-over .dv-top { position: absolute; left: 0; right: 0; top: 0; }
+  #universeOverlay.dv-over:not(.dv-solid) .dv-top { background: linear-gradient(180deg, rgba(11, 11, 16, 0.88) 0%, rgba(11, 11, 16, 0.5) 65%, rgba(11, 11, 16, 0) 100%); border-bottom-color: transparent; }
+  #universeOverlay.dv-over .dv-hero-body { padding-top: 160px; }
+}

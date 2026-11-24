@@ -21,6 +21,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.190 – Objevování na PC: průhledná lišta přes hero
 - 3.21.189 – Uzi.la: kotva #frm na přehrávač
 - 3.21.187 – Objevování na PC: vyšší hero, název se neusekne
 - 3.21.186 – pozdrav i na novém účtu
