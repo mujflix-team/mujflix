@@ -54,7 +54,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=22" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=22" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=120" />
+    <link rel="stylesheet" href="css/theme.css?v=121" />
     <link rel="stylesheet" href="css/wrapped.css?v=11" />
     <link rel="stylesheet" href="css/together.css?v=10" />
 
@@ -848,6 +848,7 @@
             <button type="button" class="wl-tab active" id="wlTabAll" data-f="all" onclick="wlSetFilter('all')">Vše</button>
             <button type="button" class="wl-tab" id="wlTabMovie" data-f="movie" onclick="wlSetFilter('movie')">Filmy</button>
             <button type="button" class="wl-tab" id="wlTabSeries" data-f="series" onclick="wlSetFilter('series')">Seriály</button>
+            <button type="button" class="wl-tab" id="wlTabNew" data-f="newep" onclick="wlSetFilter('newep')" style="display:none">Nový díl</button>
           </div>
           <div class="wl-sort"><span id="wlSortLbl">Řadit</span>
             <select id="wlSort" onchange="wlSetSort(this.value)" aria-labelledby="wlSortLbl">
@@ -1736,7 +1737,7 @@
     <script src="js/profiles/prefs.js?v=8" defer></script>
     <script src="js/app/core.js?v=14" defer></script>
     <script src="js/app/series.js?v=25" defer></script>
-    <script src="js/app/watchlist.js?v=11" defer></script>
+    <script src="js/app/watchlist.js?v=12" defer></script>
     <script src="js/app/new-episodes.js?v=1" defer></script>
     <script src="js/app/interaction.js?v=4" defer></script>
     <script src="js/app/notify.js?v=8" defer></script>
@@ -1803,7 +1804,7 @@
 <script src="js/pages/cinema.js?v=35" defer></script>
     <script src="js/app/wrapped.js?v=4" defer></script>
     <script src="js/app/together.js?v=1" defer></script>
-    <script src="js/pages/home.js?v=53" defer></script>
+    <script src="js/pages/home.js?v=55" defer></script>
     <script src="js/shell/dock.js" defer></script>
     <script src="js/shell/update.js" defer></script>
     <script src="js/shell/backup-reminder.js?v=1" defer></script>

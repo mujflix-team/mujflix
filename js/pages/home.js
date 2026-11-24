@@ -170,6 +170,12 @@
         } catch (e) { return ''; }
       }
 
+      /* „před 9 dny“ – jen když se na seriál nekoukalo víc než týden */
+      function mfhAgoText(ts) {
+        var d = Math.floor((Date.now() - (ts || 0)) / 86400000);
+        return ts && d >= 7 ? 'před ' + d + ' ' + mfhPl(d, 'dnem', 'dny', 'dny') : '';
+      }
+
       function mfhContinueCandidates() {
         var out = [], done = mfhReadDone();
         try {
@@ -186,7 +192,7 @@
             out.push({
               kind: 'series', ts: last[slug], slug: slug, title: show.name,
               episode: 'S' + next.se + ' E' + (next.ep < 10 ? '0' + next.ep : next.ep),
-              timeLeft: '', left: mfhLeftText(slug, prog),
+              timeLeft: '', left: [mfhLeftText(slug, prog), mfhAgoText(last[slug])].filter(Boolean).join(' · '),
               description: 'Pokračuj tam, kde jsi skončil/a.', progress: pct, image: show._poster || show.poster || show._backdrop
             });
           });
@@ -275,6 +281,15 @@
           return list.filter(function (p) { return p && p.id === pid; })[0] || null;
         } catch (e) { return null; }
       }
+
+      /* pozdrav v hero: podle denní doby a jména aktivního profilu (5. pád) */
+      function nfGreeting() {
+        var hr = new Date().getHours(), g = hr < 10 ? 'Dobré ráno' : hr < 18 ? 'Dobrý den' : 'Dobrý večer';
+        var p = nfActiveProfile(), n = p && p.name ? String(p.name).trim().split(/\s+/)[0] : '';
+        try { if (n && window.czechVocative) n = window.czechVocative(n) || n; } catch (e) { /* jméno bez 5. pádu */ }
+        return g + (n ? ', ' + n : '');
+      }
+      window.nfGreeting = nfGreeting; // pro testy
 
       function nfRenderProfile() {
         var b = document.getElementById('nfAvatar');
@@ -710,6 +725,7 @@
         hero.innerHTML =
           bg + '<div class="nf-hero-shade"></div>' +
           '<div class="nf-hero-body">' +
+            (h.eyebrow && /^Podle /.test(h.eyebrow) ? '<div class="nf-hero-hi">' + esc(nfGreeting()) + '</div>' : '') +
             (h.eyebrow ? '<div class="nf-hero-eyebrow' + (/^Podle /.test(h.eyebrow) ? ' nf-hero-why' : '') + '">' + esc(h.eyebrow) + '</div>' : '') +
             '<h1 class="nf-hero-title' + ((h.title || '').length > 26 ? ' nf-long' : '') + '">' + esc(h.title) + '</h1>' +
             '<div class="nf-hero-meta">' + meta.join('') + '</div>' +

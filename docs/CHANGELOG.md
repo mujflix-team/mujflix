@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.21.184
+### Přidáno
+- **Oblíbené:** záložka „Nový díl“ (jen seriály, které máš rozkoukané a za posledních 14 dní jim vyšla epizoda). Zobrazí se, jen když nějaký takový je.
+
+## 3.21.183
+### Přidáno
+- **Pokračovat ve sledování:** u seriálu, na který ses nekoukal víc než týden, přibyde „před 9 dny“ (vedle „zbývá …“).
+
+## 3.21.182
+### Přidáno
+- **Domů:** pozdrav v hlavním banneru („Dobrý večer, Jakube“ podle denní doby a jména profilu); u „Pokračovat ve sledování“ se nezobrazuje.
+
 ## 3.21.181
 ### Opraveno
 - **Domů na telefonu:** text „Podle tvých žánrů…“ nad názvem velkého banneru se skrývá (překrýval plakát).
