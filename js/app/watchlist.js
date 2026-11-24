@@ -133,7 +133,7 @@ function wlHasNewEp(item) {
 }
 let _wlNewEpAt = 0;
 function wlRefreshNewEps() {
-  if (Date.now() - _wlNewEpAt < 60000 || "function" != typeof tmdbGet || !getTmdbKey()) return;
+  if (Date.now() - _wlNewEpAt < 60000 || "function" != typeof tmdbGet) return;
   _wlNewEpAt = Date.now();
   let changed = 0, pending = 0;
   getWatchlist().forEach(item => {
