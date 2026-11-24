@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.182
+### Přidáno
+- **Domů:** pozdrav v hlavním banneru („Dobrý večer, Jakube“ podle denní doby a jména profilu); u „Pokračovat ve sledování“ se nezobrazuje.
+
 ## 3.21.181
 ### Opraveno
 - **Domů na telefonu:** text „Podle tvých žánrů…“ nad názvem velkého banneru se skrývá (překrýval plakát).
