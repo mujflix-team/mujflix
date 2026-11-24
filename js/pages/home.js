@@ -170,6 +170,12 @@
         } catch (e) { return ''; }
       }
 
+      /* „před 9 dny“ – jen když se na seriál nekoukalo víc než týden */
+      function mfhAgoText(ts) {
+        var d = Math.floor((Date.now() - (ts || 0)) / 86400000);
+        return ts && d >= 7 ? 'před ' + d + ' ' + mfhPl(d, 'dnem', 'dny', 'dny') : '';
+      }
+
       function mfhContinueCandidates() {
         var out = [], done = mfhReadDone();
         try {
@@ -186,7 +192,7 @@
             out.push({
               kind: 'series', ts: last[slug], slug: slug, title: show.name,
               episode: 'S' + next.se + ' E' + (next.ep < 10 ? '0' + next.ep : next.ep),
-              timeLeft: '', left: mfhLeftText(slug, prog),
+              timeLeft: '', left: [mfhLeftText(slug, prog), mfhAgoText(last[slug])].filter(Boolean).join(' · '),
               description: 'Pokračuj tam, kde jsi skončil/a.', progress: pct, image: show._poster || show.poster || show._backdrop
             });
           });
