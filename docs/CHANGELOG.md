@@ -1,11 +1,10 @@
 # Changelog
 
 ## 3.21.188
-### Nově
-- 
-
 ### Opraveno
-- 
+- **safeLS (js/app/core.js):** `null == []` loose equality bug – přidány strict type checks
+- **Profil purge (js/profiles/gate.js):** přesná suffixová shoda (`_` delimiter) místo `includes` – zabraňuje kolizi `p_1` vs `p_12`
+- **Genre mapping (js/ai/brain.js):** `_lookupGenre` fallback vrací pole `[key, id, names]` konzistentně s mediaType cestami – opravuje mapování CZ/EN názvů žánrů a ukládání TMDB ID při hodnocení 
 
 ## 3.21.187
 ### Opraveno
