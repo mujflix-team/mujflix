@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.187
+### Opraveno
+- **Objevování na PC:** hlavní banner je vyšší (jako na Domů), název se už nehoří nahoře a popis je na dva řádky.
+
 ## 3.21.185
 ### Změněno
 - **Úklid:** zmizel soubor `js/app/cinema-bridge.js`; `openMovieInCinema` a `closeCinema` jsou přímo v `js/pages/cinema.js` (chování stejné).

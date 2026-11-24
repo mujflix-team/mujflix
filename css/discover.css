@@ -328,3 +328,11 @@
   #universeOverlay .dv-hero-actions .dv-btn { height: var(--h-lg, 44px); padding: 0 16px; font-size: var(--fs-md); white-space: nowrap; }
   #universeOverlay .dv-hero-actions .dv-btn-ghost { flex: 1; min-width: 0; }
 }
+
+/* PC: hero jako na Domů – vyšší, název se nesmí useknout nahoře */
+@media (min-width: 701px) {
+  #universeOverlay .dv-hero { height: clamp(420px, 66vh, 620px); }
+  #universeOverlay .dv-hero-body { padding-bottom: 36px; }
+  #universeOverlay .dv-hero-title { font-size: clamp(1.9rem, 3.6vw, 2.9rem); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; padding-bottom: 2px; }
+  #universeOverlay .dv-hero-desc { -webkit-line-clamp: 2; max-width: 640px; }
+}
