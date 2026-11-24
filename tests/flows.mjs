@@ -210,9 +210,9 @@ const uzi = await page.evaluate(() => {
   };
   return { movie: find("Forrest Gump", "movie"), tv: find("Jack Reacher", "tv", { season: 4, episode: 8 }), cz: find("Spider-Man: Napříč paralelními světy", "movie") };
 });
-check("uzi.la: film → /p/forrest-gump", uzi.movie === "https://uzi.la/p/forrest-gump", uzi.movie);
-check("uzi.la: seriál → /tv/jack-reacher/S04E08", uzi.tv === "https://uzi.la/tv/jack-reacher/S04E08", uzi.tv);
-check("uzi.la: diakritika a dvojtečka se v odkazu odstraní", /^https:\/\/uzi\.la\/p\/[a-z0-9-]+$/.test(uzi.cz), uzi.cz);
+check("uzi.la: film → /p/forrest-gump", uzi.movie === "https://uzi.la/p/forrest-gump#frm", uzi.movie);
+check("uzi.la: seriál → /tv/jack-reacher/S04E08", uzi.tv === "https://uzi.la/tv/jack-reacher/S04E08#frm", uzi.tv);
+check("uzi.la: diakritika a dvojtečka se v odkazu odstraní", /^https:\/\/uzi\.la\/p\/[a-z0-9-]+\#frm$/.test(uzi.cz), uzi.cz);
 
 // --- Uzi.la: varianty názvu z TMDB (SK / CZ / původní)
 const alt = await page.evaluate(async () => {
@@ -236,7 +236,7 @@ const alt = await page.evaluate(async () => {
   window.fetch = realFetch; MFCinemaPlayer.close();
   return [...new Set(urls)];
 });
-check("uzi.la: nabízí slovenský název (spider-man-cez-paralelne-svety)", alt.includes("https://uzi.la/p/spider-man-cez-paralelne-svety"), JSON.stringify(alt));
+check("uzi.la: nabízí slovenský název (spider-man-cez-paralelne-svety)", alt.includes("https://uzi.la/p/spider-man-cez-paralelne-svety#frm"), JSON.stringify(alt));
 check("uzi.la: nabízí i český a původní název", alt.length >= 3, JSON.stringify(alt));
 
 // --- Japonský název (bez latinky) → adresy z anglického názvu

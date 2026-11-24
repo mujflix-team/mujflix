@@ -114,14 +114,16 @@
     return uziFill(UZI.search, { q: encodeURIComponent(title || "") });
   }
 
+  /* Uzi.la: kotva na přehrávač (<iframe id="frm">), stránka se po otevření odscrolluje rovnou k němu */
+  var UZI_PLAYER_HASH = "#frm";
   function uziMovieUrl(title) {
     var slug = daslug(title);
-    return slug ? uziFill(UZI.movie, { slug: slug }) : uziSearchUrl(title);
+    return slug ? uziFill(UZI.movie, { slug: slug }) + UZI_PLAYER_HASH : uziSearchUrl(title);
   }
 
   function uziTvUrl(title, season, episode) {
     var slug = daslug(title);
-    return slug ? uziFill(UZI.episode, { slug: slug, ss: pad2(season), ee: pad2(episode) }) : uziSearchUrl(title);
+    return slug ? uziFill(UZI.episode, { slug: slug, ss: pad2(season), ee: pad2(episode) }) + UZI_PLAYER_HASH : uziSearchUrl(title);
   }
 
   /* NajSerialy.io — /serial/{slug}/s01e01; u novějších seriálů je v adrese rok (např. carrie-2026), u starších ne. */
