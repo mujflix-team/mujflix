@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.21.188
+### Nově
+- 
+
+### Opraveno
+- 
+
 ## 3.21.187
 ### Opraveno
 - **Objevování na PC:** hlavní banner je vyšší (jako na Domů), název se už nehoří nahoře a popis je na dva řádky.
