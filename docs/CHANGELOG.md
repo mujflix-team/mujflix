@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.192
+### Změněno
+- **Objevování na PC:** popis banneru je v panelu vpravo dole a nad ním náhled traileru (jako na Domů).
+### Opraveno
+- **Objevování → Vše:** seznam se mohl zastavit dřív než Filmy/Seriály, protože lichá stránka podle žánrů měla méně stránek a zkrátila celý seznam; teď se počet stránek jen zvyšuje.
+
 ## 3.21.190
 ### Změněno
 - **Objevování na PC:** horní lišta (hledání, Filtry, typ) leží průhledně přes velký banner jako na Domů místo černého pruhu; po posunutí dolů se zase zapne plná.

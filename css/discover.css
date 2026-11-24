@@ -344,3 +344,16 @@
   #universeOverlay.dv-over:not(.dv-solid) .dv-top { background: linear-gradient(180deg, rgba(11, 11, 16, 0.88) 0%, rgba(11, 11, 16, 0.5) 65%, rgba(11, 11, 16, 0) 100%); border-bottom-color: transparent; }
   #universeOverlay.dv-over .dv-hero-body { padding-top: 160px; }
 }
+
+/* popis vpravo dole + náhled traileru nad ním (PC); na telefonu se skrývá */
+#universeOverlay .dv-hero-side { display: none; }
+@media (min-width: 701px) {
+  #universeOverlay .dv-hero-body .dv-hero-desc { display: none; }
+  #universeOverlay .dv-hero-side { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; position: absolute; right: var(--dv-pad); bottom: 36px; width: clamp(280px, 34vw, 520px); z-index: 2; }
+  #universeOverlay .dv-hero-side-desc { margin: 0; width: 100%; padding: 14px 18px; border-left: 3px solid var(--w-4, rgba(255, 255, 255, 0.35)); border-radius: var(--r-panel); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px); font-size: var(--fs-base); line-height: 1.5; color: #f0f0f0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  #universeOverlay .dv-hero-trl { position: relative; width: clamp(180px, 20vw, 300px); aspect-ratio: 16 / 9; padding: 0; border: 1px solid var(--w-3, rgba(255, 255, 255, 0.2)); border-radius: var(--r-panel); overflow: hidden; background: #000; cursor: pointer; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65); }
+  #universeOverlay .dv-hero-trl img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; transition: opacity var(--t-base); }
+  #universeOverlay .dv-hero-trl:hover img { opacity: 1; }
+  #universeOverlay .dv-hero-trl-play { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-md); padding-left: 3px; }
+  #universeOverlay .dv-hero-trl-lbl { position: absolute; left: 8px; bottom: 6px; font-size: var(--fs-xs); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 4px #000; }
+}
