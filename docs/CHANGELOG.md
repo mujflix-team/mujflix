@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.189
+### Změněno
+- **Uzi.la:** adresa filmu/dílu končí kotvou `#frm`, takže se okno s webem otevře odscrollované rovnou k přehrávači.
+
 ## 3.21.188
 ### Opraveno
 - **safeLS (js/app/core.js):** `null == []` loose equality bug – přidány strict type checks
