@@ -599,7 +599,8 @@
     shPost("/src/probe", { urls: urls }).then(function (r) {
       urls.forEach(function (u) { delete PROBE_PENDING[u]; });
       if (!r || !Array.isArray(r.results)) { fin(); return; }
-      urls.forEach(function (u, i) { if (r.results[i] === true || r.results[i] === false) PROBE[u] = r.results[i]; else PROBE_UNKNOWN[u] = Date.now(); });
+      /* NajSerialy: „nemá titul“ se nebere jako jisté (dávalo falešné záporné výsledky, např. u japonských názvů) – zdroj se kvůli tomu nepřeskakuje */
+      urls.forEach(function (u, i) { if (r.results[i] === true || (r.results[i] === false && !/najserialy\.io/.test(u))) PROBE[u] = r.results[i]; else PROBE_UNKNOWN[u] = Date.now(); });
       var keys = Object.keys(PROBE);
       if (keys.length > 400) keys.slice(0, keys.length - 400).forEach(function (k) { delete PROBE[k]; });
       fin();

@@ -544,7 +544,7 @@ const autoLangT = await page.evaluate(async () => {
   } finally { MFCinemaPlayer.close(); await w(400); window.fetch = of; window.TMDB_PROXY_URL = oUrl; }
   return out;
 });
-check("zdroje: když titul nemá žádný český zdroj, přepne se samo na zahraniční; ruční volba má přednost", autoLangT.auto && autoLangT.manual, JSON.stringify(autoLangT));
+check("zdroje: NajSerialy „nemá titul“ se nebere jako jisté, takže se kvůli tomu nepřepíná samo na zahraniční; ruční volba zahraničí funguje", !autoLangT.auto && autoLangT.manual, JSON.stringify(autoLangT));
 const barT = await page.evaluate(async () => {
   const w = ms => new Promise(r => setTimeout(r, ms));
   MFCinemaPlayer.open("98765", "Nějaký Seriál s dlouhým názvem", "tv", { season: 1, episode: 4 }); await w(900);
