@@ -38,7 +38,7 @@ const ProfileGate = {
                 ${avatar}
                 ${this._manageMode ? '<span class="pg-edit-overlay" aria-hidden="true"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>' : ""}
               </div>
-              ${this._manageMode ? `<button class="pg-remove-btn" type="button" aria-label="Odebrat profil ${escapeHTML(t.name)}" onclick="event.stopPropagation(); window.ProfileGate?.removeProfile('${escapeHTML(t.id)}')">−</button>` : ""}
+              ${this._manageMode ? `<button class="pg-remove-btn" type="button" aria-label="Odebrat profil ${escapeHTML(t.name)}" data-act="remove-profile" data-arg="${escapeHTML(t.id)}">−</button>` : ""}
             </div>
             <div class="pg-name">${escapeHTML(t.name)}</div>
           `;
@@ -333,7 +333,7 @@ const ProfileGate = {
   _charRowHtml(title, list) {
     if (!list.length) return "";
     return `<section class="pc-av-row"><h4>${escapeHTML(title)}</h4><div class="pc-av-strip">${list.slice(0, 16).map(c => `
-      <button type="button" class="pc-avatar-option pc-character-option" title="${escapeHTML(c.name)}" data-url="${escapeHTML(c.url)}" data-name="${escapeHTML(c.name)}" onclick="window.ProfileGate?.pickAvatarEl(this)">
+      <button type="button" class="pc-avatar-option pc-character-option" title="${escapeHTML(c.name)}" data-url="${escapeHTML(c.url)}" data-name="${escapeHTML(c.name)}" data-act="pick-avatar" data-arg="${escapeHTML(c.url)}">
         <img src="${escapeHTML(c.url)}" alt="${escapeHTML(c.name)}" loading="lazy" referrerpolicy="no-referrer">
         <span class="pc-av-cap">${escapeHTML(c.name)}</span>
       </button>`).join("")}</div></section>`;
@@ -373,7 +373,7 @@ const ProfileGate = {
       let good = all.filter(r => r.list.length >= 5);
       good.length || (good = all);
       good.sort((a, b) => (b.anime ? 1 : 0) - (a.anime ? 1 : 0) || (a.anime ? a.i - b.i : Math.min(b.list.length, 16) - Math.min(a.list.length, 16) || a.i - b.i));
-      grid.innerHTML = (good.length ? good.map(r => this._charRowHtml(r.title, r.list)).join("") : '<div class="pc-avatar-loading">Načítám postavy…</div>') + (finished && !all.some(r => r.anime) ? '<div class="pc-avatar-loading">Anime postavy se teď nepodařilo načíst (AniList neodpovídá). <button type="button" class="pc-av-retry" onclick="window.ProfileGate?.loadAvatarPicker()">Zkusit znovu</button></div>' : "");
+      grid.innerHTML = (good.length ? good.map(r => this._charRowHtml(r.title, r.list)).join("") : '<div class="pc-avatar-loading">Načítám postavy…</div>') + (finished && !all.some(r => r.anime) ? '<div class="pc-avatar-loading">Anime postavy se teď nepodařilo načíst (AniList neodpovídá). <button type="button" class="pc-av-retry" data-act="load-avatar-picker">Zkusit znovu</button></div>' : "");
     };
     const later = () => { clearTimeout(timer); timer = setTimeout(paint, 250); };
     const put = (title, list, anime, i) => { if (list && list.length) { rows[title] = { title, list, anime, i }; later(); } };
@@ -522,7 +522,7 @@ const ProfileGate = {
       ["878", "Sci-Fi"], ["27", "Horor"], ["16", "Animované"], ["anime", "Anime"],
       ["10749", "Romantika"], ["14", "Fantasy"], ["53", "Thriller"]
     ];
-    n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" onclick="this.classList.toggle('selected')">${t}</button>`).join("");
+    n.innerHTML = o.map(([e, t]) => `<button type="button" class="pw-genre" data-genre="${e}" data-act="toggle-genre">${t}</button>`).join("");
     const ag = document.getElementById("pwAge");
     ag && (ag.onclick = ev => { const b = ev.target.closest(".pw-agebtn"); b && (ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x === b))); }, ag.querySelectorAll(".pw-agebtn").forEach(x => x.classList.toggle("pw-on", x.dataset.age === "0")));
     t.dataset.profileId = e, this._onboardingStep(1), t.classList.add("show"), t.setAttribute("aria-hidden", "false");

@@ -43,7 +43,7 @@ window._tmdbSetTab = function(e) {
       t.innerHTML = "", o.forEach(e => {
         const n = `https://image.tmdb.org/t/p/${e.size}${e.imgPath}`,
           o = document.createElement("div");
-        o.className = "tmdb-av-item", o.dataset.url = n, o.dataset.name = e.name, o.innerHTML = `\n        <img class="tmdb-av-img" src="${escapeHTML(n)}" alt="${escapeHTML(e.name)}" loading="lazy" onerror="this.parentElement.remove()">\n        <span class="tmdb-av-name">${escapeHTML(e.name)}</span>\n      `, o.onclick = () => {
+        o.className = "tmdb-av-item", o.dataset.url = n, o.dataset.name = e.name, o.innerHTML = `\n        <img class="tmdb-av-img" src="${escapeHTML(n)}" alt="${escapeHTML(e.name)}" loading="lazy" data-act="img-error-remove">\n        <span class="tmdb-av-name">${escapeHTML(e.name)}</span>\n      `, o.onclick = () => {
           document.querySelectorAll(".tmdb-av-item").forEach(e => e.classList.remove("selected")), o.classList.add("selected"), _tmdbAvSelectedUrl = n, _tmdbAvSelectedName = e.name
         }, t.appendChild(o)
       })
@@ -64,7 +64,7 @@ window._tmdbSetTab = function(e) {
       window._tmdbAvOpen((e, t) => {
         ProfileGate._selectedAvatarUrl = e, ProfileGate._selectedAvatarName = t, document.querySelectorAll(".pc-emoji-btn").forEach(e => e.classList.remove("selected")), "function" == typeof showToast && showToast("✓ Obrázek z TMDB vybrán: " + t);
         let o = document.getElementById("pcTmdbPreview");
-        o || (o = document.createElement("div"), o.id = "pcTmdbPreview", o.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);border-radius:var(--r-panel);margin-top:6px;", n.insertAdjacentElement("afterend", o)), o.innerHTML = `\n          <img src="${escapeHTML(e)}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" alt="">\n          <span style="font-size:0.75rem;color:rgba(255,255,255,0.7);">${escapeHTML(t)}</span>\n          <button onclick="ProfileGate._selectedAvatarUrl=null;ProfileGate._selectedAvatarName=null;document.getElementById('pcTmdbPreview').remove();" style="margin-left:auto;background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:0.75rem;">✕ Zrušit</button>\n        `
+        o || (o = document.createElement("div"), o.id = "pcTmdbPreview", o.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);border-radius:var(--r-panel);margin-top:6px;", n.insertAdjacentElement("afterend", o)), o.innerHTML = `\n          <img src="${escapeHTML(e)}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" alt="">\n          <span style="font-size:0.75rem;color:rgba(255,255,255,0.7);">${escapeHTML(t)}</span>\n          <button data-act="cancel-tmdb-preview" style="margin-left:auto;background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:0.75rem;">✕ Zrušit</button>\n        `
       })
     }, document.getElementById("pcEmojiGrid") && t.insertAdjacentElement("afterend", n)
   }),
@@ -121,7 +121,7 @@ window._tmdbSetTab = function(e) {
           const t = document.querySelector(".pc-tmdb-btn");
           if (!t) return;
           let n = document.getElementById("pcTmdbPreview");
-          n || (n = document.createElement("div"), n.id = "pcTmdbPreview", n.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);border-radius:var(--r-panel);margin-top:6px;", t.insertAdjacentElement("afterend", n)), n.innerHTML = `\n            <img src="${escapeHTML(e.avatarUrl)}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" alt="">\n            <span style="font-size:0.75rem;color:rgba(255,255,255,0.7);">${escapeHTML(e.avatarTmdbName||"TMDB obrázek")}</span>\n            <button onclick="ProfileGate._selectedAvatarUrl=null;ProfileGate._selectedAvatarName=null;document.getElementById('pcTmdbPreview').remove();" style="margin-left:auto;background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:0.75rem;">✕ Zrušit</button>\n          `
+          n || (n = document.createElement("div"), n.id = "pcTmdbPreview", n.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);border-radius:var(--r-panel);margin-top:6px;", t.insertAdjacentElement("afterend", n)), n.innerHTML = `\n            <img src="${escapeHTML(e.avatarUrl)}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" alt="">\n            <span style="font-size:0.75rem;color:rgba(255,255,255,0.7);">${escapeHTML(e.avatarTmdbName||"TMDB obrázek")}</span>\n            <button data-act="cancel-tmdb-preview" style="margin-left:auto;background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:0.75rem;">✕ Zrušit</button>\n          `
         }, 80))
       }
     }

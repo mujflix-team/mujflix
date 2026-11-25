@@ -466,7 +466,7 @@
         var id = it && (it.tmdbId || (it.fav && it.fav.tmdbId));
         if (!id) return '';
         var k = (it.mediaType === 'tv' || it.slug || (it.fav && it.fav.type === 'series')) ? 'tv' : 'movie';
-        return '<button type="button" class="nf-trl" hidden data-tk="' + k + '" data-tid="' + (+id) + '" title="Přehrát trailer" aria-label="Trailer: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfPlayTrailer(\'' + k + '\', ' + (+id) + ')">' +
+        return '<button type="button" class="nf-trl" hidden data-act="play-trailer" data-tk="' + k + '" data-tid="' + (+id) + '" title="Přehrát trailer" aria-label="Trailer: ' + esc(it.title) + '">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>';
       }
       function mfhFavButton(it, cid, idx) {
@@ -474,7 +474,7 @@
         if (!f || typeof isTmdbFavorite !== 'function') return mfhTrailerButton(it);
         var on = false;
         try { on = mfhFavOn(f); } catch (e) {}
-        return mfhTrailerButton(it) + '<button type="button" class="nf-fav' + (on ? ' on' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + (on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených') + '" aria-label="Oblíbené: ' + esc(it.title) + '" onclick="event.stopPropagation(); mfhToggleFav(this, \'' + cid + '\', ' + idx + ')">' +
+        return mfhTrailerButton(it) + '<button type="button" class="nf-fav' + (on ? ' on' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + (on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených') + '" aria-label="Oblíbené: ' + esc(it.title) + '" data-act="toggle-favorite" data-cid="' + cid + '" data-idx="' + idx + '">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.6 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z"/></svg></button>';
       }
       window.mfhToggleFav = function (btn, cid, idx) {
@@ -502,8 +502,8 @@
         var ratePill = (it.rating > 0) ? '<span class="nf-rate">★ ' + Number(it.rating).toFixed(1) + '</span>' : '';
         return (
           '<div class="nf-card' + (rank ? ' nf-ranked' : '') + '" tabindex="0" role="button" aria-label="' + esc(it.title) + '" ' +
-            'data-cid="' + cid + '" data-idx="' + idx + '" ' +
-            'onclick="' + open + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + open + '}">' +
+            'data-act="open-card" data-cid="' + cid + '" data-idx="' + idx + '" ' +
+            'data-key="' + esc(String(it.key || '')) + '">' +
             (rank ? '<span class="nf-rank" aria-hidden="true">' + rank + '</span>' : '') +
             '<div class="nf-poster nf-skeleton">' +
               '<img class="nf-img"' + (it.image ? ' src="' + esc(it.image) + '"' : '') + ' alt="" loading="lazy">' +
@@ -511,7 +511,7 @@
               ratePill +
               (typeof it.progress === 'number' ? '<div class="nf-cprog" aria-hidden="true"><i style="width:' + Math.round(it.progress) + '%"></i></div>' : '') +
                             mfhFavButton(it, cid, idx) +
-              (it.resume ? '<button type="button" class="nf-cx" title="Dokoukal jsem – odebrat z pokračování" aria-label="Dokoukal jsem – odebrat z pokračování" onclick="event.stopPropagation(); mfhFinishItem(\'' + esc(String(it.key || '')).replace(/'/g, '') + '\')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>' : '') +
+              (it.resume ? '<button type="button" class="nf-cx" title="Dokoukal jsem – odebrat z pokračování" aria-label="Dokoukal jsem – odebrat z pokračování" data-act="finish-item" data-key="' + esc(String(it.key || '')).replace(/'/g, '') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>' : '') +
             '</div>' +
             '<div class="nf-card-info">' +
               '<p class="nf-card-title">' + esc(it.title) + '</p>' +
@@ -712,7 +712,7 @@
         var first = !hero.querySelector('.nf-hero-body');
         _trTok++; if (_trObs) { try { _trObs.disconnect(); } catch (e) {} _trObs = null; }
         var bg = h.image
-          ? '<img class="nf-hero-bg" src="' + esc(h.image) + '" alt="" decoding="async" fetchpriority="high" onerror="this.style.display=\'none\'">'
+          ? '<img class="nf-hero-bg" src="' + esc(h.image) + '" alt="" decoding="async" fetchpriority="high" data-act="img-error-hide">'
           : '';
         var meta = [];
         if (h.badge) meta.push('<span class="nf-hero-badge">' + esc(h.badge) + '</span>');
@@ -793,7 +793,7 @@
           b.className = 'nf-cs-card';
           b.style.setProperty('--k', String(k));
           b.setAttribute('aria-label', 'Přepnout na ' + o.c.title);
-          b.innerHTML = (o.c.image ? '<img src="' + esc(o.c.image) + '" alt="" loading="lazy" onerror="this.remove()">' : '') +
+          b.innerHTML = (o.c.image ? '<img src="' + esc(o.c.image) + '" alt="" loading="lazy" data-act="img-error-remove">' : '') +
             '<span class="nf-cs-t">' + esc(o.c.title) + (o.c.episode ? '<small>' + esc(o.c.episode) + '</small>' : '') + '</span>';
           b.addEventListener('click', function () {
             _lastContinue = o.c;

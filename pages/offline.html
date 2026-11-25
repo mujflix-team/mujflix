@@ -24,7 +24,8 @@
     <p class="brand">Můj<i>Flix</i></p>
     <h1>Jsi offline</h1>
     <p>Nepodařilo se připojit k internetu. Zkontroluj Wi-Fi nebo data, stránka se načte sama, jakmile se spojení vrátí.</p>
-    <button class="btn" type="button" onclick="location.reload()">Zkusit znovu</button>
+    <button class="btn" type="button" data-act="retry-offline">Zkusit znovu</button>
+    <script type="module" src="../js/shell/actions.js?v=1"></script>
     <script>window.addEventListener("online", function () { location.reload(); });</script>
   </main>
 </body>

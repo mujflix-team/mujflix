@@ -152,7 +152,7 @@ function openSeries(e) {
   const a = document.getElementById("modalRateBtn");
   a && (a.style.display = calcProgress(e).seen > 0 ? "flex" : "none");
   // „Náhodná epizoda“ dává smysl jen u seriálu s více epizodami
-  const sh = o.querySelector('[onclick="shuffleEpisode()"]');
+  const sh = o.querySelector('[data-act="shuffle-episode"]');
   if (sh) { let cnt = 0; for (let k = 1; k <= totalSeasons(e); k++) cnt += epsInSeason(e, k); sh.style.display = cnt > 1 ? "" : "none" }
 }
 
