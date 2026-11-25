@@ -1,0 +1,239 @@
+# Úkoly a rozdělená práce
+
+Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončení přesuň do „Hotovo“ a dopiš do `CHANGELOG.md`.
+
+## Rozděláno
+| Kdo | Větev | Co | Soubory |
+|---|---|---|---|
+| | | | |
+
+## Další nápady / otevřené
+- Plán na věci se zařízením (bridge, CSP po částech, CSS, Lighthouse, NajSerialy, Uzi.la): `docs/PLAN-zarizeni.md`.
+- Přihlášení ke zdrojům se neudrží: po přihlášení v Další → Přihlášení ke zdrojům tam uživatel při otevření seriálu/filmu už přihlášený není (iframe + cizí cookies; zjistit, co jde: zdroje v popup okně, jiný způsob přihlášení, nebo jen upozornit v textu).
+- Právní (potřebuje rozhodnutí): (1) [vyřešeno v 3.21.67] logo TMDB je v Soukromí a podmínky; (2) [vyřešeno v 3.21.67] písmo – ale starý Netflix Sans zůstává v historii gitu; (3) u Soukromí chybí správce údajů a soukromý kontakt (e-mail) pro žádosti o smazání a oznámení o porušení práv; (4) odkazování na weby s nelicencovaným obsahem: upozornění „odpovídáš ty“ odpovědnost provozovatele neruší.
+- Rychlost: změřit v Chrome Lighthouse; velké soubory `js/app.js` (237 kB) a `css/styles.css` (187 kB, hodně přepsáno v `netflix.css`) – po změření rozdělit / odstranit mrtvé CSS.
+- Service worker: celý „stale-while-revalidate“ zatím ne (hrozil by starý kód po opravě); písma už jdou z cache.
+- Průhledný obdélník vlevo nahoře (nereprodukovatelný v headless Chromiu): zjistit prvek přes pravý klik → Prozkoumat.
+- Ověřit, jestli NajSerialy.io nebrání vložení do iframe; pokud ano, označit zdroj jako `noEmbed`.
+- Bezpečnost (dluh): CSP `script-src 'unsafe-inline'` kvůli inline `onclick` v generovaném HTML – postupně nahradit `addEventListener` a pak přepnout na `script-src 'self'`. Iframe přehrávače běží bez `sandbox` (hostingy ho detekují); zkusit užší `sandbox` zdroj od zdroje a ručně ověřit všechny 4 zdroje. Limity ve Workeru (`probeHits`, `srcHits`) jsou v paměti jedné instance; do KV až při skutečném zneužití (KV zápis na free tarifu max. 1000/den, každý požadavek jako zápis by kvótu vyčerpal). Opatření mimo kód: branch protection na `main`, ověřit hlavičky na securityheaders.com a observatory.mozilla.org.
+- Bezpečnostní report (mujflix.pages.dev): `Cross-Origin-Embedder-Policy: credentialless` může rozbít iframe přehrávače a obrázky – jen po otestování; `require-trusted-types-for 'script'` vyžaduje přepsat všechny `innerHTML`; `access-control-allow-origin: *` v repu není nastaveno.
+- Případně přejmenovat workers.dev subdoménu (pak změnit `TMDB_PROXY_URL` v `config.js` a `ALLOWED_ORIGINS` ve Workeru).
+
+## Hotovo
+- 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.200 – dock: Oblíbené neblikne zpět na Objevovat
+- 3.21.199 – dock/lišta: Objevovat místo Seriály+Filmy (telefon i PC)
+- 3.21.198 – dock: Objevovat (Vše)
+- 3.21.197 – stabilní test paměti zdrojů
+- 3.21.196 – NajSerialy se v aplikaci nepřeskakuje kvůli ověřování
+- 3.21.195 – ověřování: NajSerialy se neodmítá kvůli jinému názvu (nasadit Worker)
+- 3.21.194 – SvetSerialu: kotva na přehrávač
+- 3.21.193 – kontaktní e-mail v Soukromí, oprava lintu
+- 3.21.192 – Objevování: popis vpravo + trailer, nekonečné Vše
+- 3.21.191 – logo TMDB v Soukromí (cesta) + text s odkazem
+- 3.21.190 – Objevování na PC: průhledná lišta přes hero
+- 3.21.189 – Uzi.la: kotva #frm na přehrávač
+- 3.21.187 – Objevování na PC: vyšší hero, název se neusekne
+- 3.21.186 – pozdrav i na novém účtu
+- 3.21.185 – smazán cinema-bridge.js
+- 3.21.184 – filtr „Nový díl“ v Oblíbených
+- 3.21.183 – „před N dny“ u rozkoukaných seriálů
+- 3.21.182 – pozdrav v hero na Domů
+- 3.21.181 – skupiny v Další, skrytý důvod v hero na telefonu
+- 3.21.180 – Přihlášení ke zdrojům v Další → Pokročilé
+- 3.21.179 – znovu priorita zdrojů zvlášť pro seriály/filmy (omylem se neslila) + test priorita.mjs
+- 3.21.177 – cinema-legacy.js přejmenováno na cinema-bridge.js (claude/uklid-legacy)
+- 3.21.176 – hlavička CORP same-origin (claude/hlavicka-corp)
+- 3.21.175 – cinema PC: zdroje bez vložení v malém okně (claude/male-okno-pc)
+- 3.21.174 – priorita zdrojů v Další (claude/priorita-zdroju)
+- 3.21.173 – Oblíbené bez probliknutí Domů, 30 herců (claude/oblibene-bez-blikani)
+- 3.21.172 – cinema: přepnutí seriálu se zapíše jako rozkoukaný (claude/serial-zacal-koukat)
+- 3.21.171 – cinema: lišta po přepnutí nahoře, nezakrývá tlačítka (claude/lista-nahore)
+- 3.21.170 – cinema: po přepnutí na webu se označí předchozí díl, přehrávač se nepřerušuje (claude/undo-toast-sirka)
+- 3.21.169 – toast Zpět má správnou šířku (claude/undo-toast-sirka)
+- 3.21.168 – cinema: nabídka označit a posunout po přepnutí epizody na webu (claude/prepnuti-na-webu)
+- 3.21.167 – kontrola verze: toast nepřekrývá lištu Obnovit (claude/update-bar-prekryv)
+- 3.21.166 – probliknutí Domů při otevření/zavření detailu z Objevování (claude/blik-detail)
+- 3.21.165 – probliknutí Domů při přechodu Objevování → Oblíbené (claude/blik-oblibene)
+- 3.21.164 – Objevování: typ pod názvem, kompaktní banner na telefonu (claude/discover-hero-karty)
+- 3.21.163 – ikona tří teček u Další, bez zdvojeného typu (claude/ikona-dalsi)
+- 3.21.162 – srdíčko a trailer i u karet se slugem (claude/srdicko-vsude)
+- 3.21.161 – karty v Domů: typ, hodnocení, trailer a srdíčko v Pokračovat (claude/home-karty-typ-hodnoceni)
+- 3.21.160 – Nastavení přejmenované na Další (claude/dalsi-nazev)
+- 3.21.159 – menší menu profilu (claude/mensi-menu-profilu)
+- 3.21.158 – menu profilu na telefonu z docku (claude/mobil-menu-profilu)
+- 3.21.157 – hodnocení na kartách v Domů jako v Objevování (claude/karta-hvezdicky)
+- 3.21.156 – Pokračovat má text po posunu seznamu (claude/pokracovat-text)
+- 3.21.155 – Pokračovat jen ikona na telefonu, menší logo ve všech režimech (claude/tlacitko-ikona)
+- 3.21.154 – logo titulu v hlavičce se na telefonu nezkracuje (claude/hero-logo-orez)
+- 3.21.153 – přepínač Vše/Filmy/Seriály vždy viditelný (claude/ochrana-filmy)
+- 3.21.152 – film do Pokračovat až po 20 s v přehrávači (claude/ochrana-filmy)
+- 3.21.151 – stará sekce Doporučení se už nezobrazí (claude/stara-oblibene)
+- 3.21.150 – Objevování: filtry za tlačítkem i na PC, bez sbalování při posouvání (claude/filtry-pod-tlacitko)
+- 3.21.149 – pořadí tlačítek v detailu, menší názvy epizod na telefonu (claude/logo-velikost)
+- 3.21.148 – jednotná velikost loga, filtry se při posouvání neschovávají (claude/logo-velikost)
+- 3.21.147 – název čeká na logo déle (claude/logo-hned)
+- 3.21.146 – PC logo a mezera v banneru, tlačítko Filtry (claude/pc-logo-filtry)
+- 3.21.145 – Domů neprobliká po křížku, dlouhé názvy epizod; verze v patičce bez podtržení (claude/ep-nazev-blik)
+- 3.21.144 – verze v patičce jako tlačítko pro kontrolu aktualizace (claude/verze-tlacitko)
+- 3.21.143 – kino: vždy dvě řady na telefonu (claude/cinema-2rady)
+- 3.21.142 – kino: pořadí tlačítek na telefonu (claude/cinema-poradi)
+- 3.21.141 – kino: dvě řady na telefonu, šipky seriálů na PC (claude/cinema-rady)
+- 3.21.140 – bez probliknutí Domů při otevření z Objevování (claude/home-blik)
+- 3.21.139 – kino: šipky u srdce, bez traileru a šipky zdroje (claude/cinema-sipky)
+- 3.21.138 – kino: lišta (claude/cinema-lista)
+- 3.21.137 – epizody doplněné z TVmaze (claude/tvmaze-nahledy)
+- 3.21.136 – epizody bez náhledu, barva spodní lišty (claude/ep-nahledy-lista)
+- 3.21.135 – banner na Domů se při startu nemění víckrát (claude/home-prvni-start)
+- 3.21.134 – stabilita testů: popis v banneru (claude/testy-stabilita)
+- 3.21.133 – tažení do strany mezi sekcemi (claude/tazeni-sekci)
+- 3.21.132 – výkon: souběžné stejné dotazy na TMDB se sloučí (claude/rychlost)
+- 3.21.131 – PWA: pojistka proti odchodu a šedé obrazovce při gestu Zpět (claude/pwa-zpet)
+- 3.21.130 – náhledy epizod ve výběru epizod v přehrávači (claude/nahledy-epizod)
+- 3.21.129 – TV ikona (trailer) v levém rohu karty (claude/trailer-vlevo)
+- 3.21.128 – TV ikona (trailer) na kartách vlevo od srdíčka (claude/trailer-tlacitko)
+- 3.21.127 – trailer jako tlačítko místo najetí myší (claude/trailer-tlacitko)
+- 3.21.126 – oprava lintu v testu (claude/lint-fix)
+- 3.21.125 – trailer při najetí na kartu (claude/trailer-hover)
+- 3.21.124 – hláška o nových dílech u Oblíbených seriálů (claude/nove-epizody)
+- 3.21.123 – hlášky (toast) na telefonu: zalomení, velikost, poloha (claude/movy)
+- 3.21.122 – tlačítko obnovení jen na telefonu, nepřekrývá avatar (claude/reload-desktop)
+- 3.21.121 – audit detailu: zpět do Objevování, název bez blikání, Označit sezónu pod epizodami (claude/audit-detail)
+- 3.21.120 – výběr barvy akcentu v Nastavení (claude/akcent)
+- 3.21.119 – zavření oken tažením dolů (claude/gesto-zavrit)
+- 3.21.118 – haptika na dock, Oblíbené a hodnocení epizody (claude/haptika-akce)
+- 3.21.117 – silnější vibrace (30–50 ms) u stažení dolů, obnovení a menu karty (claude/haptika-silnejsi)
+- 3.21.116 – tlačítko obnovení vpravo v horní liště Domů (claude/ikona-obnovit)
+- 3.21.115 – rychlejší start: paralelní načtení detailů seriálů, preconnect, priorita banneru (claude/vykon)
+- 3.21.114 – stažení dolů jen na horní části Domů (claude/pull-jen-domu)
+- 3.21.113 – těžší stažení dolů + vibrace, proměnlivé Objevování (claude/pull-tezsi)
+- 3.21.112 – nové loading animace: modrý pruh + sjednocený skeleton (claude/loading)
+- 3.21.111 – Objevování na telefonu: filtry ve dvou sloupcích (claude/discover-mobil)
+- 3.21.110 – úklid nepoužívaného CSS (claude/uklid-css)
+- 3.21.109 – drobné opravy přístupnosti (claude/pristupnost)
+- 3.21.108 – doporučení na Domů se mění při každém načtení (claude/nahodna-doporuceni)
+- 3.21.107 – Discover: filtr služby, dekády, délky a jazyka (claude/discover-filtry)
+- 3.21.106 – obnovení doporučení na Domů mění karty (claude/obnoveni-domu)
+- 3.21.104 – jednotný kroužek při ovládání klávesnicí (claude/focus)
+- 3.21.103 – designové tokeny efektů (claude/efekty)
+- 3.21.102 – animace a barvy v JS na tokeny (claude/js-tokeny)
+- 3.21.98 – designové tokeny písma (claude/pismo)
+- 3.21.101 – stažení dolů pro obnovení Domů + oprava šedé obrazovky v PWA (claude/pwa-zpet-pull)
+- 3.21.99 – designové tokeny výšek a mezer (claude/vysky)
+- 3.21.97 – druhé klepnutí na Domů v docku nahoru/obnoví (claude/dock-domu)
+- 3.21.96 – designové tokeny animací (claude/animace)
+- 3.21.95 – rychlejší otevření detailu seriálu (claude/rychle-otevreni)
+- 3.21.94 – okno nového profilu: logo, jeden křížek, odstín lišty (claude/profil-okno)
+- 3.21.93 – oprava filtrů a karet epizod na telefonu (claude/mobil-opravy)
+- 3.21.92 – nová verze i v Cinema módu, bez automatického okna hodnocení (claude/cinema-update)
+- 3.21.91 – designové tokeny barev (claude/barvy)
+- 3.21.90 – designové tokeny rohů + docs/DESIGN.md (claude/design-system)
+- 3.21.89 – vlastní rozbalovací seznam i v Objevování a Wrapped (claude/dropdown-vsude)
+- 3.21.88 – sekundární tlačítka sjednocena na šedou (claude/sekundarni-tlacitka)
+- 3.21.87 – sjednocení play tlačítka: Pokračovat v detailu seriálu jako banner (claude/play-icons)
+- 3.21.86 – banner na notebooku: trailer se nepřekrývá s popisem (claude/hero-notebook)
+- 3.21.83: toast nad Wrapped, správné id Wrapped v seznamech otevřených oken.
+- 3.21.82: placeholdery řad na Domů, chybový stav + Zkusit znovu v Procházení, aria-busy.
+- 3.21.81: audit loading efektů – fade epizodních náhledů, zpoždění v Procházení, skeleton 9 karet, úklid mrtvých keyframes a skeleton helperů.
+- 3.21.80: audit UI – tenké nadpisy, malé popisky v panelu poskytovatelů, chybová karta zdroje, radiusy Together, toast bez Outfit.
+- 3.21.79: řádek sérií ve zmenšené hlavičce ve stejné výšce jako Pokračovat.
+- 3.21.78: Objevování: víc žánrů najednou, minimální hodnocení, Skrýt už otevřené, přehled aktivních filtrů.
+- 3.21.77: výběr sérií v pravém dolním rohu hlavičky seriálu (4 čísla + šipky, při zmenšení hlavičky uprostřed).
+- 3.21.76: nenápadný symbol přehrání na náhledech epizod v detailu seriálu.
+- 3.21.75: pryč oranžový proužek u rozkoukané epizody (+ nová verze kvůli cache service workeru).
+- 3.21.74: prokliknutí epizody ji neoznačí hned jako zhlédnutou (až po 20 s v přehrávači, s tlačítkem Zpět); Pokračovat míří na rozkoukanou epizodu.
+- 3.21.73: potvrzení u loga jako bublina pod logem.
+- 3.21.72: úklid kořene, stránky do `pages/`, SECURITY do `docs/`.
+- 3.21.71: logo otevírá „Kdo se dívá?“, Domů v docku vždy nahoru.
+- 3.21.70: Co dnes pustíme dohromady? (společný tip pro víc profilů).
+- 3.21.69: text v Soukromí o externích webech sladěn s vloženým přehrávačem.
+- 3.21.68: `netflix.css` → `theme.css`, bez „Netflix“ v komentářích a docs.
+- 3.21.67: písmo Netflix Sans nahrazeno volným Inter (OFL), `fonts/` jen 2 soubory + licence.
+- 3.21.66: Soukromí a podmínky doplněno (JustWatch, YouTube, Cloudflare, IP při propojení, PIN nešifrovaně, práva a ÚOOÚ).
+- 3.21.65: Podržení karty: zablokována systémová nabídka prohlížeče (Android).
+- 3.21.64: Podržení karty (víc / méně podobného) i v seznamu Oblíbených.
+- 3.21.63: Podržení karty na telefonu: ukazovat víc / méně podobného (doporučování), srozumitelnější prázdné Oblíbené.
+- 3.21.62: Úklid mrtvého kódu po starém dlaždicovém menu (`.ps-tile`, `.ps-list`) a pole `trakt` v profilu.
+- 3.21.61: Hledání zobrazí i tituly bez plakátu.
+- 3.21.60: Profil bez věkového omezení dostává v hledání a Objevovat i tituly pro dospělé z TMDB, s omezením ne.
+- 3.21.59: Detail seriálu se otevře u epizody, kde jsi skončil; oprava odrolování po zavření jiného seriálu.
+- 3.21.58: Hledání: japonské dotazy se do TMDB neposílají rozložené.
+- 3.21.57: Hledání: podobné názvy i při nepodobných výsledcích z TMDB, japonské malé samohlásky jako dlouhé „ー“.
+- Repozitář: přidána pravidla chování (`docs/CODE_OF_CONDUCT.md`), návod pro přispěvatele (`docs/CONTRIBUTING.md`) a šablony issue (`docs/ISSUE_TEMPLATE/`). Bez licence kvůli písmu NetflixSans.
+- 3.21.56: Hledání umí japonštinu v hiraganě a překlep na konci názvu.
+- 3.21.55: Hledání porovnává i původní název (anglický, původní jazyk).
+- 3.21.54: Hledání toleruje překlepy a rychleji reaguje při psaní.
+- 3.21.53: Hledání řadí podle shody názvu a umí rok v dotazu („matrix 1999“).
+- 3.21.52: Cinema mode skryje štítek epizody, když se epizoda přepne přímo v přehrávači.
+- 3.21.51: Wrapped kratší (8 slidů), velký plakát, zkrácená verze při málo záznamech, plakát v obrázku ke sdílení (na počítači na šířku 1920×1080), jednodušší ikona.
+- 3.21.50: Wrapped sjednocený do ploché tmavé barvy s akcentem, plakáty zaoblené 12 px.
+- 3.21.49: Wrapped (měsíční přehled) jako položka v menu profilu, bez pozvánky na úvodní stránce.
+- 3.21.46: doporučení blokátoru reklam na telefonu (Brave místo rozšíření pro Chrome).
+- 3.21.48: odebrána Rozkoukanost u epizody a Sdílet v kinu na telefonu.
+- 3.21.47: pryč Jen anime z průvodce (zůstává v Nastavení).
+- 3.21.45: šipka zpět ze Zálohy vrací do Nastavení.
+- 3.21.44: Pokročilé v nastavení: záloha, verze a aktualizace, smazání dat.
+- 3.21.43: hodnocení na kartách úvodní stránky, soukromí ve stejném okně.
+- 3.21.42: úvodní obrazovka bez profilů (věta, bez Upravit), filtry v Objevovat se nevracejí samy.
+- 3.21.41: oprava překrývání banneru s horní lištou na notebooku.
+- 3.21.40: úklid mrtvého kódu (náklon dlaždic, MFProfilesDB, signál hodnocení).
+- 3.21.39: jasnější potvrzení při přidání do Oblíbených v banneru.
+- 3.21.38: drobnosti: placeholder hledání, vzhled Pokročilé v nastavení.
+- 3.21.37: oprava useknutého tlačítka Přehrát v detailu na telefonu.
+- 3.21.36: zjednodušení (banner, žánrové čipy, Náhodná, Pokročilé v nastavení).
+- 3.21.35: jemné animace (vjezd okna, postupné karty, odezva tlačítek).
+- 3.21.34: typografie – všech šest řezů Netflix Sans v jasné hierarchii (Thin až Black).
+- 3.21.33: banner ukazuje důvod doporučení (podle tvých žánrů), jen když ho známe.
+- 3.21.32: připomenutí zálohy (lišta jednou za 30 dní, když zařízení není propojené).
+- 3.21.31: minifikace JS a CSS při nasazení na Cloudflare Pages (zdroj zůstává čitelný, testy prošly i na minifikované kopii).
+- 3.21.30: onboarding zkrácen na jednu obrazovku (žánry, věk, reklamy, odkaz na propojení).
+- 3.21.29: z „Kde legálně sledovat“ pryč Kiwi (letenky).
+- 3.21.28: v menu profilu je „Odhlásit se“ (zpět na výběr profilu).
+- 3.21.27: oprava mapy obrazovek v docs/MAPA.md.
+- 3.21.26: odstraněno staré Nastavení s políčky na API klíče a nepoužívané okno „Zobrazit vše“.
+- 3.21.25: úklid CSS (nepoužité třídy a proměnné, -11 kB).
+- 3.21.24: propojení zařízení má stavový řádek, QR se načítá spolehlivě (opakování + Zkusit znovu), první zařízení pozná připojení druhého (nový Worker).
+- 3.21.23: úklid mrtvého kódu (notifikace, nepoužívané funkce, CSS .notif-*).
+- 3.21.22: bot u /f|s|c/… dostane index.html s tagy titulu místo 404.html.
+- 3.21.21: popis náhledu odkazu ve formátu „Film · rok · ★ hodnocení — děj“.
+- 3.21.20: oprava „Stránka nebyla nalezena“ u titulových odkazů (funkce pouští běžné návštěvníky přes next()); Sdílet a náhled titulů dány do main.
+- 3.21.19: náhled odkazu na titul pro boty chatů (Cloudflare Pages Function), otevírání odkazu podle ?id=.
+- 3.21.18: tlačítko Sdílet (banner, detail seriálu, přehrávač), adresy titulů s ?id= přes window.mfTitleUrl.
+- 3.21.17: rozbalování popisu v banneru a detailu (Více ▾ / Méně ▴, klávesnice, tlačítka se nevytlačí).
+- 3.21.16: statický náhled odkazu v chatech (og:image 1200×630, twitter:card summary_large_image, canonical).
+- 3.21.15: tlačítko „Označit sezónu“ v detailu seriálu (označí / odznačí všechny díly sezóny).
+- 3.21.14: srdíčko na všech kartách v řadě Oblíbené (i u starších seriálů bez TMDB ID).
+- 3.21.13: testy toků Oblíbené, přepnutí profilu a propojení dvou zařízení proti skutečnému Workeru (`tests/toky.mjs`); oprava starého seznamu v otevřených Oblíbených po přepnutí profilu.
+- Vědomě přeskočeno: PIN profilu je 4místný kód (10 000 možností), hash by ho neochránil a zásah do `gate.js`, `prefs.js` a synchronizace profilů by přinesl riziko. PIN slouží jen jako dětský zámek, proto se ukládá v čistém textu. Je i v synchronizovaných datech; sync ID je samo tajemství.
+- 3.21.12: `?v=` z hashe obsahu se při sestavení doplní i u odkazů, které parametr neměly (12 odkazů v `index.html`).
+- 3.21.11: `?v=` z hashe obsahu při sestavení na Cloudflare Pages (audit F, `scripts/hash-assets.mjs`).
+- 3.21.10: oprava CI: `@eslint/js` zpět na 9 (shoda s `eslint` 9), Dependabot nezvedá hlavní verze ESLintu samostatně.
+- 3.21.9: výkon v klidu: pryč animace pozadí na výběru profilu (−80 % práce vlákna v klidu), časovače změřeny a ponechány (audit E).
+- 3.21.8: úklid starého přehrávače (`cinema-legacy.js` 491 → 12 řádků), smazán `CinAI` a „AI Source statistiky“ v Nastavení (audit B1).
+- 3.21.7: bezpečnostní audit: HSTS a COOP v `_headers`, zúžené `frame-src` v CSP (jen weby zdrojů a YouTube), bezpečnostní hlavičky odpovědí Workeru, smazaný nepoužitý režim `MF_PROXY`, `SECURITY.md`, Dependabot, upřesněné Soukromí.
+- 3.21.6: cache service workeru podle verze aplikace (audit F).
+- 3.21.5: Worker: CORS bez otevřeného výchozího stavu, limit těla a obnova platnosti dat (audit C1, C4, C5).
+- 3.21.4: úklid po Finderu, AI klíčích a mrtvých funkcích (audit B2–B5, D2–D3).
+- 3.21.3: srdíčko na kartě a [object Object] v Oblíbených (duplicitní mfhToggleFav), zahazování poškozených záznamů Oblíbených.
+- 3.21.2: doporučení zvlášť pro každý profil, banner se neopakuje, víc a lepších podobných seriálů, verze schovaná na telefonu ve výběru profilu.
+- 3.21.1: Oblíbené bez [object Object] a bez starého vyhledávacího dialogu, prolnutí banneru s pozadím, srdíčko podle TMDB ID, čeština vždy první.
+- 3.21.0: README – poznámka, že nic není třeba spouštět lokálně, a provizorní screenshoty v `docs/screenshots/` (později nahradit skutečnými z mujflix.pages.dev).
+- 3.21.0: přehrávač má skupiny zdrojů česky / zahraničí (dvě ikony), malé „Zdroj nejde“, nové zdroje Movy a Cinejoy (adresa z TMDB ID).
+- 3.20.14: Podivana pryč, jednodušší lišta přehrávače, poslední zdroj zvlášť pro filmy a seriály, banner zešedne do černa.
+- 3.20.13: README přepsáno podle skutečného kódu (jen dokumentace).
+- 3.20.5: oprava schované horní lišty po reloadu.
+- 3.20.4: řady úvodní stránky bez blikání, smazané mrtvé CSS, jednotná barva v Nastavení.
+- 3.20.3: zavření přehrávače z odkazu /c/ vede na detail seriálu.
+- 3.20.2: výběr profilu se po obnovení / odkazu přeskočí.
+- 3.20.1: epizody v adrese, záloha v 404.html, banner bez probliknutí.
+- 3.20: adresy `/s/`, `/f/`, `/c/<název>`, šipky u řady sezón.
+- 3.17–3.18: obrazovka „Jsi offline“, banner pokaždé jiný, plynulé schování lišty v Procházení a zmenšení hlavičky seriálu, verze na výběru profilu až po najetí myší.
+- 3.16: smazány skryté funkce (Premiéry, Kolekce, Nálada, Vzhled), úklid úvodní stránky a Oblíbených, hledání v liště Procházení, šipky u herců; audit v `docs/AUDIT.md`.
+- 3.16.1: opravené názvy a obrázky epizod (doplnění z angličtiny, všechny sezóny), pryč ▶ na kartě Pokračovat.
+- Sdílená paměť zdrojů mezi uživateli (Worker `/src/*`).
+- Zaměření a žánry v menu profilu, přepínač „Jen anime“ (i při zakládání profilu).
+- Věkové omezení profilu (Do 7/12/15) přes hodnocení z TMDB; ověřit na ostrém TMDB, jak přesná jsou US hodnocení u českých/anime titulů.
+- Úklid 1–3: odstraněno staré dlaždicové menu (HTML, JS i CSS); vzhled beze změny.
+- Paměť zdrojů a „Nefunguje to“ v kině, záloha dat do souboru, rychlejší start (defer CDN skriptů, lazy QR).
+- Propojení zařízení (kód/QR, Worker + KV), třetí krok onboardingu, menu profilu, PIN zámek s eskalací, výběr avatarů z postav.
+- Kontrola chyb: escapování adresy avataru (`js/profiles/gate.js`) a pojistka proti nekonečnému obnovování po synchronizaci (`js/core/sync.js`).

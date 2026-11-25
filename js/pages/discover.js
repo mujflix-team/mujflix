@@ -1,0 +1,1251 @@
+/* MůjFlix — Objevovat: banner + řady podle žánru + filtry + hledání */
+(function () {
+  'use strict';
+
+  var IMG = 'https://image.tmdb.org/t/p/';
+  var HISTORY_KEY = 'mf_search_history_v2';
+
+  /* Žánry: pro každý typ jiné ID v TMDB (null = daný typ tento žánr nemá) */
+  var GENRES = [
+    { key: 'akcni', name: 'Akční a dobrodružné', movie: '28|12', tv: '10759' },
+    { key: 'anim', name: 'Animované', movie: '16', tv: '16' },
+    { key: 'kom', name: 'Komedie', movie: '35', tv: '35' },
+    { key: 'krimi', name: 'Krimi', movie: '80', tv: '80' },
+    { key: 'dok', name: 'Dokumenty', movie: '99', tv: '99' },
+    { key: 'drama', name: 'Drama', movie: '18', tv: '18' },
+    { key: 'rod', name: 'Rodinné', movie: '10751', tv: '10751' },
+    { key: 'scifi', name: 'Sci-Fi a fantasy', movie: '878|14', tv: '10765' },
+    { key: 'horor', name: 'Horor', movie: '27', tv: null },
+    { key: 'thr', name: 'Thriller a mysteriózní', movie: '53|9648', tv: '9648' },
+    { key: 'rom', name: 'Romantické', movie: '10749', tv: null },
+    { key: 'val', name: 'Válečné', movie: '10752', tv: '10768' },
+    { key: 'hist', name: 'Historické', movie: '36', tv: null }
+  ];
+
+  var GENRE_NAMES = {
+    28: 'Akční', 12: 'Dobrodružný', 16: 'Animovaný', 35: 'Komedie', 80: 'Krimi', 99: 'Dokumentární',
+    18: 'Drama', 10751: 'Rodinný', 14: 'Fantasy', 36: 'Historický', 27: 'Horor', 10402: 'Hudební',
+    9648: 'Mysteriózní', 10749: 'Romantický', 878: 'Sci-Fi', 53: 'Thriller', 10752: 'Válečný', 37: 'Western',
+    10759: 'Akční a dobrodružný', 10762: 'Dětský', 10763: 'Zprávy', 10764: 'Reality', 10765: 'Sci-Fi a fantasy',
+    10766: 'Telenovela', 10767: 'Talk show', 10768: 'Válka a politika'
+  };
+
+  var SORTS = [
+    { key: 'popular', label: 'Populární' },
+    { key: 'rating', label: 'Nejlépe hodnocené' },
+    { key: 'newest', label: 'Nejnovější' }
+  ];
+
+  function freshState() { return { type: 'all', genres: [], sort: 'popular', year: '', minRating: '', hideSeen: false, query: '', providers: [], runtime: '', lang: '' }; }
+  /* Streamovací služby (TMDB provider ID, region CZ), délka a původní jazyk */
+  var PROVIDERS = [{ id: 8, name: 'Netflix' }, { id: 1899, name: 'Max' }, { id: 337, name: 'Disney+' }, { id: 119, name: 'Prime Video' }, { id: 350, name: 'Apple TV+' }, { id: 1773, name: 'SkyShowtime' }];
+  var RUNTIMES = [['', 'Libovolná'], ['lt90', 'Do 90 min'], ['90-120', '90–120 min'], ['gt120', 'Přes 120 min']];
+  var LANGS = [['', 'Libovolný'], ['cs', 'Česky'], ['en', 'Anglicky'], ['ja', 'Japonsky'], ['ko', 'Korejsky'], ['fr', 'Francouzsky'], ['de', 'Německy'], ['es', 'Španělsky']];
+  var DECADES = [['2020-2029', '2020–2029'], ['2010-2019', '2010–2019'], ['2000-2009', '2000–2009'], ['1990-1999', '1990–1999'], ['1980-1989', '1980–1989'], ['1970-1979', '1970–1979']];
+  function labelOf(list, v) { var r = list.filter(function (x) { return x[0] === v; })[0]; return r ? r[1] : v; }
+  function yearRange(v) { var m = /^(\d{4})-(\d{4})$/.exec(v || ''); return m ? [m[1], m[2]] : null; }
+  var varietySeed = 1 + Math.floor(Math.random() * 997); /* nové při každém načtení aplikace, změně profilu a „Zrušit filtry“ */
+  var state = freshState();
+  var run = 0;
+  var searchTimer = null;
+  var gridCtx = null;
+  var observer = null;
+  var built = false;
+  var closeTimer = null;
+  var els = {};
+  var legacyClose = typeof window.closeUniverse === 'function' ? window.closeUniverse : null;
+
+  function $(id) { return document.getElementById(id); }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function hasKey() {
+    try {
+      return !!((typeof TMDB_KEY !== 'undefined' && TMDB_KEY));
+    } catch (e) { return false; }
+  }
+
+  function api(path) {
+    var get = function (p) { return tmdbGet(p).catch(function () { return null; }); };
+    return window.MFAge ? window.MFAge.wide(path, get) : get(path);
+  }
+
+  function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+  function genreByKey(key) {
+    for (var i = 0; i < GENRES.length; i++) if (GENRES[i].key === key) return GENRES[i];
+    return null;
+  }
+
+  function selGenres() { return state.genres.map(genreByKey).filter(Boolean); }
+
+  /* Tituly, které jsi v Objevování otevřel (nebo v nabídce karty označil „Méně podobného“). Samotné Oblíbené sem nepatří. */
+  function openedIds() {
+    var seen = {};
+    try {
+      var m = aiBrain.memory;
+      if (m && m.watchedTmdbIds) Object.keys(m.watchedTmdbIds).forEach(function (k) { seen[k] = true; });
+    } catch (e) {}
+    return seen;
+  }
+
+  function genreIdsFor(g) {
+    var out = {};
+    [g.movie, g.tv].forEach(function (s) {
+      if (s) String(s).split('|').forEach(function (x) { out[x] = true; });
+    });
+    return out;
+  }
+
+  function genreForId(id) {
+    id = String(id);
+    for (var i = 0; i < GENRES.length; i++) if (genreIdsFor(GENRES[i])[id]) return GENRES[i];
+    return null;
+  }
+
+  /* ---------- Normalizace položek ---------- */
+
+  function norm(r, forcedType) {
+    var type = forcedType || r.media_type || (r.title ? 'movie' : 'tv');
+    if (type !== 'movie' && type !== 'tv') return null;
+    var date = String(r.release_date || r.first_air_date || '');
+    return {
+      id: r.id,
+      type: type,
+      title: r.title || r.name || r.original_title || r.original_name || '',
+      orig: r.original_title || r.original_name || '',
+      year: date.slice(0, 4),
+      lang: r.original_language || '',
+      date: date,
+      rating: Number(r.vote_average) || 0,
+      pop: Number(r.popularity) || 0,
+      poster: r.poster_path ? IMG + 'w342' + r.poster_path : '',
+      backdrop: r.backdrop_path ? IMG + 'w1280' + r.backdrop_path : '',
+      overview: r.overview || '',
+      genreIds: Array.isArray(r.genre_ids) ? r.genre_ids : [],
+      anime: !!(window.mfIsAnime && window.mfIsAnime(r))
+    };
+  }
+
+  // V hledání se berou i tituly bez plakátu (málo známé a tituly pro dospělé ho v TMDB často nemají); jinde jen s plakátem
+  function normList(results, forcedType, keepNoPoster) {
+    var out = [];
+    (results || []).forEach(function (r) {
+      if (!r || typeof r !== 'object') return;
+      var n = norm(r, forcedType);
+      if (n && (n.poster || keepNoPoster) && n.title) out.push(n);
+    });
+    return out;
+  }
+
+  function interleave(a, b) {
+    var out = [], max = Math.max(a.length, b.length);
+    for (var i = 0; i < max; i++) { if (a[i]) out.push(a[i]); if (b[i]) out.push(b[i]); }
+    return out;
+  }
+
+  function sortVal(it, sort) {
+    if (sort === 'rating') return it.rating;
+    if (sort === 'newest') return it.date || '';
+    return it.pop;
+  }
+
+  function mergeBy(sort, a, b) {
+    return a.concat(b).sort(function (x, y) {
+      var kx = sortVal(x, sort), ky = sortVal(y, sort);
+      return kx < ky ? 1 : kx > ky ? -1 : 0;
+    });
+  }
+
+  /* ---------- Oblíbené a historie hledání ---------- */
+
+  function isFav(it) {
+    try { return typeof isTmdbFavorite === 'function' && isTmdbFavorite(it.id, it.type); } catch (e) { return false; }
+  }
+
+  function toggleFav(it, btn) {
+    if (typeof toggleTmdbFavorite !== 'function') return;
+    toggleTmdbFavorite(it.id, it.type, it.title, it.poster, null);
+    var on = isFav(it);
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.title = on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených';
+    if (on) {
+      try { if (it.genreIds.length) aiBrain.boostGenreIds(it.genreIds, 0.12); } catch (e) {}
+    }
+  }
+
+  function histKey() {
+    try { return typeof uKey === 'function' ? uKey(HISTORY_KEY) : HISTORY_KEY; } catch (e) { return HISTORY_KEY; }
+  }
+
+  function getHistory() {
+    try {
+      var h = JSON.parse(localStorage.getItem(histKey()) || '[]');
+      return Array.isArray(h) ? h : [];
+    } catch (e) { return []; }
+  }
+
+  function setHistory(list) {
+    try { localStorage.setItem(histKey(), JSON.stringify(list.slice(0, 8))); } catch (e) {}
+  }
+
+  function pushHistory(q) {
+    q = (q || '').trim();
+    if (q.length < 2) return;
+    var h = getHistory().filter(function (x) { return x.toLowerCase() !== q.toLowerCase(); });
+    h.unshift(q);
+    setHistory(h);
+  }
+
+  /* ---------- Otevření položky ---------- */
+
+  function openItem(it) {
+    if (state.query) pushHistory(state.query);
+    try {
+      if (it.genreIds.length) aiBrain.boostGenreIds(it.genreIds, 0.05);
+      aiBrain.recordTmdbSeen(it.id);
+    } catch (e) {}
+    window._cinYear = it.year || null;
+    if (it.type === 'tv') {
+      window._mfBackToDiscover = { s: JSON.parse(JSON.stringify(state)), q: els.input.value }; /* křížek detailu vrátí do Objevování se stejnými filtry */
+      if (typeof openDiscoverTv === 'function') openDiscoverTv(it.id, it.title);
+    } else if (typeof _showCinemaOrFinderChoice === 'function') {
+      _showCinemaOrFinderChoice(it.id, it.title, 'movie', it.title);
+    }
+  }
+
+  /* ---------- Stavební prvky ---------- */
+
+  var HEART = 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z';
+
+  function svg(path, size) {
+    var ns = 'http://www.w3.org/2000/svg';
+    var s = document.createElementNS(ns, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', size || 18);
+    s.setAttribute('height', size || 18);
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '2');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', path);
+    s.appendChild(p);
+    return s;
+  }
+
+  function favButton(it, cls) {
+    var b = el('button', cls || 'dv-fav');
+    b.type = 'button';
+    var on = isFav(it);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.title = on ? 'Odebrat z Oblíbených' : 'Přidat do Oblíbených';
+    b.setAttribute('aria-label', 'Oblíbené: ' + it.title);
+    b.appendChild(svg(HEART, 18));
+    b.addEventListener('click', function (e) { e.stopPropagation(); toggleFav(it, b); });
+    return b;
+  }
+
+  /* TV ikona vlevo od srdíčka: otevře trailer v okně (mfPlayTrailer, js/shell/trailer.js) */
+  function trailerButton(it) {
+    var b = el('button', 'dv-trl');
+    b.type = 'button';
+    b.hidden = true; b.setAttribute('data-tk', it.type === 'tv' ? 'tv' : 'movie'); b.setAttribute('data-tid', String(it.id)); /* ukáže se, až se ověří, že trailer existuje (trailer.js) */
+    b.title = 'Přehrát trailer';
+    b.setAttribute('aria-label', 'Trailer: ' + it.title);
+    var s = svg('', 18), ns = 'http://www.w3.org/2000/svg';
+    s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+    var r = document.createElementNS(ns, 'rect'); r.setAttribute('x', 3); r.setAttribute('y', 5); r.setAttribute('width', 18); r.setAttribute('height', 12); r.setAttribute('rx', 2);
+    var l = document.createElementNS(ns, 'path'); l.setAttribute('d', 'M8 21h8M12 17v4');
+    s.appendChild(r); s.appendChild(l);
+    b.appendChild(s);
+    b.addEventListener('click', function (e) { e.stopPropagation(); if (typeof window.mfPlayTrailer === 'function') window.mfPlayTrailer(it.type === 'tv' ? 'tv' : 'movie', it.id); });
+    return b;
+  }
+
+  /* Symbol přehrání uprostřed plakátu: jen šedý trojúhelník jako na náhledu epizody, zbělá a zvětší se při najetí přímo na něj.
+     Je jen vizuální, klik (i na trojúhelník) otevírá kartu jako dřív. */
+  function playCue() {
+    var ns = 'http://www.w3.org/2000/svg';
+    var w = el('span', 'dv-play');
+    w.setAttribute('aria-hidden', 'true');
+    var b = el('span', 'dv-play-btn');
+    var s = document.createElementNS(ns, 'svg');
+    s.setAttribute('viewBox', '8 5 11 14'); s.setAttribute('width', 30); s.setAttribute('height', 36);
+    s.setAttribute('fill', 'currentColor'); s.setAttribute('aria-hidden', 'true');
+    var pa = document.createElementNS(ns, 'path');
+    pa.setAttribute('d', 'M8 5v14l11-7z');
+    s.appendChild(pa); b.appendChild(s); w.appendChild(b);
+    return w;
+  }
+
+  function card(it, showType) {
+    var c = el('div', 'dv-card');
+    c._dvItem = it; // pro dlouhé podržení na telefonu (js/app/card-menu.js)
+    c.tabIndex = 0;
+    c.setAttribute('role', 'button');
+    c.setAttribute('aria-label', 'Otevřít ' + it.title);
+
+    var p = el('div', 'dv-poster dv-skel');
+    var img = new Image();
+    img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.addEventListener('load', function () { p.classList.remove('dv-skel'); });
+    img.addEventListener('error', function () {
+      p.classList.remove('dv-skel');
+      img.remove();
+      p.appendChild(el('div', 'dv-poster-fallback', (it.title || '?').trim().charAt(0).toUpperCase()));
+    });
+    if (it.poster) { img.src = it.poster; p.appendChild(img); }
+    else { p.classList.remove('dv-skel'); p.appendChild(el('div', 'dv-poster-fallback', (it.title || '?').trim().charAt(0).toUpperCase())); }
+    if (it.rating > 0) p.appendChild(el('span', 'dv-rate', '★ ' + it.rating.toFixed(1)));
+    p.appendChild(playCue());
+    if (it.id) p.appendChild(trailerButton(it));
+    p.appendChild(favButton(it));
+    c.appendChild(p);
+
+    c.appendChild(el('div', 'dv-card-title', it.title));
+    var meta = [];
+    if (it.year) meta.push(it.year);
+    meta.push(it.type === 'tv' ? 'Seriál' : 'Film'); /* typ vždy pod názvem „rok · Film“ (stejně jako v Domů), žádný odznak přes ikony na plakátu */
+    c.appendChild(el('div', 'dv-card-meta', meta.join(' · ')));
+
+    c.addEventListener('click', function () { openItem(it); });
+    c.addEventListener('keydown', function (e) {
+      if (e.target !== c) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openItem(it); }
+    });
+    return c;
+  }
+
+  function section(title, sub) {
+    var s = el('section', 'dv-row');
+    var head = el('div', 'dv-row-head');
+    head.appendChild(el('h2', 'dv-row-title', title));
+    if (sub) head.appendChild(el('p', 'dv-row-sub', sub));
+    s.appendChild(head);
+    return s;
+  }
+
+  function rowSkeleton() {
+    var wrap = el('div', 'dv-scroller');
+    var track = el('div', 'dv-track');
+    for (var i = 0; i < 8; i++) {
+      var c = el('div', 'dv-card');
+      c.appendChild(el('div', 'dv-poster dv-skel'));
+      c.appendChild(el('div', 'dv-card-title dv-skel-line'));
+      track.appendChild(c);
+    }
+    wrap.appendChild(track);
+    return wrap;
+  }
+
+  function arrow(dir, track) {
+    var b = el('button', 'dv-arrow dv-arrow-' + (dir < 0 ? 'l' : 'r'));
+    b.type = 'button';
+    b.setAttribute('aria-label', dir < 0 ? 'Posunout doleva' : 'Posunout doprava');
+    b.appendChild(svg(dir < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6', 22));
+    b.addEventListener('click', function () { track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: 'smooth' }); });
+    return b;
+  }
+
+  function fillRow(sec, items, showType) {
+    var old = sec.querySelector('.dv-scroller');
+    var wrap = el('div', 'dv-scroller');
+    var track = el('div', 'dv-track');
+    items.forEach(function (it) { track.appendChild(card(it, showType)); });
+    wrap.appendChild(track);
+    wrap.appendChild(arrow(-1, track));
+    wrap.appendChild(arrow(1, track));
+    if (old) old.replaceWith(wrap); else sec.appendChild(wrap);
+  }
+
+  function emptyState(icon, title, sub) {
+    var e = el('div', 'dv-empty');
+    var ic = el('div', 'dv-empty-icon');
+    var SV = {
+      '🔑': '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',
+      '📡': '<path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/>',
+      '🔍': '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'
+    };
+    if (SV[icon]) ic.innerHTML = '<svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + SV[icon] + '</svg>';
+    else ic.textContent = icon;
+    e.appendChild(ic);
+    e.appendChild(el('div', 'dv-empty-title', title));
+    if (sub) e.appendChild(el('div', 'dv-empty-sub', sub));
+    return e;
+  }
+
+  /* ---------- Hero banner ---------- */
+
+  function hero(it) {
+    var h = el('section', 'dv-hero');
+    if (it.backdrop) {
+      var bg = new Image();
+      bg.className = 'dv-hero-bg';
+      bg.alt = '';
+      bg.decoding = 'async';
+      bg.src = it.backdrop;
+      h.appendChild(bg);
+    }
+    h.appendChild(el('div', 'dv-hero-shade'));
+    var body = el('div', 'dv-hero-body');
+    body.appendChild(el('span', 'dv-hero-badge', it.type === 'tv' ? 'Seriál' : 'Film'));
+    body.appendChild(el('h1', 'dv-hero-title', it.title));
+
+    var meta = [];
+    if (it.rating > 0) meta.push('★ ' + it.rating.toFixed(1));
+    if (it.year) meta.push(it.year);
+    var names = it.genreIds.slice(0, 3).map(function (g) { return GENRE_NAMES[g]; }).filter(Boolean);
+    if (names.length) meta.push(names.join(' · '));
+    body.appendChild(el('div', 'dv-hero-meta', meta.join('   ')));
+    if (it.overview) body.appendChild(el('p', 'dv-hero-desc', it.overview));
+
+    var actions = el('div', 'dv-hero-actions');
+    var play = el('button', 'dv-btn dv-btn-primary', 'Přehrát');
+    play.type = 'button';
+    play.addEventListener('click', function () { openItem(it); });
+    actions.appendChild(play);
+
+    var fav = el('button', 'dv-btn dv-btn-ghost');
+    fav.type = 'button';
+    fav.appendChild(svg(HEART, 18));
+    var lbl = el('span', null, isFav(it) ? 'V oblíbených' : 'Do oblíbených');
+    fav.appendChild(lbl);
+    fav.classList.toggle('on', isFav(it));
+    fav.addEventListener('click', function () {
+      toggleFav(it, fav);
+      lbl.textContent = isFav(it) ? 'V oblíbených' : 'Do oblíbených';
+    });
+    actions.appendChild(fav);
+    body.appendChild(actions);
+    h.appendChild(body);
+
+    /* PC: popis v panelu vpravo dole a nad ním náhled traileru (jako banner na Domů); na telefonu se skrývá */
+    var side = el('div', 'dv-hero-side');
+    if (it.id) {
+      var kind = it.type === 'tv' ? 'tv' : 'movie';
+      api('/' + kind + '/' + it.id + '/videos?language=cs-CZ&include_video_language=cs,en,null').then(function (d) {
+        var yt = ((d && d.results) || []).filter(function (v) { return v && v.site === 'YouTube' && /^[\w-]{6,20}$/.test(v.key || ''); });
+        var pool = yt.filter(function (v) { return v.type === 'Trailer'; });
+        if (!pool.length) pool = yt.filter(function (v) { return v.type === 'Teaser'; });
+        if (!pool.length || !side.isConnected) return;
+        var tb = el('button', 'dv-hero-trl');
+        tb.type = 'button';
+        tb.setAttribute('aria-label', 'Přehrát trailer: ' + it.title);
+        var im = new Image(); im.alt = ''; im.loading = 'lazy'; im.src = 'https://i.ytimg.com/vi/' + pool[0].key + '/hqdefault.jpg';
+        tb.appendChild(im);
+        tb.appendChild(el('span', 'dv-hero-trl-play', '▶'));
+        tb.appendChild(el('span', 'dv-hero-trl-lbl', 'Trailer'));
+        tb.addEventListener('click', function () { if (typeof window.mfPlayTrailer === 'function') window.mfPlayTrailer(kind, it.id); });
+        side.insertBefore(tb, side.firstChild);
+      });
+    }
+    if (it.overview) side.appendChild(el('p', 'dv-hero-side-desc', it.overview));
+    h.appendChild(side);
+    return h;
+  }
+
+  /* ---------- Data ---------- */
+
+  function seenIds() {
+    var seen = {};
+    try {
+      var m = aiBrain.memory;
+      if (m && m.watchedTmdbIds) Object.keys(m.watchedTmdbIds).forEach(function (k) { seen[k] = true; });
+    } catch (e) {}
+    try { getWatchlist().forEach(function (w) { if (w.tmdbId) seen[w.tmdbId] = true; }); } catch (e) {}
+    return seen;
+  }
+
+  function topGenreIds() {
+    try {
+      var prefs = aiBrain.memory.genreIdPrefs || {};
+      var seenGroups = {};
+      return Object.keys(prefs).filter(function (k) { return prefs[k] > 0.05; })
+        .sort(function (a, b) { return prefs[b] - prefs[a]; })
+        // ID 28 a 10759 je tentýž žánr (film vs. seriál) – nezobrazovat ho dvakrát
+        .filter(function (k) {
+          var g = genreForId(k), key = g ? g.key : 'id' + k;
+          if (seenGroups[key]) return false;
+          seenGroups[key] = true; return true;
+        }).slice(0, 3);
+    } catch (e) { return []; }
+  }
+
+  function ageFilter(items) { return window.MFAge ? window.MFAge.filter(items, 24) : Promise.resolve(items); }
+
+  // true jen u profilu bez věkového omezení
+  function adultFlag() { return window.MFAge && MFAge.adultOn && MFAge.adultOn() ? 'true' : 'false'; }
+
+  function onlyAnime() { return !!(window.mfOnlyAnime && window.mfOnlyAnime()); }
+
+  function discoverUrl(type, page, o) {
+    var q = ['language=cs-CZ', 'include_adult=' + adultFlag(), 'page=' + page];
+    if (o.sort === 'rating') {
+      q.push('sort_by=vote_average.desc', 'vote_count.gte=' + (type === 'movie' ? 300 : 150));
+    } else if (o.sort === 'newest') {
+      var f = type === 'movie' ? 'primary_release_date' : 'first_air_date';
+      q.push('sort_by=' + f + '.desc', f + '.lte=' + today(), 'vote_count.gte=25');
+    } else {
+      q.push('sort_by=popularity.desc', 'vote_count.gte=25');
+    }
+    if (onlyAnime()) {
+      // „Jen anime“: animace (16) japonského původu; vybraný žánr se přidá jako další podmínka (čárka = a zároveň)
+      var extra = o.genres ? String(o.genres).split('|')[0].split(',').filter(function (x) { return x !== '16'; }).join(',') : '';
+      q.push('with_genres=' + encodeURIComponent(extra ? '16,' + extra : '16'), 'with_original_language=ja');
+    } else if (o.genres) q.push('with_genres=' + encodeURIComponent(o.genres));
+    var yr = yearRange(o.year), df = type === 'movie' ? 'primary_release_date' : 'first_air_date';
+    if (yr) q.push(df + '.gte=' + yr[0] + '-01-01', df + '.lte=' + yr[1] + '-12-31');
+    else if (o.year) q.push((type === 'movie' ? 'primary_release_year=' : 'first_air_date_year=') + o.year);
+    if (o.providers && o.providers.length) q.push('with_watch_providers=' + o.providers.join('%7C'), 'watch_region=CZ');
+    if (o.runtime === 'lt90') q.push('with_runtime.lte=90');
+    else if (o.runtime === '90-120') q.push('with_runtime.gte=90', 'with_runtime.lte=120');
+    else if (o.runtime === 'gt120') q.push('with_runtime.gte=120');
+    if (o.lang && !onlyAnime()) q.push('with_original_language=' + encodeURIComponent(o.lang));
+    if (o.minRating) q.push('vote_average.gte=' + encodeURIComponent(o.minRating));
+    return '/discover/' + type + '?' + q.join('&');
+  }
+
+  function fetchDiscover(type, page, o) {
+    return api(discoverUrl(type, page, o)).then(function (d) {
+      return { items: normList(d && d.results, type), pages: (d && d.total_pages) || 0, failed: !d }; // !d = chyba sítě / HTTP (api() ji mění na null)
+    });
+  }
+
+  /* ---------- Domovská obrazovka (řady) ---------- */
+
+  function renderHome(myRun) {
+    var body = els.body;
+    body.textContent = '';
+    if (!hasKey()) {
+      body.appendChild(emptyState('🔑', 'Chybí klíč k TMDB', 'Bez něj nejde načíst filmy a seriály. Nastav ho v Nastavení.'));
+      return;
+    }
+
+    var heroSlot = el('div', 'dv-hero-slot');
+    heroSlot.appendChild(el('div', 'dv-hero dv-skel'));
+    body.appendChild(heroSlot);
+    renderHistoryChips(body);
+
+    var vp = function () { return 1 + varietySeed % 4; }; /* každé načtení jiná stránka TMDB, aby řady nebyly pořád stejné */
+    var prefs = onlyAnime() ? [] : topGenreIds();
+    var seen = seenIds();
+    var rows = [];
+
+    if (onlyAnime()) {
+      var animeRow = function (title, sub, sort, hero) {
+        return {
+          title: title, sub: sub, showType: true, hero: !!hero,
+          load: function () {
+            return Promise.all([fetchDiscover('tv', vp(), { sort: sort }), fetchDiscover('movie', vp(), { sort: sort })])
+              .then(function (r) { return interleave(r[0].items, r[1].items); });
+          }
+        };
+      };
+      rows.push(animeRow('Populární anime', 'Máš zapnuto „Jen anime“ (změníš v menu profilu → Zaměření a žánry)', 'popular', true));
+      rows.push(animeRow('Nejlépe hodnocené anime', '', 'rating'));
+      rows.push(animeRow('🆕 Nově vydané anime', '', 'newest'));
+    }
+
+    if (prefs.length) {
+      var names = prefs.map(function (id) { return GENRE_NAMES[id]; }).filter(Boolean);
+      rows.push({
+        title: 'Pro tebe',
+        sub: names.length ? 'Podle toho, co sleduješ: ' + names.join(', ') : '',
+        showType: true,
+        load: function () {
+          // Filmy a seriály mají v TMDB částečně jiná ID žánrů (např. Akční 28 vs. 10759)
+          var idsFor = function (type) { return window.mfGenreIdsFor ? window.mfGenreIdsFor(prefs, type) : prefs.map(String); };
+          var one = function (type) {
+            var ids = idsFor(type);
+            return ids.length ? fetchDiscover(type, vp(), { genres: ids.join('|') }) : Promise.resolve({ items: [] });
+          };
+          return Promise.all([one('tv'), one('movie')])
+            .then(function (r) { return interleave(r[0].items, r[1].items).filter(function (it) { return !seen[it.id]; }); });
+        }
+      });
+    }
+
+    if (!onlyAnime()) {
+      rows.push({
+        title: 'Trendy tento týden', showType: true, hero: true,
+        load: function () { return api('/trending/all/week?language=cs-CZ').then(function (d) { return normList(d && d.results); }); }
+      });
+
+      var genreRows = [];
+      prefs.slice(0, 2).forEach(function (id) { var g = genreForId(id); if (g && genreRows.indexOf(g) < 0) genreRows.push(g); });
+      ['kom', 'akcni', 'drama'].forEach(function (k) {
+        var g = genreByKey(k);
+        if (genreRows.length < 2 && genreRows.indexOf(g) < 0) genreRows.push(g);
+      });
+      genreRows.forEach(function (g) {
+        rows.push({
+          title: g.name, sub: 'Filmy i seriály jednoho žánru', showType: true, more: g.key,
+          load: function () {
+            return Promise.all([
+              g.tv ? fetchDiscover('tv', vp(), { genres: g.tv }) : Promise.resolve({ items: [] }),
+              g.movie ? fetchDiscover('movie', vp(), { genres: g.movie }) : Promise.resolve({ items: [] })
+            ]).then(function (r) {
+              var list = interleave(r[0].items, r[1].items);
+              return g.key === 'anim' ? list.filter(function (it) { return !it.anime; }) : list;
+            });
+          }
+        });
+      });
+
+      rows.push({ title: 'Nejlépe hodnocené filmy', load: function () {
+        return api('/movie/top_rated?language=cs-CZ&page=' + vp()).then(function (d) { return normList(d && d.results, 'movie'); });
+      } });
+      rows.push({ title: 'Nejlépe hodnocené seriály', load: function () {
+        return api('/tv/top_rated?language=cs-CZ&page=' + vp()).then(function (d) { return normList(d && d.results, 'tv'); });
+      } });
+      rows.push({ title: '🆕 Nově v kinech a v televizi', showType: true, load: function () {
+        return Promise.all([api('/movie/now_playing?language=cs-CZ'), api('/tv/on_the_air?language=cs-CZ')]).then(function (r) {
+          return interleave(normList(r[0] && r[0].results, 'movie'), normList(r[1] && r[1].results, 'tv'));
+        });
+      } });
+    }
+
+    var heroDone = false, rowsLeft = rows.length, rowsKept = 0;
+    rows.forEach(function (r) {
+      var sec = section(r.title, r.sub);
+      if (r.more) {
+        var more = el('button', 'dv-row-more', 'Zobrazit vše →');
+        more.type = 'button';
+        more.addEventListener('click', function () { setGenre(r.more); });
+        sec.firstChild.appendChild(more);
+      }
+      sec.appendChild(rowSkeleton());
+      body.appendChild(sec);
+      r.load().then(function (items) { return window.mfhSeededShuffle ? window.mfhSeededShuffle(items, varietySeed + rows.indexOf(r)) : items; }).then(ageFilter).then(function (items) {
+        if (myRun !== run) return;
+        if (items.length < (window.MFAge && window.MFAge.limit() ? 6 : 1)) { sec.remove(); return; }
+        fillRow(sec, items.slice(0, 20), r.showType);
+        rowsKept++;
+        if (r.hero && !heroDone) {
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].backdrop && items[i].overview) {
+              heroDone = true;
+              heroSlot.textContent = '';
+              heroSlot.appendChild(hero(items[i]));
+              break;
+            }
+          }
+        }
+      }).catch(function () { if (myRun === run) sec.remove(); }).then(function () {
+        if (myRun === run && r.hero && !heroDone) heroSlot.remove();
+        // Když se nenačetla žádná řada (offline, špatný klíč), nenechávej prázdnou stránku
+        if (myRun === run && --rowsLeft === 0 && !rowsKept) {
+          heroSlot.remove();
+          var es = emptyState('📡', 'Nepodařilo se načíst nabídku', 'Zkontroluj připojení a klíč TMDB v Nastavení a zkus to znovu.');
+          var rb = el('button', 'dv-btn dv-btn-primary', 'Zkusit znovu');
+          rb.type = 'button';
+          rb.addEventListener('click', refresh);
+          es.appendChild(rb);
+          body.appendChild(es);
+        }
+      });
+    });
+  }
+
+  function renderHistoryChips(body) {
+    var h = getHistory();
+    if (!h.length) return;
+    var wrap = el('div', 'dv-history');
+    wrap.appendChild(el('span', 'dv-history-label', 'Nedávná hledání'));
+    h.forEach(function (q) {
+      var chip = el('button', 'dv-hchip', q);
+      chip.type = 'button';
+      chip.addEventListener('click', function () { els.input.value = q; onInput(); });
+      wrap.appendChild(chip);
+    });
+    var clear = el('button', 'dv-hclear', 'Smazat');
+    clear.type = 'button';
+    clear.addEventListener('click', function () { setHistory([]); wrap.remove(); });
+    wrap.appendChild(clear);
+    body.appendChild(wrap);
+  }
+
+  /* ---------- Mřížka (filtry a hledání) ---------- */
+
+  function provName(id) { var p = PROVIDERS.filter(function (x) { return x.id === Number(id); })[0]; return p ? p.name : String(id); }
+
+  function describeFilters() {
+    var parts = [];
+    if (state.genres.length) parts.push(selGenres().map(function (g) { return g.name; }).join(' + '));
+    parts.push(state.type === 'movie' ? 'Filmy' : state.type === 'tv' ? 'Seriály' : 'Filmy a seriály');
+    if (state.year) parts.push(labelOf(DECADES, state.year));
+    if (state.providers.length) parts.push(state.providers.map(function (id) { return provName(id); }).join(' / '));
+    if (state.runtime) parts.push(labelOf(RUNTIMES, state.runtime));
+    if (state.lang) parts.push(labelOf(LANGS, state.lang));
+    if (state.minRating) parts.push('★ ' + state.minRating + '+');
+    var s = SORTS.filter(function (x) { return x.key === state.sort; })[0];
+    if (s && state.sort !== 'popular') parts.push(s.label.toLowerCase());
+    return parts.join(' · ');
+  }
+
+  function startGrid(mode, myRun) {
+    var body = els.body;
+    body.textContent = '';
+    if (!hasKey()) {
+      body.appendChild(emptyState('🔑', 'Chybí klíč k TMDB', 'Bez něj nejde načíst filmy a seriály. Nastav ho v Nastavení.'));
+      return;
+    }
+    var head = el('div', 'dv-grid-head');
+    head.appendChild(el('h2', 'dv-grid-title', mode === 'search' ? 'Výsledky pro „' + state.query + '“' : describeFilters()));
+    body.appendChild(head);
+    var chips = activeChips();
+    if (chips.length) {
+      var act = el('div', 'dv-active');
+      chips.forEach(function (c) {
+        var b = el('button', 'dv-achip', c[0] + ' ×');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Zrušit filtr: ' + c[0]);
+        b.addEventListener('click', function () { c[1](); refresh(); });
+        act.appendChild(b);
+      });
+      body.appendChild(act);
+    }
+    var grid = el('div', 'dv-grid');
+    body.appendChild(grid);
+    var sentinel = el('div', 'dv-sentinel');
+    body.appendChild(sentinel);
+    var status = el('div', 'dv-status');
+    status.setAttribute('role', 'status');
+    body.appendChild(status);
+
+    gridCtx = { mode: mode, run: myRun, page: 0, pages: 1, loading: false, done: false, total: 0, grid: grid, status: status, head: head, sentinel: sentinel };
+    for (var i = 0; i < 12; i++) {
+      var s = el('div', 'dv-card dv-ph');
+      s.setAttribute('aria-hidden', 'true');
+      s.appendChild(el('div', 'dv-poster dv-skel'));
+      s.appendChild(el('div', 'dv-card-title dv-skel-line'));
+      grid.appendChild(s);
+    }
+    loadMore();
+    if (observer) observer.disconnect();
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(function (entries) {
+        if (entries[0] && entries[0].isIntersecting) loadMore();
+      }, { root: els.body, rootMargin: '600px 0px' });
+      observer.observe(sentinel);
+    }
+  }
+
+  function matchesFilters(it) {
+    if (state.type !== 'all' && it.type !== state.type) return false;
+    var yr = yearRange(state.year);
+    if (yr ? (it.year < yr[0] || it.year > yr[1]) : (state.year && it.year !== state.year)) return false;
+    if (state.lang && it.lang !== state.lang) return false;
+    if (state.minRating && it.rating < Number(state.minRating)) return false;
+    var sel = selGenres();
+    for (var k = 0; k < sel.length; k++) {
+      var ids = genreIdsFor(sel[k]);
+      var ok = false;
+      for (var i = 0; i < it.genreIds.length; i++) if (ids[it.genreIds[i]]) { ok = true; break; }
+      if (!ok) return false;
+    }
+    return true;
+  }
+
+  function fetchPage(ctx) {
+    return fetchPageRaw(ctx).then(function (res) {
+      return ageFilter(res.items).then(function (items) {
+        if (state.hideSeen) { var seen = openedIds(); items = items.filter(function (it) { return !seen[it.id]; }); }
+        res.items = items; return res;
+      });
+    });
+  }
+
+  /* ---------- Hledání: rok v dotazu a řazení podle shody názvu ---------- */
+
+  // Bez diakritiky a malými písmeny, aby „Pán prstenů“ našel i „pan prstenu“
+  function fold(str) {
+    var t = String(str || '').toLowerCase();
+    try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+    return t.trim();
+  }
+  // „matrix 1999“ → text „matrix“ a rok 1999 (TMDB roky v dotazu nezná)
+  function parseQuery(q) {
+    var m = /^(.*\S)\s+((?:19|20)\d{2})$/.exec(q);
+    return m ? { text: m[1], year: m[2] } : { text: q, year: '' };
+  }
+  // 0 = přesná shoda, 1 = název začíná hledaným textem, 2 = ostatní
+  function titleScore(t, needle) { return !t ? 2 : t === needle ? 0 : t.indexOf(needle) === 0 ? 1 : 2; }
+  // Žádný výsledek nezačíná hledaným textem (českým ani původním názvem)
+  function noPrefixMatch(items, pq) {
+    var needle = fold(pq.text);
+    return !items.some(function (it) { return Math.min(titleScore(fold(it.title), needle), titleScore(fold(it.orig), needle)) < 2; });
+  }
+  // Přesný název (český i původní) první, pak začátek názvu; shodný rok předbíhá. Jinak zůstává pořadí z TMDB
+  function rankByMatch(items, pq) {
+    var needle = fold(pq.text);
+    function score(it) {
+      var v = Math.min(titleScore(fold(it.title), needle), titleScore(fold(it.orig), needle));
+      return (pq.year && it.year === pq.year ? 0 : pq.year ? 4 : 0) + v;
+    }
+    return items.map(function (it, i) { return { it: it, i: i, s: score(it) }; })
+      .sort(function (a, b) { return a.s - b.s || a.i - b.i; })
+      .map(function (x) { return x.it; });
+  }
+
+  // Vzdálenost dvou textů (počet oprav písmen), pro toleranci překlepů
+  function editDistance(a, b) {
+    var prev = [], cur, i, j;
+    for (j = 0; j <= b.length; j++) prev[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      cur = [i];
+      for (j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  // TMDB překlepy nezná. Když hledání nic nenajde, zkusí se dvě nejdelší slova zvlášť
+  // a nechají se jen názvy, které se hledanému textu podobají (třeba „breking bad“ → Breaking Bad)
+  function fuzzySearch(pq) {
+    var raw = String(pq.text || '').toLowerCase(), needle = fold(raw);
+    // Japonština: hiragana → katakana (TMDB je bere jako různé znaky; názvy bývají v katakaně)
+    var kata = /[\u3041-\u3096]/.test(raw) ? raw.replace(/[\u3041-\u3096]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); }) : '';
+    var cands = [];
+    function add(q) { if (q && q.length >= 2 && cands.indexOf(q) < 0) cands.push(q); }
+    // slova z původního textu; diakritika se odstraňuje jen u latinky (u japonštiny by se „ば“ rozložilo na dva znaky)
+    raw.split(/\s+/).map(function (w) { return /[\u3040-\u9fff]/.test(w) ? w : fold(w); })
+      .filter(function (w) { return w.length >= 3; }).sort(function (a, b) { return b.length - a.length; }).slice(0, 2).forEach(add);
+    // „ろぉ“ se v katakaně píše jako dlouhé „ロー“: malé samohlásky ァィゥェォ se zkusí i jako „ー“
+    add(kata.replace(/[\u30A1\u30A3\u30A5\u30A7\u30A9]/g, '\u30FC'));
+    add(kata);
+    if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(raw) && !/\s/.test(raw)) { // zkrácené dotazy, když je poslední znak překlep
+      var base = kata || raw;
+      if (base.length >= 4) add(base.slice(0, -1));
+      if (base.length >= 5) add(base.slice(0, -2));
+    }
+    if (!cands.length || needle.length < 4) return Promise.resolve([]);
+    var needles = [needle].concat(kata ? [fold(kata)] : []);
+    return Promise.all(cands.slice(0, 4).map(function (w) {
+      return api('/search/multi?language=cs-CZ&include_adult=' + adultFlag() + '&page=1&query=' + encodeURIComponent(w)).catch(function () { return null; });
+    })).then(function (rs) {
+      var seen = {}, max = Math.max(2, Math.floor(needle.length * 0.3)), out = [];
+      rs.forEach(function (d) {
+        normList(d && d.results, undefined, true).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; }).forEach(function (it) {
+          var key = it.type + it.id;
+          if (seen[key]) return;
+          seen[key] = 1;
+          var dist = 99;
+          [fold(it.title), fold(it.orig)].filter(Boolean).forEach(function (t) {
+            needles.forEach(function (nd) { dist = Math.min(dist, editDistance(t, nd), editDistance(t.slice(0, nd.length), nd)); });
+          });
+          if (dist <= max) out.push({ it: it, d: dist });
+        });
+      });
+      out.sort(function (a, b) { return a.d - b.d; });
+      return out.map(function (x) { return x.it; });
+    });
+  }
+
+  function fetchPageRaw(ctx) {
+    var page = ctx.page + 1;
+    if (ctx.mode === 'search') {
+      var pq = parseQuery(state.query);
+      return api('/search/multi?language=cs-CZ&include_adult=' + adultFlag() + '&page=' + page + '&query=' + encodeURIComponent(pq.text)).then(function (d) {
+        if (!d) throw new Error('tmdb'); // chyba sítě: ať se nezobrazí „Žádné výsledky“
+        var items = normList(d && d.results, undefined, true).filter(matchesFilters).filter(function (it) { return !onlyAnime() || it.anime; });
+        if (state.sort !== 'popular') items = mergeBy(state.sort, items, []);
+        else items = rankByMatch(items, pq);
+        // Nic nezačíná hledaným textem (překlep, jiné písmo): zkusí se i podobné názvy a dají se na začátek
+        if (page === 1 && (!items.length || noPrefixMatch(items, pq))) {
+          return fuzzySearch(pq).then(function (f) {
+            var seen = {};
+            f.forEach(function (it) { seen[it.type + it.id] = 1; });
+            return { items: f.concat(items.filter(function (it) { return !seen[it.type + it.id]; })), pages: items.length ? (d && d.total_pages) || 0 : 1 };
+          });
+        }
+        return { items: items, pages: (d && d.total_pages) || 0 };
+      });
+    }
+    var sel = selGenres();
+    var types = state.type === 'all' ? ['movie', 'tv'] : [state.type];
+    var jobs = [];
+    /* Výchozí nabídka (bez filtrů): při každém načtení začne na jiné stránce, liché stránky se berou podle oblíbených žánrů profilu
+       a pořadí se míchá, aby tam nebyly pořád stejné tituly na stejných místech. Jakmile je nastavený filtr, chová se jako dřív. */
+    var vary = !state.genres.length && !state.year && !state.minRating && !state.providers.length && !state.runtime && !state.lang && state.sort === 'popular';
+    var vpage = vary ? page + (varietySeed % 5) : page;
+    var vgen = vary && page % 2 === 1 && !onlyAnime() && window.mfhTopGenreIdsWithProfile ? window.mfhTopGenreIdsWithProfile() : [];
+    types.forEach(function (t) {
+      var ids = sel.map(function (g) { return g[t]; });
+      if (ids.some(function (x) { return !x; })) return;
+      /* Jeden žánr může být „A|B“ (nebo). Při více žánrech TMDB nepustí nebo uvnitř „a“, proto se vezme první ID z každého. */
+      var gid = ids.length > 1 ? ids.map(function (x) { return String(x).split('|')[0]; }).join(',') : (ids[0] || '');
+      if (vary && vgen.length && window.mfGenreIdsFor) { var pid = window.mfGenreIdsFor(vgen, t); if (pid && pid.length) gid = pid.join('|'); }
+      jobs.push(fetchDiscover(t, vpage, { sort: state.sort, genres: gid, year: state.year, minRating: state.minRating, providers: state.providers, runtime: state.runtime, lang: state.lang }));
+    });
+    if (!jobs.length) return Promise.resolve({ items: [], pages: 0 });
+    return Promise.all(jobs).then(function (r) {
+      if (r.some(function (x) { return x.failed; })) throw new Error('tmdb');
+      var pages = 0, lists = [];
+      r.forEach(function (x) { pages = Math.max(pages, x.pages); lists.push(x.items); });
+      var merged = lists.length === 2 ? mergeBy(state.sort, lists[0], lists[1]) : lists[0];
+      if (state.genres.indexOf('anim') > -1 && !onlyAnime()) merged = merged.filter(function (it) { return !it.anime; });
+      if (vary && window.mfhSeededShuffle) merged = window.mfhSeededShuffle(merged, varietySeed + page);
+      return { items: merged, pages: pages };
+    });
+  }
+
+  function loadMore() {
+    var ctx = gridCtx;
+    if (!ctx || ctx.loading || ctx.done || ctx.run !== run) return;
+    ctx.loading = true;
+    ctx.grid.setAttribute('aria-busy', 'true');
+    var added = 0, guard = 0;
+
+    function step() {
+      return fetchPage(ctx).then(function (res) {
+        if (ctx.run !== run) return;
+        ctx.page++;
+        ctx.pages = Math.max(ctx.pages || 0, Math.min(res.pages || 0, 500)); /* lichá stránka podle žánrů má méně stránek, nesmí zkrátit celý seznam */
+        if (ctx.page === 1) ctx.grid.querySelectorAll('.dv-ph').forEach(function (n) { n.remove(); });
+        res.items.forEach(function (it) { ctx.grid.appendChild(card(it, state.type === 'all')); added++; ctx.total++; });
+        if (ctx.page >= ctx.pages || !res.pages) ctx.done = true;
+        guard++;
+        if (!ctx.done && added < 12 && guard < 4) return step();
+      });
+    }
+
+    step().catch(function () { ctx.done = true; ctx.failed = true; }).then(function () {
+      if (ctx.run !== run) return;
+      ctx.loading = false;
+      ctx.grid.removeAttribute('aria-busy');
+      if (ctx.failed && !ctx.total) {
+        // Nic se nenačetlo kvůli síti: ne „Žádné výsledky“, ale chyba s možností zkusit znovu
+        ctx.grid.textContent = '';
+        ctx.status.textContent = '';
+        ctx.status.appendChild(emptyState('📡', 'Nepodařilo se načíst', 'Zkontroluj připojení a zkus to znovu.'));
+        var rt = el('button', 'dv-btn dv-btn-primary', 'Zkusit znovu');
+        rt.type = 'button';
+        rt.addEventListener('click', refresh);
+        ctx.status.appendChild(rt);
+        return;
+      }
+      if (!ctx.total) {
+        ctx.grid.textContent = '';
+        ctx.status.textContent = '';
+        ctx.status.appendChild(emptyState('🔍', ctx.mode === 'search' ? 'Nic jsme nenašli' : 'Žádné výsledky', 'Zkus jiný název nebo uvolni filtry.'));
+        var r = el('button', 'dv-btn dv-btn-ghost', 'Zrušit filtry');
+        r.type = 'button';
+        r.addEventListener('click', resetAll);
+        ctx.status.appendChild(r);
+        return;
+      }
+      var c = ctx.head.querySelector('.dv-grid-count');
+      if (!c) { c = el('span', 'dv-grid-count'); ctx.head.appendChild(c); }
+      c.textContent = ctx.total + (ctx.done ? '' : '+') + ' ' + (ctx.done ? mfPlural(ctx.total, 'titul', 'tituly', 'titulů') : 'titulů');
+      if (ctx.failed) {
+        // Chyba u dalších stránek: už načtené karty zůstanou, dalších se jde znovu dotázat
+        ctx.status.textContent = 'Další tituly se nepodařilo načíst. ';
+        var rt2 = el('button', 'dv-btn dv-btn-ghost', 'Zkusit znovu');
+        rt2.type = 'button';
+        rt2.addEventListener('click', function () { ctx.failed = false; ctx.done = false; ctx.status.textContent = ''; loadMore(); });
+        ctx.status.appendChild(rt2);
+        return;
+      }
+      ctx.status.textContent = ctx.done ? '' : 'Načítám další…';
+      if (!ctx.done) {
+        var rect = ctx.sentinel.getBoundingClientRect(), root = els.body.getBoundingClientRect();
+        if (rect.top < root.bottom + 600) loadMore();
+      }
+    });
+  }
+
+  /* ---------- Stav a ovládání ---------- */
+
+  function activeCount() {
+    return (state.type !== 'all' ? 1 : 0) + state.genres.length + (state.sort !== 'popular' ? 1 : 0) + (state.year ? 1 : 0) + state.providers.length + (state.runtime ? 1 : 0) + (state.lang ? 1 : 0) + (state.minRating ? 1 : 0) + (state.hideSeen ? 1 : 0);
+  }
+
+  function filtersActive() { return activeCount() > 0; }
+
+  /* Přehled aktivních filtrů nad mřížkou, každý jde odebrat jedním klepnutím. */
+  function activeChips() {
+    var out = [];
+    if (state.type !== 'all') out.push([state.type === 'movie' ? 'Filmy' : 'Seriály', function () { state.type = 'all'; }]);
+    state.genres.forEach(function (k) { var g = genreByKey(k); if (g) out.push([g.name, function () { state.genres = state.genres.filter(function (x) { return x !== k; }); }]); });
+    if (state.year) out.push([labelOf(DECADES, state.year), function () { state.year = ''; }]);
+    state.providers.forEach(function (id) { out.push([provName(id), function () { state.providers = state.providers.filter(function (x) { return x !== id; }); }]); });
+    if (state.runtime) out.push([labelOf(RUNTIMES, state.runtime), function () { state.runtime = ''; }]);
+    if (state.lang) out.push([labelOf(LANGS, state.lang), function () { state.lang = ''; }]);
+    if (state.minRating) out.push(['★ ' + state.minRating + '+', function () { state.minRating = ''; }]);
+    if (state.hideSeen) out.push(['Bez už otevřených', function () { state.hideSeen = false; }]);
+    var so = SORTS.filter(function (x) { return x.key === state.sort; })[0];
+    if (so && state.sort !== 'popular') out.push([so.label, function () { state.sort = 'popular'; }]);
+    return out;
+  }
+
+  function syncControls() {
+    els.reset.hidden = !(filtersActive() || state.query.length > 0);
+    if (els.fbtn) { var dot = els.fbtn.querySelector('.dv-filter-dot'); if (dot) { dot.hidden = !filtersActive(); dot.textContent = activeCount() || ''; } }
+    els.clear.hidden = !els.input.value;
+    [].forEach.call(els.type.children, function (b) {
+      var on = b.getAttribute('data-type') === state.type;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    [].forEach.call(els.genres.children, function (b) {
+      var key = b.getAttribute('data-genre');
+      var g = genreByKey(key);
+      b.disabled = state.type !== 'all' && !g[state.type];
+      var on = state.genres.indexOf(key) > -1;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    els.sort.value = state.sort;
+    els.year.value = state.year;
+    els.rating.value = state.minRating;
+    els.runtime.value = state.runtime;
+    els.lang.value = state.lang;
+    [].forEach.call(els.providers.children, function (b) {
+      var on = state.providers.indexOf(Number(b.getAttribute('data-provider'))) > -1;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    [els.sort, els.year, els.rating, els.runtime, els.lang].forEach(function (s) { window.mfSyncDropdown && window.mfSyncDropdown(s); });
+    els.seen.classList.toggle('active', state.hideSeen);
+    els.seen.setAttribute('aria-pressed', state.hideSeen ? 'true' : 'false');
+  }
+
+  function refresh() {
+    run++;
+    gridCtx = null;
+    if (observer) observer.disconnect();
+    var mode = state.query.length >= 2 ? 'search' : filtersActive() ? 'grid' : 'home';
+    syncControls();
+    els.root.classList.remove('dv-compact');
+    els.body.scrollTop = 0;
+    if (mode === 'home') renderHome(run); else startGrid(mode, run);
+  }
+
+  function setType(t) {
+    state.type = t;
+    if (t !== 'all') state.genres = state.genres.filter(function (k) { return genreByKey(k)[t]; });
+    refresh();
+  }
+
+  function setGenre(key) {
+    var at = state.genres.indexOf(key);
+    if (at > -1) state.genres.splice(at, 1); else state.genres.push(key);
+    refresh();
+    var b = els.genres.querySelector('[data-genre="' + key + '"]');
+    if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+
+  function resetAll() {
+    state = freshState();
+    varietySeed = 1 + Math.floor(Math.random() * 997);
+    els.input.value = '';
+    refresh();
+  }
+
+  function onInput() {
+    var v = els.input.value.trim();
+    els.clear.hidden = !els.input.value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      var q = v.length >= 2 ? v : '';
+      if (q === state.query) return;
+      state.query = q;
+      refresh();
+    }, v.length >= 2 ? 250 : 0);
+  }
+
+  /* ---------- Sestavení rozhraní ---------- */
+
+  function build() {
+    if (built) return true;
+    var root = $('universeOverlay');
+    if (!root) return false;
+    els = {
+      root: root, input: $('dvSearch'), clear: $('dvClear'), close: $('dvClose'), fbtn: $('dvFilterBtn'), reset: $('dvReset'),
+      type: $('dvType'), genres: $('dvGenres'), sort: $('dvSort'), year: $('dvYear'), rating: $('dvRating'), runtime: $('dvRuntime'), lang: $('dvLang'), providers: $('dvProviders'), seen: $('dvHideSeen'), body: $('dvBody')
+    };
+    if (!els.input || !els.body || !els.rating || !els.seen || !els.runtime || !els.lang || !els.providers) return false;
+
+    GENRES.forEach(function (g) {
+      var b = el('button', 'dv-chip', g.name);
+      b.type = 'button';
+      b.setAttribute('data-genre', g.key);
+      b.addEventListener('click', function () { setGenre(g.key); });
+      els.genres.appendChild(b);
+    });
+    SORTS.forEach(function (s) {
+      var o = el('option', null, s.label);
+      o.value = s.key;
+      els.sort.appendChild(o);
+    });
+    var any = el('option', null, 'Kterýkoli rok');
+    any.value = '';
+    els.year.appendChild(any);
+    DECADES.forEach(function (d) { var od = el('option', null, d[1]); od.value = d[0]; els.year.appendChild(od); });
+    for (var y = new Date().getFullYear(); y >= 1970; y--) {
+      var o2 = el('option', null, String(y));
+      o2.value = String(y);
+      els.year.appendChild(o2);
+    }
+
+    [['', 'Libovolné'], ['6', '★ 6+'], ['7', '★ 7+'], ['8', '★ 8+']].forEach(function (r) {
+      var o3 = el('option', null, r[1]);
+      o3.value = r[0];
+      els.rating.appendChild(o3);
+    });
+    [[els.runtime, RUNTIMES], [els.lang, LANGS]].forEach(function (pair) {
+      pair[1].forEach(function (r) { var oo = el('option', null, r[1]); oo.value = r[0]; pair[0].appendChild(oo); });
+    });
+    PROVIDERS.forEach(function (pv) {
+      var pb = el('button', 'dv-chip', pv.name);
+      pb.type = 'button';
+      pb.setAttribute('data-provider', String(pv.id));
+      pb.addEventListener('click', function () {
+        var at = state.providers.indexOf(pv.id);
+        if (at > -1) state.providers.splice(at, 1); else state.providers.push(pv.id);
+        refresh();
+      });
+      els.providers.appendChild(pb);
+    });
+    [els.sort, els.year, els.rating, els.runtime, els.lang].forEach(function (s) { window.mfEnhanceDropdown && window.mfEnhanceDropdown(s); });
+
+    [].forEach.call(els.type.children, function (b) {
+      b.addEventListener('click', function () { setType(b.getAttribute('data-type')); });
+    });
+    els.sort.addEventListener('change', function () { state.sort = els.sort.value; refresh(); });
+    els.year.addEventListener('change', function () { state.year = els.year.value; refresh(); });
+    els.rating.addEventListener('change', function () { state.minRating = els.rating.value; refresh(); });
+    els.runtime.addEventListener('change', function () { state.runtime = els.runtime.value; refresh(); });
+    els.lang.addEventListener('change', function () { state.lang = els.lang.value; refresh(); });
+    els.seen.addEventListener('click', function () { state.hideSeen = !state.hideSeen; refresh(); });
+    els.input.addEventListener('input', onInput);
+    els.input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { pushHistory(els.input.value); els.input.blur(); }
+    });
+    els.clear.addEventListener('click', function () { els.input.value = ''; onInput(); els.input.focus(); });
+    els.reset.addEventListener('click', resetAll);
+    els.close.addEventListener('click', closeUniverse);
+    root.addEventListener('click', function (e) { if (e.target === root) closeUniverse(); });
+
+    /* Přepínač Vše / Filmy / Seriály je pořád vidět pod hledáním (ne za tlačítkem Filtry), ať se dá přepnout jedním klepnutím */
+    try { var fl = document.getElementById('dvFilters'); if (els.type && fl && fl.parentNode) { els.type.classList.add('dv-seg-top'); fl.parentNode.insertBefore(els.type, fl); } } catch (e) {}
+
+    /* PC: horní lišta leží průhledně přes hero banner (jako na Domů); po posunutí dolů se zase zapne plná */
+    function overUpdate() {
+      var r = els.root, b = els.body;
+      if (!r || !b) return;
+      var hero = window.innerWidth > 700 && !!b.querySelector('.dv-hero:not(.dv-skel)');
+      r.classList.toggle('dv-over', hero);
+      r.classList.toggle('dv-solid', !hero || b.scrollTop > 60);
+    }
+    if (els.body) {
+      els.body.addEventListener('scroll', overUpdate, { passive: true });
+      new MutationObserver(overUpdate).observe(els.body, { childList: true, subtree: true });
+      window.addEventListener('resize', overUpdate);
+    }
+
+    // Telefon: filtry jsou za tlačítkem „Filtry“ (nic se samo nesbaluje při posouvání)
+    if (els.fbtn) els.fbtn.addEventListener('click', function () {
+      var on = !root.classList.contains('dv-filters-open');
+      root.classList.toggle('dv-filters-open', on);
+      if (on) root.classList.remove('dv-collapsed', 'dv-gone'); /* po posunu dolů byly filtry schované a tlačítko se tvářilo, že nic nedělá */
+      els.fbtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+
+    root.addEventListener('keydown', function (e) {
+      var tag = (e.target && e.target.tagName) || '';
+      if (e.key === '/' && tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') {
+        e.preventDefault();
+        e.stopPropagation();
+        els.input.focus();
+      }
+    });
+    built = true;
+    return true;
+  }
+
+  function openUniverse(focus) {
+    if (!build()) return;
+    try { // Oblíbené se zavřou, ať Procházení nepřekrývá otevřené okno
+      var wo = document.getElementById('watchlistOverlay');
+      if (wo && (wo.classList.contains('open') || wo.classList.contains('visible')) && typeof window.closeWatchlist === 'function') window.closeWatchlist();
+    } catch (e) {}
+    clearTimeout(closeTimer);
+    var wasOpen = els.root.classList.contains('open');
+    document.body.classList.add('discover-open');
+    els.root.classList.add('open');
+    requestAnimationFrame(function () { requestAnimationFrame(function () { els.root.classList.add('visible'); }); });
+    try { kbLayer = 'search'; } catch (e) {}
+    try { if (typeof pauseBgParticles === 'function') pauseBgParticles(); } catch (e) {}
+    if (!wasOpen || !els.body.firstChild) refresh();
+    if (focus) setTimeout(function () { els.input.focus(); }, 60);
+  }
+
+  function closeUniverse() {
+    if (!built) return;
+    document.body.classList.remove('discover-open');
+    els.root.classList.remove('visible');
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(function () {
+      els.root.classList.remove('open');
+      run++;
+      gridCtx = null;
+      if (observer) observer.disconnect();
+      state = freshState();
+      els.root.classList.remove('dv-filters-open');
+      if (els.fbtn) els.fbtn.setAttribute('aria-expanded', 'false');
+      els.input.value = '';
+      els.body.textContent = '';
+      /* Objevovat otevřené z jiné sekce (např. prázdné Oblíbené → Objevovat): po zavření zpět na domů, ať nezmizí dock */
+      try {
+        var wl = document.getElementById('watchlistOverlay');
+        var wlOpen = wl && (wl.classList.contains('open') || wl.classList.contains('visible'));
+        if (!document.documentElement.classList.contains('mfh-home-on') && !document.body.classList.contains('mf-section-protebe') && !wlOpen && typeof window.mfShowSection === 'function') { if (typeof window.mfhShowHome === 'function') window.mfhShowHome({ force: true }); else window.mfShowSection('serialy'); }
+      } catch (e) {}
+    }, 300);
+    try { kbLayer = 'menu'; } catch (e) {}
+    try { if (typeof resumeBgParticles === 'function') resumeBgParticles(); } catch (e) {}
+    try { if (legacyClose) legacyClose(); } catch (e) {}
+  }
+
+  window.mfDiscoverOpen = function (type, genre) {
+    if (!build()) return;
+    type = type || 'all';
+    genre = genre && genreByKey(genre) && genreByKey(genre).key ? genre : '';
+    if (genre && type !== 'all' && !genreByKey(genre)[type]) genre = '';
+    var gl = genre ? [genre] : [];
+    var open = els.root.classList.contains('open');
+    if (open) { state.type = type; state.genres = gl; state.query = ''; els.input.value = ''; refresh(); return; }
+    state.type = type;
+    state.genres = gl;
+    openUniverse(false);
+  };
+  window.mfDiscoverType = function () {
+    try { return els && els.root && els.root.classList.contains('open') ? state.type : ''; } catch (e) { return ''; }
+  };
+  // Po změně věku/žánrů/zaměření se otevřený Objevovat sám obnoví (bez Ctrl+R)
+  window.addEventListener('mf:profile-changed', function () {
+    varietySeed = 1 + Math.floor(Math.random() * 997);
+    try { if (els && els.root && els.root.classList.contains('open')) refresh(); } catch (e) {}
+  });
+  window.openUniverse = function () { openUniverse(false); };
+  window.openDiscover = function () { openUniverse(false); };
+  window.mfDiscoverRestore = function (sn) { if (!sn || !built) return; state = sn.s; els.input.value = sn.q || ''; syncControls(); els.root.style.transition = 'none'; openUniverse(false); setTimeout(function () { els.root.style.transition = ''; }, 500); }; /* bez prolínání: Objevování je hned pod mizejícím detailem, jinak se při křížku na chvíli ukázalo Domů */
+  window.mfDiscoverReroll = function () { varietySeed = 1 + Math.floor(Math.random() * 997); refresh(); }; /* tlačítko obnovení v hlavičce */
+  window.openSearch = function () { openUniverse(true); };
+  window.closeUniverse = closeUniverse;
+  window.closeSearch = closeUniverse;
+  window.closeDiscover = closeUniverse;
+})();
