@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.201
+### Změněno
+- **Objevování:** z názvů řad zmizelo emoji 🆕 („Nově vydané anime“, „Nově v kinech a v televizi“).
+### Testy
+- Test automatického přepnutí na zahraniční zdroje vrácen na původní očekávání (po změně 3.21.200 v ověřování NajSerialy; skutečná 404 se bere jako jistá).
+
 ## 3.21.200
 ### Opraveno
 - **Dock:** po klepnutí na Oblíbené z Objevování už zvýraznění neblikne zpět na Objevovat ani na Domů (Oblíbené mají při určování aktivní položky přednost, hned po klepnutí se zvýraznění drží a zavření Objevování ho nepřepíše na Domů). Přibyl test.

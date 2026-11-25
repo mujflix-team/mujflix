@@ -555,7 +555,7 @@
       };
       rows.push(animeRow('Populární anime', 'Máš zapnuto „Jen anime“ (změníš v menu profilu → Zaměření a žánry)', 'popular', true));
       rows.push(animeRow('Nejlépe hodnocené anime', '', 'rating'));
-      rows.push(animeRow('🆕 Nově vydané anime', '', 'newest'));
+      rows.push(animeRow('Nově vydané anime', '', 'newest'));
     }
 
     if (prefs.length) {
@@ -610,7 +610,7 @@
       rows.push({ title: 'Nejlépe hodnocené seriály', load: function () {
         return api('/tv/top_rated?language=cs-CZ&page=' + vp()).then(function (d) { return normList(d && d.results, 'tv'); });
       } });
-      rows.push({ title: '🆕 Nově v kinech a v televizi', showType: true, load: function () {
+      rows.push({ title: 'Nově v kinech a v televizi', showType: true, load: function () {
         return Promise.all([api('/movie/now_playing?language=cs-CZ'), api('/tv/on_the_air?language=cs-CZ')]).then(function (r) {
           return interleave(normList(r[0] && r[0].results, 'movie'), normList(r[1] && r[1].results, 'tv'));
         });
