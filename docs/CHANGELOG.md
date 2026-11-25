@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.196
+### Opraveno
+- **Zdroje:** výsledek „NajSerialy nemá titul“ z ověřování se v aplikaci nebere jako jistý, takže se NajSerialy kvůli němu nepřeskočí (nezávisle na verzi Workeru).
+
 ## 3.21.195
 ### Opraveno
 - **Ověřování zdrojů (Worker):** NajSerialy se kvůli jinému názvu na stránce, než je v adrese (např. japonský titul), už nevyhodí jako „nemá titul“. Skutečná 404 a „nenalezeno“ v titulku platí dál. **Worker je potřeba znovu nasadit.**
