@@ -21,6 +21,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.200 – dock: Oblíbené neblikne zpět na Objevovat
 - 3.21.199 – dock/lišta: Objevovat místo Seriály+Filmy (telefon i PC)
 - 3.21.198 – dock: Objevovat (Vše)
 - 3.21.197 – stabilní test paměti zdrojů

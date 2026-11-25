@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.200
+### Opraveno
+- **Dock:** po klepnutí na Oblíbené z Objevování už zvýraznění neblikne zpět na Objevovat ani na Domů (Oblíbené mají při určování aktivní položky přednost, hned po klepnutí se zvýraznění drží a zavření Objevování ho nepřepíše na Domů). Přibyl test.
+
 ## 3.21.199
 ### Změněno
 - **Dock a horní lišta (telefon i PC):** místo Seriálů a Filmů je jedna položka **Objevovat** (Vše); typ se vybírá záložkami v Objevování. Dock má 4 položky (Domů, Objevovat, Oblíbené, Profil).

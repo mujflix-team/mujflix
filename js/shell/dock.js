@@ -34,11 +34,18 @@
       var el = document.getElementById(id);
       return !!(el && el.classList.contains(cls));
     }
+    var favTapAt = 0;
+    document.addEventListener("click", function (ev) {
+      var b = ev.target && ev.target.closest && ev.target.closest("#dockProtebe");
+      if (b) favTapAt = Date.now();
+    }, true);
     function target() {
       var gate = document.getElementById("mfProfileGate");
       if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none") return "dockProfile";
-      if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockObjevovat"; /* každý typ v Objevování (Vše, Filmy, Seriály) patří pod jednu položku Objevovat */
+      if (favTapAt && Date.now() - favTapAt < 450) return "dockProtebe"; /* hned po klepnutí na Oblíbené se otevírají asynchronně; do té doby zvýraznění nepřeskakuje */
+      /* Oblíbené mají přednost: při přepnutí z Objevování zůstane Objevování ještě chvíli otevřené pod nimi a zvýraznění by jinak krátce blikalo zpět na Objevovat */
       if (has("watchlistOverlay", "visible")) return "dockProtebe";
+      if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockObjevovat"; /* každý typ v Objevování (Vše, Filmy, Seriály) patří pod jednu položku Objevovat */
       var pr = document.getElementById("mfSectionProtebe");
       if (document.body.classList.contains("mf-section-protebe") || (pr && pr.style.display === "block")) return "dockProtebe";
       return "dockHome";
