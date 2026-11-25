@@ -1240,6 +1240,8 @@
     varietySeed = 1 + Math.floor(Math.random() * 997);
     try { if (els && els.root && els.root.classList.contains('open')) refresh(); } catch (e) {}
   });
+  /* Sestavení ovládacích prvků Objevování proběhne předem v klidu, ať první klepnutí na dock nezasekne telefon */
+  (function () { var warm = function () { try { build(); } catch (e) {} }; if (window.requestIdleCallback) window.requestIdleCallback(warm, { timeout: 4000 }); else setTimeout(warm, 2500); })();
   window.openUniverse = function () { openUniverse(false); };
   window.openDiscover = function () { openUniverse(false); };
   window.mfDiscoverRestore = function (sn) { if (!sn || !built) return; state = sn.s; els.input.value = sn.q || ''; syncControls(); els.root.style.transition = 'none'; openUniverse(false); setTimeout(function () { els.root.style.transition = ''; }, 500); }; /* bez prolínání: Objevování je hned pod mizejícím detailem, jinak se při křížku na chvíli ukázalo Domů */
