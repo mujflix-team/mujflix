@@ -61,6 +61,7 @@ check("worker: SRC_SHARE=off sdílení vypne (501)", off.status === 501);
 const realFetch = globalThis.fetch;
 const pages = {
   "https://www.najserialy.io/serial/ma/s01e01": () => new Response("<html><title>Má titul</title>" + "x".repeat(2000) + "</html>", { status: 200 }),
+  "https://www.najserialy.io/serial/dragon-ball-super/s01e02": () => new Response("<html><title>ドラゴンボール超 ビルス</title><h1>ドラゴンボール超</h1>" + "x".repeat(2000) + "</html>", { status: 200 }),
   "https://www.najserialy.io/serial/nema/s01e01": () => new Response("nic", { status: 404 }),
   "https://svetserialu.to/serial/soft/s01e01": () => new Response("<html><title>Stránka nebyla nalezena</title>" + "x".repeat(2000) + "</html>", { status: 200 }),
   "https://uzi.la/tv/ochrana/S01E01": () => new Response("blocked", { status: 403 }),
@@ -78,6 +79,8 @@ globalThis.fetch = async (u) => { const f = pages[String(u)]; if (!f) throw new 
 const pr = await call("/src/probe", { urls: ["https://www.najserialy.io/serial/ma/s01e01", "https://www.najserialy.io/serial/nema/s01e01", "https://svetserialu.to/serial/soft/s01e01", "https://uzi.la/tv/ochrana/S01E01", "https://evil.example/x", "http://uzi.la/p/x", "javascript:alert(1)"] }, "https://a.b", "7.7.7.1");
 check("probe: má titul = true, 404 = false, „nenalezeno“ v titulku = false, ochrana webu = null", JSON.stringify(pr.json.results.slice(0, 4)) === JSON.stringify([true, false, false, null]), JSON.stringify(pr.json));
 const ps = await call("/src/probe", { urls: ["https://www.bombuj.si/online-film-odyssea-2026", "https://www.bombuj.si/online-film-oppenheimer-2023"] }, "https://a.b", "7.7.7.9");
+const pj = await call("/src/probe", { urls: ["https://www.najserialy.io/serial/dragon-ball-super/s01e02"] }, "https://a.b", "7.7.7.11");
+check("probe: NajSerialy s jiným názvem na stránce než ve slugu = null (nevíme), ne false", JSON.stringify(pj.json.results) === "[null]", JSON.stringify(pj.json));
 check("probe: měkká 404 (200 + obecná stránka bez názvu titulu) = false, skutečná stránka = true", JSON.stringify(ps.json.results) === "[false,true]", JSON.stringify(ps.json));
 const pd = await call("/src/probe", { urls: ["https://uzi.la/p/presmerovano-ven", "https://uzi.la/p/presmerovano-http", "https://uzi.la/p/presmerovano-uvod", "https://uzi.la/p/presmerovano-www", "https://uzi.la/p/smycka"] }, "https://a.b", "7.7.7.5");
 check("probe: přesměrování se sleduje ručně – ven z povolených webů / na http / smyčka = null, na úvod = false, na www variantu = true", JSON.stringify(pd.json.results) === "[null,null,false,true,null]", JSON.stringify(pd.json));

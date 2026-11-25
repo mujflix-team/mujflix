@@ -21,6 +21,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.195 – ověřování: NajSerialy se neodmítá kvůli jinému názvu (nasadit Worker)
 - 3.21.194 – SvetSerialu: kotva na přehrávač
 - 3.21.193 – kontaktní e-mail v Soukromí, oprava lintu
 - 3.21.192 – Objevování: popis vpravo + trailer, nekonečné Vše
