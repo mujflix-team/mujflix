@@ -122,10 +122,10 @@ check("cinema: neoznačuje epizody cizího seriálu", cin.marked.length === 0, J
 const swtT = await page.evaluate(async () => {
   window.ontouchstart = null;
   await new Promise(r => { const sc = document.createElement("script"); sc.src = "js/shell/swipe-tabs.js"; sc.onload = r; document.body.appendChild(sc); });
-  const ORDER = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"];
+  const ORDER = ["dockHome", "dockObjevovat", "dockProtebe", "dockProfile"];
   const gate = document.getElementById("mfProfileGate"); if (gate) gate.style.setProperty("display", "none", "important");
   const openMods = [...document.querySelectorAll("#seriesModal.open, #mfStandaloneCinema.open, #epRatingOverlay.open")]; openMods.forEach(m => m.classList.remove("open")); /* okno z dřívějšího testu swipe správně blokuje */ /* otevřený výběr profilu swipe správně blokuje */
-  const prevAct = document.querySelector(".dock-btn.active"); document.querySelectorAll(".dock-btn.active").forEach(b => b.classList.remove("active")); document.getElementById("dockFilmy").classList.add("active");
+  const prevAct = document.querySelector(".dock-btn.active"); document.querySelectorAll(".dock-btn.active").forEach(b => b.classList.remove("active")); document.getElementById("dockObjevovat").classList.add("active");
   const act = document.querySelector(".dock-btn.active"); const i = ORDER.indexOf(act && act.id);
   const clicks = []; const cap = e => { const b = e.target.closest && e.target.closest(".dock-btn"); if (b) { clicks.push(b.id); e.stopPropagation(); e.preventDefault(); } };
   document.addEventListener("click", cap, true);
@@ -137,10 +137,10 @@ const swtT = await page.evaluate(async () => {
   sw(wide, 180, 20); const inRow = clicks.length - left.length - shortSw - vert;
   sw(document.body, 120, 300); const right = clicks.slice(left.length + shortSw + vert + inRow);
   document.removeEventListener("click", cap, true); wide.remove();
-  document.getElementById("dockFilmy").classList.remove("active"); prevAct && prevAct.classList.add("active"); if (gate) gate.style.removeProperty("display"); openMods.forEach(m => m.classList.add("open"));
+  document.getElementById("dockObjevovat").classList.remove("active"); prevAct && prevAct.classList.add("active"); if (gate) gate.style.removeProperty("display"); openMods.forEach(m => m.classList.add("open"));
   return { start: act && act.id, left, right, shortSw, vert, inRow, i };
 });
-const expLeft = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"][swtT.i + 1], expRight = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"][swtT.i - 1];
+const expLeft = ["dockHome", "dockObjevovat", "dockProtebe", "dockProfile"][swtT.i + 1], expRight = ["dockHome", "dockObjevovat", "dockProtebe", "dockProfile"][swtT.i - 1];
 check("sekce tažením: doleva další, doprava předchozí; krátké, svislé a tažení ve vodorovné řadě nic nepřepne", swtT.i >= 0 && swtT.left.length === 1 && swtT.left[0] === expLeft && swtT.shortSw === 0 && swtT.vert === 0 && swtT.inRow === 0 && swtT.right.length === 1 && swtT.right[0] === expRight, JSON.stringify(swtT));
 // --- Výkon: stejný souběžný dotaz na TMDB se pošle jen jednou
 const dedupT = await page.evaluate(async () => {
@@ -2715,25 +2715,25 @@ const nav3 = await page.evaluate(async () => {
   const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none"; window.mfGoHome(); await w(500);
   document.getElementById("dockProtebe").click(); await w(700);
   o.favNav = getComputedStyle(document.getElementById("nfTop")).display !== "none";
-  document.getElementById("dockFilmy").click(); await w(900);
+  document.getElementById("dockObjevovat").click(); await w(900);
   const u = document.getElementById("universeOverlay");
   o.discover = u.classList.contains("open"); o.wlClosed = !document.getElementById("watchlistOverlay").classList.contains("visible");
   o.dockShown = getComputedStyle(document.getElementById("mfDock")).display !== "none"; o.topShown = getComputedStyle(document.getElementById("nfTop")).display !== "none";
   o.active = document.querySelector("#mfDock .dock-btn.active")?.id;
-  document.getElementById("dockSeriale").click(); await w(700);
-  o.tv = window.mfDiscoverType() === "tv" && document.querySelector("#mfDock .dock-btn.active")?.id === "dockSeriale";
+  o.tv = window.mfDiscoverType() === "all"; // Objevovat otevře Vše
+  window.mfDiscoverOpen("tv"); await w(500); o.tv = o.tv && window.mfDiscoverType() === "tv" && document.querySelector("#mfDock .dock-btn.active")?.id === "dockObjevovat"; // typ z Objevování, dock zůstane na Objevovat
   document.getElementById("dockHome").click(); await w(900);
   o.home = document.documentElement.classList.contains("mfh-home-on") && !u.classList.contains("open");
   gate.style.display = gd; return o;
 });
-check("navigace: Oblíbené i Procházení mají horní lištu a dock, Seriály/Filmy přepínají typ a zvýrazní se správná záložka", nav3.favNav && nav3.discover && nav3.wlClosed && nav3.dockShown && nav3.topShown && nav3.active === "dockFilmy" && nav3.tv && nav3.home, JSON.stringify(nav3));
+check("navigace: Oblíbené i Procházení mají horní lištu a dock, Objevovat otevře Vše, typ jde změnit a zvýrazní se správná záložka", nav3.favNav && nav3.discover && nav3.wlClosed && nav3.dockShown && nav3.topShown && nav3.active === "dockObjevovat" && nav3.tv && nav3.home, JSON.stringify(nav3));
 
 // --- v3.4: každá dvojice záložek funguje (z Procházení i z Oblíbených), logo a hledání zavřou Oblíbené
 const nav4 = await page.evaluate(async () => {
   const w = ms => new Promise(r => setTimeout(r, ms)); const bad = [];
   const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none"; window.mfGoHome(); await w(500);
   const st = () => ({ uo: document.getElementById("universeOverlay").classList.contains("open"), wl: document.getElementById("watchlistOverlay").classList.contains("visible"), act: document.querySelector("#mfDock .dock-btn.active")?.id });
-  const want = { dockHome: { uo: false, wl: false }, dockSeriale: { uo: true, wl: false }, dockFilmy: { uo: true, wl: false }, dockProtebe: { uo: false, wl: true } };
+  const want = { dockHome: { uo: false, wl: false }, dockObjevovat: { uo: true, wl: false }, dockProtebe: { uo: false, wl: true } };
   const ids = Object.keys(want);
   for (const a of ids) for (const b of ids) {
     if (a === b) continue;

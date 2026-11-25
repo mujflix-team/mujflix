@@ -24,7 +24,7 @@
 
 (function mfDockSync() {
   try {
-    var IDS = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"];
+    var IDS = ["dockHome", "dockSeriale", "dockFilmy", "dockObjevovat", "dockProtebe", "dockProfile"];
     function shown(el) {
       if (!el) return false;
       var cs = getComputedStyle(el);
@@ -37,7 +37,7 @@
     function target() {
       var gate = document.getElementById("mfProfileGate");
       if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none") return "dockProfile";
-      if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return (typeof window.mfDiscoverType === "function" && window.mfDiscoverType() === "tv") ? "dockSeriale" : (typeof window.mfDiscoverType === "function" && window.mfDiscoverType() === "movie") ? "dockFilmy" : "dockHome";
+      if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockObjevovat"; /* každý typ v Objevování (Vše, Filmy, Seriály) patří pod jednu položku Objevovat */
       if (has("watchlistOverlay", "visible")) return "dockProtebe";
       var pr = document.getElementById("mfSectionProtebe");
       if (document.body.classList.contains("mf-section-protebe") || (pr && pr.style.display === "block")) return "dockProtebe";
@@ -46,6 +46,7 @@
     function apply() {
       try {
         var id = target();
+        if ((id === "dockSeriale" || id === "dockFilmy")) id = "dockObjevovat"; // místo Seriálů a Filmů je jedna položka Objevovat
         IDS.forEach(function (d) {
           var b = document.getElementById(d);
           if (!b) return;
@@ -149,7 +150,7 @@
       setHidden(false);
       if (!wasActive) return;
       setTimeout(function () {
-        if (btn.id === "dockFilmy" || btn.id === "dockSeriale") {
+        if (btn.id === "dockFilmy" || btn.id === "dockSeriale" || btn.id === "dockObjevovat") {
           var inp = document.getElementById("dvSearch");
           var body = document.getElementById("dvBody");
           if (body) body.scrollTo({ top: 0, behavior: "smooth" });

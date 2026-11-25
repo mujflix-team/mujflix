@@ -5,7 +5,7 @@
 (function mfSwipeTabs() {
   try {
     if (!("ontouchstart" in window)) return;
-    var ORDER = ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile"], MIN = 90, st = null;
+    var ORDER = ["dockHome", "dockObjevovat", "dockProtebe", "dockProfile"], MIN = 90, st = null; /* na telefonu: Domů, Objevovat, Oblíbené, Profil */
     function modalOpen() {
       if (document.querySelector("#seriesModal.open, #mfStandaloneCinema.open, #mfTrailerBox, #epRatingOverlay.open")) return true;
       var ms = document.querySelectorAll("[aria-modal='true']");
