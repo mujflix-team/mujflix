@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.198
+### Přidáno
+- **Dock / horní lišta:** nová položka **Objevovat** (filmy i seriály dohromady, záložka Vše). Na PC je vždy v horní liště; na telefonu se zobrazí jen v Objevování a nahradí tam Seriály a Filmy, takže dock má pořád pět položek.
+
 ## 3.21.197
 ### Testy
 - Test „rychlé přepnutí označí zdroj“ ve `flows` už nezávisí na načasování ověřování zdrojů (v testu je sdílení a ověřování vypnuté), takže přestal náhodně padat.
