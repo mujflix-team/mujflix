@@ -147,6 +147,7 @@ function _bombujMovieUrlVariants(e, t) {
     }
     window.closeUniverse = function() {
       t && t.apply(this, arguments), setTimeout(() => {
+        if (document.getElementById("watchlistOverlay")?.classList.contains("visible")) return setDockActive("dockProtebe"); /* Oblíbené jsou otevřené: zvýraznění nesmí zablikat na Domů */
         if ("filmy" === e) {
           const q = document.querySelector(".ps-menu-scene"),
             w = document.querySelector(".key-hint");

@@ -2728,6 +2728,19 @@ const nav3 = await page.evaluate(async () => {
 });
 check("navigace: Oblíbené i Procházení mají horní lištu a dock, Objevovat otevře Vše, typ jde změnit a zvýrazní se správná záložka", nav3.favNav && nav3.discover && nav3.wlClosed && nav3.dockShown && nav3.topShown && nav3.active === "dockObjevovat" && nav3.tv && nav3.home, JSON.stringify(nav3));
 
+// --- Oblíbené z Objevování: zvýraznění v docku nesmí zablikat zpět na Objevovat
+const flk = await page.evaluate(async () => {
+  const w = ms => new Promise(r => setTimeout(r, ms));
+  const gate = document.getElementById("mfProfileGate"), gd = gate.style.display; gate.style.display = "none"; window.mfGoHome(); await w(500);
+  document.getElementById("dockObjevovat").click(); await w(900);
+  document.getElementById("dockProtebe").click();
+  const seen = [];
+  for (let i = 0; i < 14; i++) { await w(50); seen.push(document.querySelector("#mfDock .dock-btn.active")?.id); }
+  await w(500); document.getElementById("dockHome").click(); await w(800); gate.style.display = gd;
+  return seen;
+});
+check("dock: Oblíbené z Objevování – zvýraznění neblikne zpět na Objevovat", flk.every(x => x === "dockProtebe"), flk.join(","));
+
 // --- v3.4: každá dvojice záložek funguje (z Procházení i z Oblíbených), logo a hledání zavřou Oblíbené
 const nav4 = await page.evaluate(async () => {
   const w = ms => new Promise(r => setTimeout(r, ms)); const bad = [];
