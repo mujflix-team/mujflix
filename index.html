@@ -54,7 +54,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=25" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=22" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=121" />
+    <link rel="stylesheet" href="css/theme.css?v=122" />
     <link rel="stylesheet" href="css/wrapped.css?v=11" />
     <link rel="stylesheet" href="css/together.css?v=10" />
 
@@ -411,6 +411,21 @@
           <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 7h5M17 17h5" />
         </svg>
         <span class="dock-label">Filmy</span>
+      </button>
+
+      <button
+        class="dock-btn"
+        id="dockObjevovat"
+        data-hash="#objevovat"
+        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockObjevovat'); mfDiscoverOpen('all');"
+        title="Objevovat filmy i seriály"
+        aria-label="Objevovat filmy i seriály"
+      >
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="m15.5 8.5-2 5-5 2 2-5z" />
+        </svg>
+        <span class="dock-label">Objevovat</span>
       </button>
 
       <button
