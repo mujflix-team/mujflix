@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.197
+### Testy
+- Test „rychlé přepnutí označí zdroj“ ve `flows` už nezávisí na načasování ověřování zdrojů (v testu je sdílení a ověřování vypnuté), takže přestal náhodně padat.
+
 ## 3.21.196
 ### Opraveno
 - **Zdroje:** výsledek „NajSerialy nemá titul“ z ověřování se v aplikaci nebere jako jistý, takže se NajSerialy kvůli němu nepřeskočí (nezávisle na verzi Workeru).

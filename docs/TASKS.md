@@ -21,6 +21,7 @@ Zapiš sem, co děláš, ať se nepotkáte na stejných souborech. Po dokončen�
 
 ## Hotovo
 - 3.21.178 – malé okno přesně na místě přehrávače (claude/male-okno-v-cinema)
+- 3.21.197 – stabilní test paměti zdrojů
 - 3.21.196 – NajSerialy se v aplikaci nepřeskakuje kvůli ověřování
 - 3.21.195 – ověřování: NajSerialy se neodmítá kvůli jinému názvu (nasadit Worker)
 - 3.21.194 – SvetSerialu: kotva na přehrávač

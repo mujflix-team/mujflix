@@ -2371,6 +2371,7 @@ check("kino: Další epizoda funguje i bez TMDB", /S01 · E02/.test(nxt), nxt);
 const memRun = () => page.evaluate(async () => {
   const out = {}, wait = ms => new Promise(r => setTimeout(r, ms));
   localStorage.removeItem("mf_src_pref");
+  localStorage.setItem("mfx_src_share_off", "1"); // bez sdílení a ověřování zdrojů: sonda by mezitím sama přepla zdroj a test by závisel na načasování
   const label = () => MFCinemaPlayer.sourceLabel();
   const real = Date.now;
   MFCinemaPlayer.open("777001", "Paměť test", "movie", {});
@@ -2400,6 +2401,7 @@ const memRun = () => page.evaluate(async () => {
   MFCinemaPlayer.open("777001", "Paměť test", "movie", {}); await wait(50);
   out.expired = label() === out.first;
   MFCinemaPlayer.close();
+  localStorage.removeItem("mfx_src_share_off");
   return out;
 });
 let mem = await memRun(); /* souběh se sondou zdrojů občas rozhodí první pokus (v CI) – další dva pokusy */
