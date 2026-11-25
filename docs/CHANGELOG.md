@@ -3,6 +3,8 @@
 ## 3.21.201
 ### Změněno
 - **Objevování:** z názvů řad zmizelo emoji 🆕 („Nově vydané anime“, „Nově v kinech a v televizi“).
+### Dokumentace
+- `docs/CLAUDE.md` rozšířen (styl práce, postup vydání, důležité části kódu, CSP, zákazy) a přidán kořenový `CLAUDE.md`, který na něj odkazuje, aby ho Claude Code načetl sám.
 ### Testy
 - Test automatického přepnutí na zahraniční zdroje vrácen na původní očekávání (po změně 3.21.200 v ověřování NajSerialy; skutečná 404 se bere jako jistá).
 
