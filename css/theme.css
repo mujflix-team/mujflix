@@ -2166,10 +2166,7 @@ html body #seriesModal #modalFavBtn { order: 4; }
 @media (max-width: 700px) { .nf-hero-why { display: none; } }
 .nf-hero-hi { font-size: var(--fs-lg, 1.1rem); font-weight: 700; color: #fff; margin-bottom: 4px; }
 
-/* Dock: „Objevovat“ (Vše). PC: vždy v horní liště. Telefon: jen v Objevování, kde nahradí Seriály a Filmy (zůstává 5 položek) */
-html body #mfDock #dockObjevovat { display: none; }
+/* Dock / horní lišta: jedna položka „Objevovat“ (Vše) místo Seriálů a Filmů (typ se volí záložkami v Objevování) */
+html body #mfDock #dockObjevovat { display: flex; }
 @media (min-width: 900px) { html body #mfDock #dockObjevovat { display: inline-flex; } }
-@media (max-width: 899px) {
-  html body:has(#universeOverlay.open) #mfDock #dockObjevovat { display: flex; }
-  html body:has(#universeOverlay.open) #mfDock #dockSeriale, html body:has(#universeOverlay.open) #mfDock #dockFilmy { display: none; }
-}
+html body #mfDock #dockSeriale, html body #mfDock #dockFilmy { display: none; }

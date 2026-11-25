@@ -165,7 +165,7 @@ function _bombujMovieUrlVariants(e, t) {
     }, true);
     const o = window.setDockActive;
     window.setDockActive = function(e) {
-      o && o(e), ["dockHome", "dockSeriale", "dockFilmy", "dockProtebe", "dockProfile", "dockMore"].forEach(t => {
+      o && o(e), ["dockHome", "dockSeriale", "dockFilmy", "dockObjevovat", "dockProtebe", "dockProfile", "dockMore"].forEach(t => {
         const n = document.getElementById(t);
         n && (t === e ? n.classList.add("active") : n.classList.remove("active"))
       })

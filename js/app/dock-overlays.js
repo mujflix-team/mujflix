@@ -1,5 +1,6 @@
 /* Dock a zavírání oken, PWA instalace. Část původního app.js, načítá se v tomto pořadí (viz index.html). */
 function setDockActive(e) {
+  if (("dockSeriale" === e || "dockFilmy" === e)) e = "dockObjevovat"; // místo Seriálů a Filmů je jedna položka Objevovat
   document.querySelectorAll(".dock-btn").forEach(e => e.classList.remove("active"));
   const t = document.getElementById(e);
   t && (t.classList.add("active"), t.style.transform = "scale(0.88) translateZ(0)", requestAnimationFrame(() => requestAnimationFrame(() => {

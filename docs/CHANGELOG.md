@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.199
+### Změněno
+- **Dock a horní lišta (telefon i PC):** místo Seriálů a Filmů je jedna položka **Objevovat** (Vše); typ se vybírá záložkami v Objevování. Dock má 4 položky (Domů, Objevovat, Oblíbené, Profil).
+
 ## 3.21.198
 ### Přidáno
 - **Dock / horní lišta:** nová položka **Objevovat** (filmy i seriály dohromady, záložka Vše). Na PC je vždy v horní liště; na telefonu se zobrazí jen v Objevování a nahradí tam Seriály a Filmy, takže dock má pořád pět položek.
