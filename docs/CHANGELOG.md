@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.195
+### Opraveno
+- **Ověřování zdrojů (Worker):** NajSerialy se kvůli jinému názvu na stránce, než je v adrese (např. japonský titul), už nevyhodí jako „nemá titul“. Skutečná 404 a „nenalezeno“ v titulku platí dál. **Worker je potřeba znovu nasadit.**
+
 ## 3.21.194
 ### Změněno
 - **SvetSerialu:** adresa dílu končí kotvou `#source-1-iframe`, takže se stránka odscrolluje rovnou k přehrávači.

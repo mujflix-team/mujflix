@@ -59,6 +59,8 @@ async function handleSrc(request, env, cors, url) {
 /* Ověření zdrojů: Worker stáhne stránku zdroje (prohlížeč to kvůli CORS nesmí) a řekne, jestli titul opravdu existuje. */
 const PROBE_HOSTS = new Set(["www.najserialy.io", "najserialy.io", "svetserialu.to", "www.svetserialu.to", "serialy.bombuj.si", "www.bombuj.si", "bombuj.si", "uzi.la", "www.uzi.la"]);
 const PROBE_MAX = 8, PROBE_TTL = 1800, PROBE_LIMIT = 200;
+/* Weby, kde heuristika „na stránce není nic z názvu“ dává falešné záporné výsledky: výsledek je „nevíme“ (zdroj zůstane), ne „nemá“. Skutečná 404 a „nenalezeno“ v titulku platí dál. */
+const SOFT_UNSURE = new Set(["www.najserialy.io", "najserialy.io"]);
 const NOTFOUND_RE = /(\b404\b|nenalezen|nebyl[aoy]? nalezen|neexistuje|stránk[auy] nebyl|not found|nic (jsme )?nenašli)/i;
 const probeHits = new Map();
 
@@ -110,7 +112,7 @@ async function probeOne(raw, ctx) {
       if (m && NOTFOUND_RE.test(m[1])) v = false;
       else if (text.length < 1500) v = null;
       // měkká 404: web vrátí 200 a obecnou stránku, kde není nic z názvu titulu (ani v nadpisu, ani v textu); u stránek bez názvu v titulku se hledá v celém textu, ať se funkční zdroj omylem nepřeskočí
-      else if (toks.length && !toks.some(t => foldText(head).includes(t)) && !toks.some(t => foldText(text).includes(t))) v = false;
+      else if (toks.length && !toks.some(t => foldText(head).includes(t)) && !toks.some(t => foldText(text).includes(t))) v = SOFT_UNSURE.has(u.hostname) ? null : false; // NajSerialy má jiný název než slug (např. japonský titul), tak ho kvůli tomu nezahazovat
       else v = true;
     }
   } catch { v = null; } finally { clearTimeout(timer); }
