@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.207
+### Změněno
+- **Dock:** plynulejší ovládání. Aktivní záložku označuje tenká čárka, která se mezi tlačítky posouvá (nahoře u spodní lišty na telefonu, pod textem na PC), ikony reagují na stisk a ukazatel se při načtení nerozjíždí zleva. Z JS odstraněno skokové zvětšení ikony.
+
 ## 3.21.206
 ### Změněno
 - **Výběr profilu:** místo přeletu avataru plynulý přechod. Ostatní profily a nadpis se rozplynou, vybraný avatar se zvětší a celá obrazovka výběru pak jemně zmizí (dřív zmizela naráz, protože pravidlo `display: none` plynulé skrytí přebíjelo).
