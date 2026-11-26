@@ -42,7 +42,14 @@ const ProfileGate = {
             </div>
             <div class="pg-name">${escapeHTML(t.name)}</div>
           `;
-      n.onclick = () => this._manageMode ? ProfileGate.openCreate(t.id) : ProfileGate.selectProfile(t.id);
+      n.onclick = () => {
+        if (this._manageMode) return ProfileGate.openCreate(t.id);
+        /* plynulý přechod: vybraný profil (avatar + jméno) se zvětší, ostatní zhasnou, pak se profil aktivuje */
+        const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (t.pin || reduce || e.classList.contains("pg-leaving")) return ProfileGate.selectProfile(t.id);
+        e.classList.add("pg-leaving"); n.classList.add("pg-chosen");
+        setTimeout(() => { e.classList.remove("pg-leaving"); n.classList.remove("pg-chosen"); ProfileGate.selectProfile(t.id); }, 320);
+      };
       e.appendChild(n);
     });
     const n = document.createElement("div");

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.203
+### Přidáno
+- **Karty epizod:** swipe doleva nebo doprava (na dotyku) přepne „zhlédnuto“; po tahu se karta nespustí.
+- **Výběr profilu:** plynulý přechod, vybraný avatar se jménem se zvětší a ostatní zhasnou (u profilu s PINem a při omezeném pohybu bez animace).
+
 ## 3.21.202
 ### Opraveno
 - **Dock:** po klepnutí na Objevovat se zvýraznění ukáže hned (otevření stránky se spustí až po vykreslení tlačítka) a ovládací prvky Objevování se sestaví předem v klidu, takže první klepnutí na slabším telefonu nezamrzne.
