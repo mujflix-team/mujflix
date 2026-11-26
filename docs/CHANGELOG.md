@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.206
+### Změněno
+- **Výběr profilu:** místo přeletu avataru plynulý přechod. Ostatní profily a nadpis se rozplynou, vybraný avatar se zvětší a celá obrazovka výběru pak jemně zmizí (dřív zmizela naráz, protože pravidlo `display: none` plynulé skrytí přebíjelo).
+
 ## 3.21.205
 ### Opraveno
 - **Dock:** po klepnutí na libovolné tlačítko se zvýraznění až 600 ms drží na něm, takže už nepřeskočí krátce na Domů, než se stránka otevře (dříve jen u Oblíbených).
