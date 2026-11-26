@@ -41,7 +41,7 @@ async function openDiscoverTv(tmdbId, title) {
     } catch(err) {
       console.error('[openDiscoverTv]', err);
       window._mfBackToDiscover = null;
-      if (typeof showToast === 'function') showToast('⚠ Nepodařilo se načíst', 3000);
+      if (typeof showToast === 'function') showToast('Nepodařilo se načíst', 3000);
       return;
     }
   }
@@ -576,7 +576,7 @@ async function renderEpisodes() {
   try {
     const t = document.getElementById("episodesGrid");
     if (!t) return;
-    if (!activeSeries || !db[activeSeries]) return void(t.innerHTML = '<div style="color:var(--muted);font-size:0.76rem;padding:16px;opacity:0.5">⚠ Žádný seriál není vybrán</div>');
+    if (!activeSeries || !db[activeSeries]) return void(t.innerHTML = '<div style="color:var(--muted);font-size:0.76rem;padding:16px;opacity:0.5">Žádný seriál není vybrán</div>');
     t.style.display = "grid";
     const n = db[activeSeries],
       o = getWatched(),
@@ -629,7 +629,7 @@ async function renderEpisodes() {
   } catch (l) {
     console.error("renderEpisodes error:", l);
     const c = document.getElementById("episodesGrid");
-    c && (c.innerHTML = '<div style="color:#ff6060;font-size:0.72rem;padding:16px;grid-column:1/-1">⚠ Chyba při načítání epizod: ' + escapeHTML(l.message) + "</div>")
+    c && (c.innerHTML = '<div style="color:#ff6060;font-size:0.72rem;padding:16px;grid-column:1/-1">Chyba při načítání epizod: ' + escapeHTML(l.message) + "</div>")
   }
 }
 
@@ -839,7 +839,7 @@ function shuffleEpisode() {
     const i = `https://svetserialu.to/serial/${_ss}/s${String(t).padStart(2,"0")}e${String(o).padStart(2,"0")}`,
       a = db[activeSeries]?.tmdbId,
       s = `${db[activeSeries].name} — S${String(t).padStart(2,"0")}E${String(o).padStart(2,"0")}`;
-    a ? (markWatchedSoon(e), window._cinSiteSlug = _ss, _showCinemaOrFinderChoice(a + "/" + t + "/" + o, s, "tv_ep", i)) : showConfirm("🎲", "Náhodná epizoda", s, "Otevřít na externím webu", () => {
+    a ? (markWatchedSoon(e), window._cinSiteSlug = _ss, _showCinemaOrFinderChoice(a + "/" + t + "/" + o, s, "tv_ep", i)) : showConfirm("", "Náhodná epizoda", s, "Otevřít na externím webu", () => {
       markWatchedSoon(e), window.open(i, "_blank", "noopener,noreferrer")
     })
   }, 90)

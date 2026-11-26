@@ -37,7 +37,7 @@ function safeSetItem(e, t) {
   try {
     return localStorage.setItem(e, t), !0
   } catch (e) {
-    return "QuotaExceededError" !== e.name && 22 !== e.code || showToast("⚠ Paměť prohlížeče plná – data se neukládají", 4e3), !1
+    return "QuotaExceededError" !== e.name && 22 !== e.code || showToast("Paměť prohlížeče plná – data se neukládají", 4e3), !1
   }
 }
 

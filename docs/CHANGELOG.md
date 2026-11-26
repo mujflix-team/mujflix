@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.204
+### Změněno
+- **Bez emoji v textech:** z oznámení, chybových hlášek, popisků a dialogů zmizela emoji (⚠, ✅, ⭐, 🎉, 👍, 🔍, 🎬, 🎛, 👤). Zůstávají avatary profilu, hvězdy hodnocení a plamen série.
+
 ## 3.21.203
 ### Přidáno
 - **Karty epizod:** swipe doleva nebo doprava (na dotyku) přepne „zhlédnuto“; po tahu se karta nespustí.
