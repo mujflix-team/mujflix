@@ -1474,7 +1474,13 @@
             var el = document.getElementById(id);
             if (el) {
               el.style.removeProperty('pointer-events');
-              el.classList.remove('active', 'open', 'visible', 'show');
+              if (id === 'universeOverlay' && el.classList.contains('open')) {
+                /* Objevování se plynule rozplyne (display zmizí až po doběhnutí přechodu) */
+                el.classList.remove('active', 'visible', 'show');
+                setTimeout(function () { if (!el.classList.contains('visible')) el.classList.remove('open'); }, 340);
+              } else {
+                el.classList.remove('active', 'open', 'visible', 'show');
+              }
             }
           });
           document.body.classList.remove('modal-open');

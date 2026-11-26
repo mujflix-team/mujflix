@@ -131,7 +131,7 @@ function _bombujMovieUrlVariants(e, t) {
       if (document.body.classList.remove("mf-section-protebe"), "serialy" === t) {
         "function" == typeof closeUniverse && closeUniverse();
         const e = document.getElementById("universeOverlay");
-        e && (e.classList.remove("visible", "open"), document.body.classList.remove("discover-open"));
+        e && e.classList.contains("visible") && (e.classList.remove("visible", "open"), document.body.classList.remove("discover-open")); /* když closeUniverse proběhl, nechá se doběhnout plynulé zhasnutí */
         "function" == typeof closeDockOverlays && closeDockOverlays();
         setDockActive("dockHome");
         location.hash = "#serialy";

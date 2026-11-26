@@ -48,6 +48,8 @@ const ProfileGate = {
         const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (t.pin || reduce || e.classList.contains("pg-leaving")) return ProfileGate.selectProfile(t.id);
         const gt = document.getElementById("mfProfileGate"); gt && gt.classList.add("pg-leaving"); e.classList.add("pg-leaving"); n.classList.add("pg-chosen");
+        /* domovská stránka a data z TMDB se začnou načítat hned, ať je při doznění animace hotová */
+        try { localStorage.setItem(ACTIVE_PID_KEY, t.id); ProfileGate._warmed = t.id; window.dispatchEvent(new Event("mf:profile-changed")); } catch (err) { ProfileGate._warmed = null; }
         setTimeout(() => { ProfileGate.selectProfile(t.id); setTimeout(() => { gt && gt.classList.remove("pg-leaving"); e.classList.remove("pg-leaving"); n.classList.remove("pg-chosen"); }, 700); }, 380);
       };
       e.appendChild(n);
@@ -120,7 +122,7 @@ const ProfileGate = {
   },
   activateProfile(e) {
     try { sessionStorage.setItem("mf_gate_ok", "1") } catch (_) {}
-    localStorage.setItem(ACTIVE_PID_KEY, e), window.dispatchEvent(new Event("mf:profile-changed")), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
+    localStorage.setItem(ACTIVE_PID_KEY, e), this._warmed === e ? this._warmed = null : window.dispatchEvent(new Event("mf:profile-changed")), this.renderBadge(), _applyProfileAccent(), this.hide(), this.closePin(), setTimeout(() => {
       void 0 !== aiBrain && (aiBrain.reloadForProfile(), aiBrain.applyDecay()), "function" == typeof refreshUserContent && refreshUserContent(), "function" == typeof updateWatchlistBtns && updateWatchlistBtns(), "function" == typeof updateLogoProgress && updateLogoProgress()
     }, 100);
     const t = _getProfiles().find(t => t.id === e);
