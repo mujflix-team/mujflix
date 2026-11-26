@@ -20,7 +20,7 @@ const ProfileGate = {
     const e = document.getElementById("mfProfileGate");
     e && (e.classList.add("hiding"), setTimeout(() => {
       e.style.display = "none"
-    }, 520))
+    }, e.classList.contains("pg-focus") ? 950 : 520))
   },
   renderGate() {
     const e = document.getElementById("pgProfilesList");
@@ -49,7 +49,38 @@ const ProfileGate = {
         const gt = document.getElementById("mfProfileGate"); gt && gt.classList.add("pg-leaving"); e.classList.add("pg-leaving"); n.classList.add("pg-chosen");
         /* domovská stránka a data z TMDB se začnou načítat hned, ať je při doznění animace hotová */
         try { localStorage.setItem(ACTIVE_PID_KEY, t.id); ProfileGate._warmed = t.id; window.dispatchEvent(new Event("mf:profile-changed")); } catch (err) { ProfileGate._warmed = null; }
-        setTimeout(() => { ProfileGate.selectProfile(t.id); setTimeout(() => { gt && gt.classList.remove("pg-leaving"); e.classList.remove("pg-leaving"); n.classList.remove("pg-chosen"); }, 700); }, 380);
+        n.style.setProperty("--pg-c", t.color || "#e50914");
+        try { /* vybraný profil se plynule přesune na střed */
+          const rr = n.getBoundingClientRect(), lr = e.getBoundingClientRect();
+          n.style.setProperty("--pg-dx", (lr.left + lr.width / 2 - rr.left - rr.width / 2) + "px");
+        } catch (err) { void err; }
+        /* za avatarem se z rozmazaných tvarů pomalu skládá náznak Domů (hlavní fotka a dvě řady karet) */
+        let skel = null;
+        if (gt) {
+          skel = document.createElement("div"); skel.className = "pg-skel"; skel.setAttribute("aria-hidden", "true");
+          let h = '<div class="pg-skel-hero"></div>';
+          for (let r = 0; r < 2; r++) { h += '<div class="pg-skel-row">'; for (let c = 0; c < 9; c++) h += '<i style="animation-delay:' + (0.25 + r * 0.35 + c * 0.07).toFixed(2) + 's"></i>'; h += "</div>"; }
+          skel.innerHTML = h; gt.insertBefore(skel, gt.firstChild); gt.style.setProperty("--pg-c", t.color || "#e50914"); gt.classList.add("pg-loading");
+        }
+        /* avatar dýchá, dokud není Domů hotové (nejméně 1,2 s, nejvýše 3,5 s); pak se obrazovka zaostří do skutečného Domů */
+        const t0 = Date.now();
+        const ready = () => {
+          const body = document.querySelector("#mfSectionHome .nf-hero-body");
+          if (!body) return false;
+          const bg = document.querySelector("#mfSectionHome .nf-hero-bg");
+          return !bg || bg.style.display === "none" || (bg.complete && bg.naturalWidth > 0);
+        };
+        const go = () => {
+          gt && gt.classList.add("pg-focus");
+          ProfileGate.selectProfile(t.id);
+          setTimeout(() => { skel && skel.remove(); gt && (gt.classList.remove("pg-leaving", "pg-loading", "pg-focus"), gt.style.removeProperty("--pg-c")); e.classList.remove("pg-leaving"); n.classList.remove("pg-chosen"); n.style.removeProperty("--pg-dx"); }, 1100);
+        };
+        const tick = () => {
+          const el = Date.now() - t0;
+          if ((el >= 1200 && ready()) || el >= 3500) return go();
+          setTimeout(tick, 100);
+        };
+        setTimeout(tick, 500);
       };
       e.appendChild(n);
     });

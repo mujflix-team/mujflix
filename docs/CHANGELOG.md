@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.211
+### Změněno
+- **Výběr profilu:** přechod, který jen naznačí načítání. Vybraný avatar se přesune na střed a jemně „dýchá“ (záře v barvě profilu), za ním se z rozmazaných tvarů skládá náznak Domů (hlavní fotka a řady karet). Jakmile je Domů hotové (nejméně 1,2 s, nejvýše 3,5 s), obraz se zaostří do skutečného Domů. Bez textu a bez točícího se kolečka. Při omezeném pohybu zůstává jen zhasnutí.
+
 ## 3.21.210
 ### Změněno
 - **Oblíbené z Objevování:** otevření je rychlejší. Objevování se zavře už po 80 ms místo 320 ms a prolnutí Oblíbených je zkrácené (z cca 0,35 s na 0,2 s).
