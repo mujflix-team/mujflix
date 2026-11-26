@@ -51,7 +51,7 @@ function triggerPwaInstall() {
   }) => {
     if ("accepted" === e) {
       const e = document.getElementById("pwaInstallBtn");
-      e && (e.style.display = "none"), showToast("✅ MůjFlix nainstalován!", "success")
+      e && (e.style.display = "none"), showToast("MůjFlix nainstalován!", "success")
     }
     window._pwaInstallPrompt = null
   })) : showToast("ℹ️ Instalace není k dispozici — otevři MůjFlix v prohlížeči (ne jako PWA)", "info")
@@ -67,11 +67,11 @@ function triggerPwaInstall() {
       const {
         outcome: e
       } = await window._pwaInstallPrompt.userChoice;
-      "accepted" === e && (t.style.display = "none", "function" == typeof showToast && showToast("✅ MůjFlix nainstalován!", "success")), window._pwaInstallPrompt = null
+      "accepted" === e && (t.style.display = "none", "function" == typeof showToast && showToast("MůjFlix nainstalován!", "success")), window._pwaInstallPrompt = null
     })
   }), window.addEventListener("appinstalled", () => {
     const e = document.getElementById("pwaInstallBtn");
-    e && (e.style.display = "none"), "function" == typeof showToast && showToast("✅ MůjFlix nainstalován!", "success")
+    e && (e.style.display = "none"), "function" == typeof showToast && showToast("MůjFlix nainstalován!", "success")
   }),
   function() {
     function e() {
@@ -171,7 +171,7 @@ function triggerPwaInstall() {
         }(t);
       const a = n,
         l = o;
-      "function" == typeof window.mfHaptic && window.mfHaptic([30, 40, 30]), closeEpRating(!0), s(a, l), "function" == typeof showToast && showToast("⭐ Hodnocení uloženo"), void 0 !== activeSeries && r(activeSeries);
+      "function" == typeof window.mfHaptic && window.mfHaptic([30, 40, 30]), closeEpRating(!0), s(a, l), "function" == typeof showToast && showToast("Hodnocení uloženo"), void 0 !== activeSeries && r(activeSeries);
       if (typeof aiBrain !== "undefined" && typeof db !== "undefined") {
         const parts = a.split("-"),
           epSlug = parts.slice(0, parts.length - 2).join("-"),

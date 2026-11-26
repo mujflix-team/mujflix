@@ -4918,3 +4918,4 @@ h2.title,
 .pg-leaving .pg-profile-item.pg-chosen { transform: scale(1.12); }
 .pg-leaving .pg-profile-item.pg-chosen .pg-name { opacity: .9; }
 .episode-card.ep-swiping { will-change: transform; }
+#confirmIcon:empty { display: none; }

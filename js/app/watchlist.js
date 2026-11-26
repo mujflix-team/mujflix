@@ -359,7 +359,7 @@ function submitRating(e) {
     const t = "loved" === e ? .25 : "liked" === e ? .15 : "ok" === e ? .05 : -.1;
     db[_ratingSlug]._genres && aiBrain.boostGenresFromTmdb(db[_ratingSlug]._genres, t, db[_ratingSlug]?.type === "movie" ? "movie" : "tv")
   }
-  closeRating(), showToast("loved" === e ? "Super! AI si to zapamatuje pro doporučení 🎉" : "meh" === e ? "Chápeme, příště něco lepšího 👍" : "Díky za hodnocení!")
+  closeRating(), showToast("loved" === e ? "Super! AI si to zapamatuje pro doporučení" : "meh" === e ? "Chápeme, příště něco lepšího" : "Díky za hodnocení!")
 }
 document.getElementById("watchlistOverlay").addEventListener("click", e => {
   e.target === document.getElementById("watchlistOverlay") && closeWatchlist()

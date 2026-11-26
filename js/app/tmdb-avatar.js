@@ -16,7 +16,7 @@ window._tmdbSetTab = function(e) {
     const e = document.getElementById("tmdbAvInput").value.trim();
     if (!e) return;
     const t = document.getElementById("tmdbAvGrid");
-    t.innerHTML = '<div class="tmdb-av-loading">🔍 Hledám…</div>';
+    t.innerHTML = '<div class="tmdb-av-loading">Hledám…</div>';
     const n = mfTmdbKey();
     if (n) try {
       let o = [];
@@ -48,10 +48,10 @@ window._tmdbSetTab = function(e) {
         }, t.appendChild(o)
       })
     } catch (e) {
-      t.innerHTML = '<div class="tmdb-av-loading">⚠ Chyba při hledání: ' + escapeHTML(e.message) + "</div>"
-    } else t.innerHTML = '<div class="tmdb-av-loading">⚠ Nastav TMDB API klíč v nastavení, aby šlo hledat.</div>'
+      t.innerHTML = '<div class="tmdb-av-loading">Chyba při hledání: ' + escapeHTML(e.message) + "</div>"
+    } else t.innerHTML = '<div class="tmdb-av-loading">Nastav TMDB API klíč v nastavení, aby šlo hledat.</div>'
   }, window._tmdbAvConfirm = function() {
-    _tmdbAvSelectedUrl ? (_tmdbAvCallback && _tmdbAvCallback(_tmdbAvSelectedUrl, _tmdbAvSelectedName), _tmdbAvClose()) : "function" == typeof showToast && showToast("⚠ Vyber nejdřív obrázek")
+    _tmdbAvSelectedUrl ? (_tmdbAvCallback && _tmdbAvCallback(_tmdbAvSelectedUrl, _tmdbAvSelectedName), _tmdbAvClose()) : "function" == typeof showToast && showToast("Vyber nejdřív obrázek")
   }, document.addEventListener("DOMContentLoaded", function() {
     if (!document.querySelector(".pc-box .pc-label")) return;
     const e = document.querySelectorAll(".pc-box .pc-label");
@@ -60,7 +60,7 @@ window._tmdbSetTab = function(e) {
         "Avatar" === e.textContent.trim() && (t = e)
       }), !t) return;
     const n = document.createElement("button");
-    n.className = "pc-tmdb-btn", n.textContent = "🎬 Vybrat foto z TMDB (herec/osobnost)", n.onclick = () => {
+    n.className = "pc-tmdb-btn", n.textContent = "Vybrat foto z TMDB (herec/osobnost)", n.onclick = () => {
       window._tmdbAvOpen((e, t) => {
         ProfileGate._selectedAvatarUrl = e, ProfileGate._selectedAvatarName = t, document.querySelectorAll(".pc-emoji-btn").forEach(e => e.classList.remove("selected")), "function" == typeof showToast && showToast("✓ Obrázek z TMDB vybrán: " + t);
         let o = document.getElementById("pcTmdbPreview");

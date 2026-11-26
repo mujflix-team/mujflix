@@ -1407,7 +1407,7 @@
         }
 
         if (typeof showToast === 'function') {
-          showToast('⚠ ' + title, 'info');
+          showToast(title, 'info');
         }
       };
 
@@ -1754,7 +1754,7 @@
                   'color:#fff;text-align:center;' +
                   'z-index:999999;border:1px solid rgba(255,255,255,0.1);max-width:400px;';
                 msg.innerHTML =
-                  '<div style="font-size:1.5rem;margin-bottom:8px;">⚠️</div>' +
+                  '' +
                   '<div style="font-weight:700;margin-bottom:8px;">Zdroj nenalezen</div>' +
                   '<div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-bottom:16px;">' +
                   'Zkus jiný zdroj nebo zavři přehrávač.</div>' +
