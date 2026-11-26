@@ -47,35 +47,8 @@ const ProfileGate = {
         /* plynulý přechod: vybraný profil (avatar + jméno) se zvětší, ostatní zhasnou, pak se profil aktivuje */
         const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (t.pin || reduce || e.classList.contains("pg-leaving")) return ProfileGate.selectProfile(t.id);
-        e.classList.add("pg-leaving"); n.classList.add("pg-chosen");
-        /* avatar přeletí tam, kde je profil v aplikaci (horní lišta, na telefonu dock); cíl je vidět až po skrytí výběru, proto se měří po aktivaci */
-        let fly = null, sr = null;
-        try {
-          const src = n.querySelector(".pg-avatar"); sr = src && src.getBoundingClientRect();
-          if (sr && sr.width > 0) {
-            fly = src.cloneNode(true);
-            fly.style.cssText = "position:fixed;margin:0;z-index:100000;pointer-events:none;left:" + sr.left + "px;top:" + sr.top + "px;width:" + sr.width + "px;height:" + sr.height + "px;transform-origin:center";
-            document.body.appendChild(fly);
-            n.classList.remove("pg-chosen"); src.style.visibility = "hidden";
-          }
-        } catch (err) { fly = null; }
-        setTimeout(() => {
-          e.classList.remove("pg-leaving"); n.classList.remove("pg-chosen");
-          ProfileGate.selectProfile(t.id);
-          if (!fly) return;
-          const done = () => { try { fly.remove(); } catch (x) { void x; } };
-          setTimeout(() => {
-            const tg = ["nfAvatar", "dockProfile"].map(i => document.getElementById(i)).find(x => x && x.getBoundingClientRect().width > 0);
-            const tr = tg && tg.getBoundingClientRect();
-            if (!tr) { fly.style.transition = "opacity .25s"; fly.style.opacity = "0"; return setTimeout(done, 280); }
-            fly.style.transition = "transform .55s cubic-bezier(.6,0,.2,1), opacity .2s ease .4s";
-            requestAnimationFrame(() => {
-              fly.style.transform = "translate(" + (tr.left + tr.width / 2 - sr.left - sr.width / 2) + "px," + (tr.top + tr.height / 2 - sr.top - sr.height / 2) + "px) scale(" + Math.min(tr.width / sr.width, tr.height / sr.height) + ")";
-              fly.style.opacity = "0";
-            });
-            setTimeout(done, 650);
-          }, 120);
-        }, 320);
+        const gt = document.getElementById("mfProfileGate"); gt && gt.classList.add("pg-leaving"); e.classList.add("pg-leaving"); n.classList.add("pg-chosen");
+        setTimeout(() => { ProfileGate.selectProfile(t.id); setTimeout(() => { gt && gt.classList.remove("pg-leaving"); e.classList.remove("pg-leaving"); n.classList.remove("pg-chosen"); }, 700); }, 380);
       };
       e.appendChild(n);
     });

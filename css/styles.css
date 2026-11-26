@@ -4243,9 +4243,6 @@ body::before, body::after { display: none !important; }
 }
 #hdrStreakDays { font-size: 17px !important; font-weight: 800 !important; color: #ff9f0a !important; font-family: var(--font) !important; }
 
-#mfProfileGate.hiding {
-  display: none !important;
-}
 
 .pg-logo {      filter: none !important; margin-bottom: 4px !important; }
 .pg-logo span {  filter: none !important; }
@@ -4914,8 +4911,11 @@ h2.title,
 
 /* Výběr profilu: plynulý přechod avataru a jména */
 .pg-profile-item { transition: opacity .3s ease, transform .32s cubic-bezier(.2,.8,.2,1); }
-.pg-leaving .pg-profile-item:not(.pg-chosen) { opacity: 0; transform: scale(.92); pointer-events: none; }
-.pg-leaving .pg-profile-item.pg-chosen { transform: scale(1.12); }
-.pg-leaving .pg-profile-item.pg-chosen .pg-name { opacity: .9; }
+.pg-leaving .pg-profile-item:not(.pg-chosen) { opacity: 0 !important; transform: scale(.94) !important; pointer-events: none; transition: opacity .28s ease, transform .35s ease !important; animation: none !important; }
+.pg-leaving .pg-profile-item.pg-chosen { transform: scale(1.1) !important; transition: transform .38s cubic-bezier(.22,.8,.2,1) !important; animation: none !important; opacity: 1 !important; }
+.pg-leaving .pg-logo, .pg-leaving .pg-title, .pg-leaving .pg-subtitle { opacity: 0 !important; transition: opacity .25s ease !important; animation: none !important; }
+/* po aktivaci profilu se výběr plynule rozplyne a pod ním naskočí aplikace (dřív zmizel naráz) */
+#mfProfileGate.hiding:not(.pg-leaving) { display: none !important; } /* bez animace (obnovení stránky) zmizí hned */
+#mfProfileGate.hiding { transform: scale(1.03); transition: opacity .5s ease, transform .5s ease !important; }
 .episode-card.ep-swiping { will-change: transform; }
 #confirmIcon:empty { display: none; }
