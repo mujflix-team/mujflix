@@ -357,3 +357,8 @@
   #universeOverlay .dv-hero-trl-play { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-md); padding-left: 3px; }
   #universeOverlay .dv-hero-trl-lbl { position: absolute; left: 8px; bottom: 6px; font-size: var(--fs-xs); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 4px #000; }
 }
+
+/* plynulý přechod mezi sekcemi: Objevování se jemně vysune a rozplyne */
+#universeOverlay { transform: translateY(14px); transition: opacity .3s ease, transform .38s cubic-bezier(.22, .8, .2, 1); }
+#universeOverlay.visible { transform: none; }
+@media (prefers-reduced-motion: reduce) { #universeOverlay { transform: none; transition: opacity .15s ease; } }

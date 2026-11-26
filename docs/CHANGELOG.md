@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.208
+### Změněno
+- **Přechody mezi sekcemi:** Objevování se při otevření jemně vysune a rozplyne, Domů se při zobrazení plynule objeví (dříve naskočilo naráz). Bez animace při omezeném pohybu. Objevování se při návratu na Domů plynule rozplyne (dřív zmizelo naráz).
+- **Výběr profilu:** domovská stránka a data z TMDB se začnou načítat už na začátku animace, takže jsou po jejím doznění hotová.
+
 ## 3.21.207
 ### Změněno
 - **Dock:** plynulejší ovládání. Aktivní záložku označuje tenká čárka, která se mezi tlačítky posouvá (nahoře u spodní lišty na telefonu, pod textem na PC), ikony reagují na stisk a ukazatel se při načtení nerozjíždí zleva. Z JS odstraněno skokové zvětšení ikony.
