@@ -3,11 +3,7 @@ function setDockActive(e) {
   if (("dockSeriale" === e || "dockFilmy" === e)) e = "dockObjevovat"; // místo Seriálů a Filmů je jedna položka Objevovat
   document.querySelectorAll(".dock-btn").forEach(e => e.classList.remove("active"));
   const t = document.getElementById(e);
-  t && (t.classList.add("active"), t.style.transform = "scale(0.88) translateZ(0)", requestAnimationFrame(() => requestAnimationFrame(() => {
-    t.style.transition = "transform 0.38s cubic-bezier(0.34,1.5,0.64,1)", t.style.transform = "", setTimeout(() => {
-      t.style.transition = ""
-    }, 400)
-  })))
+  t && t.classList.add("active")
 }
 
 function closeDockOverlays() {

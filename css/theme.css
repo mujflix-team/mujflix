@@ -57,7 +57,17 @@ html body #mfDock.mf-dock {
   background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;
   backdrop-filter: none !important; -webkit-backdrop-filter: none !important; overflow: visible;
 }
-html body #mfDock .mf-dock-pill { display: none !important; }
+/* plynulý ukazatel aktivní záložky: tenká čárka, která se posouvá mezi tlačítky (poloha z js/shell/dock.js movePill) */
+html body #mfDock .mf-dock-pill { display: block !important; position: absolute; left: 0; top: 0; pointer-events: none; background: none; z-index: 0; transition: transform .38s cubic-bezier(.3,.9,.3,1), width .38s cubic-bezier(.3,.9,.3,1), opacity .2s ease; }
+html body #mfDock .mf-dock-pill::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: 0; height: 2px; border-radius: 2px; background: var(--nf-text, #fff); }
+html body #mfDock .dock-btn { z-index: 1; }
+html body #mfDock .dock-btn svg { transition: transform .25s cubic-bezier(.3,.9,.3,1), stroke .2s ease; }
+html body #mfDock .dock-btn:active svg, html body #mfDock .dock-btn:active .dock-label { transform: scale(.9); }
+@media (max-width: 899px) {
+  html body #mfDock .mf-dock-pill::after { bottom: auto; top: 0; left: 30%; right: 30%; }
+  html body #mfDock .dock-btn.active svg { transform: translateY(-1px) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) { html body #mfDock .mf-dock-pill, html body #mfDock .dock-btn svg { transition: none; } }
 html body #mfDock .dock-btn {
   position: relative; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
   background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important;

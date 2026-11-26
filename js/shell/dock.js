@@ -109,10 +109,13 @@
       if (!dock || !pill) return;
       var act = dock.querySelector(".dock-btn.active");
       if (!act || act.offsetWidth === 0) { pill.style.opacity = "0"; return; }
+      var first = !pill._ready;
+      if (first) pill.style.transition = "none"; /* při prvním umístění se čárka nerozjíždí zleva */
       pill.style.opacity = "1";
       pill.style.width = act.offsetWidth + "px";
       pill.style.height = act.offsetHeight + "px";
       pill.style.transform = "translate(" + act.offsetLeft + "px," + act.offsetTop + "px)";
+      if (first) { pill._ready = true; void pill.offsetWidth; requestAnimationFrame(function () { pill.style.transition = ""; }); }
     }
 
     function updateBadge() {
