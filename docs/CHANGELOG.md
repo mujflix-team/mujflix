@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.212
+### Opraveno
+- **Dock po výběru profilu:** dock byl při výběru profilu skrytý a naskočil až po úplném zmizení obrazovky profilů. Teď se plynule vysune zdola už při zaostřování Domů.
+
 ## 3.21.211
 ### Změněno
 - **Výběr profilu:** přechod, který jen naznačí načítání. Vybraný avatar se přesune na střed a jemně „dýchá“ (záře v barvě profilu), za ním se z rozmazaných tvarů skládá náznak Domů (hlavní fotka a řady karet). Jakmile je Domů hotové (nejméně 1,2 s, nejvýše 3,5 s), obraz se zaostří do skutečného Domů. Bez textu a bez točícího se kolečka. Při omezeném pohybu zůstává jen zhasnutí.

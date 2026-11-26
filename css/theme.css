@@ -2185,3 +2185,8 @@ html body #mfDock #dockSeriale, html body #mfDock #dockFilmy { display: none; }
 @keyframes mfSecIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 body.mfh-home-on #mfSectionHome { animation: mfSecIn .22s cubic-bezier(.22, .8, .2, 1) both; }
 @media (prefers-reduced-motion: reduce) { body.mfh-home-on #mfSectionHome { animation: none; } }
+
+/* Dock se po výběru profilu plynule vysune spolu se zaostřením Domů (dřív naskočil až po zmizení výběru) */
+@keyframes mfDockIn { from { translate: 0 120%; } to { translate: 0 0; } } /* translate, ne transform: dock má transform a opacity přebité !important */
+html:has(#mfProfileGate.pg-focus) body #mfDock { animation: mfDockIn .7s cubic-bezier(.22, .8, .2, 1) .15s both; }
+@media (prefers-reduced-motion: reduce) { html:has(#mfProfileGate.pg-focus) body #mfDock { animation: none; } }
