@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.210
+### Změněno
+- **Oblíbené z Objevování:** otevření je rychlejší. Objevování se zavře už po 80 ms místo 320 ms a prolnutí Oblíbených je zkrácené (z cca 0,35 s na 0,2 s).
+
 ## 3.21.209
 ### Změněno
 - **Přechody mezi sekcemi:** zkráceny (Objevování a Domů asi o polovinu), aby přepínání na PC nepůsobilo opožděně.
