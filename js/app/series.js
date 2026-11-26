@@ -655,9 +655,39 @@ function _buildEpCardBase(e, t, n, o, i, a, s) {
   }), y.addEventListener("click", o => {
     /* Celý řádek epizodu pouští přehrávání (kromě kolečka „zhlédnuto“ a po dlouhém stisku, který otevírá dialog postupu). */
     if (o.target.closest && (o.target.closest(".ep-btn-mark") || o.target.closest(".ep-user-rating"))) return;
+    if (y._mfSwiped && Date.now() - y._mfSwiped < 400) return;
     playWithConfirm(e, t, n, c)
-  }), y
+  }), mfEpSwipe(y, e), y
 }
+
+/* Swipe doleva nebo doprava na kartě epizody přepne „zhlédnuto“ (jen dotyk, vodorovný tah). */
+function mfEpSwipe(card, slug) {
+  let x0 = 0, y0 = 0, dx = 0, on = false, locked = false;
+  const reset = () => { card.style.transition = "transform .2s ease"; card.style.transform = ""; card.classList.remove("ep-swiping"); setTimeout(() => { card.style.transition = ""; }, 220); };
+  card.addEventListener("touchstart", ev => {
+    const t = ev.touches[0]; x0 = t.clientX; y0 = t.clientY; dx = 0; on = true; locked = false;
+  }, { passive: true });
+  card.addEventListener("touchmove", ev => {
+    if (!on) return;
+    const t = ev.touches[0], mx = t.clientX - x0, my = t.clientY - y0;
+    if (!locked) {
+      if (Math.abs(my) > 10 && Math.abs(my) > Math.abs(mx)) { on = false; return; }
+      if (Math.abs(mx) < 12) return;
+      locked = true; card.classList.add("ep-swiping");
+    }
+    dx = mx; card.style.transform = "translateX(" + Math.max(-110, Math.min(110, mx * 0.6)) + "px)";
+  }, { passive: true });
+  const end = () => {
+    if (!on) return; on = false;
+    if (locked && Math.abs(dx) > 90) { card._mfSwiped = Date.now(); try { toggleWatch(slug); } catch (e) {} }
+    else if (locked) card._mfSwiped = Date.now();
+    if (locked) reset();
+  };
+  card.addEventListener("touchend", end, { passive: true });
+  card.addEventListener("touchcancel", () => { on = false; if (locked) reset(); }, { passive: true });
+  return card;
+}
+
 
 function playWithConfirm(e, t, n, o) {
   const i = db[activeSeries]?.name || activeSeries,
