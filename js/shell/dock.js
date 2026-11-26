@@ -43,7 +43,7 @@
     }, true);
     function target() {
       var gate = document.getElementById("mfProfileGate");
-      if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none") return "dockProfile";
+      if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none" && !gate.classList.contains("pg-focus")) return "dockProfile"; /* při zaostřování po výběru profilu se dock ukazuje už pod mizející obrazovkou */
       if (tapId && Date.now() - tapAt < 600) return tapId; /* hned po klepnutí se stránky otevírají asynchronně; do té doby zvýraznění nepřeskakuje na starý stav (např. Domů) */
       /* Oblíbené mají přednost: při přepnutí z Objevování zůstane Objevování ještě chvíli otevřené pod nimi a zvýraznění by jinak krátce blikalo zpět na Objevovat */
       if (has("watchlistOverlay", "visible")) return "dockProtebe";
