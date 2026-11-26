@@ -34,15 +34,17 @@
       var el = document.getElementById(id);
       return !!(el && el.classList.contains(cls));
     }
-    var favTapAt = 0;
+    var tapId = "", tapAt = 0;
     document.addEventListener("click", function (ev) {
-      var b = ev.target && ev.target.closest && ev.target.closest("#dockProtebe");
-      if (b) favTapAt = Date.now();
+      var b = ev.target && ev.target.closest && ev.target.closest("#mfDock .dock-btn");
+      if (!b || IDS.indexOf(b.id) === -1) return;
+      tapId = (b.id === "dockSeriale" || b.id === "dockFilmy") ? "dockObjevovat" : b.id;
+      tapAt = Date.now();
     }, true);
     function target() {
       var gate = document.getElementById("mfProfileGate");
       if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none") return "dockProfile";
-      if (favTapAt && Date.now() - favTapAt < 450) return "dockProtebe"; /* hned po klepnutí na Oblíbené se otevírají asynchronně; do té doby zvýraznění nepřeskakuje */
+      if (tapId && Date.now() - tapAt < 600) return tapId; /* hned po klepnutí se stránky otevírají asynchronně; do té doby zvýraznění nepřeskakuje na starý stav (např. Domů) */
       /* Oblíbené mají přednost: při přepnutí z Objevování zůstane Objevování ještě chvíli otevřené pod nimi a zvýraznění by jinak krátce blikalo zpět na Objevovat */
       if (has("watchlistOverlay", "visible")) return "dockProtebe";
       if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockObjevovat"; /* každý typ v Objevování (Vše, Filmy, Seriály) patří pod jednu položku Objevovat */
