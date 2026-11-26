@@ -4925,3 +4925,6 @@ h2.title,
   .pg-leaving .pg-profile-item.pg-chosen, .pg-leaving .pg-profile-item:not(.pg-chosen) { transform: none !important; }
   #mfProfileGate.hiding { transform: none; }
 }
+
+/* Oblíbené: rychlejší prolnutí (z Objevování to trvalo nejdéle) */
+.watchlist-overlay { transition: opacity .2s ease; }
