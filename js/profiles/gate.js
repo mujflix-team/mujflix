@@ -45,8 +45,7 @@ const ProfileGate = {
       n.onclick = () => {
         if (this._manageMode) return ProfileGate.openCreate(t.id);
         /* plynulý přechod: vybraný profil (avatar + jméno) se zvětší, ostatní zhasnou, pak se profil aktivuje */
-        const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (t.pin || reduce || e.classList.contains("pg-leaving")) return ProfileGate.selectProfile(t.id);
+        if (t.pin || e.classList.contains("pg-leaving")) return ProfileGate.selectProfile(t.id);
         const gt = document.getElementById("mfProfileGate"); gt && gt.classList.add("pg-leaving"); e.classList.add("pg-leaving"); n.classList.add("pg-chosen");
         /* domovská stránka a data z TMDB se začnou načítat hned, ať je při doznění animace hotová */
         try { localStorage.setItem(ACTIVE_PID_KEY, t.id); ProfileGate._warmed = t.id; window.dispatchEvent(new Event("mf:profile-changed")); } catch (err) { ProfileGate._warmed = null; }

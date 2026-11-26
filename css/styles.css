@@ -4919,3 +4919,9 @@ h2.title,
 #mfProfileGate.hiding { transform: scale(1.03); transition: opacity .5s ease, transform .5s ease !important; }
 .episode-card.ep-swiping { will-change: transform; }
 #confirmIcon:empty { display: none; }
+
+/* při omezeném pohybu (např. vypnuté animace ve Windows) zůstává jen plynulé zhasnutí bez zvětšování */
+@media (prefers-reduced-motion: reduce) {
+  .pg-leaving .pg-profile-item.pg-chosen, .pg-leaving .pg-profile-item:not(.pg-chosen) { transform: none !important; }
+  #mfProfileGate.hiding { transform: none; }
+}

@@ -359,6 +359,6 @@
 }
 
 /* plynulý přechod mezi sekcemi: Objevování se jemně vysune a rozplyne */
-#universeOverlay { transform: translateY(14px); transition: opacity .3s ease, transform .38s cubic-bezier(.22, .8, .2, 1); }
+#universeOverlay { transform: translateY(8px); transition: opacity .18s ease, transform .24s cubic-bezier(.22, .8, .2, 1); }
 #universeOverlay.visible { transform: none; }
 @media (prefers-reduced-motion: reduce) { #universeOverlay { transform: none; transition: opacity .15s ease; } }
