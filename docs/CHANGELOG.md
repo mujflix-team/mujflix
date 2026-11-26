@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.205
+### Opraveno
+- **Dock:** po klepnutí na libovolné tlačítko se zvýraznění až 600 ms drží na něm, takže už nepřeskočí krátce na Domů, než se stránka otevře (dříve jen u Oblíbených).
+### Změněno
+- **Výběr profilu:** vybraný avatar po kliknutí přeletí do horní lišty (na telefonu k tlačítku Profil) místo pouhého zvětšení. U profilu s PINem a při omezeném pohybu bez animace.
+
 ## 3.21.204
 ### Změněno
 - **Bez emoji v textech:** z oznámení, chybových hlášek, popisků a dialogů zmizela emoji (⚠, ✅, ⭐, 🎉, 👍, 🔍, 🎬, 🎛, 👤). Zůstávají avatary profilu, hvězdy hodnocení a plamen série.
