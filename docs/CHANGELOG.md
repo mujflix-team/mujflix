@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.21.209
+### Změněno
+- **Přechody mezi sekcemi:** zkráceny (Objevování a Domů asi o polovinu), aby přepínání na PC nepůsobilo opožděně.
+### Opraveno
+- **Výběr profilu:** animace se přeskakovala, pokud měl systém zapnuté omezení pohybu (např. vypnuté animace ve Windows), takže na PC nebyla vidět. Teď se přehraje vždy; při omezeném pohybu jen jako plynulé zhasnutí bez zvětšování.
+
 ## 3.21.208
 ### Změněno
 - **Přechody mezi sekcemi:** Objevování se při otevření jemně vysune a rozplyne, Domů se při zobrazení plynule objeví (dříve naskočilo naráz). Bez animace při omezeném pohybu. Objevování se při návratu na Domů plynule rozplyne (dřív zmizelo naráz).

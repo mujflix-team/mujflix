@@ -2182,6 +2182,6 @@ html body #mfDock #dockObjevovat { display: flex; }
 html body #mfDock #dockSeriale, html body #mfDock #dockFilmy { display: none; }
 
 /* plynulý přechod mezi sekcemi: Domů se při zobrazení jemně vysune a rozplyne */
-@keyframes mfSecIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-body.mfh-home-on #mfSectionHome { animation: mfSecIn .4s cubic-bezier(.22, .8, .2, 1) both; }
+@keyframes mfSecIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+body.mfh-home-on #mfSectionHome { animation: mfSecIn .22s cubic-bezier(.22, .8, .2, 1) both; }
 @media (prefers-reduced-motion: reduce) { body.mfh-home-on #mfSectionHome { animation: none; } }
