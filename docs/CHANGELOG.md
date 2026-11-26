@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.202
+### Opraveno
+- **Dock:** po klepnutí na Objevovat se zvýraznění ukáže hned (otevření stránky se spustí až po vykreslení tlačítka) a ovládací prvky Objevování se sestaví předem v klidu, takže první klepnutí na slabším telefonu nezamrzne.
+
 ## 3.21.201
 ### Změněno
 - **Objevování:** z názvů řad zmizelo emoji 🆕 („Nově vydané anime“, „Nově v kinech a v televizi“).

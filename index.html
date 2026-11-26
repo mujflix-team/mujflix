@@ -387,7 +387,7 @@
         class="dock-btn"
         id="dockSeriale"
         data-hash="#seriale"
-        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockSeriale'); mfDiscoverOpen('tv');"
+        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockSeriale'); requestAnimationFrame(function () { setTimeout(function () { mfDiscoverOpen('tv'); }, 0); });"
         title="Procházet seriály"
         aria-label="Procházet seriály"
       >
@@ -402,7 +402,7 @@
         class="dock-btn"
         id="dockFilmy"
         data-hash="#filmy"
-        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockFilmy'); mfDiscoverOpen('movie');"
+        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockFilmy'); requestAnimationFrame(function () { setTimeout(function () { mfDiscoverOpen('movie'); }, 0); });"
         title="Procházet filmy"
         aria-label="Procházet filmy"
       >
@@ -417,7 +417,7 @@
         class="dock-btn"
         id="dockObjevovat"
         data-hash="#objevovat"
-        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockObjevovat'); mfDiscoverOpen('all');"
+        onclick="if (typeof closeWatchlist === 'function') closeWatchlist(); setDockActive('dockObjevovat'); requestAnimationFrame(function () { setTimeout(function () { mfDiscoverOpen('all'); }, 0); });"
         title="Objevovat filmy i seriály"
         aria-label="Objevovat filmy i seriály"
       >
@@ -1762,7 +1762,7 @@
     <script src="js/app/tmdb-avatar.js?v=3" defer></script>
     <script src="js/app/sections.js?v=9" defer></script>
     <script src="js/app/fx.js?v=3" defer></script>
-    <script src="js/pages/discover.js?v=32" defer></script>
+    <script src="js/pages/discover.js?v=33" defer></script>
 
     <script>
       (function () {
