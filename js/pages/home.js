@@ -1245,23 +1245,18 @@
           ? 'Podle tvých oblíbených žánrů: ' + genres.map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean).join(' · ')
           : '';
         nfRowShell('mfhForYou', forYouTitle, forYouSub);
-        var oa = mfhOnlyAnime();
-        nfRowShell('mfhTop10', oa ? 'Top 10 anime' : 'Top 10 tento týden', '', true);
-        nfRowShell('mfhTopTv', oa ? 'Nejlepší anime seriály' : 'Nejlépe hodnocené seriály');
-        nfRowShell('mfhTopMovie', oa ? 'Nejlepší anime filmy' : 'Nejlépe hodnocené filmy');
-
         nfFillRow('mfhRecent', contItems);
         nfFillRow('mfhMyList', mine);
 
         if (!getTmdbKey()) {
-          ['mfhForYou', 'mfhTop10', 'mfhTopTv', 'mfhTopMovie'].forEach(function (id) { nfFillRow(id, []); });
+          ['mfhForYou'].forEach(function (id) { nfFillRow(id, []); });
           var h = document.getElementById('nfHero');
           if (h) h.className = 'nf-hero nf-hero-none';
           return;
         }
 
         // Řady z TMDB ukazují hned placeholdery, dokud nepřijdou data (prázdná řada se po odpovědi odstraní)
-        ['mfhForYou', 'mfhTop10', 'mfhTopTv', 'mfhTopMovie'].forEach(nfRowLoading);
+        ['mfhForYou'].forEach(nfRowLoading);
 
         var seen = mfhSeenTmdbIds();
         var fresh = function (items) { return items.filter(function (it) { return !seen[it.tmdbId]; }); };
@@ -1301,21 +1296,6 @@
         }).catch(function () {
           if (myRun !== _nfRun) return;
           nfFillRow('mfhForYou', []);
-        });
-
-        var AQ = window.MF_ANIME_QUERY || '';
-        function nfPg() { return _nfBump ? (oa ? '&page=' : '?page=') + (1 + _nfBump % 4) : ''; } /* při ručním obnovení se vezme další stránka žebříčku */
-        nfJson(oa ? '/discover/tv?sort_by=popularity.desc&vote_count.gte=50' + AQ : '/trending/all/week').then(function (d) {
-          if (myRun !== _nfRun) return;
-          nfFillRow('mfhTop10', (oa ? nfItems(d, 'tv') : nfItems(d)).slice(0, 10), true);
-        });
-        nfJson(oa ? '/discover/tv?sort_by=vote_average.desc&vote_count.gte=300' + AQ + nfPg() : '/tv/top_rated' + nfPg()).then(function (d) {
-          if (myRun !== _nfRun) return;
-          nfFillRow('mfhTopTv', mfhSeededShuffle(fresh(nfItems(d, 'tv')), _nfBump).slice(0, 20));
-        });
-        nfJson(oa ? '/discover/movie?sort_by=vote_average.desc&vote_count.gte=300' + AQ + nfPg() : '/movie/top_rated' + nfPg()).then(function (d) {
-          if (myRun !== _nfRun) return;
-          nfFillRow('mfhTopMovie', mfhSeededShuffle(fresh(nfItems(d, 'movie')), _nfBump + 1).slice(0, 20));
         });
       }
 

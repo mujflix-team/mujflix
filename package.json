@@ -1,6 +1,10 @@
 {
   "name": "mujflix",
+ claude/domu-objevovani
+  "version": "3.21.219",
+=======
   "version": "3.21.218",
+ main
   "private": true,
   "type": "module",
   "description": "MůjFlix — osobní tracker filmů a seriálů (statická PWA)",

@@ -1,8 +1,14 @@
 # Changelog
 
+ claude/domu-objevovani
+## 3.21.219
+### Změněno
+- **Domů vs. Objevování:** Domů je jen osobní (pokračuj ve sledování, moje řady, „Protože jsi viděl“, „Pro tebe“); obecné řady Top 10 a nejlépe hodnocené byly z Domů přesunuty do Objevování (nové „Top 10 tento týden“).
+=======
 ## 3.21.218
 ### Změněno
 - **Úvodní obrazovka s logem:** logo se ukáže nejméně 1 s od spuštění, aby se animace stihla přehrát (dýchání, záře, lesk), a pak se zvětší, mírně rozostří a rozplyne do aplikace místo prostého zhasnutí. Lesk přijede dřív.
+ main
 
 ## 3.21.217
 ### Změněno

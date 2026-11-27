@@ -1828,12 +1828,12 @@ check("načítání: token --sk-dur (1.3s) existuje", sdurT === "1.3s", sdurT);
 const newPicksT = await page.evaluate(async () => {
   const origFetch = window.fetch, urls = []; localStorage.setItem("mf_tmdb_key", "K");
   window.fetch = async (u) => { urls.push(String(u)); return { ok: true, json: async () => ({ results: [] }) }; };
-  window.mfhNewPicks(); await new Promise(r => setTimeout(r, 700)); const a = urls.filter(u => /top_rated|vote_average\.desc/.test(u)).join(" ");
-  urls.length = 0; window.mfhNewPicks(); await new Promise(r => setTimeout(r, 700)); const b = urls.filter(u => /top_rated|vote_average\.desc/.test(u)).join(" ");
+  window.mfhNewPicks(); await new Promise(r => setTimeout(r, 700)); const a = urls.filter(u => /discover\/(tv|movie)\?/.test(u)).join(" ");
+  urls.length = 0; window.mfhNewPicks(); await new Promise(r => setTimeout(r, 700)); const b = urls.filter(u => /discover\/(tv|movie)\?/.test(u)).join(" ");
   window.fetch = origFetch; localStorage.removeItem("mf_tmdb_key");
   return { a, b };
 });
-check("obnovení Domů: každé ruční obnovení vezme jinou stránku žebříčků (jiné tituly)", /[?&]page=\d/.test(newPicksT.a) && newPicksT.a !== newPicksT.b, JSON.stringify(newPicksT));
+check("obnovení Domů: každé ruční obnovení vezme jinou stránku nabídky Pro tebe (jiné tituly)", /[?&]page=\d/.test(newPicksT.a) && newPicksT.a !== newPicksT.b, JSON.stringify(newPicksT));
 const hspT = await page.evaluate(() => { const r = getComputedStyle(document.documentElement); return [r.getPropertyValue("--h-lg").trim(), r.getPropertyValue("--h-xl").trim(), r.getPropertyValue("--sp-2").trim(), r.getPropertyValue("--sp-4").trim()]; });
 check("výšky a mezery: existují tokeny --h-* a --sp-*", hspT.join() === "44px,48px,8px,16px", JSON.stringify(hspT));
 
