@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.218
+### Změněno
+- **Úvodní obrazovka s logem:** logo se ukáže nejméně 1 s od spuštění, aby se animace stihla přehrát (dýchání, záře, lesk), a pak se zvětší, mírně rozostří a rozplyne do aplikace místo prostého zhasnutí. Lesk přijede dřív.
+
 ## 3.21.217
 ### Změněno
 - **Bez odkazů na GitHub na webu:** ze stránky Soukromí zmizely odkazy na repozitář (Issues, SECURITY.md); kontakt zůstává e-mail. Web se publikuje z kořene repozitáře, proto jsou navíc skryté vývojářské soubory (`README.md`, `CLAUDE.md`, `package.json`, `docs/`, `tests/`, `scripts/`, `worker/`, `functions/`, `.github/`), které odkazy na repozitář obsahují; místo nich se zobrazí stránka 404.
