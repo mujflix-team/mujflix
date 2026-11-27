@@ -3,3 +3,15 @@
 /s/*  /index.html  200
 /f/*  /index.html  200
 /c/*  /index.html  200
+# Zdrojové a vývojářské soubory se z webu nezobrazují (nikdo se přes ně nedostane na repozitář)
+/README.md  /404.html  200
+/CLAUDE.md  /404.html  200
+/package.json  /404.html  200
+/package-lock.json  /404.html  200
+/docs/*  /404.html  200
+/tests/*  /404.html  200
+/scripts/*  /404.html  200
+/worker/*  /404.html  200
+/functions/*  /404.html  200
+/.github/*  /404.html  200
+/.gitignore  /404.html  200

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.217
+### Změněno
+- **Bez odkazů na GitHub na webu:** ze stránky Soukromí zmizely odkazy na repozitář (Issues, SECURITY.md); kontakt zůstává e-mail. Web se publikuje z kořene repozitáře, proto jsou navíc skryté vývojářské soubory (`README.md`, `CLAUDE.md`, `package.json`, `docs/`, `tests/`, `scripts/`, `worker/`, `functions/`, `.github/`), které odkazy na repozitář obsahují; místo nich se zobrazí stránka 404.
+
 ## 3.21.215
 ### Změněno
 - **Úvodní obrazovka s logem:** logo se při spuštění plynule objeví, jemně „dýchá“, modré „Flix“ se v rytmu rozsvěcuje a občas přes logo přejede lesk. Obrazovka také pomaleji (0,35 s) zmizí. Při omezeném pohybu zůstává statické logo.
