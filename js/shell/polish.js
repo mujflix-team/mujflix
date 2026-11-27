@@ -68,10 +68,15 @@
     var sp = document.getElementById('mfSplash');
     if (!sp) return;
     sp.classList.add('out');
-    setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 400);
+    setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 600);
   }
-  setTimeout(hideSplash, 2000);
-  window.addEventListener('load', function () { setTimeout(hideSplash, 250); });
+  /* Logo se ukáže aspoň 1 s od spuštění, ať se animace stihne přehrát; pak se zvětší a rozplyne do aplikace */
+  function hideSplashSoon() {
+    var left = 1000 - (window.performance && performance.now ? performance.now() : 1000);
+    setTimeout(hideSplash, Math.max(250, left));
+  }
+  setTimeout(hideSplash, 2200);
+  window.addEventListener('load', hideSplashSoon);
 
   /* Bez připojení: celá obrazovka „Jsi offline“ místo výběru profilu a prázdných řad. Po obnovení spojení se stránka načte sama. */
   function netBar() {
