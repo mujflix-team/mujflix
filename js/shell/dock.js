@@ -41,10 +41,10 @@
       tapId = (b.id === "dockSeriale" || b.id === "dockFilmy") ? "dockObjevovat" : b.id;
       tapAt = Date.now();
     }, true);
-    function target() {
+    function target(noTap) {
       var gate = document.getElementById("mfProfileGate");
       if (gate && shown(gate) && gate.offsetHeight > 0 && gate.style.display !== "none" && !gate.classList.contains("pg-focus")) return "dockProfile"; /* při zaostřování po výběru profilu se dock ukazuje už pod mizející obrazovkou */
-      if (tapId && Date.now() - tapAt < 600) return tapId; /* hned po klepnutí se stránky otevírají asynchronně; do té doby zvýraznění nepřeskakuje na starý stav (např. Domů) */
+      if (!noTap && tapId && Date.now() - tapAt < 600) return tapId; /* hned po klepnutí se stránky otevírají asynchronně; do té doby zvýraznění nepřeskakuje na starý stav (např. Domů) */
       /* Oblíbené mají přednost: při přepnutí z Objevování zůstane Objevování ještě chvíli otevřené pod nimi a zvýraznění by jinak krátce blikalo zpět na Objevovat */
       if (has("watchlistOverlay", "visible")) return "dockProtebe";
       if (has("universeOverlay", "open") && document.body.classList.contains("discover-open")) return "dockObjevovat"; /* každý typ v Objevování (Vše, Filmy, Seriály) patří pod jednu položku Objevovat */
@@ -74,7 +74,8 @@
       clearTimeout(timer);
       timer = setTimeout(apply, typeof delay === "number" ? delay : 60);
     }
-    window.mfDockTarget = target;
+    window.mfDockTarget = function () { return target(); };
+    window.mfDockTargetState = function () { return target(true); }; /* skutečný stav bez zvýraznění po klepnutí (pro viditelnost docku) */
     function init() {
       ["universeOverlay", "watchlistOverlay", "mfProfileGate", "mfSectionProtebe", "seriesModal", "mfStandaloneCinema", "cinemaModal", "dockMoreSheet", "ratingOverlay"].forEach(function (id) {
         var el = document.getElementById(id);

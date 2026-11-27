@@ -1585,7 +1585,7 @@
           }
         }
         if (!document.documentElement.classList.contains('mfh-home-on')) return false;
-        if (typeof window.mfDockTarget === 'function' && window.mfDockTarget() !== 'dockHome') return false;
+        if (typeof window.mfDockTargetState === 'function' ? window.mfDockTargetState() !== 'dockHome' : (typeof window.mfDockTarget === 'function' && window.mfDockTarget() !== 'dockHome')) return false;
         return true;
       }
 

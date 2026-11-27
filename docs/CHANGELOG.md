@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.213
+### Opraveno
+- **Dock mizel po klepnutí na Profil:** po klepnutí na tlačítko Profil na telefonu dock na zhruba půl sekundy zmizel a pak se vrátil. Příčinou bylo, že se zvýraznění „drží“ na klepnutém tlačítku a viditelnost docku se počítala z něj. Viditelnost teď vychází ze skutečného stavu stránky (nová funkce `mfDockTargetState`).
+
 ## 3.21.212
 ### Opraveno
 - **Dock po výběru profilu:** dock byl při výběru profilu skrytý a naskočil až po úplném zmizení obrazovky profilů. Teď se plynule vysune zdola už při zaostřování Domů.
