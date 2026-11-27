@@ -4954,3 +4954,8 @@ h2.title,
   .pg-skel-row i { animation-duration: .01s; }
   #mfProfileGate.hiding.pg-focus { opacity: 0 !important; -webkit-backdrop-filter: none; backdrop-filter: none; transition: opacity .5s ease !important; }
 }
+
+/* Výběr profilu na telefonu: logo MůjFlix se nesmí dotýkat nadpisu „Kdo se dívá?“ */
+@media (max-width: 899px) {
+  #mfProfileGate .pg-title { margin-top: 46px !important; line-height: 1.15; } /* logo je v rohu a při více profilech by se dotýkal nadpisu */
+}
