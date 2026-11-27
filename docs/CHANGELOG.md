@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.219
+### Změněno
+- **Domů vs. Objevování:** Domů je jen osobní (pokračuj ve sledování, moje řady, „Protože jsi viděl“, „Pro tebe“); obecné řady Top 10 a nejlépe hodnocené byly z Domů přesunuty do Objevování (nové „Top 10 tento týden“).
+
 ## 3.21.217
 ### Změněno
 - **Bez odkazů na GitHub na webu:** ze stránky Soukromí zmizely odkazy na repozitář (Issues, SECURITY.md); kontakt zůstává e-mail. Web se publikuje z kořene repozitáře, proto jsou navíc skryté vývojářské soubory (`README.md`, `CLAUDE.md`, `package.json`, `docs/`, `tests/`, `scripts/`, `worker/`, `functions/`, `.github/`), které odkazy na repozitář obsahují; místo nich se zobrazí stránka 404.

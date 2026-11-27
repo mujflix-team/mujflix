@@ -583,6 +583,10 @@
         load: function () { return api('/trending/all/week?language=cs-CZ').then(function (d) { return normList(d && d.results); }); }
       });
 
+      rows.push({ title: 'Top 10 tento týden', sub: 'Co sleduje celý svět', showType: true, load: function () {
+        return api('/trending/all/day?language=cs-CZ').then(function (d) { return normList(d && d.results).slice(0, 10); });
+      } });
+
       var genreRows = [];
       prefs.slice(0, 2).forEach(function (id) { var g = genreForId(id); if (g && genreRows.indexOf(g) < 0) genreRows.push(g); });
       ['kom', 'akcni', 'drama'].forEach(function (k) {
