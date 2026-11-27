@@ -68,7 +68,7 @@
     var sp = document.getElementById('mfSplash');
     if (!sp) return;
     sp.classList.add('out');
-    setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 250);
+    setTimeout(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 400);
   }
   setTimeout(hideSplash, 2000);
   window.addEventListener('load', function () { setTimeout(hideSplash, 250); });

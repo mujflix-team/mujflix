@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.215
+### Změněno
+- **Úvodní obrazovka s logem:** logo se při spuštění plynule objeví, jemně „dýchá“, modré „Flix“ se v rytmu rozsvěcuje a občas přes logo přejede lesk. Obrazovka také pomaleji (0,35 s) zmizí. Při omezeném pohybu zůstává statické logo.
+
 ## 3.21.214
 ### Opraveno
 - **Výběr profilu na telefonu:** logo MůjFlix se dotýkalo nadpisu „Kdo se dívá?“, když bylo profilů hodně. Nadpis má na telefonu větší odstup od loga.
