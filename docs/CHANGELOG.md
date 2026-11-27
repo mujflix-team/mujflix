@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.214
+### Opraveno
+- **Výběr profilu na telefonu:** logo MůjFlix se dotýkalo nadpisu „Kdo se dívá?“, když bylo profilů hodně. Nadpis má na telefonu větší odstup od loga.
+- **Ikona aplikace (PWA) v Brave/Chrome na Androidu:** nápis „MůjFlix“ byl ořezaný, protože maskovatelná ikona měla logo širší než bezpečná zóna (launcher ořízne okraje do kruhu či zaobleného čtverce). Logo je zmenšené na přibližně 54 % šířky a vejde se do masky. Firefox používá běžnou ikonu, proto tam ořez nebyl. U již nainstalované aplikace se ikona nemění sama; je potřeba ji odinstalovat a přidat znovu.
+
 ## 3.21.213
 ### Opraveno
 - **Dock mizel po klepnutí na Profil:** po klepnutí na tlačítko Profil na telefonu dock na zhruba půl sekundy zmizel a pak se vrátil. Příčinou bylo, že se zvýraznění „drží“ na klepnutém tlačítku a viditelnost docku se počítala z něj. Viditelnost teď vychází ze skutečného stavu stránky (nová funkce `mfDockTargetState`).
