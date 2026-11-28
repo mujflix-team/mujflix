@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.230
+### Opraveno
+- **Oblíbené na telefonu:** řada záložek (Vše, Rozkoukané, Filmy…) se už při tažení nehýbe nahoru a dolů (podtržení přetékalo mimo řadu); podtržení je uvnitř řady.
+
 ## 3.21.229
 ### Přidáno
 - **Oblíbené:** nahoře řada „Pokračovat ve sledování“ (širší karty s proužkem postupu a dalším dílem; jen ve „Vše“ bez hledání). Nové záložky **Rozkoukané** (dřív se kvůli chybějícímu tlačítku nikdy nezobrazila) a **Chci vidět** (to, co jsi ještě nezačal).

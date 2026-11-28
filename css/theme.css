@@ -2207,12 +2207,12 @@ html body #watchlistOverlay .wl-header { align-items: flex-end; }
 html body #watchlistOverlay .wl-title { font-size: clamp(1.9rem, 3.6vw, 2.8rem) !important; font-weight: 800 !important; letter-spacing: -0.04em !important; line-height: 1; }
 html body #watchlistOverlay .wl-count { font-size: var(--fs-md); color: var(--c-text-4) !important; padding-bottom: 4px; }
 html body #watchlistOverlay .wl-tools { gap: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--w-2); padding-bottom: 0; }
-html body #watchlistOverlay .wl-tabs { display: flex; flex-wrap: nowrap; gap: var(--sp-5); overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+html body #watchlistOverlay .wl-tabs { display: flex; flex-wrap: nowrap; gap: var(--sp-5); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; max-width: 100%; }
 html body #watchlistOverlay .wl-tabs::-webkit-scrollbar { display: none; }
 html body #watchlistOverlay .wl-tab { flex: none; position: relative; padding: 10px 2px 12px; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: var(--c-text-4) !important; font-size: var(--fs-base); font-weight: 600; transition: color var(--t-fast); }
 html body #watchlistOverlay .wl-tab:hover { color: #fff !important; }
 html body #watchlistOverlay .wl-tab.active { background: transparent !important; color: #fff !important; }
-html body #watchlistOverlay .wl-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent, var(--c-accent)); }
+html body #watchlistOverlay .wl-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent, var(--c-accent)); }
 html body #watchlistOverlay .wl-search { flex: 0 1 260px; height: var(--h-md); padding: 0 14px; margin-bottom: 8px; background: transparent !important; border: 0 !important; border-bottom: 1px solid var(--w-3) !important; border-radius: 0 !important; font-size: var(--fs-base); }
 html body #watchlistOverlay .wl-search:focus { background: transparent !important; border-bottom-color: #fff !important; }
 html body #watchlistOverlay .wl-sort { margin-bottom: 8px; }
