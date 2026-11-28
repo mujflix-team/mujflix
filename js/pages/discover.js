@@ -849,6 +849,8 @@
       if (base.length >= 4) add(base.slice(0, -1));
       if (base.length >= 5) add(base.slice(0, -2));
     }
+    // Chybějící mezera („breakingbad“): zkusí se začátek dotazu (45 % a 65 % délky), shoda se pak hodnotí bez mezer
+    if (!/\s/.test(raw) && /^[a-z0-9]+$/.test(needle) && needle.length >= 7) { add(needle.slice(0, Math.ceil(needle.length * 0.45))); add(needle.slice(0, Math.ceil(needle.length * 0.65))); }
     if (!cands.length || needle.length < 4) return Promise.resolve([]);
     var needles = [needle].concat(kata ? [fold(kata)] : []);
     return Promise.all(cands.slice(0, 4).map(function (w) {
@@ -861,8 +863,10 @@
           if (seen[key]) return;
           seen[key] = 1;
           var dist = 99;
-          [fold(it.title), fold(it.orig)].filter(Boolean).forEach(function (t) {
-            needles.forEach(function (nd) { dist = Math.min(dist, editDistance(t, nd), editDistance(t.slice(0, nd.length), nd)); });
+          [fold(it.title), fold(it.orig)].filter(Boolean).forEach(function (t0) {
+            [t0, t0.replace(/[^a-z0-9]+/g, '')].forEach(function (t) {
+              needles.forEach(function (nd) { dist = Math.min(dist, editDistance(t, nd), editDistance(t.slice(0, nd.length), nd)); });
+            });
           });
           if (dist <= max) out.push({ it: it, d: dist });
         });
