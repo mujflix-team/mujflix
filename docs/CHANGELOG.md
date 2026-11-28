@@ -1,8 +1,14 @@
 # Changelog
 
+## 3.21.226
+### Změněno
+- **Objevování:** „Top 10 tento týden“ je zpět ve stylu z Domů (velká čísla za plakáty, pořadí podle týdenního žebříčku, bez míchání).
+- **Šipky řad na Domů** vypadají stejně jako v Objevování (barevný přechod).
+- Text pro nového člověka je pod kartami řady „Populární právě teď“.
+
 ## 3.21.225
 ### Opraveno
-- **Domů pro nového člověka:** text „Zatím nemáš nic rozkoukané…“ je na vlastním řádku pod nadpisem „Populární právě teď“ (dřív vedle něj a v telefonu skrytý).
+- **Domů pro nového člověka:** text „Zatím nemáš nic rozkoukané…“ je pod kartami řady „Populární právě teď“ (dřív vedle nadpisu a v telefonu skrytý).
 
 ## 3.21.224
 ### Změněno

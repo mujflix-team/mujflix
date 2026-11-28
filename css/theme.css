@@ -2193,6 +2193,11 @@ body.mfh-home-on #mfSectionHome { animation: mfSecIn .22s cubic-bezier(.22, .8, 
 html:has(#mfProfileGate.pg-focus) body #mfDock { animation: mfDockIn .7s cubic-bezier(.22, .8, .2, 1) .15s both; }
 @media (prefers-reduced-motion: reduce) { html:has(#mfProfileGate.pg-focus) body #mfDock { animation: none; } }
 
-/* Text pod nadpisem řady (nový člověk bez historie): na vlastním řádku, i v telefonu */
-html body .nf-row-head:has(.nf-row-sub-below) { flex-wrap: wrap; }
-html body .nf-row-sub.nf-row-sub-below { display: block !important; flex: 0 0 100%; order: 2; white-space: normal; margin-top: 4px; }
+/* Poznámka pod řadou (nový člověk bez historie): pod kartami, i v telefonu */
+.nf-row-note { margin: 10px var(--nf-pad) 0; font-size: var(--fs-sm); line-height: 1.5; color: var(--c-text-4); }
+
+/* Šipky řad na Domů stejné jako v Objevování (barevný přechod místo tmavého obdélníku) */
+html body .nf-row .nf-arrow { width: 48px; border-radius: 0; background: none; }
+html body .nf-row .nf-arrow-l { background: linear-gradient(90deg, rgba(11, 11, 16, 0.92), transparent); }
+html body .nf-row .nf-arrow-r { background: linear-gradient(270deg, rgba(11, 11, 16, 0.92), transparent); }
+html body .nf-row .nf-arrow:hover { background-color: transparent; }
