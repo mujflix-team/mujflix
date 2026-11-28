@@ -1360,6 +1360,8 @@ html body #seriesModal .close-btn { position: absolute !important; top: 14px; ri
    takže se člověk nikdy neocitne na obrazovce bez navigace. V telefonu zůstává spodní lišta. */
 html.mfh-home-on body.discover-open #nfTop { display: flex; background: var(--nf-bg); z-index: 9991; }
 html body.discover-open #mfDock { display: flex !important; }
+/* Logo a profil nahoře v Objevování nesmí zmizet (třídy mfh-home-on / nf-top-hidden se tu občas rozejdou) */
+html body.discover-open #nfTop, html body.discover-open #nfTop.nf-top-hidden { display: flex !important; }
 #universeOverlay .dv-brand { display: none !important; }
 #universeOverlay .dv-top { padding-top: calc(env(safe-area-inset-top, 0px) + var(--nf-bar-h) + 8px); border-bottom: 0; }
 #universeOverlay .dv-body { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }

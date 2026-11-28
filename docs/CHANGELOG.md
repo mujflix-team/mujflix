@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.221
+### Opraveno
+- **Uzi.la:** Worker při ověřování zdrojů bere Uzi.la jako NajSerialy: když na stránce nenajde název z adresy, výsledek je „nevíme“ (zdroj se nepřeskočí); skutečná 404 a „nenalezeno“ platí dál. **Worker je potřeba znovu nasadit.**
+- **Objevování:** logo a profil v horní liště už nemizí; rozbalené filtry mají plné pozadí (neprosvítá banner ani náhled traileru).
+
 ## 3.21.220
 ### Opraveno
 - **CI:** do kontroly přibyl krok hlídající zbytky po slučování; v `package.json`, `js/core/version.js` a changelogu zůstaly zbytky po slučování větví (CI padalo na neplatném JSON); odstraněny.

@@ -60,7 +60,7 @@ async function handleSrc(request, env, cors, url) {
 const PROBE_HOSTS = new Set(["www.najserialy.io", "najserialy.io", "svetserialu.to", "www.svetserialu.to", "serialy.bombuj.si", "www.bombuj.si", "bombuj.si", "uzi.la", "www.uzi.la"]);
 const PROBE_MAX = 8, PROBE_TTL = 1800, PROBE_LIMIT = 200;
 /* Weby, kde heuristika „na stránce není nic z názvu“ dává falešné záporné výsledky: výsledek je „nevíme“ (zdroj zůstane), ne „nemá“. Skutečná 404 a „nenalezeno“ v titulku platí dál. */
-const SOFT_UNSURE = new Set(["www.najserialy.io", "najserialy.io"]);
+const SOFT_UNSURE = new Set(["www.najserialy.io", "najserialy.io", "uzi.la", "www.uzi.la"]);
 const NOTFOUND_RE = /(\b404\b|nenalezen|nebyl[aoy]? nalezen|neexistuje|stránk[auy] nebyl|not found|nic (jsme )?nenašli)/i;
 const probeHits = new Map();
 
