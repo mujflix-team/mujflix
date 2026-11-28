@@ -130,8 +130,10 @@ function wlItemSet(item, fn) {
 }
 function wlCloseMenu() {
   const m = document.getElementById("mfWlMenu");
-  m && m.remove(), document.removeEventListener("mousedown", wlMenuOutside, true), document.removeEventListener("keydown", wlMenuKey, true)
+  m && m.remove(), document.removeEventListener("mousedown", wlMenuOutside, true), document.removeEventListener("keydown", wlMenuKey, true), document.removeEventListener("scroll", wlMenuScroll, true)
 }
+/* Posunutí stránky nabídku zavře (kotví k tlačítku, které by jinak ujelo); posun uvnitř nabídky ne */
+function wlMenuScroll(e) { const m = document.getElementById("mfWlMenu"); m && !m.contains(e.target) && !m.contains(document.activeElement) && wlCloseMenu() } /* při psaní názvu (klávesnice posouvá stránku) se nezavírá */
 function wlMenuOutside(e) { const m = document.getElementById("mfWlMenu"); m && !m.contains(e.target) && !e.target.closest(".wl-card-lists") && wlCloseMenu() }
 function wlMenuKey(e) { "Escape" === e.key && (e.stopPropagation(), wlCloseMenu()) }
 function wlOpenListMenu(item, anchor) {
@@ -143,14 +145,15 @@ function wlOpenListMenu(item, anchor) {
   m.id = "mfWlMenu", m.className = "wl-menu", m.setAttribute("role", "dialog"), m.setAttribute("aria-label", "Seznamy");
   const draw = () => {
     const cur = getWatchlist().find(x => x.slug === item.slug && x.name === item.name), mine = (cur && cur.lists) || [];
-    m.innerHTML = '<div class="wl-menu-title">Přidat do seznamu</div>' + wlListNames().map(n => `<button type="button" class="wl-menu-row${mine.includes(n) ? " on" : ""}" data-n="${_esc(n)}"><span class="wl-menu-check">${mine.includes(n) ? "✓" : ""}</span><span class="wl-menu-name">${_esc(n)}</span></button>`).join("") + '<form class="wl-menu-new"><input type="text" maxlength="24" placeholder="Nový seznam" aria-label="Název nového seznamu"><button type="submit">Přidat</button></form>';
+    m.innerHTML = '<div class="wl-menu-head"><div class="wl-menu-title">Přidat do seznamu</div><button type="button" class="wl-menu-x" aria-label="Zavřít">&#x2715;</button></div>' + wlListNames().map(n => `<button type="button" class="wl-menu-row${mine.includes(n) ? " on" : ""}" data-n="${_esc(n)}"><span class="wl-menu-check">${mine.includes(n) ? "✓" : ""}</span><span class="wl-menu-name">${_esc(n)}</span></button>`).join("") + '<form class="wl-menu-new"><input type="text" maxlength="24" placeholder="Nový seznam" aria-label="Název nového seznamu"><button type="submit">Přidat</button></form>';
+    m.querySelector(".wl-menu-x").onclick = () => { anchor._wlOpen = false, wlCloseMenu() };
     m.querySelectorAll(".wl-menu-row").forEach(b => b.onclick = () => { const n = b.dataset.n; wlItemSet(item, l => { const i = l.indexOf(n); i >= 0 ? l.splice(i, 1) : l.push(n) }), draw() });
     m.querySelector("form").onsubmit = e => { e.preventDefault(); const v = m.querySelector("input").value.trim().slice(0, 24); v && (wlItemSet(item, l => { l.includes(v) || l.push(v) }), draw()) }
   };
   draw(), document.body.appendChild(m);
   const r = anchor.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
   m.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + "px", m.style.top = (r.bottom + 6 + h > innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6) + "px";
-  setTimeout(() => { document.addEventListener("mousedown", wlMenuOutside, true), document.addEventListener("keydown", wlMenuKey, true) }, 0)
+  setTimeout(() => { document.addEventListener("mousedown", wlMenuOutside, true), document.addEventListener("keydown", wlMenuKey, true), document.addEventListener("scroll", wlMenuScroll, true) }, 0)
 }
 function wlRenameList(name) {
   const v = (prompt("Nový název seznamu", name) || "").trim().slice(0, 24);
@@ -306,9 +309,9 @@ function renderWatchlist() {
   }
   if ("string" == typeof f && 0 === f.indexOf("list:")) {
     const nm = f.slice(5), bar = document.createElement("div");
-    bar.className = "wl-resume wl-listbar", bar.innerHTML = '<span class="wl-listbar-name"></span><button type="button" class="wl-listbar-btn" data-a="rename">Přejmenovat</button><button type="button" class="wl-listbar-btn" data-a="delete">Smazat seznam</button>',
+    bar.className = "wl-resume wl-listbar", bar.innerHTML = '<span class="wl-listbar-name"></span><button type="button" class="wl-listbar-btn" data-a="share">Sdílet</button><button type="button" class="wl-listbar-btn" data-a="rename">Přejmenovat</button><button type="button" class="wl-listbar-btn" data-a="delete">Smazat seznam</button>',
     bar.querySelector(".wl-listbar-name").textContent = nm,
-    bar.querySelector('[data-a="rename"]').onclick = () => wlRenameList(nm), bar.querySelector('[data-a="delete"]').onclick = () => wlDeleteList(nm),
+    bar.querySelector('[data-a="share"]').onclick = () => window.mfShareList && window.mfShareList(nm), bar.querySelector('[data-a="rename"]').onclick = () => wlRenameList(nm), bar.querySelector('[data-a="delete"]').onclick = () => wlDeleteList(nm),
     list.insertBefore(bar, list.firstChild)
   }
   if ("all" === f && !q) {
