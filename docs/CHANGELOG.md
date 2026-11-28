@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.225
+### Opraveno
+- **Domů pro nového člověka:** text „Zatím nemáš nic rozkoukané…“ je na vlastním řádku pod nadpisem „Populární právě teď“ (dřív vedle něj a v telefonu skrytý).
+
 ## 3.21.223
 ### Změněno
 - **Synchronizace bez načtení stránky:** data z jiného zařízení se projeví na místě (Domů, Oblíbené, profil), stránka se už nereloaduje. Drobnosti (série, průběh sledování, historie) se uloží potichu a nic nepřekreslují, takže pouhé přihlášení na telefonu PC neruší. Když je otevřený detail, přehrávač nebo Objevování, ukáže se jen nabídka „Načíst změny“. Reload zůstává jen tehdy, když zmizel aktivní profil.
