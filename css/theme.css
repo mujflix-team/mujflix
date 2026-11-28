@@ -2192,3 +2192,7 @@ body.mfh-home-on #mfSectionHome { animation: mfSecIn .22s cubic-bezier(.22, .8, 
 @keyframes mfDockIn { from { translate: 0 120%; } to { translate: 0 0; } } /* translate, ne transform: dock má transform a opacity přebité !important */
 html:has(#mfProfileGate.pg-focus) body #mfDock { animation: mfDockIn .7s cubic-bezier(.22, .8, .2, 1) .15s both; }
 @media (prefers-reduced-motion: reduce) { html:has(#mfProfileGate.pg-focus) body #mfDock { animation: none; } }
+
+/* Text pod nadpisem řady (nový člověk bez historie): na vlastním řádku, i v telefonu */
+html body .nf-row-head:has(.nf-row-sub-below) { flex-wrap: wrap; }
+html body .nf-row-sub.nf-row-sub-below { display: block !important; flex: 0 0 100%; order: 2; white-space: normal; margin-top: 4px; }

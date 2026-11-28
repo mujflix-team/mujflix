@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.225
+### Opraveno
+- **Domů pro nového člověka:** text „Zatím nemáš nic rozkoukané…“ je na vlastním řádku pod nadpisem „Populární právě teď“ (dřív vedle něj a v telefonu skrytý).
+
 ## 3.21.224
 ### Změněno
 - **Soukromí a podmínky:** aktualizováno k dnešnímu stavu (datum, platnost propojení se čtením prodlužuje, pravidelné dotazování propojených zařízení, mezipaměť souborů aplikace, ověření zdrojů posílá adresu titulu na zdroji, bez odkazu na veřejný issue).

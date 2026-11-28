@@ -605,7 +605,7 @@
         return '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="' + (left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6') + '"/></svg>';
       }
 
-      function nfRowShell(id, title, sub, ranked) {
+      function nfRowShell(id, title, sub, ranked, subBelow) {
         var host = document.getElementById('nfRows');
         if (!host) return;
         var sec = document.createElement('section');
@@ -615,7 +615,7 @@
         sec.innerHTML =
           '<div class="nf-row-head">' +
             '<h2 class="nf-row-title">' + esc(title) + '</h2>' +
-            (sub ? '<span class="nf-row-sub">' + esc(sub) + '</span>' : '') +
+            (sub ? '<span class="nf-row-sub' + (subBelow ? ' nf-row-sub-below' : '') + '">' + esc(sub) + '</span>' : '') +
           '</div>' +
           '<div class="nf-scroller">' +
             '<div class="nf-track" id="' + id + '"></div>' +
@@ -1244,7 +1244,7 @@
         var forYouSub = mfhOnlyAnime() ? 'Podle toho, že sleduješ hlavně anime' : genres.length
           ? 'Podle tvých oblíbených žánrů: ' + genres.map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean).join(' · ')
           : 'Zatím nemáš nic rozkoukané. Pusť si pár seriálů a filmů a tady se objeví tipy přímo pro tebe.';
-        nfRowShell('mfhForYou', forYouTitle, forYouSub);
+        nfRowShell('mfhForYou', forYouTitle, forYouSub, false, !genres.length && !mfhOnlyAnime());
         nfFillRow('mfhRecent', contItems);
         nfFillRow('mfhMyList', mine);
 
