@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.231
+### Přidáno
+- **Oblíbené: vlastní seznamy** (např. „Na víkend“, „Anime“). Tlačítko se seznamem na kartě otevře nabídku (zaškrtni existující nebo vytvoř nový), seznamy se objeví jako záložky; v seznamu je lišta Přejmenovat / Smazat seznam (filmy a seriály zůstávají v Oblíbených). Názvy jsou uložené u položek, takže se synchronizují a patří vždy danému profilu.
+- **Tolerantnější hledání:** v Oblíbených se hledá bez ohledu na diakritiku, velikost písmen, mezery a interpunkci; v Objevování najde i slepená slova (např. „breakingbad“ → Breaking Bad).
+
 ## 3.21.230
 ### Opraveno
 - **Oblíbené na telefonu:** řada záložek (Vše, Rozkoukané, Filmy…) se už při tažení nehýbe nahoru a dolů (podtržení přetékalo mimo řadu); podtržení je uvnitř řady.

@@ -114,6 +114,58 @@ function closeWatchlist() {
   e.classList.remove("visible"), clearTimeout(closeWatchlist._t), closeWatchlist._t = setTimeout(() => e.classList.remove("open"), 280)
 }
 
+/* Vlastní seznamy: názvy jsou uložené přímo u položek (item.lists), takže se synchronizují i oddělují po profilech beze změny úložiště */
+function wlListNames(all) {
+  const set = {};
+  (all || getWatchlist()).forEach(it => (it.lists || []).forEach(n => { set[n] = 1 }));
+  return Object.keys(set).sort((a, b) => a.localeCompare(b, "cs"))
+}
+function wlItemSet(item, fn) {
+  const cur = getWatchlist(), k = cur.findIndex(x => x.slug === item.slug && x.name === item.name);
+  if (k < 0) return;
+  cur[k].lists = (cur[k].lists || []).slice();
+  fn(cur[k].lists);
+  cur[k].lists.length || delete cur[k].lists;
+  saveWatchlistData(cur), renderWatchlist()
+}
+function wlCloseMenu() {
+  const m = document.getElementById("mfWlMenu");
+  m && m.remove(), document.removeEventListener("mousedown", wlMenuOutside, true), document.removeEventListener("keydown", wlMenuKey, true)
+}
+function wlMenuOutside(e) { const m = document.getElementById("mfWlMenu"); m && !m.contains(e.target) && !e.target.closest(".wl-card-lists") && wlCloseMenu() }
+function wlMenuKey(e) { "Escape" === e.key && (e.stopPropagation(), wlCloseMenu()) }
+function wlOpenListMenu(item, anchor) {
+  const had = !!document.getElementById("mfWlMenu");
+  wlCloseMenu();
+  if (had && anchor._wlOpen) { anchor._wlOpen = false; return }
+  anchor._wlOpen = true;
+  const m = document.createElement("div");
+  m.id = "mfWlMenu", m.className = "wl-menu", m.setAttribute("role", "dialog"), m.setAttribute("aria-label", "Seznamy");
+  const draw = () => {
+    const cur = getWatchlist().find(x => x.slug === item.slug && x.name === item.name), mine = (cur && cur.lists) || [];
+    m.innerHTML = '<div class="wl-menu-title">Přidat do seznamu</div>' + wlListNames().map(n => `<button type="button" class="wl-menu-row${mine.includes(n) ? " on" : ""}" data-n="${_esc(n)}"><span class="wl-menu-check">${mine.includes(n) ? "✓" : ""}</span><span class="wl-menu-name">${_esc(n)}</span></button>`).join("") + '<form class="wl-menu-new"><input type="text" maxlength="24" placeholder="Nový seznam" aria-label="Název nového seznamu"><button type="submit">Přidat</button></form>';
+    m.querySelectorAll(".wl-menu-row").forEach(b => b.onclick = () => { const n = b.dataset.n; wlItemSet(item, l => { const i = l.indexOf(n); i >= 0 ? l.splice(i, 1) : l.push(n) }), draw() });
+    m.querySelector("form").onsubmit = e => { e.preventDefault(); const v = m.querySelector("input").value.trim().slice(0, 24); v && (wlItemSet(item, l => { l.includes(v) || l.push(v) }), draw()) }
+  };
+  draw(), document.body.appendChild(m);
+  const r = anchor.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + "px", m.style.top = (r.bottom + 6 + h > innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6) + "px";
+  setTimeout(() => { document.addEventListener("mousedown", wlMenuOutside, true), document.addEventListener("keydown", wlMenuKey, true) }, 0)
+}
+function wlRenameList(name) {
+  const v = (prompt("Nový název seznamu", name) || "").trim().slice(0, 24);
+  if (!v || v === name) return;
+  const cur = getWatchlist();
+  cur.forEach(it => { it.lists && it.lists.includes(name) && (it.lists = Array.from(new Set(it.lists.map(n => n === name ? v : n)))) });
+  saveWatchlistData(cur), window._wlFilter = "list:" + v, renderWatchlist()
+}
+function wlDeleteList(name) {
+  if (!confirm("Smazat seznam „" + name + "“? Filmy a seriály zůstanou v Oblíbených.")) return;
+  const cur = getWatchlist();
+  cur.forEach(it => { it.lists && (it.lists = it.lists.filter(n => n !== name), it.lists.length || delete it.lists) });
+  saveWatchlistData(cur), window._wlFilter = "all", renderWatchlist()
+}
+
 window._wlFilter = "all";
 window._wlQuery = "";
 
@@ -177,8 +229,14 @@ function wlResumeInfo(item) {
   return null
 }
 
+/* Hledání bez ohledu na diakritiku, velikost písmen, mezery a interpunkci („breakingbad“ najde „Breaking Bad“) */
+function wlFold(t) {
+  let x = String(t || "").toLowerCase();
+  try { x = x.normalize("NFD").replace(/[\u0300-\u036f]/g, "") } catch (e) {}
+  return x.replace(/[^a-z0-9\u0400-\u04ff\u3040-\u9fff]+/g, "")
+}
 function wlSearch(v) {
-  window._wlQuery = (v || "").trim().toLowerCase(), renderWatchlist()
+  window._wlQuery = wlFold(v), renderWatchlist()
 }
 
 function renderWatchlist() {
@@ -187,10 +245,12 @@ function renderWatchlist() {
     empty = document.getElementById("watchlistEmpty"),
     count = document.getElementById("wlCount"),
     tools = document.getElementById("wlTools"),
-    f = window._wlFilter || "all",
     q = window._wlQuery || "";
   if (!list || !empty) return;
+  let f = window._wlFilter || "all";
   list.querySelectorAll(".wl-card, .wl-noresult, .wl-resume").forEach(x => x.remove());
+  const listNames = wlListNames(all);
+  "string" == typeof f && 0 === f.indexOf("list:") && !listNames.includes(f.slice(5)) && (f = window._wlFilter = "all");
   const nSeries = all.filter(x => "series" === x.type).length,
     nMovie = all.length - nSeries;
   if (count && (count.textContent = all.length ? all.length + (1 === all.length ? " položka" : all.length < 5 ? " položky" : " položek") : ""), tools) {
@@ -204,6 +264,15 @@ function renderWatchlist() {
     nb && (nb.textContent = "Nový díl · " + nNew, nb.classList.toggle("active", "newep" === f), nb.style.display = nNew || "newep" === f ? "" : "none");
     const nRes = all.filter(x => { const r = wlResumeInfo(x); return r && !r.done }).length, rb = document.getElementById("wlTabResume");
     rb && (rb.textContent = "Rozkoukané · " + nRes, rb.classList.toggle("active", "resume" === f), rb.style.display = nRes || "resume" === f ? "" : "none");
+    const tabs = tools.querySelector(".wl-tabs");
+    tabs.querySelectorAll(".wl-tab-list").forEach(x => x.remove());
+    const anchorTab = document.getElementById("wlTabNew");
+    listNames.forEach(n => {
+      const b = document.createElement("button");
+      b.type = "button", b.className = "wl-tab wl-tab-list" + (("list:" + n) === window._wlFilter ? " active" : ""), b.dataset.f = "list:" + n,
+      b.textContent = n + " · " + all.filter(x => (x.lists || []).includes(n)).length, b.onclick = () => wlSetFilter("list:" + n),
+      tabs.insertBefore(b, anchorTab)
+    });
     const nTodo = all.filter(x => !wlResumeInfo(x)).length, tb = document.getElementById("wlTabTodo");
     tb && (tb.textContent = "Chci vidět · " + nTodo, tb.classList.toggle("active", "todo" === f), tb.style.display = nTodo && nTodo < all.length || "todo" === f ? "" : "none");
     const so = document.getElementById("wlSort");
@@ -216,13 +285,15 @@ function renderWatchlist() {
   all.forEach((item, idx) => {
     if ("newep" === f) {
       if (!wlHasNewEp(item)) return
+    } else if ("string" == typeof f && 0 === f.indexOf("list:")) {
+      if (!(item.lists || []).includes(f.slice(5))) return
     } else if ("todo" === f) {
       if (wlResumeInfo(item)) return
     } else if ("resume" === f) {
       const r = wlResumeInfo(item);
       if (!r || r.done) return
     } else if ("all" !== f && ("series" === f ? "series" !== item.type : "series" === item.type)) return;
-    q && !(item.name || "").toLowerCase().includes(q) || shown.push({
+    q && !wlFold(item.name).includes(q) || shown.push({
       item,
       idx
     })
@@ -232,6 +303,13 @@ function renderWatchlist() {
   if (!shown.length) {
     const n = document.createElement("div");
     return n.className = "wl-noresult", n.textContent = "Nic nenalezeno. Zkus jiný filtr nebo hledání.", void list.appendChild(n)
+  }
+  if ("string" == typeof f && 0 === f.indexOf("list:")) {
+    const nm = f.slice(5), bar = document.createElement("div");
+    bar.className = "wl-resume wl-listbar", bar.innerHTML = '<span class="wl-listbar-name"></span><button type="button" class="wl-listbar-btn" data-a="rename">Přejmenovat</button><button type="button" class="wl-listbar-btn" data-a="delete">Smazat seznam</button>',
+    bar.querySelector(".wl-listbar-name").textContent = nm,
+    bar.querySelector('[data-a="rename"]').onclick = () => wlRenameList(nm), bar.querySelector('[data-a="delete"]').onclick = () => wlDeleteList(nm),
+    list.insertBefore(bar, list.firstChild)
   }
   if ("all" === f && !q) {
     const cont = all.map(it => ({ it, r: wlResumeInfo(it) })).filter(x => x.r && !x.r.done);
@@ -258,13 +336,13 @@ function renderWatchlist() {
     const c = document.createElement("div"),
       isSeries = "series" === item.type,
       res = wlResumeInfo(item);
-    c.className = "wl-card", c._wlItem = item, c.tabIndex = 0, c.setAttribute("role", "button"), c.setAttribute("aria-label", "Otevřít " + (item.name || "")), c.innerHTML = `<div class="wl-card-poster">${item.poster?`<img src="${_esc(item.poster)}" alt="" loading="lazy" onerror="this.remove()">`:""}<div class="wl-card-fallback">${_esc((item.name||"?").trim().charAt(0).toUpperCase())}</div><button type="button" class="wl-card-remove" title="Odebrat z Oblíbených" aria-label="Odebrat z Oblíbených">✕</button><div class="wl-card-play" aria-hidden="true"><span class="wl-card-play-btn"><svg viewBox="8 5 11 14" width="30" height="36" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div>${res&&!res.done&&res.kind==="series"?`<div class="wl-card-prog" aria-hidden="true"><i style="width:${Math.max(4,res.pct)}%"></i></div>`:""}</div><div class="wl-card-name">${_esc(item.name)}</div><div class="wl-card-sub">${isSeries?"Seriál":"Film"}${res?" · "+(res.done?"Dokoukáno":res.kind==="series"?`${res.seen} z ${res.total} epizod${res.next?" · další "+res.next:""}`:"Rozkoukaný film"):""}</div>`;
+    c.className = "wl-card", c._wlItem = item, c.tabIndex = 0, c.setAttribute("role", "button"), c.setAttribute("aria-label", "Otevřít " + (item.name || "")), c.innerHTML = `<div class="wl-card-poster">${item.poster?`<img src="${_esc(item.poster)}" alt="" loading="lazy" onerror="this.remove()">`:""}<div class="wl-card-fallback">${_esc((item.name||"?").trim().charAt(0).toUpperCase())}</div><button type="button" class="wl-card-lists${item.lists && item.lists.length ? " on" : ""}" title="Seznamy" aria-label="Přidat do seznamu"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h12M4 12h8M4 18h8M18 14v6M15 17h6"/></svg></button><button type="button" class="wl-card-remove" title="Odebrat z Oblíbených" aria-label="Odebrat z Oblíbených">✕</button><div class="wl-card-play" aria-hidden="true"><span class="wl-card-play-btn"><svg viewBox="8 5 11 14" width="30" height="36" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div>${res&&!res.done&&res.kind==="series"?`<div class="wl-card-prog" aria-hidden="true"><i style="width:${Math.max(4,res.pct)}%"></i></div>`:""}</div><div class="wl-card-name">${_esc(item.name)}</div><div class="wl-card-sub">${isSeries?"Seriál":"Film"}${res?" · "+(res.done?"Dokoukáno":res.kind==="series"?`${res.seen} z ${res.total} epizod${res.next?" · další "+res.next:""}`:"Rozkoukaný film"):""}</div>`;
     const open = () => openFavoriteItem(item);
     c.onclick = e => {
-      e.target.closest(".wl-card-remove") || open()
+      e.target.closest(".wl-card-remove, .wl-card-lists") || open()
     }, c.onkeydown = e => {
       "Enter" !== e.key && " " !== e.key || (e.preventDefault(), open())
-    }, c.querySelector(".wl-card-remove").onclick = e => {
+    }, c.querySelector(".wl-card-lists").onclick = e => { e.stopPropagation(), wlOpenListMenu(item, e.currentTarget) }, c.querySelector(".wl-card-remove").onclick = e => {
       e.stopPropagation();
       const cur = getWatchlist(),
         k = cur.findIndex(x => x.slug === item.slug && x.name === item.name);

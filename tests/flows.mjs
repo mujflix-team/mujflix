@@ -1105,6 +1105,29 @@ const favFixT = await page.evaluate(async () => {
 });
 check("oblíbené: název vždy text, seriál z místního slugu se pozná, starý vyhledávací dialog se nikdy neukáže", favFixT.nameStr && favFixT.localIsFav && favFixT.removed && favFixT.nameFromObj && favFixT.noFinder, JSON.stringify(favFixT));
 
+const wlListT = await page.evaluate(() => {
+  const out = {}, key = uKey("mf_watchlist"), keep = localStorage.getItem(key), f0 = window._wlFilter, q0 = window._wlQuery;
+  localStorage.setItem(key, JSON.stringify([{ slug: "t1", name: "Breaking Bad", type: "series", tmdbId: 1, poster: "" }, { slug: "t2", name: "Matrix", type: "movie", tmdbId: 2, poster: "" }]));
+  openWatchlist();
+  wlItemSet(getWatchlist()[0], l => l.push("Na víkend"));
+  out.saved = getWatchlist()[0].lists.join() === "Na víkend" && !getWatchlist()[1].lists;
+  out.tab = !!document.querySelector('.wl-tab-list[data-f="list:Na víkend"]');
+  wlSetFilter("list:Na víkend");
+  out.onlyOne = document.querySelectorAll("#watchlistList .wl-card").length === 1 && document.querySelector("#watchlistList .wl-card-name").textContent === "Breaking Bad";
+  wlSetFilter("all");
+  wlSearch("breakingbad");
+  out.noSpace = document.querySelectorAll("#watchlistList .wl-card").length === 1;
+  wlSearch("MÁTRIX");
+  out.diacritics = document.querySelectorAll("#watchlistList .wl-card").length === 1;
+  wlSearch("");
+  const _c = window.confirm; window.confirm = () => true; wlDeleteList("Na víkend"); window.confirm = _c;
+  out.deleted = !getWatchlist().some(w => w.lists) && window._wlFilter === "all";
+  closeWatchlist();
+  localStorage.setItem(key, keep === null ? "[]" : keep); window._wlFilter = f0; window._wlQuery = q0;
+  return out;
+});
+check("oblíbené: vlastní seznam se uloží, má záložku a filtr, hledání zvládne chybějící mezeru i diakritiku, smazání seznam jen zruší", wlListT.saved && wlListT.tab && wlListT.onlyOne && wlListT.noSpace && wlListT.diacritics && wlListT.deleted, JSON.stringify(wlListT));
+
 const cspT = await page.evaluate(() => {
   const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]').content;
   const pats = ((/frame-src ([^;]*)/.exec(csp) || [])[1] || "").split(/\s+/).filter(Boolean);
