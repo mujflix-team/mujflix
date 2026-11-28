@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.228
+### Změněno
+- **Oblíbené mají nový vzhled v duchu MůjFlix:** velký nadpis, podtržené záložky jako v horní liště, jednoduché hledání, karty jako na Domů (název a typ „Film / Seriál“ pod plakátem, rozkoukanost v témže řádku, proužek postupu), odebrání plným srdíčkem; písmeno místo emoji u plakátu bez obrázku.
+
 ## 3.21.227
 ### Opraveno
 - **Objevování, Top 10 na telefonu:** řada se už nedá posouvat nahoru a dolů (přetékalo zvětšení plakátu, protože karta nemá pod plakátem text); řady v Objevování se posouvají jen do stran.
