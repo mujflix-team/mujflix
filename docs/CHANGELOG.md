@@ -2,7 +2,7 @@
 
 ## 3.21.225
 ### Opraveno
-- **Domů pro nového člověka:** text „Zatím nemáš nic rozkoukané…“ je na vlastním řádku pod nadpisem „Populární právě teď“ (dřív vedle něj a v telefonu skrytý).
+- **Domů pro nového člověka:** text „Zatím nemáš nic rozkoukané…“ je pod kartami řady „Populární právě teď“ (dřív vedle nadpisu a v telefonu skrytý).
 
 ## 3.21.224
 ### Změněno
