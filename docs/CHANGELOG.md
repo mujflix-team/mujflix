@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.224
+### Změněno
+- **Soukromí a podmínky:** aktualizováno k dnešnímu stavu (datum, platnost propojení se čtením prodlužuje, pravidelné dotazování propojených zařízení, mezipaměť souborů aplikace, ověření zdrojů posílá adresu titulu na zdroji, bez odkazu na veřejný issue).
+
 ## 3.21.223
 ### Změněno
 - **Synchronizace bez načtení stránky:** data z jiného zařízení se projeví na místě (Domů, Oblíbené, profil), stránka se už nereloaduje. Drobnosti (série, průběh sledování, historie) se uloží potichu a nic nepřekreslují, takže pouhé přihlášení na telefonu PC neruší. Když je otevřený detail, přehrávač nebo Objevování, ukáže se jen nabídka „Načíst změny“. Reload zůstává jen tehdy, když zmizel aktivní profil.
