@@ -1128,14 +1128,14 @@ const wlListT = await page.evaluate(() => {
 });
 check("oblíbené: vlastní seznam se uloží, má záložku a filtr, hledání zvládne chybějící mezeru i diakritiku, smazání seznam jen zruší", wlListT.saved && wlListT.tab && wlListT.onlyOne && wlListT.noSpace && wlListT.diacritics && wlListT.deleted, JSON.stringify(wlListT));
 
-const shareListT = await page.evaluate(() => {
+const shareListT = await page.evaluate(async () => {
   const out = {}, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
-  localStorage.setItem(key, JSON.stringify([{ slug: "s1", name: "Šifra", type: "movie", tmdbId: 11, poster: "", lists: ["Víkend"] }, { slug: "s2", name: "Dexter", type: "series", tmdbId: 22, poster: "" }, { slug: "s3", name: "Dark", type: "series", tmdbId: 33, poster: "", lists: ["Víkend"] }]));
-  const url = mfListShareUrl("Víkend"), p = new URL(url).searchParams.get("seznam");
+  localStorage.setItem(key, JSON.stringify([{ slug: "s1", name: "Šifra", type: "movie", tmdbId: 11, poster: "", lists: ["Víkend"] }, { slug: "s2", name: "Dexter", type: "series", tmdbId: 22, poster: "" }, { slug: "s3", name: "Dark", type: "series", tmdbId: 33, poster: "", lists: ["Víkend"] }, { slug: "__tmdbfav_tv_44", name: "Bez ID", type: "series", poster: "", lists: ["Víkend"] }]));
+  const url = await mfListShareUrl("Víkend"), p = new URL(url).searchParams.get("seznam");
   let d = null;
   try { const s = p.replace(/-/g, "+").replace(/_/g, "/"), bin = atob(s + "=".repeat((4 - s.length % 4) % 4)); d = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)))); } catch { d = null; }
-  out.roundtrip = !!d && d.n === "Víkend" && JSON.stringify(d.t) === JSON.stringify([["f", 11], ["s", 33]]);
-  out.emptyNoUrl = mfListShareUrl("Neexistuje") === "";
+  out.roundtrip = !!d && d.n === "Víkend" && JSON.stringify(d.t) === JSON.stringify([["f", 11], ["s", 33], ["s", 44]]);
+  out.emptyNoUrl = (await mfListShareUrl("Neexistuje")) === "";
   localStorage.setItem(key, keep === null ? "[]" : keep);
   return out;
 });
