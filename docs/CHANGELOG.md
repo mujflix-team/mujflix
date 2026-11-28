@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.223
+### Změněno
+- **Synchronizace bez načtení stránky:** data z jiného zařízení se projeví na místě (Domů, Oblíbené, profil), stránka se už nereloaduje. Drobnosti (série, průběh sledování, historie) se uloží potichu a nic nepřekreslují, takže pouhé přihlášení na telefonu PC neruší. Když je otevřený detail, přehrávač nebo Objevování, ukáže se jen nabídka „Načíst změny“. Reload zůstává jen tehdy, když zmizel aktivní profil.
+- **Domů pro nového člověka:** u řady „Populární právě teď“ je text, ať si pustí seriály a filmy (pak se objeví tipy pro něj), a řada je delší (40 titulů).
+
 ## 3.21.222
 ### Přidáno
 - **Objevování:** pod bannerem dlaždice podle nálady (Něco k smíchu, Napětí, Akce …); klik otevře výsledky daného žánru. Objevování se tak na první pohled liší od osobních Domů.

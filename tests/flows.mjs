@@ -2319,8 +2319,10 @@ const sy2 = await page.evaluate(async () => {
   out.noBanner1 = !document.getElementById("mfSyncBanner");
   // jiné zařízení změnilo data aktivního profilu
   edit(b => { b.keys["mf_watched_p_A"] = { v: JSON.stringify({ a: true, b: true }), t: Date.now() }; });
+  let softEv = false; window.addEventListener("mf:sync-applied", () => { softEv = true; }, { once: true });
   await MFSync.syncNow({ mode: "poll" });
   out.banner = !!document.getElementById("mfSyncBanner");
+  out.softEv = softEv;
   out.applied = (localStorage.getItem("mf_watched_p_A") || "").includes('"b"');
   // změna profilů se posílá rychle (do ~6 s + rezerva), ne až po minutách
   const before = __kv.n;
@@ -2333,7 +2335,7 @@ const sy2 = await page.evaluate(async () => {
   return out;
 });
 check("sync: nový profil z jiného zařízení se objeví hned (bez obnovení)", sy2.names.includes("Cyril") && sy2.noBanner1, JSON.stringify(sy2));
-check("sync: ostatní změny se načtou a nabídne se „Načíst změny“", sy2.banner && sy2.applied, JSON.stringify(sy2));
+check("sync: ostatní změny se projeví na místě (bez obnovení stránky a bez nabídky)", !sy2.banner && sy2.softEv && sy2.applied, JSON.stringify(sy2));
 check("sync: změna profilu se odešle do ~10 s", sy2.fastPush, JSON.stringify(sy2));
 
 await page.evaluate(() => { if (window.__origProxy === undefined) delete window.TMDB_PROXY_URL; else window.TMDB_PROXY_URL = window.__origProxy; });
