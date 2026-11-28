@@ -1243,7 +1243,7 @@
         var forYouTitle = (genres.length || mfhOnlyAnime()) ? 'Vybráno pro tebe' : 'Populární právě teď';
         var forYouSub = mfhOnlyAnime() ? 'Podle toho, že sleduješ hlavně anime' : genres.length
           ? 'Podle tvých oblíbených žánrů: ' + genres.map(function (g) { return GENRE_LABELS[g]; }).filter(Boolean).join(' · ')
-          : '';
+          : 'Zatím nemáš nic rozkoukané. Pusť si pár seriálů a filmů a tady se objeví tipy přímo pro tebe.';
         nfRowShell('mfhForYou', forYouTitle, forYouSub);
         nfFillRow('mfhRecent', contItems);
         nfFillRow('mfhMyList', mine);
@@ -1285,7 +1285,7 @@
           return window.MFAge ? window.MFAge.filter(items, 40) : items;
         }).then(function (items) {
           if (myRun !== _nfRun) return;
-          items = fresh(items.filter(function (it) { return it.image; })).slice(0, 20);
+          items = fresh(items.filter(function (it) { return it.image; })).slice(0, (!genres.length && !contItems.length && !mine.length) ? 40 : 20); /* nový člověk bez historie: delší nabídka */
           nfFillRow('mfhForYou', items);
           /* Banner: titul z nabídky pro tebe. Vybírá se z širší nabídky (14 titulů) a mimo posledních 8 ukázaných, ať se neopakuje;
              během jednoho otevření aplikace se nemění. */

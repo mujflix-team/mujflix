@@ -340,6 +340,13 @@
     setTimeout(hide, 12000);
   }
 
+  /* Je otevřený detail, přehrávač nebo okno, které by se překreslením rozbilo? */
+  function busyUi() {
+    if (cinemaOpen() || document.body.classList.contains("discover-open")) return true;
+    var m = document.getElementById("seriesModal");
+    return !!(m && m.classList.contains("open")) || !!document.querySelector(".modal.open, .mf-modal.open") || !!document.getElementById("mfProfileGate") && document.getElementById("mfProfileGate").classList.contains("pg-focus");
+  }
+
   function activeProfileGone() {
     try {
       var id = get("mf_active_pid");
@@ -358,9 +365,21 @@
       try { if (window.nfRenderProfile) nfRenderProfile(); } catch (e) {}
       return r;
     }
-    if (mode === "poll") { banner(); return r; }
-    if (typeof showToast === "function") showToast("Načtena data z jiného zařízení", 1800);
-    setTimeout(function () { location.reload(); }, 900);
+    /* Jen drobnosti (průběh sledování, série, historie…): uloží se potichu, nic se nepřekresluje ani se neukazuje */
+    if (keys.every(function (k) { return NOISY.test(k); })) return r;
+    /* Ostatní změny se projeví na místě bez načtení stránky; když je otevřený detail/přehrávač, nechá se to na nabídce */
+    if (!activeProfileGone() && !busyUi()) {
+      try { window.dispatchEvent(new Event("mf:sync-applied")); } catch (e) {}
+      try { window.dispatchEvent(new Event("mf:profile-changed")); } catch (e) {}
+      try { if (window.nfRenderProfile) nfRenderProfile(); } catch (e) {}
+      return r;
+    }
+    if (activeProfileGone()) {
+      if (typeof showToast === "function") showToast("Načtena data z jiného zařízení", 1800);
+      setTimeout(function () { location.reload(); }, 900);
+      return r;
+    }
+    banner();
     return r;
   }
 
