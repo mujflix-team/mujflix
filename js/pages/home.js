@@ -615,13 +615,14 @@
         sec.innerHTML =
           '<div class="nf-row-head">' +
             '<h2 class="nf-row-title">' + esc(title) + '</h2>' +
-            (sub ? '<span class="nf-row-sub' + (subBelow ? ' nf-row-sub-below' : '') + '">' + esc(sub) + '</span>' : '') +
+            (sub && !subBelow ? '<span class="nf-row-sub">' + esc(sub) + '</span>' : '') +
           '</div>' +
           '<div class="nf-scroller">' +
             '<div class="nf-track" id="' + id + '"></div>' +
             '<button type="button" class="nf-arrow nf-arrow-l" aria-label="Posunout doleva">' + nfArrowSvg(true) + '</button>' +
             '<button type="button" class="nf-arrow nf-arrow-r" aria-label="Posunout doprava">' + nfArrowSvg(false) + '</button>' +
-          '</div>';
+          '</div>' +
+          (sub && subBelow ? '<p class="nf-row-note">' + esc(sub) + '</p>' : '');
         host.appendChild(sec);
         var track = sec.querySelector('.nf-track');
         sec.querySelector('.nf-arrow-l').addEventListener('click', function () { track.scrollBy({ left: -track.clientWidth * 0.85, behavior: 'smooth' }); });
