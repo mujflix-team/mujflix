@@ -161,7 +161,7 @@
 #universeOverlay .dv-row-more:hover { text-decoration: underline; }
 #universeOverlay .dv-scroller { position: relative; }
 #universeOverlay .dv-track {
-  display: flex; gap: var(--sp-3); overflow-x: auto; padding: 8px var(--dv-pad) 14px; scroll-snap-type: x proximity;
+  display: flex; gap: var(--sp-3); overflow-x: auto; overflow-y: hidden; padding: 8px var(--dv-pad) 14px; scroll-snap-type: x proximity;
   scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-padding-left: var(--dv-pad);
 }
 #universeOverlay .dv-track::-webkit-scrollbar { display: none; }
@@ -384,3 +384,7 @@
   #universeOverlay .dv-row-ranked .dv-track .dv-card { width: 168px; }
   #universeOverlay .dv-rank { font-size: 110px; }
 }
+
+/* Top 10 na telefonu: řada se nesmí posouvat svisle (karta nemá pod plakátem text, takže zvětšení plakátu přetékalo) */
+#universeOverlay .dv-row-ranked .dv-track { overflow-y: hidden; padding-top: 16px; padding-bottom: 22px; }
+#universeOverlay .dv-row-ranked .dv-card:hover .dv-poster { transform: none; }
