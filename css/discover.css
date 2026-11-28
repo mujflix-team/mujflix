@@ -364,3 +364,10 @@
 #universeOverlay { transform: translateY(8px); transition: opacity .18s ease, transform .24s cubic-bezier(.22, .8, .2, 1); }
 #universeOverlay.visible { transform: none; }
 @media (prefers-reduced-motion: reduce) { #universeOverlay { transform: none; transition: opacity .15s ease; } }
+
+/* Dlaždice podle nálady v Objevování */
+#universeOverlay .dv-moods { display: flex; gap: 10px; overflow-x: auto; padding: 14px var(--dv-pad) 4px; scrollbar-width: none; }
+#universeOverlay .dv-moods::-webkit-scrollbar { display: none; }
+#universeOverlay .dv-mood { flex: none; min-width: 132px; height: 64px; padding: 0 16px; border: 1px solid var(--dv-line); border-radius: var(--r-ctl); background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)); color: #fff; font: 700 var(--fs-sm)/1.2 inherit; text-align: left; cursor: pointer; transition: transform var(--t-fast), background var(--t-fast), border-color var(--t-fast); }
+#universeOverlay .dv-mood:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.3); }
+#universeOverlay .dv-mood:active { transform: scale(var(--fx-press-sm, 0.97)); }

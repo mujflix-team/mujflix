@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.222
+### Přidáno
+- **Objevování:** pod bannerem dlaždice podle nálady (Něco k smíchu, Napětí, Akce …); klik otevře výsledky daného žánru. Objevování se tak na první pohled liší od osobních Domů.
+
 ## 3.21.221
 ### Opraveno
 - **Uzi.la:** Worker při ověřování zdrojů bere Uzi.la jako NajSerialy: když na stránce nenajde název z adresy, výsledek je „nevíme“ (zdroj se nepřeskočí); skutečná 404 a „nenalezeno“ platí dál. **Worker je potřeba znovu nasadit.**
