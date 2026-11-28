@@ -1128,6 +1128,19 @@ const wlListT = await page.evaluate(() => {
 });
 check("oblíbené: vlastní seznam se uloží, má záložku a filtr, hledání zvládne chybějící mezeru i diakritiku, smazání seznam jen zruší", wlListT.saved && wlListT.tab && wlListT.onlyOne && wlListT.noSpace && wlListT.diacritics && wlListT.deleted, JSON.stringify(wlListT));
 
+const shareListT = await page.evaluate(() => {
+  const out = {}, key = uKey("mf_watchlist"), keep = localStorage.getItem(key);
+  localStorage.setItem(key, JSON.stringify([{ slug: "s1", name: "Šifra", type: "movie", tmdbId: 11, poster: "", lists: ["Víkend"] }, { slug: "s2", name: "Dexter", type: "series", tmdbId: 22, poster: "" }, { slug: "s3", name: "Dark", type: "series", tmdbId: 33, poster: "", lists: ["Víkend"] }]));
+  const url = mfListShareUrl("Víkend"), p = new URL(url).searchParams.get("seznam");
+  let d = null;
+  try { const s = p.replace(/-/g, "+").replace(/_/g, "/"), bin = atob(s + "=".repeat((4 - s.length % 4) % 4)); d = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)))); } catch { d = null; }
+  out.roundtrip = !!d && d.n === "Víkend" && JSON.stringify(d.t) === JSON.stringify([["f", 11], ["s", 33]]);
+  out.emptyNoUrl = mfListShareUrl("Neexistuje") === "";
+  localStorage.setItem(key, keep === null ? "[]" : keep);
+  return out;
+});
+check("sdílení seznamu: odkaz nese název a jen položky ze seznamu, prázdný seznam odkaz nemá", shareListT.roundtrip && shareListT.emptyNoUrl, JSON.stringify(shareListT));
+
 const cspT = await page.evaluate(() => {
   const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]').content;
   const pats = ((/frame-src ([^;]*)/.exec(csp) || [])[1] || "").split(/\s+/).filter(Boolean);

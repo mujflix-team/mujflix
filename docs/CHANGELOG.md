@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.21.232
+### Přidáno
+- **Sdílení vlastního seznamu odkazem:** ve vybraném seznamu v Oblíbených tlačítko Sdílet (systémové sdílení, jinak zkopíruje odkaz). Seznam je zakódovaný přímo v adrese `?seznam=…` (nic se neukládá na server, max. 60 titulů). Příjemce po výběru profilu uvidí náhled s plakáty a může si seznam přidat do svých Oblíbených (jako seznam stejného názvu). Nový soubor `js/app/list-share.js`.
+- **Nabídka „Přidat do seznamu“:** má tlačítko ✕ pro zavření a zavře se i posunutím stránky (ne při psaní názvu nového seznamu).
+
 ## 3.21.231
 ### Přidáno
 - **Oblíbené: vlastní seznamy** (např. „Na víkend“, „Anime“). Tlačítko se seznamem na kartě otevře nabídku (zaškrtni existující nebo vytvoř nový), seznamy se objeví jako záložky; v seznamu je lišta Přejmenovat / Smazat seznam (filmy a seriály zůstávají v Oblíbených). Názvy jsou uložené u položek, takže se synchronizují a patří vždy danému profilu.
