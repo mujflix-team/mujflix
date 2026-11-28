@@ -16,16 +16,32 @@
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     return new TextDecoder().decode(bytes);
   }
-  function itemId(it) { return it.tmdbId || (window.db && db[it.slug] && db[it.slug].tmdbId) || 0; }
+  /* ID z uložené položky, z místního seriálu nebo ze slugu přidaného z TMDB (__tmdbfav_tv_123) */
+  function itemId(it) {
+    if (it.tmdbId) return +it.tmdbId;
+    if (window.db && db[it.slug] && db[it.slug].tmdbId) return +db[it.slug].tmdbId;
+    var m = /^__tmdbfav_(?:tv|movie)_(\d+)$/.exec(it.slug || "");
+    return m ? +m[1] : 0;
+  }
+  /* Starší položky bez ID: dohledá se v TMDB podle názvu (první výsledek) */
+  async function findId(it) {
+    var kind = it.type === "series" ? "tv" : "movie", name = typeof mfFavName === "function" ? mfFavName(it) : it.name;
+    if (!name || typeof tmdbGet !== "function") return 0;
+    try {
+      var d = await tmdbGet("/search/" + kind + "?language=cs-CZ&query=" + encodeURIComponent(name)), r = d && d.results && d.results[0];
+      return r ? +r.id : 0;
+    } catch (e) { return 0; }
+  }
 
   /* Odkaz na seznam: {n: název, t: [[„f“|„s“, tmdbId], …]}; položky bez tmdbId se přeskočí */
-  window.mfListShareUrl = function (name) {
-    var items = getWatchlist().filter(function (w) { return (w.lists || []).indexOf(name) >= 0; }), t = [];
-    items.forEach(function (w) { var id = itemId(w); if (id && t.length < MAX) t.push([w.type === "series" ? "s" : "f", id]); });
+  window.mfListShareUrl = async function (name) {
+    var items = getWatchlist().filter(function (w) { return (w.lists || []).indexOf(name) >= 0; }).slice(0, MAX), t = [];
+    var ids = await Promise.all(items.map(function (w) { return itemId(w) || findId(w); }));
+    items.forEach(function (w, i) { if (ids[i]) t.push([w.type === "series" ? "s" : "f", ids[i]]); });
     return t.length ? SITE + "/?seznam=" + b64enc(JSON.stringify({ n: name, t: t })) : "";
   };
   window.mfShareList = async function (name) {
-    var url = window.mfListShareUrl(name);
+    var url = await window.mfListShareUrl(name);
     if (!url) { if (typeof showToast === "function") showToast("Seznam je prázdný, není co sdílet"); return "empty"; }
     if (navigator.share) {
       try { await navigator.share({ title: name, text: "Seznam „" + name + "“ na MůjFlix", url: url }); return "shared"; }

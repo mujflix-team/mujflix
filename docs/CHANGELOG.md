@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.233
+### Opraveno
+- **Sdílení seznamu:** hlásilo „Seznam je prázdný“, i když v něm něco bylo (položky bez uloženého tmdbId). ID se teď bere i ze slugu položky přidané z TMDB a u starších záznamů se dohledá v TMDB podle názvu.
+
 ## 3.21.232
 ### Přidáno
 - **Sdílení vlastního seznamu odkazem:** ve vybraném seznamu v Oblíbených tlačítko Sdílet (systémové sdílení, jinak zkopíruje odkaz). Seznam je zakódovaný přímo v adrese `?seznam=…` (nic se neukládá na server, max. 60 titulů). Příjemce po výběru profilu uvidí náhled s plakáty a může si seznam přidat do svých Oblíbených (jako seznam stejného názvu). Nový soubor `js/app/list-share.js`.
