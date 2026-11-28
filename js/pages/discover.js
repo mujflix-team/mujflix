@@ -538,6 +538,16 @@
     body.appendChild(heroSlot);
     renderHistoryChips(body);
 
+    /* Dlaždice podle nálady: odlišují Objevování (katalog) od Domů (osobní); klik vybere žánr a otevře výsledky */
+    var moods = el('div', 'dv-moods');
+    [['Něco k smíchu', 'kom'], ['Napětí', 'thr'], ['Akce', 'akcni'], ['Do jiných světů', 'scifi'], ['Pro mrazení v zádech', 'horor'], ['Na dojetí', 'drama'], ['Celá rodina', 'rod']].forEach(function (m) {
+      var t = el('button', 'dv-mood', m[0]);
+      t.type = 'button';
+      t.addEventListener('click', function () { state.genres = [m[1]]; refresh(); });
+      moods.appendChild(t);
+    });
+    body.appendChild(moods);
+
     var vp = function () { return 1 + varietySeed % 4; }; /* každé načtení jiná stránka TMDB, aby řady nebyly pořád stejné */
     var prefs = onlyAnime() ? [] : topGenreIds();
     var seen = seenIds();
