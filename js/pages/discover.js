@@ -359,11 +359,16 @@
     return b;
   }
 
-  function fillRow(sec, items, showType) {
+  function fillRow(sec, items, showType, ranked) {
     var old = sec.querySelector('.dv-scroller');
     var wrap = el('div', 'dv-scroller');
     var track = el('div', 'dv-track');
-    items.forEach(function (it) { track.appendChild(card(it, showType)); });
+    items.forEach(function (it, i) {
+      var c = card(it, showType);
+      if (ranked) c.appendChild(el('span', 'dv-rank', String(i + 1)));
+      track.appendChild(c);
+    });
+    sec.classList.toggle('dv-row-ranked', !!ranked);
     wrap.appendChild(track);
     wrap.appendChild(arrow(-1, track));
     wrap.appendChild(arrow(1, track));
@@ -593,8 +598,8 @@
         load: function () { return api('/trending/all/week?language=cs-CZ').then(function (d) { return normList(d && d.results); }); }
       });
 
-      rows.push({ title: 'Top 10 tento týden', sub: 'Co sleduje celý svět', showType: true, load: function () {
-        return api('/trending/all/day?language=cs-CZ').then(function (d) { return normList(d && d.results).slice(0, 10); });
+      rows.push({ title: 'Top 10 tento týden', sub: 'Co sleduje celý svět', showType: true, ranked: true, load: function () {
+        return api('/trending/all/week?language=cs-CZ').then(function (d) { return normList(d && d.results).slice(0, 10); });
       } });
 
       var genreRows = [];
@@ -642,10 +647,10 @@
       }
       sec.appendChild(rowSkeleton());
       body.appendChild(sec);
-      r.load().then(function (items) { return window.mfhSeededShuffle ? window.mfhSeededShuffle(items, varietySeed + rows.indexOf(r)) : items; }).then(ageFilter).then(function (items) {
+      r.load().then(function (items) { return window.mfhSeededShuffle && !r.ranked ? window.mfhSeededShuffle(items, varietySeed + rows.indexOf(r)) : items; }).then(ageFilter).then(function (items) {
         if (myRun !== run) return;
         if (items.length < (window.MFAge && window.MFAge.limit() ? 6 : 1)) { sec.remove(); return; }
-        fillRow(sec, items.slice(0, 20), r.showType);
+        fillRow(sec, items.slice(0, r.ranked ? 10 : 20), r.showType, r.ranked);
         rowsKept++;
         if (r.hero && !heroDone) {
           for (var i = 0; i < items.length; i++) {
