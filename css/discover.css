@@ -343,6 +343,8 @@
   #universeOverlay.dv-over .dv-top { position: absolute; left: 0; right: 0; top: 0; }
   #universeOverlay.dv-over:not(.dv-solid) .dv-top { background: linear-gradient(180deg, rgba(11, 11, 16, 0.88) 0%, rgba(11, 11, 16, 0.5) 65%, rgba(11, 11, 16, 0) 100%); border-bottom-color: transparent; }
   #universeOverlay.dv-over .dv-hero-body { padding-top: 160px; }
+  /* Rozbalené filtry: plné pozadí nad banner i náhled traileru (jinak prosvítaly) */
+  #universeOverlay.dv-filters-open .dv-top { background: var(--dv-bg) !important; z-index: 40; }
 }
 
 /* popis vpravo dole + náhled traileru nad ním (PC); na telefonu se skrývá */
