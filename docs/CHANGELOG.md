@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.227
+### Opraveno
+- **Objevování, Top 10 na telefonu:** řada se už nedá posouvat nahoru a dolů (přetékalo zvětšení plakátu, protože karta nemá pod plakátem text); řady v Objevování se posouvají jen do stran.
+
 ## 3.21.226
 ### Změněno
 - **Objevování:** „Top 10 tento týden“ je zpět ve stylu z Domů (velká čísla za plakáty, pořadí podle týdenního žebříčku, bez míchání).
