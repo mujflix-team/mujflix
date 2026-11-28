@@ -54,7 +54,7 @@
     <!-- Objevování se otevírá až na požádání, styly se proto načítají bokem (neblokují první vykreslení) -->
     <link rel="stylesheet" href="css/discover.css?v=31" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="css/discover.css?v=31" /></noscript>
-    <link rel="stylesheet" href="css/theme.css?v=133" />
+    <link rel="stylesheet" href="css/theme.css?v=134" />
     <link rel="stylesheet" href="css/wrapped.css?v=11" />
     <link rel="stylesheet" href="css/together.css?v=10" />
 
@@ -861,6 +861,8 @@
           <input class="wl-search" type="search" placeholder="Hledat v oblíbených…" oninput="wlSearch(this.value)" aria-label="Hledat v oblíbených">
           <div class="wl-tabs">
             <button type="button" class="wl-tab active" id="wlTabAll" data-f="all" onclick="wlSetFilter('all')">Vše</button>
+            <button type="button" class="wl-tab" id="wlTabResume" data-f="resume" onclick="wlSetFilter('resume')" style="display:none">Rozkoukané</button>
+            <button type="button" class="wl-tab" id="wlTabTodo" data-f="todo" onclick="wlSetFilter('todo')" style="display:none">Chci vidět</button>
             <button type="button" class="wl-tab" id="wlTabMovie" data-f="movie" onclick="wlSetFilter('movie')">Filmy</button>
             <button type="button" class="wl-tab" id="wlTabSeries" data-f="series" onclick="wlSetFilter('series')">Seriály</button>
             <button type="button" class="wl-tab" id="wlTabNew" data-f="newep" onclick="wlSetFilter('newep')" style="display:none">Nový díl</button>
@@ -1752,7 +1754,7 @@
     <script src="js/profiles/prefs.js?v=8" defer></script>
     <script src="js/app/core.js?v=15" defer></script>
     <script src="js/app/series.js?v=27" defer></script>
-    <script src="js/app/watchlist.js?v=14" defer></script>
+    <script src="js/app/watchlist.js?v=15" defer></script>
     <script src="js/app/new-episodes.js?v=1" defer></script>
     <script src="js/app/interaction.js?v=4" defer></script>
     <script src="js/app/notify.js?v=8" defer></script>

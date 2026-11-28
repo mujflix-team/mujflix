@@ -190,7 +190,7 @@ function renderWatchlist() {
     f = window._wlFilter || "all",
     q = window._wlQuery || "";
   if (!list || !empty) return;
-  list.querySelectorAll(".wl-card, .wl-noresult").forEach(x => x.remove());
+  list.querySelectorAll(".wl-card, .wl-noresult, .wl-resume").forEach(x => x.remove());
   const nSeries = all.filter(x => "series" === x.type).length,
     nMovie = all.length - nSeries;
   if (count && (count.textContent = all.length ? all.length + (1 === all.length ? " položka" : all.length < 5 ? " položky" : " položek") : ""), tools) {
@@ -204,6 +204,8 @@ function renderWatchlist() {
     nb && (nb.textContent = "Nový díl · " + nNew, nb.classList.toggle("active", "newep" === f), nb.style.display = nNew || "newep" === f ? "" : "none");
     const nRes = all.filter(x => { const r = wlResumeInfo(x); return r && !r.done }).length, rb = document.getElementById("wlTabResume");
     rb && (rb.textContent = "Rozkoukané · " + nRes, rb.classList.toggle("active", "resume" === f), rb.style.display = nRes || "resume" === f ? "" : "none");
+    const nTodo = all.filter(x => !wlResumeInfo(x)).length, tb = document.getElementById("wlTabTodo");
+    tb && (tb.textContent = "Chci vidět · " + nTodo, tb.classList.toggle("active", "todo" === f), tb.style.display = nTodo && nTodo < all.length || "todo" === f ? "" : "none");
     const so = document.getElementById("wlSort");
     so && so.value !== (window._wlSort || "new") && (so.value = window._wlSort || "new", window.mfSyncDropdown && window.mfSyncDropdown(so))
   }
@@ -214,6 +216,8 @@ function renderWatchlist() {
   all.forEach((item, idx) => {
     if ("newep" === f) {
       if (!wlHasNewEp(item)) return
+    } else if ("todo" === f) {
+      if (wlResumeInfo(item)) return
     } else if ("resume" === f) {
       const r = wlResumeInfo(item);
       if (!r || r.done) return
@@ -228,6 +232,24 @@ function renderWatchlist() {
   if (!shown.length) {
     const n = document.createElement("div");
     return n.className = "wl-noresult", n.textContent = "Nic nenalezeno. Zkus jiný filtr nebo hledání.", void list.appendChild(n)
+  }
+  if ("all" === f && !q) {
+    const cont = all.map(it => ({ it, r: wlResumeInfo(it) })).filter(x => x.r && !x.r.done);
+    if (cont.length) {
+      const box = document.createElement("section");
+      box.className = "wl-resume";
+      box.innerHTML = '<h3 class="wl-resume-title">Pokračovat ve sledování</h3><div class="wl-resume-track"></div>';
+      const track = box.querySelector(".wl-resume-track");
+      cont.forEach(({ it, r }) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "wl-resume-card";
+        b.innerHTML = `<span class="wl-resume-poster">${it.poster ? `<img src="${_esc(it.poster)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</span><span class="wl-resume-info"><span class="wl-resume-name">${_esc(it.name)}</span><span class="wl-resume-sub">${"series" === r.kind ? (r.next ? "Další " + r.next : r.seen + " z " + r.total + " epizod") : "Rozkoukaný film"}</span>${"series" === r.kind ? `<span class="wl-resume-bar"><i style="width:${Math.max(4, r.pct)}%"></i></span>` : ""}<span class="wl-resume-go">Pokračovat</span></span>`;
+        b.onclick = () => openFavoriteItem(it);
+        track.appendChild(b)
+      });
+      list.insertBefore(box, list.firstChild)
+    }
   }
   shown.forEach(({
     item,

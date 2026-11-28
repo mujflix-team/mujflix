@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.21.229
+### Přidáno
+- **Oblíbené:** nahoře řada „Pokračovat ve sledování“ (širší karty s proužkem postupu a dalším dílem; jen ve „Vše“ bez hledání). Nové záložky **Rozkoukané** (dřív se kvůli chybějícímu tlačítku nikdy nezobrazila) a **Chci vidět** (to, co jsi ještě nezačal).
+
 ## 3.21.228
 ### Změněno
 - **Oblíbené mají nový vzhled v duchu MůjFlix:** velký nadpis, podtržené záložky jako v horní liště, jednoduché hledání, karty jako na Domů (název a typ „Film / Seriál“ pod plakátem, rozkoukanost v témže řádku, proužek postupu), odebrání plným srdíčkem; písmeno místo emoji u plakátu bez obrázku.
